@@ -53,6 +53,11 @@
   max-width: 85%;
 }
 
+[data-theme='dark'] .chatContainer .pqlMessage li,
+[data-theme='dark'] .chatContainer .pqlMessage p {
+  color: #1a1a1a;
+}
+
 .queryPlanHeader {
   display: flex;
   align-items: center;

@@ -8,16 +8,6 @@ keywords:
   - getting started
   - guide
   - postgres
-  - alloydb
-  - aws aurora
-  - azure
-  - cosmos
-  - citus
-  - cockroach
-  - gcp cloud sql
-  - neon
-  - timescale
-  - yugabyte
 ---
 
 import Prereqs from "@site/docs/_prereqs.mdx";
@@ -33,15 +23,12 @@ This tutorial takes about twenty minutes to complete. You'll learn how to:
 - Connect it to a PostgreSQL database
 - Generate Hasura metadata
 - Create a build
-- Run your first query
-- Create relationships
-- Mutate data
+- Run your first query with PromptQL
 
 Additionally, we'll familiarize you with the steps and workflows necessary to iterate on your data source.
 
-This tutorial assumes you're starting from scratch; a PostgreSQL docker image ships with the data connector you'll use
-in just a bit to connect a locally-running database to Hasura, but you can easily follow the steps if you already have
-data seeded; Hasura will never modify your source schema.
+This tutorial assumes you're starting from scratch; you can with use an existing PostgreSQL database that you have or
+the PostgreSQL docker image ships with the data connector.
 
 <Prereqs />
 
@@ -71,8 +58,15 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 ddn connector init my_pg -i
 ```
 
-From the dropdown, select `/hasura/postgres` (you can type to filter the list), then hit enter to accept the default of
-all the options.
+### Step 4. Add your own connection string or use the included Postgres docker image
+
+From the dropdown, select `/hasura/postgres` (you can type to filter the list). You'll be asked to provide a connection
+string to your PostgreSQL database. If you have one, enter it. DDN will never modify your source schema.
+
+:::info Optionally, use the included PostgreSQL docker compose file
+
+If you don't have one, you can leave this blank to use the included PostgreSQL docker compose file which will spin up a
+PostgreSQL database and a postgres-adminer instance you can use to seed with some data and use for development.
 
 The CLI will output something similar to this:
 
@@ -83,43 +77,9 @@ HINT To access the local Postgres database:
 - To connect to the database using other clients use postgresql://user:password@local.hasura.dev:8105/dev
 ```
 
-### Step 4. Start the local PostgreSQL container and Adminer
+:::
 
-```sh title="Use the hint from the CLI output:"
-docker compose -f app/connector/my_pg/compose.postgres-adminer.yaml up -d
-```
-
-Run `docker ps` to see on which port Adminer is running. Then, you can then navigate to the address below to access it:
-
-```plaintext
-http://localhost:<ADMINER_PORT>
-```
-
-### Step 5. Create a table in your PostgreSQL database
-
-```sql title="Next, via Adminer select SQL command from the left-hand nav, then enter the following:"
---- Create the table
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  age INT NOT NULL
-);
-
---- Insert some data
-INSERT INTO users (name, age)
-VALUES
-  ('Alice', 25),
-  ('Bob', 30),
-  ('Charlie', 35);
-```
-
-You can verify this worked by using Adminer to query all records from the `users` table:
-
-```sql
-SELECT * FROM users;
-```
-
-### Step 6. Introspect your PostgreSQL database
+### Step 5. Introspect your PostgreSQL database
 
 ```sh title="Next, use the CLI to introspect your PostgreSQL database:"
 ddn connector introspect my_pg
@@ -132,33 +92,33 @@ After running this, you should see a representation of your database's schema in
 ddn connector show-resources my_pg
 ```
 
-### Step 7. Add your model
+### Step 6. Add your resources
 
 ```sh title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
-ddn model add my_pg users
+ddn model add my_pg "*"
+ddn command add my_pg "*"
+ddn relationship add my_pg "*"
 ```
 
-Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The DDN CLI will use this Hasura
-Metadata Language file to represent the `users` table from PostgreSQL to PromptQL as a
-[model](/reference/metadata-reference/models.mdx).
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language file to represent the tables from PostgreSQL to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
 
-### Step 8. Optional: Add semantic information to your model
+### Step 7. Optional: Add semantic information to your metadata
 
 It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
-can better understand your data model and create appropriate query plans.
+can better understand your data and create appropriate query plans.
 
 The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
 context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
-
-Add a description to the `users` table. Find the Model definition in the `users.hml` file in the `app/metadata/`
-directory and add a description in the `definition` section.
 
 - What the table represents
 - Key relationships
 - Important business rules
 - Data lifecycle information
 
-### Step 9. Create a new build
+### Step 8. Create a new build
 
 ```sh title="To create a local build, run:"
 ddn supergraph build local
@@ -166,7 +126,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-### Step 10. Start your local services
+### Step 9. Start your local services
 
 ```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
@@ -174,7 +134,7 @@ ddn run docker-start
 
 Your terminal will be taken over by logs for the different services.
 
-### Step 11. Chat about the users
+### Step 10. Chat with your data
 
 ```sh title="In a new terminal tab, open your local console:"
 ddn console --local
@@ -183,203 +143,50 @@ ddn console --local
 Once the PromptQL interface is open, ask a question about your data:
 
 <PqlChat>
-  <User>How many users are there?</User>
+  <User>Hi, what are some questions you can answer?</User>
   <Pql>
-    I'll count the number of users in the database.
-    <QueryPlanComponent>
-      1. Query the app.users table to count the total number of users <br />
-      2. Store the result in a table artifact
-    </QueryPlanComponent>
-  </Pql>
-  <Pql>There are 3 users in the database.</Pql>
-</PqlChat>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
 
-### Step 12. Iterate on your PostgreSQL schema
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
 
-```sql title="Via Adminer, add a new table and insert some data to your PostgreSQL database:"
--- Create the posts table
-CREATE TABLE posts (
-  id SERIAL PRIMARY KEY,
-  user_id INT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  title TEXT NOT NULL,
-  content TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+    Would you like me to explore any of these areas in particular?
 
--- Insert some seed data
-INSERT INTO posts (user_id, title, content) VALUES
-  (1, 'My First Post', 'This is Alice''s first post.'),
-  (1, 'Another Post', 'Alice writes again!'),
-  (2, 'Bob''s Post', 'Bob shares his thoughts.'),
-  (3, 'Hello World', 'Charlie joins the conversation.');
-```
-
-```sql title="Using Adminer, verify this by running the following query:"
--- Fetch all posts with user information
-SELECT
-  posts.id AS post_id,
-  posts.title,
-  posts.content,
-  posts.created_at,
-  users.name AS author
-FROM
-  posts
-JOIN
-  users ON posts.user_id = users.id;
-```
-
-You should see a list of posts returned with the author's information joined from the `users` table
-
-### Step 13. Refresh your metadata and rebuild your project
-
-:::tip
-
-The following steps are necessary each time you make changes to your **source** schema. This includes, adding,
-modifying, or dropping tables.
-
-:::
-
-#### Step 13.1. Re-introspect your data source
-
-```sh title="Run the introspection command again:"
-ddn connector introspect my_pg
-```
-
-In `app/connector/my_pg/configuration.json`, you'll see schema updated to include operations for the `posts` table. In
-`app/metadata/my_pg.hml`, you'll see `posts` present in the metadata as well.
-
-#### Step 13.2. Update your metadata
-
-```sh title="Add the posts model:"
-ddn model add my_pg posts
-```
-
-#### Step 13.3. Describe your model
-
-In the same way we described the `users` model, we can describe the `posts` model so that the LLM can better understand
-the data and create appropriate query plans. Read more about providing
-[semantic information here](/data-modeling/semantic-information.mdx#models).
-
-#### Step 13.4. Create a new build
-
-```sh title="Next, create a new build:"
-ddn supergraph build local
-```
-
-#### Step 13.5. Restart your services
-
-```sh title="Bring down the services by pressing CTRL+C and start them back up:"
-ddn run docker-start
-```
-
-### Step 14. Chat about the posts
-
-Open the PromptQL interface and ask another question about your data:
-
-<PqlChat>
-  <User>Show me the titles of all the posts.</User>
-  <Pql>
-    I'll retrieve all post titles from the database.
-    <QueryPlanComponent>
-      1. Query the app.posts table to get all post titles <br />
-      2. Store the results in a table artifact for display
-    </QueryPlanComponent>
-  </Pql>
-  <Pql>
-    <div>
-      Here are all the posts:
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>My First Post</td>
-          </tr>
-          <tr>
-            <td>Another Post</td>
-          </tr>
-          <tr>
-            <td>Bob's Post</td>
-          </tr>
-          <tr>
-            <td>Hello World</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </Pql>
 </PqlChat>
 
-### Step 15. Create a relationship
+### Step 11. Iterate on your PostgreSQL schema
 
-```sh title="Since there's already a foreign key on the posts table in PostgreSQL, we can easily add the relationship:"
-ddn relationship add my_pg posts
-```
-
-You'll see a new metadata object added to the `app/metadata/posts.hml` file of kind `Relationship` explaining the
-relationship between `posts` and `users`.
-
-### Step 16. Add a description to the relationship
-
-Again, it's important to provide semantic information to the LLM so that it can create appropriate query plans. Read
-more about providing [semantic information here](/data-modeling/semantic-information.mdx#relationships).
-
-### Step 17. Rebuild your project
-
-```sh title="As your metadata has changed, create a new build:"
-ddn supergraph build local
-```
-
-```sh title="Bring down the services by pressing CTRL+C and start them back up:"
-ddn run docker-start
-```
-
-### Step 18. Chat with your data using the relationship
-
-Open the PromptQL interface and ask another question about your data:
-
-<PqlChat>
-  <User>Show me all the posts that Alice has written and their content</User>
-  <Pql>
-    I'll help you find all posts written by Alice. Let me query the posts and join with the users table to find Alice's
-    posts.
-    <QueryPlanComponent>
-      1. Join the posts and users tables to find posts where the user's name is 'Alice' <br />
-      2. Select the post title, content, and creation timestamp <br />
-      3. Order the posts by creation timestamp (most recent first) <br />
-      4. Store the results in an artifact for display
-    </QueryPlanComponent>
-  </Pql>
-  <Pql>
-    <div>
-      Here are all of Alice's posts:
-      <table>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Content</th>
-            <th>Created At</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>My First Post</td>
-            <td>This is Alice's first post.</td>
-            <td>2025-04-02T12:57:40.981280</td>
-          </tr>
-          <tr>
-            <td>Another Post</td>
-            <td>Alice writes again!</td>
-            <td>2025-04-02T12:57:40.981280</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </Pql>
-</PqlChat>
+If something changes in your PostgreSQL schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 ## Next steps
 
@@ -387,13 +194,13 @@ Congratulations on completing your first Hasura PromptQL project with PostgreSQL
 
 Here's what you just accomplished:
 
-- You started with a fresh project and connected it to a local PostgreSQL database.
-- You set up metadata to represent your tables and relationships, which acts as the blueprint for PromptQL.
+- You started with a fresh project and connected it to a PostgreSQL database.
+- You set up metadata to represent your database schema, which acts as the blueprint for PromptQL.
 - Then, you created a build — essentially compiling everything into a ready-to-use structure — and successfully ran your
-  first PromptQL queries to fetch data.
-- Along the way, you learned how to iterate on your schema and refresh your metadata to reflect changes.
+  first PromptQL queries to learn about your data.
 
 Now, you're equipped to connect and expose your data, empowering you to iterate and scale with confidence. Great work!
 
-Take a look at our PostgreSQL docs to learn more about how to use Hasura PromptQL with PostgreSQL. Or, if you're ready,
-get started with adding [permissions](/auth/permissions/index.mdx) to control access to your data.
+Take a look at our [PostgreSQL docs](/reference/connectors/postgresql/index.mdx) to learn more about how to use Hasura
+PromptQL with PostgreSQL. Or, if you're ready, get started with adding [permissions](/auth/permissions/index.mdx) to
+control access to your data.
