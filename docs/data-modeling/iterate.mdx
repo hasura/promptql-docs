@@ -1,0 +1,92 @@
+---
+sidebar_label: Iterating on your data model
+sidebar_position: 1.5
+description: "Learn how to iterate on your data model to reflect changes in the underlying data sources."
+keywords:
+  - hasura ddn
+  - data modeling
+  - promptql
+  - changing data
+  - getting started
+  - guide
+---
+
+# Iterate on your Data Model
+
+After you have successfully created a DDN supergraph to use with PromptQL, you will soon want to iterate on your data
+model to reflect changes in the underlying data sources
+
+## Changing your underlying data model
+
+Depending on your data source, you may be adding a column to a table in PostgreSQL, or a creating a new collection in
+MongoDB. You may have written new custom logic in TypeScript or want to import a new command from the Stripe connector.
+Whatever it is, you will follow the same steps each time anything changes in your data source schema to iterate on your
+data model.
+
+## Re-introspecting your data model
+
+Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
+
+```sh
+ddn connector introspect my_connector
+```
+
+## Viewing resources
+
+```sh title="You can then view the resources that have been discovered by running:"
+ddn connector show-resources my_connector
+```
+
+## Adding resources
+
+```sh title="And add precisely the resources you need running any of the following commands with real values:"
+ddn model add my_connector my_model
+ddn command add my_connector my_command
+ddn relationship add my_connector my_relationship
+```
+
+```sh title="Or if you want to add all resources:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+## Adding semantic Information
+
+It's highly recommended to provide extra natural language descriptions of the resources in your project so that the
+PromptQL can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+## Building a new supergraph
+
+```sh title="You can then build a new local supergraph by running:"
+ddn supergraph build local
+```
+
+:::info Build for Hasura Cloud
+
+You can also build a new supergraph for a project on Hasura Cloud:
+
+If you don't have a project on Hasura Cloud, you can create one by running:
+
+```sh
+ddn project init
+```
+
+Then:
+
+```sh
+ddn supergraph build create
+```
+
+:::
+
+## Restarting services locally
+
+If you are iterating locally, you then need to restart the Docker services by running:
+
+```sh
+ddn run docker-start
+```
