@@ -200,7 +200,7 @@ describe:
 
 See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
-### Step 8. Create a new build
+### Step 9. Create a new build
 
 ```sh title="To create a local build, run:"
 ddn supergraph build local
@@ -208,7 +208,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-### Step 9. Start your local services
+### Step 10. Start your local services
 
 ```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
@@ -216,7 +216,7 @@ ddn run docker-start
 
 Your terminal will be taken over by logs for the different services.
 
-### Step 10. Chat about the users
+### Step 11. Chat about the users
 
 ```sh title="In a new terminal tab, open your local console:"
 ddn console --local
@@ -236,7 +236,7 @@ Once the PromptQL interface is open, ask a question about your data:
   <Pql>There are 3 users in the database.</Pql>
 </PqlChat>
 
-### Step 11. Iterate on your PostgreSQL schema
+### Step 12. Iterate on your PostgreSQL schema
 
 ```sql title="Via Adminer, add a new table and insert some data to your PostgreSQL database:"
 -- Create the posts table
@@ -272,7 +272,7 @@ JOIN
 
 You should see a list of posts returned with the author's information joined from the `users` table
 
-### Step 12. Refresh your metadata and rebuild your project
+### Step 13. Refresh your metadata and rebuild your project
 
 :::tip
 
@@ -281,7 +281,7 @@ modifying, or dropping tables.
 
 :::
 
-#### Step 12.1. Re-introspect your data source
+#### Step 13.1. Re-introspect your data source
 
 ```sh title="Run the introspection command again:"
 ddn connector introspect my_pg
@@ -290,13 +290,13 @@ ddn connector introspect my_pg
 In `app/connector/my_pg/configuration.json`, you'll see schema updated to include operations for the `posts` table. In
 `app/metadata/my_pg.hml`, you'll see `posts` present in the metadata as well.
 
-#### Step 12.2. Update your metadata
+#### Step 13.2. Update your metadata
 
 ```sh title="Add the posts model:"
 ddn model add my_pg posts
 ```
 
-#### Step 12.3. Describe your model
+#### Step 13.3. Describe your model
 
 In the same way we described the `users` model, we can describe the `posts` model so that the LLM can better understand
 the data and create appropriate query plans:
@@ -338,19 +338,19 @@ definition:
         rootField: posts_aggregate
 ```
 
-#### Step 12.3. Create a new build
+#### Step 13.4. Create a new build
 
 ```sh title="Next, create a new build:"
 ddn supergraph build local
 ```
 
-#### Step 12.4. Restart your services
+#### Step 13.5. Restart your services
 
 ```sh title="Bring down the services by pressing CTRL+C and start them back up:"
 ddn run docker-start
 ```
 
-### Step 13. Chat about the posts
+### Step 14. Chat about the posts
 
 Open the PromptQL interface and ask another question about your data:
 
@@ -391,7 +391,7 @@ Open the PromptQL interface and ask another question about your data:
   </Pql>
 </PqlChat>
 
-### Step 14. Create a relationship
+### Step 15. Create a relationship
 
 ```sh title="Since there's already a foreign key on the posts table in PostgreSQL, we can easily add the relationship:"
 ddn relationship add my_pg posts
@@ -400,7 +400,7 @@ ddn relationship add my_pg posts
 You'll see a new metadata object added to the `app/metadata/posts.hml` file of kind `Relationship` explaining the
 relationship between `posts` and `users`.
 
-### Step 15. Add a description to the relationship
+### Step 16. Add a description to the relationship
 
 Again, it's important to provide semantic information to the LLM so that it can create appropriate query plans.
 
@@ -431,7 +431,7 @@ definition:
           - fieldName: id
 ```
 
-### Step 15. Rebuild your project
+### Step 17. Rebuild your project
 
 ```sh title="As your metadata has changed, create a new build:"
 ddn supergraph build local
@@ -441,7 +441,7 @@ ddn supergraph build local
 ddn run docker-start
 ```
 
-### Step 16. Chat with your data using the relationship
+### Step 18. Chat with your data using the relationship
 
 Open the PromptQL interface and ask another question about your data:
 
@@ -485,7 +485,7 @@ Open the PromptQL interface and ask another question about your data:
   </Pql>
 </PqlChat>
 
-### Step 17. Add all commands
+### Step 19. Add all commands
 
 We'll track the available operations — for inserting, updating, and deleting — on our `users` and `posts` tables as
 commands.
@@ -497,7 +497,7 @@ ddn command add my_pg "*"
 You'll see newly-generated metadata files in the `metadata` directory for your connector that represent insert, update,
 and delete operations.
 
-Step 18. Describe the commands
+### Step 20. Describe the commands
 
 As ever, it's important to provide semantic information to the LLM so that it can create appropriate query plans. For
 example, for the `insert_users` command, we can add a description to the metadata:
@@ -527,7 +527,7 @@ ddn supergraph build local
 ddn run docker-start
 ```
 
-### Step 18. Add a new user using natural language
+### Step 21. Add a new user using natural language
 
 <PqlChat>
   <User>Insert a new user Alex who is 57 years old.</User>
