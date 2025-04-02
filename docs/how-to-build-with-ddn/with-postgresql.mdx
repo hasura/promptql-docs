@@ -142,63 +142,21 @@ Open the `app/metadata` directory and you'll find a newly-generated file: `Users
 Metadata Language file to represent the `users` table from PostgreSQL to PromptQL as a
 [model](/reference/metadata-reference/models.mdx).
 
-### Step 8. Add semantic information to your model
+### Step 8. Optional: Add semantic information to your model
 
 It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
 can better understand your data model and create appropriate query plans.
 
-The description field can be added to various metadata elements to provide semantic context.
+The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
-Let's add a description to the `users` table. Find the Model definition in the `users.hml` file in the `app/metadata/`
-directory and add a description:
-
-```yaml
----
-kind: Model
-version: v2
-definition:
-  name: users
-  # highlight-start
-  description: |
-    Users are the people who use the app. 
-    They have a name, age, and id. 
-    They include customers and administrators.
-    The id is an auto-incrementing integer.
-  # highlight-end
-  objectType: users
-  source:
-    dataConnectorName: my_pg
-    collection: users
-  filterExpressionType: users_bool_exp
-  aggregateExpression: users_agg_exp
-  orderByExpression: users_order_by_exp
-  graphql:
-    selectMany:
-      queryRootField: users
-      subscription:
-        rootField: users
-    selectUniques:
-      - queryRootField: users_by_id
-        uniqueIdentifier:
-          - id
-        subscription:
-          rootField: users_by_id
-    filterInputTypeName: users_filter_input
-    aggregate:
-      queryRootField: users_aggregate
-      subscription:
-        rootField: users_aggregate
-```
-
-For this demo the description is very basic but in a real app with Models representing database tables it's important to
-describe:
+Add a description to the `users` table. Find the Model definition in the `users.hml` file in the `app/metadata/`
+directory and add a description in the `definition` section.
 
 - What the table represents
 - Key relationships
 - Important business rules
 - Data lifecycle information
-
-See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
 ### Step 9. Create a new build
 
@@ -299,44 +257,8 @@ ddn model add my_pg posts
 #### Step 13.3. Describe your model
 
 In the same way we described the `users` model, we can describe the `posts` model so that the LLM can better understand
-the data and create appropriate query plans:
-
-```yaml
----
-kind: Model
-version: v2
-definition:
-  name: posts
-  # highlight-start
-  description: |
-    Posts are the blog-like content that users create. They have a id, title, content, created_at, and user_id. 
-    User_id is a foreign key to the users table and represents the author of the post. If a user is deleted, 
-    their post will be deleted. user_id is a required field.
-  # highlight-end
-  objectType: posts
-  source:
-    dataConnectorName: my_pg
-    collection: posts
-  filterExpressionType: posts_bool_exp
-  aggregateExpression: posts_agg_exp
-  orderByExpression: posts_order_by_exp
-  graphql:
-    selectMany:
-      queryRootField: posts
-      subscription:
-        rootField: posts
-    selectUniques:
-      - queryRootField: posts_by_id
-        uniqueIdentifier:
-          - id
-        subscription:
-          rootField: posts_by_id
-    filterInputTypeName: posts_filter_input
-    aggregate:
-      queryRootField: posts_aggregate
-      subscription:
-        rootField: posts_aggregate
-```
+the data and create appropriate query plans. Read more about providing
+[semantic information here](/data-modeling/semantic-information.mdx#models).
 
 #### Step 13.4. Create a new build
 
@@ -402,34 +324,8 @@ relationship between `posts` and `users`.
 
 ### Step 16. Add a description to the relationship
 
-Again, it's important to provide semantic information to the LLM so that it can create appropriate query plans.
-
-```yaml
----
-kind: Relationship
-version: v1
-definition:
-  name: user
-  # highlight-start
-  description: |
-    References the user who created the post. 
-    One user can have many posts. 
-    Posts cannot exist without a user. 
-    Posts are deleted when the user is deleted.
-  # highlight-end
-  sourceType: posts
-  target:
-    model:
-      name: users
-      relationshipType: Object
-  mapping:
-    - source:
-        fieldPath:
-          - fieldName: user_id
-      target:
-        modelField:
-          - fieldName: id
-```
+Again, it's important to provide semantic information to the LLM so that it can create appropriate query plans. Read
+more about providing [semantic information here](/data-modeling/semantic-information.mdx#relationships).
 
 ### Step 17. Rebuild your project
 
@@ -485,67 +381,6 @@ Open the PromptQL interface and ask another question about your data:
   </Pql>
 </PqlChat>
 
-### Step 19. Add all commands
-
-We'll track the available operations — for inserting, updating, and deleting — on our `users` and `posts` tables as
-commands.
-
-```sh title="Add all available commands:"
-ddn command add my_pg "*"
-```
-
-You'll see newly-generated metadata files in the `metadata` directory for your connector that represent insert, update,
-and delete operations.
-
-### Step 20. Describe the commands
-
-As ever, it's important to provide semantic information to the LLM so that it can create appropriate query plans. For
-example, for the `insert_users` command, we can add a description to the metadata:
-
-```yaml
-description: |
-  Insert one or more new users into the users table.
-
-  Args:
-      objects: Array of user objects to insert, each containing:
-          - name (text!): The name of the user
-          - age (int_4!): The age of the user
-          - id (int_4): Optional ID for the user (auto-generated if not provided)
-      post_check: Optional permission predicate to validate the inserted data
-
-  Returns:
-      insert_users_response containing:
-          - affected_rows: Number of rows inserted
-          - returning: Array of the inserted user objects
-```
-
-```sh title="As your metadata has changed, create a new build:"
-ddn supergraph build local
-```
-
-```sh title="Bring down the services by pressing CTRL+C and start them back up:"
-ddn run docker-start
-```
-
-### Step 21. Add a new user using natural language
-
-<PqlChat>
-  <User>Insert a new user Alex who is 57 years old.</User>
-  <Pql>
-    I'll help you insert a new user named Alex into the database.
-    <QueryPlanComponent>
-      1. Insert a new row into the app.users table with: <br />
-      name = 'Alex' <br />
-      age = 57 <br />
-      The id will be auto-generated by the database <br />
-      2. Verify the insertion by retrieving the newly inserted user
-    </QueryPlanComponent>
-  </Pql>
-  <Pql>Alex, age 57, has been inserted into the database.</Pql>
-</PqlChat>
-
-You should see a response that returns your inserted data along with the `id` and `name` fields for the author.
-
 ## Next steps
 
 Congratulations on completing your first Hasura PromptQL project with PostgreSQL! 🎉
@@ -557,7 +392,6 @@ Here's what you just accomplished:
 - Then, you created a build — essentially compiling everything into a ready-to-use structure — and successfully ran your
   first PromptQL queries to fetch data.
 - Along the way, you learned how to iterate on your schema and refresh your metadata to reflect changes.
-- Finally, we looked at how to enable mutations and insert data using PromptQL.
 
 Now, you're equipped to connect and expose your data, empowering you to iterate and scale with confidence. Great work!
 
