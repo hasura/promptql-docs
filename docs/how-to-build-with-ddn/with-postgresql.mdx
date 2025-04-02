@@ -27,8 +27,8 @@ This tutorial takes about twenty minutes to complete. You'll learn how to:
 
 Additionally, we'll familiarize you with the steps and workflows necessary to iterate on your data source.
 
-This tutorial assumes you're starting from scratch; you can with use an existing PostgreSQL database that you have or
-the PostgreSQL docker image ships with the data connector.
+This tutorial assumes you're starting from scratch; you can use an existing PostgreSQL database that you have or the
+PostgreSQL docker image that ships with the data connector.
 
 <Prereqs />
 
@@ -60,13 +60,14 @@ ddn connector init my_pg -i
 
 ### Step 4. Add your own connection string or use the included Postgres docker image
 
-From the dropdown, select `/hasura/postgres` (you can type to filter the list). You'll be asked to provide a connection
+From the dropdown, select `hasura/postgres` (you can type to filter the list). You'll be asked to provide a connection
 string to your PostgreSQL database. If you have one, enter it. DDN will never modify your source schema.
 
 :::info Optionally, use the included PostgreSQL docker compose file
 
-If you don't have one, you can leave this blank to use the included PostgreSQL docker compose file which will spin up a
-PostgreSQL database and a postgres-adminer instance you can use to seed with some data and use for development.
+If you don't have an existing PostgreSQL database, you can leave this blank to use the included PostgreSQL docker
+compose file which will spin up a PostgreSQL database and a postgres-adminer instance you can use to seed with some data
+and use for development.
 
 The CLI will output something similar to this:
 
@@ -140,7 +141,7 @@ Your terminal will be taken over by logs for the different services.
 ddn console --local
 ```
 
-Once the PromptQL interface is open, ask a question about your data:
+Once the PromptQL interface is open, ask a question about your data. For example:
 
 <PqlChat>
   <User>Hi, what are some questions you can answer?</User>
@@ -201,6 +202,6 @@ Here's what you just accomplished:
 
 Now, you're equipped to connect and expose your data, empowering you to iterate and scale with confidence. Great work!
 
-Take a look at our [PostgreSQL docs](/reference/connectors/postgresql/index.mdx) to learn more about how to use Hasura
-PromptQL with PostgreSQL. Or, if you're ready, get started with adding [permissions](/auth/permissions/index.mdx) to
-control access to your data.
+Take a look at our [PostgreSQL docs](/reference/connectors/postgresql/index.mdx) to learn more about how to use PromptQL
+with PostgreSQL. Or, if you're ready, get started with [adding custom business logic](/business-logic/overview.mdx) to
+get PromptQL to act on a user's behalf!

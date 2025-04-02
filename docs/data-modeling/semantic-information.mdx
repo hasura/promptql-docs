@@ -34,7 +34,7 @@ When defining custom functions, use the `description` field to explain:
 
 **Example: Web Search Command**
 
-```yaml
+```yaml {8-18}
 kind: Command
 version: v1
 definition:
@@ -85,7 +85,7 @@ For database tables, describe:
 
 **Example: Customer Table**
 
-```yaml
+```yaml {5-9}
 kind: Model
 version: v1
 definition:
@@ -120,7 +120,7 @@ For fields, describe:
 
 **Example: Order Status Field**
 
-```yaml
+```yaml {3-11}
 name: status
 type: String
 description: |
@@ -140,7 +140,7 @@ Describe the business meaning of relationships and any important constraints.
 
 **Example: Customer-Order Relationship**
 
-```yaml
+```yaml {7-10}
 kind: Relationship
 version: v1
 definition:
@@ -183,7 +183,7 @@ definition:
 
 Here's a comprehensive example showing semantic descriptions at multiple levels:
 
-```yaml
+```yaml {4-9,13,17,21-25,29-32,36-39,44,48}
 kind: Model
 version: v1
 definition:
@@ -244,5 +244,5 @@ Good semantic information helps PromptQL:
 - Provide more relevant responses to natural language queries
 - Handle edge cases correctly
 
-The more crisper and relevant context you provide through descriptions, the better PromptQL can understand and work with
+The more crisp and relevant context you provide through descriptions, the better PromptQL can understand and work with
 your data model.

@@ -11,7 +11,7 @@ keywords:
   - guide
 ---
 
-# Iterate on your data model
+# Iterate on your Data Model
 
 After you have successfully created a DDN supergraph to use with PromptQL, you will soon want to iterate on your data
 model to reflect changes in the underlying data sources
@@ -19,13 +19,13 @@ model to reflect changes in the underlying data sources
 ## Changing your underlying data model
 
 Depending on your data source, you may be adding a column to a table in PostgreSQL, or a creating a new collection in
-MongoDB. You may have written new custom logic in Typescript or want to import a new command from the Stripe connector.
+MongoDB. You may have written new custom logic in TypeScript or want to import a new command from the Stripe connector.
 Whatever it is, you will follow the same steps each time anything changes in your data source schema to iterate on your
 data model.
 
-## Reintrospecting your data model
+## Re-introspecting your data model
 
-Reintrospecting your data model will update the connector configuration to reflect the changes in your data sources.
+Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
 
 ```sh
 ddn connector introspect my_connector
@@ -33,43 +33,35 @@ ddn connector introspect my_connector
 
 ## Viewing resources
 
-You can then view the resources that have been discovered by running:
-
-```sh
+```sh title="You can then view the resources that have been discovered by running:"
 ddn connector show-resources my_connector
 ```
 
 ## Adding resources
 
-You can then add precisely the resources you need by running for instance:
-
-```sh
+```sh title="And add precisely the resources you need running any of the following commands with real values:"
 ddn model add my_connector my_model
 ddn command add my_connector my_command
 ddn relationship add my_connector my_relationship
 ```
 
-or if you want to add all resources:
-
-```sh
+```sh title="Or if you want to add all resources:"
 ddn model add my_connector "*"
 ddn command add my_connector "*"
 ddn relationship add my_connector "*"
 ```
 
-## Adding Semantic Information
+## Adding semantic Information
 
 It's highly recommended to provide extra natural language descriptions of the resources in your project so that the
-PromptQL LLM can better understand your data and create appropriate query plans.
+PromptQL can better understand your data and create appropriate query plans.
 
 The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
 context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
 ## Building a new supergraph
 
-You can then build a new local supergraph by running:
-
-```sh
+```sh title="You can then build a new local supergraph by running:"
 ddn supergraph build local
 ```
 
