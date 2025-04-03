@@ -19,11 +19,10 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 # Quickstart with PromptQL
 
-In this getting started guide, you'll get hands on experience with PromptQL. In a few steps, you can have PromptQL
-running locally, connected to a sample dataset.
-
-By the end of the guide, you'll have deployed your project and created an AI agent that can take action on a user's
-behalf.
+In this getting started guide, you'll get hands-on with PromptQL by deploying it and connecting to a sample dataset.
+You'll use a hosted PostgreSQL database pre-loaded with IMDB movie data. You’ll be able to chat with the data to explore
+information about different movies. Then, you'll add custom business logic that lets PromptQL take action — like renting
+a movie on a user's behalf.
 
 <Prereqs />
 
@@ -53,7 +52,8 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 ddn connector init imdb -i
 ```
 
-From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI to an existing PostgreSQL database of IMDB data:
+From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI
+to an existing PostgreSQL database of IMDB data:
 
 ```plaintext
 postgresql://read_only:npg_1nLZu7MKkwlN@ep-bold-bush-835547-pooler.us-west-2.aws.neon.tech/promptql-imdb-poc?sslmode=require
@@ -140,8 +140,8 @@ ddn connector init promptflix -i
 ```
 
 From the list of choices, select `hasura/nodejs`. Like with the PostgreSQL connector, the CLI will scaffold out a set of
-configuration files, including a file called `app/connector/promptflix/functions.ts` — this is where we'll add our logic so the application can
-take action on our behalf.
+configuration files, including a file called `app/connector/promptflix/functions.ts` — this is where we'll add our logic
+so the application can take action on our behalf.
 
 ```typescript title="Replace the content of your functions.ts file with the following:"
 /*
@@ -181,7 +181,8 @@ ddn connector introspect promptflix
 ddn command add promptflix "*"
 ```
 
-Before we create a new build, let's add a description to the metadata for our command located in `app/metadata/rent_single_movie_by_series_title.hml`
+Before we create a new build, let's add a description to the metadata for our command located in
+`app/metadata/rent_single_movie_by_series_title.hml`
 
 ```yaml title="Open the newly-generated rent_single_movie_by_series_title.hml file and add the following description:" {6-7}
 ---
