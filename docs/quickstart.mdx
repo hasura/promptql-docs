@@ -19,7 +19,7 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 # Quickstart with PromptQL
 
-In this getting started guide, you’ll get hands on experience with PromptQL. In a few steps, you can have PromptQL
+In this getting started guide, you'll get hands on experience with PromptQL. In a few steps, you can have PromptQL
 running locally, connected to a sample dataset.
 
 By the end of the guide, you'll have deployed your project and created an AI agent that can take action on a user's
@@ -44,7 +44,7 @@ acknowledge your login, giving you access to Hasura Cloud resources.
 ddn supergraph init imdb-promptflix --with-promptql && cd imdb-promptflix
 ```
 
-Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+Now that you're in this directory, you'll see your project scaffolded out for you. You can view the structure by either
 running `ls` in your terminal, or by opening the directory in your preferred editor.
 
 ### Step 3. Initialize your PostgreSQL connector
@@ -53,7 +53,7 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 ddn connector init imdb -i
 ```
 
-From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI:
+From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI to an existing PostgreSQL database of IMDB data:
 
 ```plaintext
 postgresql://read_only:npg_1nLZu7MKkwlN@ep-bold-bush-835547-pooler.us-west-2.aws.neon.tech/promptql-imdb-poc?sslmode=require
@@ -78,8 +78,8 @@ Based on our sample database, a SQL schema will be generated. Let's track all th
 ddn model add imdb "*"
 ```
 
-Open the `app/metadata` directory. You’ll find Hasura Metadata Language (HML) files for each table in your database.  
-In this case, there’s only one: `movies`.
+Open the `app/metadata` directory. You'll find Hasura Metadata Language (HML) files for each table in your database.  
+In this case, there's only one: `movies`.
 
 The DDN CLI uses these HML files to represent PostgreSQL tables in your API as
 [models](/reference/metadata-reference/models.mdx).
@@ -132,7 +132,7 @@ Go ahead and ask a question! In the next steps, we'll take a deeper look at inte
 ### Step 1. Create a command
 
 While it's great that we can ask questions about the data set, what if the application could take action on our behalf?
-We can easily do this by adding custom business logic using one of our
+Such as rent a movie for us? We can easily do this by adding custom business logic using one of our
 [lambda connectors](/business-logic/overview.mdx). In the example below, we'll use TypeScript.
 
 ```sh title="Like before, let's initialize this connector:"
@@ -140,7 +140,7 @@ ddn connector init promptflix -i
 ```
 
 From the list of choices, select `hasura/nodejs`. Like with the PostgreSQL connector, the CLI will scaffold out a set of
-configuration files, including a file called `functions.ts` — this is where we'll add our logic so the application can
+configuration files, including a file called `app/connector/promptflix/functions.ts` — this is where we'll add our logic so the application can
 take action on our behalf.
 
 ```typescript title="Replace the content of your functions.ts file with the following:"
@@ -181,7 +181,7 @@ ddn connector introspect promptflix
 ddn command add promptflix "*"
 ```
 
-Before we create a new build, let's add a description to our command.
+Before we create a new build, let's add a description to the metadata for our command located in `app/metadata/rent_single_movie_by_series_title.hml`
 
 ```yaml title="Open the newly-generated rent_single_movie_by_series_title.hml file and add the following description:" {6-7}
 ---
