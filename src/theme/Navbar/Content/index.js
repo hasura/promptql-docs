@@ -86,11 +86,11 @@ export default function NavbarContent() {
         // TODO stop hardcoding items?
         <>
           {!mobileSidebar.disabled && <NavbarMobileSidebarToggle />}
-          <NavbarLogo />
-          <div className="pr-6">
-            <DocsLogoLight />
+          <div className="navbar__logo">
+            <NavbarLogo />
           </div>
-          <div className={styles.dividerLine}>|</div>
+          {/* <div className="pr-6"><DocsLogoLight /></div> */}
+          {/* <div className={styles.dividerLine}>|</div> */}
           <NavbarItems items={leftItems} />
           <div className="">
             <NavbarColorModeToggle className={styles.colorModeToggle} />
