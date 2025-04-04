@@ -13,27 +13,12 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import CommandCreateClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-tutorial.mdx";
 import CommandCreateClickHouseNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-native-operation-how-to.mdx";
-import CommandCreateClickHouseNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-native-operation-tutorial.mdx";
-import CommandCreateLambdaGo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-tutorial.mdx";
 import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaPython from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-tutorial.mdx";
 import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaTypescript from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-tutorial.mdx";
 import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
-import CommandCreateMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-tutorial.mdx";
 import CommandCreateMongoDBNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-native-operation-how-to.mdx";
-import CommandCreateMongoDBNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-native-operation-tutorial.mdx";
-import CommandCreatePostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-tutorial.mdx";
 import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
-import CommandCreatePostgreSQLNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-tutorial.mdx";
-import CommandUpdateClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-update-tutorial.mdx";
-import CommandUpdateLambdaGo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-update-tutorial.mdx";
-import CommandUpdateLambdaPython from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-update-tutorial.mdx";
-import CommandUpdateLambdaTypescript from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-update-tutorial.mdx";
-import CommandUpdateMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-update-tutorial.mdx";
-import CommandUpdatePostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-update-tutorial.mdx";
 
 # Commands Enable PromptQL to Modify Data
 
@@ -157,93 +142,6 @@ ddn command remove <command_name>
 
 Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
 in its query planning.
-
-## Tutorials {#command-tutorials}
-
-The tutorials below follow on from each particular tutorial in the
-[How to Build with DDN](/how-to-build-with-promptql/overview.mdx) section. Select the relevant data connector to follow
-the tutorial.
-
-### Creating a command
-
-To enable PromptQL to modify your data, you first need to create commands that map to specific operations within your
-data sources.
-
-#### From a source operation
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandCreatePostgreSQL />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandCreateMongoDB />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandCreateClickHouse />
-  </TabItem>
-</Tabs>
-
-#### Via native operations {#via-native-operation-tutorials}
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandCreatePostgreSQLNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandCreateMongoDBNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandCreateClickHouseNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandCreateLambdaTypescript />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandCreateLambdaPython />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandCreateLambdaGo />
-  </TabItem>
-</Tabs>
-
-:::info Lambda connectors
-
-Lambda connectors allow PromptQL to execute custom business logic as part of its query plan. You can learn more about
-Lambda connectors in the [docs](/business-logic/overview.mdx).
-
-:::
-
-### Updating a command
-
-Your underlying data source may change over time. You can update your commands to ensure PromptQL continues to interact
-accurately with your data.
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandUpdatePostgreSQL />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandUpdateMongoDB />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandUpdateClickHouse />
-  </TabItem>
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandUpdateLambdaTypescript />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandUpdateLambdaPython />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandUpdateLambdaGo />
-  </TabItem>
-</Tabs>
-
-### Deleting a command
-
-```bash title="If you no longer need a command, you can delete it with the CLI:"
-ddn command remove <command_name>
-```
 
 ## Reference
 

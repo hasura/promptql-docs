@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-sidebar_label: "Models enable PromptQL to understand your data"
+sidebar_label: "Models read data"
 description: "Models make your data accessible to PromptQL, enabling accurate data interactions and insights."
 keywords:
   - model
@@ -15,15 +15,11 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import ModelCreatePostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_model-create-tutorial.mdx";
-import ModelCreateMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_model-create-tutorial.mdx";
-import ModelCreateClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_model-create-tutorial.mdx";
 import ModelCreateNativeQueryHowToPostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_model-create-native-query-how-to.mdx";
-import ModelCreateNativeQueryTutorialPostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_model-create-native-query-tutorial.mdx";
 import ModelCreateNativeQueryHowToMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_model-create-native-query-how-to.mdx";
-import ModelCreateNativeQueryTutorialMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_model-create-native-query-tutorial.mdx";
 import ModelCreateNativeQueryHowToClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_model-create-native-query-how-to.mdx";
-import ModelCreateNativeQueryTutorialClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_model-create-native-query-tutorial.mdx";
+
+import { PqlChat, User, Pql, QueryPlanComponent } from "@site/src/components/PqlChat/PqlChat";
 
 # Models Empower PromptQL to Understand Your Data
 
@@ -162,89 +158,6 @@ ddn model remove users
 ```
 
 In addition to removing the `Model` object itself, the DDN CLI will also remove the associated metadata definitions.
-
-## Tutorials {#model-tutorials}
-
-The tutorials below follow on from each particular tutorial in the
-[How to Build with PromptQL](/how-to-build-with-promptql/overview.mdx) section. Select the relevant data connector to
-follow the tutorial.
-
-### Creating a model
-
-To enable PromptQL to understand and interact with your data, you'll first need to create models that represent that
-data.
-
-#### From a source entity
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-
-    <ModelCreatePostgreSQL />
-
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-
-    <ModelCreateMongoDB />
-
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-
-    <ModelCreateClickHouse />
-
-  </TabItem>
-</Tabs>
-
-#### Via native query
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-
-    <ModelCreateNativeQueryTutorialPostgreSQL />
-
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-
-    <ModelCreateNativeQueryTutorialMongoDB />
-
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-
-    <ModelCreateNativeQueryTutorialClickHouse />
-
-  </TabItem>
-</Tabs>
-
-### Updating a model
-
-Your underlying data source may change over time. You can update your model to reflect these changes and ensure PromptQL
-continues to have accurate understanding of your data.
-
-You'll need to update the mapping of your model to the data source by updating the
-[DataConnectorLink](/reference/metadata-reference/data-connector-links.mdx) object.
-
-```bash title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```bash title="Then, update your model:"
-ddn model update <connector_link_name> <model_name>
-```
-
-This will find changed resources in the data source and attempt to merge them into the model.
-
-If you'd like to completely add the model again, you can first run the `model remove` command (below) and then re-create
-your model.
-
-### Extending a model {#tutorial-extend-model}
-
-Find tutorials about extending a model with related information or custom logic in the
-[Relationships](/data-modeling/relationship.mdx) section.
-
-### Deleting a model
-
-```bash title="If you no longer need a model, you can delete it:"
-ddn model remove users
-```
 
 ## Reference
 
