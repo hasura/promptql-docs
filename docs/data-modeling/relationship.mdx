@@ -1,10 +1,13 @@
 ---
 sidebar_position: 4
 sidebar_label: "Relationships connect data"
-description: "Relationships allow you to connect data across different models."
+description: "Relationships allow you to connect data across different models for PromptQL to understand and access."
 keywords:
   - relationship
   - data modeling
+  - promptql
+  - ai
+  - llm
 ---
 
 import Tabs from "@theme/Tabs";
@@ -19,16 +22,19 @@ import ClickHouseRelationshipCreateModelToModel from "@site/docs/data-modeling/p
 
 ## Introduction
 
-Relationships allow you to connect data, enabling PromptQL to access data across multiple entities.
+Relationships allow you to connect your data, enabling PromptQL to understand the semantic connections between your data
+entities and accurately talk to all your data. By defining these relationships, PromptQL can generate intelligent query
+plans that navigate complex data structures to provide meaningful insights.
 
-Examples include:
+Examples of how PromptQL uses relationships to deliver powerful insights:
 
-- Querying a `Customer` and at the same time getting their `Orders` and each `Product` item in those orders. (Model to
+- When asking PromptQL about a customer's purchasing patterns, it can understand the relationship between `Customer`,
+  their `Orders`, and each `Product` item in those orders, delivering comprehensive purchasing analysis. (Model to
   Model)
-- Querying a `Customer` and also getting the analytics of their app usage from another data source. (Model to Model in
-  another subgraph or data connector)
-- Querying an `Order` and also getting a live currency conversion for the value of the order enabled with a lambda data
-  connector with a connection to a currency exchange API. (Model to Command)
+- When requesting customer behavior analytics, PromptQL can correlate a `Customer` with their app usage metrics from
+  another data source, providing cross-data-source insights. (Model to Model in another subgraph or data connector)
+- When analyzing international sales performance, PromptQL can combine `Order` data with live currency conversions from
+  an external API through a lambda data connector, delivering real-time financial analysis. (Model to Command)
 
 Relationships can be added between _any_ kind of semantically related models and/or commands. They do not need to be
 related in the data source by, for example, a foreign key. They also do not need to be backed by the same data source or
@@ -42,8 +48,8 @@ keys. In such cases the lifecycle in creating a relationship in your metadata is
 1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
 2. Add the detected relationships to your metadata with the DDN CLI.
 3. Create a build of your supergraph API with the DDN CLI.
-4. Serve your build as your API with the Hasura engine either locally or in the cloud.
-5. Iterate on your API by repeating this process or by editing your metadata manually as needed.
+4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
+5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
 
@@ -58,8 +64,8 @@ Relationships are defined in metadata from an
 models and commands are also defined with object types, you can think of relationships as being between models and/or
 commands.
 
-The target command can be enabled with a a custom piece of business logic on a lambda data connector, or a native
-mutation operation.
+The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
+operation.
 
 ### Using the DDN CLI
 
@@ -99,7 +105,8 @@ Relationships can also be manually added to your metadata.
 The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you to author
 relationships.
 
-For example, you can configure a relationship so that you can also get Orders when querying a Customer.
+For example, you can configure a relationship so that when a user asks PromptQL about a Customer's purchasing history,
+it can also access their Orders data.
 
 ```yaml title="Create a relationship in your metadata:"
 ---
@@ -121,9 +128,9 @@ definition:
           - fieldName: customerId # The existing field on the target model that we want to map to the source object type
 ```
 
-By defining this `Relationship` object, all other [models](/reference/metadata-reference/models.mdx) or
-[commands](/reference/metadata-reference/commands.mdx) whose output type is the source object type in the relationship
-will now have a connection to the target model or command.
+By defining this `Relationship` object, PromptQL will understand that customers and orders are connected, allowing it to
+generate accurate query plans that can navigate from customer data to their associated orders when responding to user
+queries about customer purchasing behavior.
 
 Learn more about the [Relationship](/reference/metadata-reference/relationships.mdx) object.
 
@@ -250,45 +257,25 @@ definition:
 ddn supergraph build local
 ```
 
-```bash title="Serve your build as your API locally:"
+```bash title="Serve your build to enable PromptQL to access your data:"
 ddn run docker-start
 ddn console --local
 ```
 
-We can now query the `Users` model and also return the result of the `shoutName` function with its default argument of
-`name`.
+Now when you ask PromptQL about users, it can automatically apply the `shoutName` function to transform user names into
+uppercase, enhancing the analysis capabilities.
 
-```graphql title="Query the Users model:"
-query {
-  users {
-    name
-    shoutName
-  }
-}
+For example, when asking "Show me all user names and their shouted versions", PromptQL will use this relationship to
+generate a query plan that fetches user data and applies the transformation:
+
+```
+User: "Show me all user names and their shouted versions"
 ```
 
-```json title="Result:"
-{
-  "data": {
-    "users": [
-      {
-        "name": "Alice",
-        "shoutName": "ALICE"
-      },
-      {
-        "name": "Bob",
-        "shoutName": "BOB"
-      },
-      {
-        "name": "Charlie",
-        "shoutName": "CHARLIE"
-      }
-    ]
-  }
-}
-```
+PromptQL will generate a query plan that uses this relationship.
 
-With relationships and custom commands we can transform or enrich any data.
+With relationships and custom commands, PromptQL can transform or enrich data automatically as part of its dynamic query
+planning process, delivering more accurate and insightful responses to user questions.
 
 ### Updating a relationship
 
