@@ -1,0 +1,37 @@
+---
+sidebar_position: 12
+sidebar_label: With Prometheus
+description: "Learn the basics of Hasura DDN and how to get started with Prometheus metrics."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - prometheus
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Prometheus
+
+<BoilerplateOverview dataSourceName="Prometheus" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/prometheus` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV              | Example                 | Description                                                                                          |
+| ---------------- | ----------------------- | ---------------------------------------------------------------------------------------------------- |
+| `CONNECTION_URL` | `https://<host>:<port>` | The full connection string used to connect to the Prometheus server. By default, the port is `9090`. |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Prometheus" />

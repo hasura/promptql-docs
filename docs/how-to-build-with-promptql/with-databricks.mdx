@@ -1,0 +1,38 @@
+---
+sidebar_position: 3
+sidebar_label: With Databricks
+description: "Learn the basics of Hasura DDN and how to get started with a Databricks instance."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - databricks
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Databricks
+
+<BoilerplateOverview dataSourceName="Databricks" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/databricks` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV            | Example                                                                                                                                                                  | Description                                                                                                                        |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:databricks://<host>:<port>/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/<warehouse-id>;UID=token;PWD=<access-token>;ConnCatalog=main;` | You can construct the base of this using your Databricks UI under `SQL Warehouses` » `<name-of-warehouse>` » `Connection details`. |
+| `JDBC_SCHEMAS` | `default,public`                                                                                                                                                         | A comma-separated list of schemas within the referenced catalog.                                                                   |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Databricks" />

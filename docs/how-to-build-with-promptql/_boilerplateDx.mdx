@@ -1,0 +1,106 @@
+import { PqlChat, User, Pql, QueryPlanComponent } from "@site/src/components/PqlChat/PqlChat";
+
+### Step 4. Introspect your source
+
+```sh title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```sh title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```sh title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```sh title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```sh title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```sh title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).

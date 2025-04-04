@@ -1,0 +1,37 @@
+---
+sidebar_position: 4
+sidebar_label: With DuckDB
+description: "Learn the basics of Hasura DDN and how to get started with a DuckDB database."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - duckdb
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and DuckDB
+
+<BoilerplateOverview dataSourceName="DuckDB" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/duckdb` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV          | Example             | Description                                                                              |
+| ------------ | ------------------- | ---------------------------------------------------------------------------------------- |
+| `DUCKDB_URL` | `/path/to/*.duckdb` | The path to the DuckDB database file which will be mounted to the connector's container. |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="DuckDB" />

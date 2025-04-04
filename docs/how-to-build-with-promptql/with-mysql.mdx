@@ -1,0 +1,37 @@
+---
+sidebar_position: 9
+sidebar_label: With MySQL
+description: "Learn the basics of Hasura DDN and how to get started with a MySQL database."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - mysql
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and MySQL
+
+<BoilerplateOverview dataSourceName="MySQL" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/mysql` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV        | Example                                        | Description                         |
+| ---------- | ---------------------------------------------- | ----------------------------------- |
+| `JDBC_URL` | `jdbc:mysql://user:password@host:3306/db_name` | This connector requires a JDBC URL. |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="MySQL" />

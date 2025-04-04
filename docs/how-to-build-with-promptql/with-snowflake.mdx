@@ -1,0 +1,44 @@
+---
+sidebar_position: 14
+sidebar_label: With Snowflake
+description: "Learn the basics of Hasura DDN and how to get started with a Snowflake instance."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - snowflake
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Snowflake
+
+<BoilerplateOverview dataSourceName="Snowflake" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/snowflake` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV        | Example                                                                                                                                                                                       | Description                         |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------- |
+| `JDBC_URL` | `jdbc:snowflake://<account-identifier.<region>.snowflakecomputing.com?user=YOUR_USERNAME&&password=YOUR_PASSWORD&db=YOUR_DATABASE&warehouse=YOUR_WAREHOUSE&schema=YOUR_SCHEMA&role=YOUR_ROLE` | This connector requires a JDBC URL. |
+
+:::info Optional parameters for Snowflake
+
+Snowflake allows you to set a number of defaults. Your JDBC can minimal (i.e., only including the account identifier,
+username, and password) or more granular depending on your settings within Snowflake.
+
+:::
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Snowflake" />

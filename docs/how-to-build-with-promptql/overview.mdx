@@ -1,0 +1,56 @@
+---
+sidebar_position: 1
+sidebar_label: Basics
+description: "Learn how to get started with PromptQL and your data."
+keywords:
+  - promptql
+  - hasura ddn
+  - getting started
+  - guide
+---
+
+import { OverviewTopSectionIconNoVideo } from "@site/src/components/OverviewTopSectionIconNoVideo";
+import { OverviewPlainCard } from "@site/src/components/OverviewPlainCard";
+import Icon from "@site/static/icons/speedometer-04.svg";
+import Link from "@docusaurus/Link";
+
+# Basics
+
+## Introduction
+
+PromptQL is powered by Hasura DDN, which enables a powerful, yet simple-to-create AI-enabled API on your data.
+
+Each tutorial in this section will guide you through creating your PromptQL project on top of your preferred data
+source. First, let's go over the broad stokes of how it works.
+
+### You have data
+
+Your data can live in a variety of places - relational or non-relational databases, OLAP or OLTP databases, vector
+stores, third-party services, or output by your code. With PromptQL, you can talk to all of it from a single endpoint.
+
+### You connect it to PromptQL
+
+Regardless of where your data lives, you'll connect it to your API using a **native data connector**. These connectors
+will introspect your data sources and generate metadata that Hasura DDN will use to build and power your PromptQL
+application.
+
+### You configure your API in metadata
+
+This **semantic metadata layer** is written as Hasura Metadata Language (HML), which is an extension of YAML. You can
+use the DDN CLI and your text editor to fine-tune and configure the API to your liking; this includes easily creating
+metadata objects for permissions, relationships, configuring authentication, etc.
+
+### You talk to your data
+
+To convert your metadata into something that you can talk with, you'll create a build - an immutable snapshot of your
+API at that point in time which the Hasura Engine can run and via PromptQL. You can then use the **PiQL** (pronounced
+_pickle_) - our GUI - to talk to your data, or integrate it with your client apps via the **PromptQL API**.
+
+## Get started with your favorite source
+
+- [PostgreSQL](/how-to-build-with-promptql/with-postgresql.mdx)
+- [MongoDB](/how-to-build-with-promptql/with-mongodb.mdx)
+- [ClickHouse](/how-to-build-with-promptql/with-clickhouse.mdx)
+- [Oracle](/how-to-build-with-promptql/with-oracle.mdx)
+
+See the whole list in the sidenav to the left!

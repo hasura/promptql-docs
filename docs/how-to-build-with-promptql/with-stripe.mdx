@@ -1,0 +1,37 @@
+---
+sidebar_position: 17
+sidebar_label: With Stripe
+description: "Learn the basics of Hasura DDN and how to get started with a Stripe account."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - stripe
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Stripe
+
+<BoilerplateOverview dataSourceName="Stripe" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/stripe` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV                        | Example                               | Description                                                                                                                         |
+| -------------------------- | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `STRIPE_BEARER_AUTH_TOKEN` | `sk_<test\|prod>_<unique_identifier>` | A **secret** key for your account, retrievable from your [API Keys dashboard in Stripe](https://dashboard.stripe.com/test/apikeys). |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Stripe" />

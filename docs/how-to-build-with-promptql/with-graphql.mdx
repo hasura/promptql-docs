@@ -1,0 +1,47 @@
+---
+sidebar_position: 6
+sidebar_label: With Existing GraphQL
+description: "Learn the basics of Hasura DDN and how to get started with an existing GraphQL API."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - graphql connector
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and an Existing GraphQL API
+
+<BoilerplateOverview dataSourceName="GraphQL" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/graphql` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV                | Example                                     | Description                                |
+| ------------------ | ------------------------------------------- | ------------------------------------------ |
+| `GRAPHQL_ENDPOINT` | `https://spacex-production.up.railway.app/` | The GraphQL endpoint for the existing API. |
+
+:::info The GraphQL connector is highly configurable
+
+When you first initialize the connector, the CLI will only ask for the API's endpoint. You can further configure the
+connector — such as choosing different configurations for introspection vs. execution — using the connector's
+configuration file.
+
+Learn more [here](/reference/connectors/graphql/configuration.mdx).
+
+:::
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="GraphQL" />
