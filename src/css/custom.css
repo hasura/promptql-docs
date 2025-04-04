@@ -987,43 +987,6 @@ table td {
 }
 
 /* Buttons */
-.cta-button p {
-  color: var(--ifm-color-primary) !important;
-  font-weight: 800 !important;
-}
-/* 
-.cta-button:hover {
-  background-color: var(--ifm-color-primary-darkest);
-  text-decoration: none;
-}
-
-.cta-button p {
-  color: var(--primary-neutral-1000);
-  margin-bottom: 0;
-  display: flex;
-  align-items: center;
-}
-
-.cta-button p span {
-  color: var(--primary-neutral-1000);
-  font-weight: bold;
-  margin-right: 8px;
-}
-
-.cta-button p::after {
-  content: '';
-  background-image: url('data:image/svg+xml;utf8,<svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 15.5L12.5 10.5L7.5 5.5" stroke="black" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>');
-  width: 20px;
-  height: 21px;
-  margin-left: 8px;
-  display: inline-block;
-  transition: transform 0.3s ease-in-out;
-}
-
-.cta-button:hover p::after {
-  transform: translateX(4px);
-} */
-
 .button--primary {
   color: var(--primary-neutral-0);
 }

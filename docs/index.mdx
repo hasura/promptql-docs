@@ -55,9 +55,7 @@ import Link from "@docusaurus/Link";
       <li>Fine grained entitlements and access control</li>
     </ul>
 
-    <Link to="/quickstart/" className="cta-button">
-      Quickstart here.
-    </Link>
+    <Link to="/quickstart/">Quickstart.</Link>
 
   </div>
   <div className={'video-wrapper'}>
@@ -76,7 +74,7 @@ import Link from "@docusaurus/Link";
 Check out these three demos to get a feel for how PromptQL works.
 
 <div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box">
+  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Handshake className="demo-icon" />
   </div>
@@ -85,9 +83,10 @@ Check out these three demos to get a feel for how PromptQL works.
     See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
     drive strategic business decisions.
   </p>
+  <div class="demo-cta-button">Explore the GTM demo</div>
 </a>
 
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box">
+<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Healthcare className="demo-icon" />
   </div>
@@ -96,9 +95,10 @@ Check out these three demos to get a feel for how PromptQL works.
     Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
     operational efficiency while maintaining compliance.
   </p>
+  <div class="demo-cta-button">Explore the Healthcare demo</div>
 </a>
 
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/playground" className="demo-box">
+<a href="https://promptql.console.hasura.io/public/sandbox-aml/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Banking className="demo-icon" />
   </div>
@@ -107,6 +107,7 @@ Check out these three demos to get a feel for how PromptQL works.
     Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
     transaction data, uncovering suspicious patterns, and enhancing compliance with regulatory requirements.
   </p>
+  <div class="demo-cta-button">Explore the AML demo</div>
 </a>
 
 </div>
@@ -158,6 +159,30 @@ Check out these three demos to get a feel for how PromptQL works.
     margin-top: 0.75rem;
     color: var(--primary-neutral-400);
     font-size: 0.9rem;
+  }
+
+  .homepage-demo-grid .demo-box .demo-cta-button {
+    display: inline-block;
+    background-color: var(--ifm-color-primary);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    color: #000000 !important;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+  }
+
+  .homepage-demo-grid .demo-box:hover .demo-cta-button {
+    background-color: var(--ifm-color-primary-darker);
+  }
+
+  .quickstart-button {
+    color: var(--ifm-color-primary) !important;
+  }
+
+  .quickstart-button:hover {
   }
 
   .cta-button-demos {
