@@ -4,7 +4,6 @@ import Layout from '@theme/Layout';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './index.module.css';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 
 function HomepageHeader() {
   const { siteConfig } = useDocusaurusContext();
@@ -21,16 +20,13 @@ function HomepageHeader() {
           <h1 className="hero__title">{siteConfig.title}</h1>
           <p className="hero__subtitle">{siteConfig.tagline}</p>
         </div>
-        <div className="flex justify-center flex-w">
-          <Link className="button button--primary button--lg m-2" to="/index">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem' }}>
+          <Link className="button button--primary button--lg" id="hasura-promptql-docs-main-button" to="/index">
             Hasura PromptQL Docs
           </Link>
-          <Link className="button button--secondary button--lg m-2" to="/wiki/">
+          <Link className="button button--secondary button--lg" to="/wiki/">
             Docs Wiki
           </Link>
-        </div>
-        <div className={'flex justify-center'}>
-          <img src={useBaseUrl('/img/hasuras.png')} alt="Hasuras Image" />
         </div>
       </div>
     </header>

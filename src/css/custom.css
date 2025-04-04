@@ -189,6 +189,10 @@ p code {
   border: 1px solid var(--primary-neutral-900);
 }
 
+#hasura-promptql-docs-main-button {
+  color: var(--primary-neutral-1000);
+}
+
 /* -------------- LAYOUT & CONTAINERS -------------- */
 
 .container > div > div:first-child {
