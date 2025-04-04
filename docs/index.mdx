@@ -1,21 +1,21 @@
 ---
-title: Hasura DDN Documentation
+title: Hasura PromptQL Documentation
 description:
-  "Explore comprehensive documentation on the Hasura Data Delivery Network (DDN). Discover its ability to generate
-  instant GraphQL APIs on various data sources and the suite of developer tools it offers for increased productivity and
-  management. Learn how Hasura DDN can enable your backend teams to provide data access from the edge efficiently and
-  securely."
+  "Explore comprehensive documentation on Hasura PromptQL, a novel agent approach for high-trust LLM interaction with
+  business data. Discover how it dynamically plans and executes queries across various data sources, providing
+  explainability, accuracy, and repeatability for complex tasks. Learn how PromptQL leverages Hasura DDN's connectors to
+  help you build high-quality, realtime data products with natural language."
 keywords:
-  - hasura ddn
-  - graphql api
-  - instant graphql api
-  - data sources integration
-  - developer productivity tools
-  - hasura ddn documentation
-  - data delivery network
-  - backend data access
-  - api edge delivery
-  - declarative metadata
+  - hasura promptql
+  - natural language data querying
+  - llm data interaction
+  - agentic query planning
+  - data source connectors
+  - hasura promptql documentation
+  - semantic metadata
+  - dynamic query execution
+  - fine-grained access control
+  - explainable ai data access
 sidebar_label: Introduction
 sidebar_class_name: hidden-sidebar-item
 sidebar_position: 0
@@ -40,7 +40,7 @@ import Link from "@docusaurus/Link";
 
 <div className={'front-matter'}>
   <div>
-    Talk to your data accurately with natural language. 
+    Talk to your all your data accurately with natural language. 
     
     PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
     tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
@@ -54,8 +54,8 @@ import Link from "@docusaurus/Link";
       <li>Fine grained entitlements and access control</li>
     </ul>
 
-    <Link to="/quickstart/" className="cta-button mb-5 xl:mb-0 xl:mt-8 text-white hover:text-white">
-      <span>Quickstart.</span> Free. Easy. Fast.
+    <Link to="/quickstart/" className="cta-button">
+      Quickstart here.
     </Link>
 
   </div>
@@ -152,6 +152,28 @@ Check out these three demos to get a feel for how PromptQL works.
     margin-top: 0.75rem;
     color: var(--primary-neutral-400);
     font-size: 0.9rem;
+  }
+
+  .cta-button-demos {
+    display: inline-block;
+    background-color: var(--ifm-color-primary);
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    color: #000000 !important;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+  }
+
+  .cta-button-demos a p {
+    color: #000000 !important;
+  }
+
+  .cta-button-demos:hover {
+    background-color: var(--ifm-color-primary-darker);
+    text-decoration: none;
+    color: #000000 !important;
   }
 `}
 </style>
