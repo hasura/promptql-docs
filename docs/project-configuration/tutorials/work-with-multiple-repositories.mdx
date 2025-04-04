@@ -49,7 +49,7 @@ provisioning subgraphs, inviting collaborators, and managing the API as a whole.
 
 ### Step 1. Initialize a new local project
 
-```sh title="Create a new local project and initialize a git repository:"
+```ddn title="Create a new local project and initialize a git repository:"
 ddn supergraph init parent-project && cd parent-project && git init
 ```
 
@@ -57,7 +57,7 @@ This will scaffold out the local configuration for a DDN project and initialize 
 
 ### Step 2. Create a cloud project
 
-```sh title="From the local project directory, create a new cloud project:"
+```ddn title="From the local project directory, create a new cloud project:"
 ddn project init
 ```
 
@@ -73,13 +73,13 @@ git add . && git commit -m "Initial commit"
 
 We'll add two subgraphs to this supergraph: `customers` and `billing`.
 
-```sh title="Create the subgraphs on the cloud project:"
+```ddn title="Create the subgraphs on the cloud project:"
 ddn project subgraph create customers && ddn project subgraph create billing
 ```
 
 ### Step 5. Create a supergraph build
 
-```sh title="Create an initial supergraph build:"
+```ddn title="Create an initial supergraph build:"
 ddn supergraph build create
 ```
 
@@ -112,7 +112,7 @@ initializing a new repository below.
 
 #### Step 1. Create a new repo for the `customers` subgraph
 
-```sh title="Initialize a new local project and git repo:"
+```ddn title="Initialize a new local project and git repo:"
 ddn supergraph init customer-team --create-subgraph customers && cd customer-team && git init
 ```
 
@@ -120,7 +120,7 @@ This will scaffold out the necessary project structure along with initializing a
 
 #### Step 2. Map the local project to the existing cloud project
 
-```sh title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
+```ddn title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
 ddn project init --with-project <project-name>
 ```
 
@@ -128,7 +128,7 @@ You'll see the `project` key-value pair updated in your `.hasura/context.yaml` f
 
 #### Step 3. Set the subgraph context
 
-```sh title="Change the context to your subgraph's configuration file:"
+```ddn title="Change the context to your subgraph's configuration file:"
 ddn context set subgraph ./customers/subgraph.yaml
 ```
 
@@ -162,13 +162,13 @@ In this tutorial, we'll use the PostgreSQL connector and our sample PostgreSQL d
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
 ```
 
-```sh title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
+```ddn title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
 ddn connector init customers_pg -i
 ```
 
 ##### Generate the Hasura metadata
 
-```sh title="Next, use the CLI to introspect the PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect the PostgreSQL database:"
 ddn connector introspect customers_pg
 ```
 
@@ -176,7 +176,7 @@ After running this, you should see a representation of your database's schema in
 `customers/connector/customers_pg/configuration.json` file; you can view this using `cat` or open the file in your
 editor.
 
-```sh title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
 ddn models add customers_pg users
 ```
 
@@ -186,19 +186,19 @@ Hasura Metadata Language file to represent the `users` table from PostgreSQL in 
 
 ##### Create a new local build and test the API
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
 Your terminal will be taken over by logs for the different services.
 
-```sh title="In a new terminal tab, open your local console:"
+```ddn title="In a new terminal tab, open your local console:"
 ddn console --local
 ```
 
@@ -245,7 +245,7 @@ query GET_USERS {
 Now that we've tested our local API and are happy with its state, we can create a build of our independent subgraph on
 our cloud project.
 
-```sh title="Create a subgraph build on your DDN project:"
+```ddn title="Create a subgraph build on your DDN project:"
 ddn subgraph build create
 ```
 
@@ -253,20 +253,20 @@ The CLI will return the subgraph's build version; you'll need this value in the 
 
 #### Step 7. Create a supergraph build
 
-```sh title="Begin by listing the available supergraph builds:"
+```ddn title="Begin by listing the available supergraph builds:"
 ddn supergraph build get
 ```
 
 Grab the most recent build's version and use it — along with the subgraph build version — in the following command.
 
-```sh title="Finally, create a supergraph build incorporating your latest subgraph build:"
+```ddn title="Finally, create a supergraph build incorporating your latest subgraph build:"
 ddn supergraph build create --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id>
 ```
 
 The CLI will return a build URL for the console so you can explore your build and test your subgraph changes with others
 before applying the build to the supergraph. In order to apply the build, you must be a **subgraph admin** or higher:
 
-```sh
+```ddn
 ddn supergraph build apply <supergraph-build-version>
 ```
 
@@ -289,7 +289,7 @@ The steps below will allow you to incorporate your independent `billing` subgrap
 
 #### Step 1. Create a new repo for the `billing` subgraph
 
-```sh title="Initialize a new local project and git repo:"
+```ddn title="Initialize a new local project and git repo:"
 ddn supergraph init billing-team --create-subgraph billing && cd billing-team && git init
 ```
 
@@ -297,7 +297,7 @@ This will scaffold out the necessary project structure along with initializing a
 
 #### Step 2. Map the local project to the existing cloud project
 
-```sh title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
+```ddn title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
 ddn project init --with-project <project-name>
 ```
 
@@ -305,7 +305,7 @@ You'll see the `project` key-value pair updated in your `.hasura/context.yaml` f
 
 #### Step 3. Set the subgraph context
 
-```sh title="Change the context to your subgraph's configuration file:"
+```ddn title="Change the context to your subgraph's configuration file:"
 ddn context set subgraph ./billing/subgraph.yaml
 ```
 
@@ -339,20 +339,20 @@ As before, we'll use the PostgreSQL connector with our sample database:
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
 ```
 
-```sh title="In your project directory, run:"
+```ddn title="In your project directory, run:"
 ddn connector init billing_pg -i
 ```
 
 ##### Generate the Hasura metadata
 
-```sh title="Next, use the CLI to introspect the PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect the PostgreSQL database:"
 ddn connector introspect billing_pg
 ```
 
 After running this, you should see a representation of your database's schema in the
 `billing/connector/billing_pg/configuration.json` file; you can view this using `cat` or open the file in your editor.
 
-```sh title="Now, track the table from the PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from the PostgreSQL database as a model in your DDN metadata:"
 ddn models add billing_pg orders
 ```
 
@@ -362,19 +362,19 @@ Hasura Metadata Language file to represent the `orders` table from PostgreSQL in
 
 ##### Create a new local build and test the API
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
 Your terminal will be taken over by logs for the different services.
 
-```sh title="In a new terminal tab, open your local console:"
+```ddn title="In a new terminal tab, open your local console:"
 ddn console --local
 ```
 
@@ -424,7 +424,7 @@ query GET_ORDERS {
 
 #### Step 6. Create a subgraph build
 
-```sh title="Once your local metadata is in its desired state, create a subgraph build on your DDN project:"
+```ddn title="Once your local metadata is in its desired state, create a subgraph build on your DDN project:"
 ddn subgraph build create
 ```
 
@@ -432,20 +432,20 @@ The CLI will return the subgraph's build version; you'll need this value in the 
 
 #### Step 7. Create a supergraph build
 
-```sh title="Begin by listing the available supergraph builds:"
+```ddn title="Begin by listing the available supergraph builds:"
 ddn supergraph build get
 ```
 
 Grab the most-recent build's version and use it — along with the subgraph build version — in the following command.
 
-```sh title="Finally, create a supergraph build incorporating your latest subgraph build:"
+```ddn title="Finally, create a supergraph build incorporating your latest subgraph build:"
 ddn supergraph build create --subgraph-version billing:<build-version> --base-supergraph-version <supergraph-build-id>
 ```
 
 The CLI will return a build URL for the console so you can explore your build and test your subgraph changes with others
 before applying the build to the supergraph. In order to apply the build, you must be a **subgraph admin** or higher:
 
-```sh
+```ddn
 ddn supergraph build apply <supergraph-build-version>
 ```
 
@@ -490,15 +490,15 @@ definition:
           - fieldName: userId
 ```
 
-```sh title="Create a new subgraph build:"
+```ddn title="Create a new subgraph build:"
 ddn subgraph build create
 ```
 
-```sh title="Get the list of supergraph builds:"
+```ddn title="Get the list of supergraph builds:"
 ddn supergraph build get
 ```
 
-```sh title="Then, create a supergraph build incorporating your latest subgraph build:"
+```ddn title="Then, create a supergraph build incorporating your latest subgraph build:"
 ddn supergraph build create --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id>
 ```
 

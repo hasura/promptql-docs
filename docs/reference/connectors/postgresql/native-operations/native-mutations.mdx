@@ -114,7 +114,7 @@ RETURNING *;
 
 To list the existing Native Operations for a specific connector, use the `list` command. For example:
 
-```sh
+```ddn
 ddn connector plugin --connector my_subgraph/connector/chinook_pg/connector.yaml -- \
   native-operation list
 ```
@@ -123,7 +123,7 @@ ddn connector plugin --connector my_subgraph/connector/chinook_pg/connector.yaml
 
 A Native Query can be deleted with the `delete` command. For example:
 
-```sh
+```ddn
 ddn connector plugin --connector my_subgraph/connector/chinook_pg/connector.yaml -- \
   native-operation delete --name insert_artist --kind mutation
 ```

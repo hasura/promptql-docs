@@ -138,11 +138,11 @@ By following these steps, you should be able to resolve the introspection hang o
 Typically, you won't experience any issues when connecting to or introspecting a database with a large number of tables.
 However, _builds_ of your supergraph may exceed timeouts given the size of your project.
 
-```sh title="If possible, consider removing unused models via the CLI:"
+```ddn title="If possible, consider removing unused models via the CLI:"
 ddn model remove <table>
 ```
 
-```sh title="Then, retry your supergraph build:"
+```ddn title="Then, retry your supergraph build:"
 ddn supergraph build <local|create>
 ```
 

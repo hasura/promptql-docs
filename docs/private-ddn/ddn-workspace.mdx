@@ -105,19 +105,19 @@ Run the command below to authenticate the CLI with a service account token. If y
 [these](/project-configuration/project-management/service-accounts/#how-to-create-service-account) steps to generate
 one.
 
-```bash
+```ddn
 ddn auth login --access-token <service-account-token>
 ```
 
 Alternatively, if you have opted to use a Personal Access Token (PAT), run the following command instead:
 
-```bash
+```ddn
 ddn auth login --pat <personal-account-token>
 ```
 
 ## Step 4. Scaffold out a new local project
 
-```sh title="Next, create a new local project:"
+```ddn title="Next, create a new local project:"
 ddn supergraph init my-project && cd my-project
 ```
 
@@ -137,7 +137,7 @@ This hostname/IP will be communicated to you by the Hasura team during the coord
 The command below launches a wizard in the DDN CLI to guide you through adding a data connector. You can learn more
 about adding sources via data connectors [here](/data-sources/connect-to-a-source.mdx).
 
-```sh title="Add a data source using the CLI:"
+```ddn title="Add a data source using the CLI:"
 ddn connector init <connector_name> -i
 ```
 
@@ -153,11 +153,11 @@ outcomes and allow for independent ownership and governance of data sources. Lea
 
 ## Step 6. Generate your metadata
 
-```sh title="First, introspect your data source:"
+```ddn title="First, introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```sh title="Then, generate the metadata:"
+```ddn title="Then, generate the metadata:"
 ddn model add <connector_name> '*'
 ddn command add <connector_name> '*'
 ddn relationship add <connector_name> '*'
@@ -180,13 +180,13 @@ the metadata is generated, create a cloud project and deploy your supergraph to 
 In this step, use the `<project-name>` from Step 2.
 :::
 
-```sh title="Initiate against an existing project on your data plane:"
+```ddn title="Initiate against an existing project on your data plane:"
 ddn project init --with-project <project-name>
 ```
 
 ## Step 8. Build and deploy your supergraph
 
-```sh title="Build and deploy your supergraph:"
+```ddn title="Build and deploy your supergraph:"
 ddn supergraph build create
 ```
 

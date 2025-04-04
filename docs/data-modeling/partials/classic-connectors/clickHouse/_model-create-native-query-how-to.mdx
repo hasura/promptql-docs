@@ -24,19 +24,19 @@ The process for adding a native query for ClickHouse is:
 
 - Introspect your ClickHouse data connector to fetch the latest resources.
 
-```bash
+```ddn
 ddn connector introspect <connector_name>
 ```
 
 - Show the found resources to see the new native query.
 
-```bash
+```ddn
 ddn connector show-resources <connector_name>
 ```
 
 - Add the model for the native query.
 
-```bash
+```ddn
 ddn model add <connector_link_name> <model_name>
 ```
 

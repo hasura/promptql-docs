@@ -27,25 +27,25 @@ data model.
 
 Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
 
-```sh
+```ddn
 ddn connector introspect my_connector
 ```
 
 ## Viewing resources
 
-```sh title="You can then view the resources that have been discovered by running:"
+```ddn title="You can then view the resources that have been discovered by running:"
 ddn connector show-resources my_connector
 ```
 
 ## Adding resources
 
-```sh title="And add precisely the resources you need running any of the following commands with real values:"
+```ddn title="And add precisely the resources you need running any of the following commands with real values:"
 ddn model add my_connector my_model
 ddn command add my_connector my_command
 ddn relationship add my_connector my_relationship
 ```
 
-```sh title="Or if you want to add all resources:"
+```ddn title="Or if you want to add all resources:"
 ddn model add my_connector "*"
 ddn command add my_connector "*"
 ddn relationship add my_connector "*"
@@ -61,7 +61,7 @@ context. See more about [semantic information here](/data-modeling/semantic-info
 
 ## Building a new supergraph
 
-```sh title="You can then build a new local supergraph by running:"
+```ddn title="You can then build a new local supergraph by running:"
 ddn supergraph build local
 ```
 
@@ -71,13 +71,13 @@ You can also build a new supergraph for a project on Hasura Cloud:
 
 If you don't have a project on Hasura Cloud, you can create one by running:
 
-```sh
+```ddn
 ddn project init
 ```
 
 Then:
 
-```sh
+```ddn
 ddn supergraph build create
 ```
 
@@ -87,6 +87,6 @@ ddn supergraph build create
 
 If you are iterating locally, you then need to restart the Docker services by running:
 
-```sh
+```ddn
 ddn run docker-start
 ```

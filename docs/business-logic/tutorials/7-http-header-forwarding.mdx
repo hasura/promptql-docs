@@ -88,7 +88,7 @@ across all functions and it must always be used to receive HTTP headers.
 
 Next, we need to re-introspect the connector given that we just changed the definition of our functions.
 
-```bash title="Introspect the connector"
+```ddn title="Introspect the connector"
 ddn connector introspect my_ts
 ```
 
@@ -138,7 +138,7 @@ definition:
 
 Now, we can rebuild the supergraph and test our changes:
 
-```bash title="Run:"
+```ddn title="Run:"
 ddn supergraph build local
 ```
 
@@ -158,7 +158,7 @@ therefore are not defined on the `Command` as arguments that API users can set.
 
 Don't forget to start your GraphQL engine using the following command.
 
-```bash title="From the root of your project, run:"
+```ddn title="From the root of your project, run:"
 ddn run docker-start
 ```
 
@@ -169,7 +169,7 @@ any connectors, and observability tools.
 
 Launch the Hasura console to see and test your GraphQL API using:
 
-```bash title="Run:"
+```ddn title="Run:"
 ddn console --local
 ```
 
@@ -255,7 +255,7 @@ return that, as well as our response string, inside our new `HeadersResponse` ob
 
 Next, we need to re-introspect the connector given that we just changed the definition of our functions.
 
-```bash title="Introspect the connector"
+```ddn title="Introspect the connector"
 ddn connector introspect my_ts
 ```
 
@@ -306,7 +306,7 @@ definition:
 
 Now, we can rebuild the supergraph and test our changes:
 
-```bash title="Run:"
+```ddn title="Run:"
 ddn supergraph build local
 ```
 
@@ -326,7 +326,7 @@ agent schema".
 
 Don't forget to start your GraphQL engine using the following command.
 
-```bash title="From the root of your project, run:"
+```ddn title="From the root of your project, run:"
 ddn run docker-start
 ```
 
@@ -337,6 +337,6 @@ any connectors, and observability tools.
 
 Launch the Hasura console to see and test your GraphQL API using:
 
-```bash title="Run:"
+```ddn title="Run:"
 ddn console --local
 ```

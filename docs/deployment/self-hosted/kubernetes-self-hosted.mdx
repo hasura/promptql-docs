@@ -57,7 +57,7 @@ For more details regarding local development, you may reference our
 
 :::
 
-```bash title="Login with the DDN CLI."
+```ddn title="Login with the DDN CLI."
 ddn auth login
 ```
 
@@ -65,33 +65,33 @@ ddn auth login
 mkdir hasura_project && cd hasura_project
 ```
 
-```bash title="Initialize supergraph."
+```ddn title="Initialize supergraph."
 ddn supergraph init .
 ```
 
-```bash title="Add a connector.  Here, we are using the -i flag for interactive mode."
+```ddn title="Add a connector.  Here, we are using the -i flag for interactive mode."
 ddn connector init -i
 ```
 
-```bash title="Introspect the data source.  Substitute <connector-name> with name you chose for your connector above."
+```ddn title="Introspect the data source.  Substitute <connector-name> with name you chose for your connector above."
 ddn connector introspect <connector-name>
 ```
 
-```bash title="Add models, commands and relationships based on the output from previous command.  Substitute <connector-name> with name you chose for your connector above."
+```ddn title="Add models, commands and relationships based on the output from previous command.  Substitute <connector-name> with name you chose for your connector above."
 ddn model add <connector-name> "*"
 ddn command add <connector-name> "*"
 ddn relationship add <connector-name> "*"
 ```
 
-```bash title="Build the supergraph locally."
+```ddn title="Build the supergraph locally."
 ddn supergraph build local
 ```
 
-```bash title="Run docker.  Ensure all containers start up successfully."
+```ddn title="Run docker.  Ensure all containers start up successfully."
 ddn run docker-start
 ```
 
-```bash title="Verify via local console."
+```ddn title="Verify via local console."
 ddn console --local
 ```
 
@@ -188,7 +188,7 @@ helm upgrade --install <connector-helm-release-name> \
 
 Ensure that you are running the commands here from the root of your supergraph.
 
-```bash title="Create cloud project."
+```ddn title="Create cloud project."
 ddn project init --data-plane-id <data-plane-id>
 ```
 
@@ -223,7 +223,7 @@ URL: **http://`<connector-helm-release-name>`-`<connector-type>`.`<namespace>`:8
 After making the necessary changes to your `.env.cloud` file, run the below command. This will create a cloud build and
 will also generate the necessary artifacts which will later on be consumed by your v3-engine.
 
-```bash title="Create a build for your cloud project."
+```ddn title="Create a build for your cloud project."
 ddn supergraph build create --self-hosted-data-plane --output-dir build-cloud --project <ddn-project-name> --out json
 ```
 
@@ -362,7 +362,7 @@ Next, you will be running the command below in order to record the ingress URL w
 
 :::
 
-```bash title="Record the ingress URL for your build version."
+```ddn title="Record the ingress URL for your build version."
 ddn supergraph build set-self-hosted-engine-url <ingress-url> --build-version <build_version> --project <ddn-project-name>
 ```
 
@@ -476,7 +476,7 @@ within Hasura's Control Plane.
 
 :::
 
-```bash title="Record the ingress URL for your project's API."
+```ddn title="Record the ingress URL for your project's API."
 ddn project set-self-hosted-engine-url <ingress-url>
 ```
 
@@ -501,7 +501,7 @@ step below.
 
 :::
 
-```bash title="Mark build as applied."
+```ddn title="Mark build as applied."
 ddn supergraph build apply <build_version>
 ```
 

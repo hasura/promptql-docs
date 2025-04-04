@@ -18,13 +18,13 @@ will generate an `app` subgraph when a new project is initialized.
 
 ## In your local metadata {#local}
 
-```sh title="Within a local project directory, run the following:"
+```ddn title="Within a local project directory, run the following:"
 ddn subgraph init <subgraph-name>
 ```
 
 You can verify this by identifying the new subdirectory in your project with the subgraph's name.
 
-```sh title="Then, add the subgraph to your supergraph's config file:"
+```ddn title="Then, add the subgraph to your supergraph's config file:"
 ddn subgraph add <subgraph-name> --subgraph ./<subgraph-name>/subgraph.yaml --target-supergraph ./supergraph.yaml
 ```
 
@@ -48,7 +48,7 @@ existing project — follow these steps:
 
 ### Using the CLI
 
-```sh title="The folowing will create a new subgraph on the current context's cloud project:"
+```ddn title="The folowing will create a new subgraph on the current context's cloud project:"
 ddn project subgraph create <subgraph-name>
 ```
 

@@ -105,7 +105,7 @@ At this stage, you can now build and deploy your connector on Hasura DDN.
 
 You can build the entire supergraph with all subgraphs and connectors.
 
-```bash
+```ddn
 ddn supergraph build create
 ```
 
@@ -114,7 +114,7 @@ You can also specify exactly which subgraphs and connectors you want to build. S
 
 To build a specific connector, run the following replacing the directory names with those that reflect your project.
 
-```bash title="Taking care to update the path to your connector's configuration file, run:"
+```ddn title="Taking care to update the path to your connector's configuration file, run:"
 ddn connector build create --connector ./my_subgraph/connector/my_connector/connector.yaml
 ```
 

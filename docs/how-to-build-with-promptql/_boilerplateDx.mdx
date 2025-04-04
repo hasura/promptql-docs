@@ -2,7 +2,7 @@ import { PqlChat, User, Pql, QueryPlanComponent } from "@site/src/components/Pql
 
 ### Step 4. Introspect your source
 
-```sh title="Next, use the CLI to introspect your source:"
+```ddn title="Next, use the CLI to introspect your source:"
 ddn connector introspect my_connector
 ```
 
@@ -10,13 +10,13 @@ After running this, you should see a representation of your source's schema in t
 `app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
 editor.
 
-```sh title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
 ddn connector show-resources my_connector
 ```
 
 ### Step 5. Add your resources
 
-```sh title="Add your resources to create metadata:"
+```ddn title="Add your resources to create metadata:"
 ddn model add my_connector "*"
 ddn command add my_connector "*"
 ddn relationship add my_connector "*"
@@ -37,7 +37,7 @@ context. See more about [semantic information here](/data-modeling/semantic-info
 
 ### Step 7. Create a new build
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
@@ -45,7 +45,7 @@ The build is stored as a set of JSON files in `engine/build`.
 
 ### Step 8. Start your local services
 
-```sh title="Start your local Hasura DDN Engine and connector:"
+```ddn title="Start your local Hasura DDN Engine and connector:"
 ddn run docker-start
 ```
 
@@ -53,7 +53,7 @@ Your terminal will be taken over by logs for the different services.
 
 ### Step 9. Chat with your data
 
-```sh title="In a new terminal tab, open your local console:"
+```ddn title="In a new terminal tab, open your local console:"
 ddn console --local
 ```
 

@@ -4,7 +4,7 @@ Within your connector's directory, you can add a new file with a `.sql` extensio
 
 Then, use the PostgreSQL connector's plugin to add the native operation to your connector's configuration:
 
-```sh title="Then, use the PostgreSQL connector's plugin to add the native operation to your connector's configuration:"
+```ddn title="Then, use the PostgreSQL connector's plugin to add the native operation to your connector's configuration:"
 ddn connector plugin \
   --connector <subgraph_name>/<path-to-your-connector>/connector.yaml \
   -- \
@@ -16,15 +16,15 @@ ddn connector plugin \
 By specifying the `--kind mutation` flag, you are indicating that the operation is a mutation. If you specify
 `--kind query`, the operation will be a query.
 
-```sh title="Introspect your PostgreSQL instance:"
+```ddn title="Introspect your PostgreSQL instance:"
 ddn connector introspect <connector_name>
 ```
 
-```sh title="Show the found resources:"
+```ddn title="Show the found resources:"
 ddn connector show-resources <connector_name>
 ```
 
-```sh title="Then, add your model:"
+```ddn title="Then, add your model:"
 ddn command add <connector_name> <mutation_name>
 ```
 

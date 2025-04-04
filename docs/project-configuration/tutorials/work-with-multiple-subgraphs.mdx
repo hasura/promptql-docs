@@ -34,7 +34,7 @@ This tutorial should take less than twenty minutes.
 
 ### Step 1. Initialize a new local project
 
-```sh title="Create the project directory and move into it:"
+```ddn title="Create the project directory and move into it:"
 ddn supergraph init subgraph-example && cd subgraph-example
 ```
 
@@ -46,20 +46,20 @@ In this tutorial, we'll use the PostgreSQL connector and our sample PostgreSQL d
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
 ```
 
-```sh title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
+```ddn title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
 ddn connector init customers_pg -i
 ```
 
 ### Step 3. Generate the Hasura metadata
 
-```sh title="Next, use the CLI to introspect your PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect your PostgreSQL database:"
 ddn connector introspect customers_pg
 ```
 
 After running this, you should see a representation of your database's schema in the
 `app/connector/customers_pg/configuration.json` file; you can view this using `cat` or open the file in your editor.
 
-```sh title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
 ddn models add customers_pg users
 ```
 
@@ -69,19 +69,19 @@ Metadata Language file to represent the `users` table from PostgreSQL in your AP
 
 ### Step 4. Create a new local build and test the API
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
 Your terminal will be taken over by logs for the different services.
 
-```sh title="In a new terminal tab, open your local console:"
+```ddn title="In a new terminal tab, open your local console:"
 ddn console --local
 ```
 
@@ -127,7 +127,7 @@ query GET_USERS {
 
 ### Step 5. Create a new `billing` subgraph
 
-```sh title="Use the DDN CLI to create the subgraph in your local metadata:"
+```ddn title="Use the DDN CLI to create the subgraph in your local metadata:"
 ddn subgraph init billing --graphql-type-name-prefix billing
 ```
 
@@ -138,7 +138,7 @@ Additionally, by adding the `--graphql-type-name-prefix` flag, we're ensuring an
 conflict with existing types from our other subgraph. If we had concerns about conflicts of root-level GraphQL fields,
 we could also add the flag `--graphql-root-field-prefix`.
 
-```sh title="Then, add it to your supergraph.yaml config:"
+```ddn title="Then, add it to your supergraph.yaml config:"
 ddn subgraph add billing --subgraph ./billing/subgraph.yaml --target-supergraph ./supergraph.yaml
 ```
 
@@ -156,7 +156,7 @@ definition:
 
 ### Step 6. Switch contexts {#switch-contexts}
 
-```sh title="Switch contexts to the billing subgraph:"
+```ddn title="Switch contexts to the billing subgraph:"
 ddn context set subgraph billing/subgraph.yaml
 ```
 
@@ -171,7 +171,7 @@ As before, we'll use the PostgreSQL connector with our sample database:
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
 ```
 
-```sh title="In your project directory, run:"
+```ddn title="In your project directory, run:"
 ddn connector init billing_pg -i
 ```
 
@@ -184,14 +184,14 @@ connector in the `billing` subgraph directory.
 
 ### Step 8. Generate the Hasura metadata
 
-```sh title="Next, use the CLI to introspect the PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect the PostgreSQL database:"
 ddn connector introspect billing_pg
 ```
 
 After running this, you should see a representation of the database's schema in the
 `billing/connector/billing_pg/configuration.json` file; you can view this using `cat` or open the file in your editor.
 
-```sh title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
 ddn models add billing_pg orders
 ```
 
@@ -201,7 +201,7 @@ use this Hasura Metadata Language file to represent the `payment_information` ta
 
 ### Step 9. Create a new local build and test the API
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
@@ -209,11 +209,11 @@ ddn supergraph build local
 CTRL+C
 ```
 
-```sh title="Restart your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Restart your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
-```sh title="In a new terminal tab, open your local console:"
+```ddn title="In a new terminal tab, open your local console:"
 ddn console --local
 ```
 
@@ -253,11 +253,11 @@ By calling out the `billing` subgraph in the relationship object, the
 [Hasura VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you with
 validating your configuration.
 
-```sh title="Then, create a new build:"
+```ddn title="Then, create a new build:"
 ddn supergraph build local
 ```
 
-```sh title="And kill your services with CTRL+C before restarting them:"
+```ddn title="And kill your services with CTRL+C before restarting them:"
 ddn run docker-start
 ```
 
@@ -341,7 +341,7 @@ query GET_USERS_AND_ORDERS {
 
 ### Step 11. Create a cloud project
 
-```sh title="Using your default context, create a new cloud project:"
+```ddn title="Using your default context, create a new cloud project:"
 ddn project init
 ```
 
@@ -353,7 +353,7 @@ Additionally, the CLI will output information about each subgraph that it genera
 
 ### Step 12. Create a new build on your production project
 
-```sh title="Finally, create a new build on your cloud project:"
+```ddn title="Finally, create a new build on your cloud project:"
 ddn supergraph build create
 ```
 

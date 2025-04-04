@@ -35,11 +35,11 @@ is used instead of `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` in `connector.yaml` and 
 To start using this new feature in an existing project:
 
 1. Update your CLI to the latest version.
-```bash
+```ddn
 ddn update-cli
 ```
 2. Run codemod from Hasura project directory to update the name of the environment variables
-```bash
+```ddn
 ddn codemod fix-traces-env-var --dir .
 ```
 
