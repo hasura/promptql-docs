@@ -137,6 +137,10 @@ const config: Config = {
     },
   ],
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark',
+      disableSwitch: true,
+    },
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
