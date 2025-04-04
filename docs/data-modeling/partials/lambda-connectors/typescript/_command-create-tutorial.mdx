@@ -11,23 +11,23 @@ export function shoutName(name: string): string {
 }
 ```
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_ts shoutName
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

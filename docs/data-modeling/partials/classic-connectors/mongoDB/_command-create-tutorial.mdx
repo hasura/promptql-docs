@@ -36,7 +36,7 @@ mkdir -p app/connector/my_mongo/native_mutations/
 }
 ```
 
-```bash title="Use the DDN CLI to introspect your MongoDB instance:"
+```ddn title="Use the DDN CLI to introspect your MongoDB instance:"
 ddn connector introspect my_mongo
 ```
 
@@ -50,13 +50,13 @@ ddn command add my_mongo insertUser
 
 Rebuild your supergraph API.
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
 Serve your build.
 
-```bash title="Serve your build:"
+```ddn title="Serve your build:"
 ddn run docker-start
 ddn console --local
 ```

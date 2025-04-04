@@ -19,23 +19,23 @@ By adding the `@readonly` tag, we are indicating that this function is a read-on
 function which will ulitmately show up as a GraphQL query. Leaving the tag off will expose the function as an NDC
 procedure which will be a GraphQL mutation.
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_ts myCustomCode
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

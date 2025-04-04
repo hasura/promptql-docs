@@ -54,7 +54,7 @@ Build and deploy your connector and note the:
 
 For example, to build the connector on DDN:
 
-```bash title="Build connector on DDN using config at <subgraph-name>/connector/<connector-name>/connector.yaml"
+```ddn title="Build connector on DDN using config at <subgraph-name>/connector/<connector-name>/connector.yaml"
 ddn connector build create --connector <subgraph-name>/connector/<connector-name>/connector.yaml \
   --env-file .env.cloud \
   --project <project-name>
@@ -153,7 +153,7 @@ definition:
 
 Now you can run the following command to build the supergraph:
 
-```bash
+```ddn
 ddn run build-supergraph
 ```
 

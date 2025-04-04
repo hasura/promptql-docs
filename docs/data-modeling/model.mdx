@@ -50,26 +50,26 @@ that point.
 
 ### From a source entity
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
 Whenever you update your data source, you can run the above command to fetch the latest resources.
 
-```bash title="Show the resources discovered from your data source:"
+```ddn title="Show the resources discovered from your data source:"
 ddn connector show-resources <connector_name>
 ```
 
 This is an optional step and will output a list of resources that DDN discovered in your data source in the previous
 step.
 
-```bash
+```ddn
 ddn model add <connector_link_name> <collection_name>
 ```
 
 Or you can optionally add all the models by specifying `"*"`.
 
-```bash
+```ddn
 ddn model add <connector_link_name> "*"
 ```
 
@@ -118,11 +118,11 @@ its own syntax.
 If you want to update your model to reflect a change that happened in the underlying data source you should first
 introspect to get the latest resources and then update the relevant model.
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Then, update your existing model:"
+```ddn title="Then, update your existing model:"
 ddn model update <connector_link_name> <model_name>
 ```
 
@@ -148,7 +148,7 @@ The way this is done is via a `Relationship`. Read more about
 
 ## Delete a model
 
-```bash title="If you no longer need a model, you can delete it:"
+```ddn title="If you no longer need a model, you can delete it:"
 ddn model remove users
 ```
 
@@ -211,11 +211,11 @@ Your underlying data source may change over time. You can update your model to r
 You'll need to update the mapping of your model to the data source by updating the
 [DataConnectorLink](/reference/metadata-reference/data-connector-links.mdx) object.
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Then, update your model:"
+```ddn title="Then, update your model:"
 ddn model update <connector_link_name> <model_name>
 ```
 
@@ -231,7 +231,7 @@ Find tutorials about extending a model with related information or custom logic 
 
 ### Deleting a model
 
-```bash title="If you no longer need a model, you can delete it:"
+```ddn title="If you no longer need a model, you can delete it:"
 ddn model remove users
 ```
 

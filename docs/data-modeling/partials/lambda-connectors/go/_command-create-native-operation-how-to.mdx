@@ -39,23 +39,23 @@ Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutat
 Both have typed input arguments and return strings, which the connector will use to generate the corresponding GraphQL
 schema.
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_go
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_go customCode
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

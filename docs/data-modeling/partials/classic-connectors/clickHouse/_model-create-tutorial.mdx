@@ -16,23 +16,23 @@ INSERT INTO comments (id, comment, user_id, post_id) VALUES
     (3, 'Interesting perspective.', 3, 1);
 ```
 
-```bash title="Use the DDN CLI to introspect your ClickHouse instance:"
+```ddn title="Use the DDN CLI to introspect your ClickHouse instance:"
 ddn connector introspect my_clickhouse
 ```
 
-```bash title="Then, add your model:"
+```ddn title="Then, add your model:"
 ddn model add my_clickhouse comments
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

@@ -24,23 +24,23 @@ By adding the `@connector.register_query` decorator, we are indicating that this
 function which will ultimately show up as a GraphQL query. If you use `@connector.register_mutation` instead, the
 function will be exposed as an NDC procedure which will be a GraphQL mutation.
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_py
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_py my_custom_code
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

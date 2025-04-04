@@ -66,21 +66,21 @@ mutation operation.
 The DDN CLI and your data connectors will detect many relationships in your data sources automatically, for instance
 from foreign keys in a relational database, and once introspected, you can add them to your metadata.
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Show the found relationships:"
+```ddn title="Show the found relationships:"
 ddn connector show-resources <connector_name>
 ```
 
-```bash title="Add a relationship to your metadata:"
+```ddn title="Add a relationship to your metadata:"
 ddn relationship add <connector_link_name> <collection_name>
 ```
 
 Or optionally add all relationships found for a connector at once:
 
-```bash
+```ddn
 ddn relationship add <connector_link_name> "*"
 ```
 
@@ -136,17 +136,17 @@ the relationship to reflect this change.
 
 First, update your connector configuration and models.
 
-```bash title="Update your source introspection:"
+```ddn title="Update your source introspection:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Then, update your model:"
+```ddn title="Then, update your model:"
 ddn model update <connector_name> <model_name>
 ```
 
 Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
 
-```bash title="Delete your existing relationship manually and add it again:"
+```ddn title="Delete your existing relationship manually and add it again:"
 ddn relationship add <connector_link_name> <collection_name>
 ```
 
@@ -195,7 +195,7 @@ all connector types.
 
 Initialize a new data connector with the TypeScript connector.
 
-```bash title="Run the following command in your DDN project directory:"
+```ddn title="Run the following command in your DDN project directory:"
 ddn connector init my_ts -i
 ```
 
@@ -209,13 +209,13 @@ export function shoutName(name: string) {
 }
 ```
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
 ```
 
 Then, we can add the model made available from the introspection.
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_ts shoutName
 ```
 
@@ -246,11 +246,11 @@ definition:
           argumentName: name # The name of the argument on the target command that we want to map to the source field
 ```
 
-```bash title="Create a build of your supergraph API:"
+```ddn title="Create a build of your supergraph API:"
 ddn supergraph build local
 ```
 
-```bash title="Serve your build as your API locally:"
+```ddn title="Serve your build as your API locally:"
 ddn run docker-start
 ddn console --local
 ```
@@ -299,17 +299,17 @@ the relationship to reflect this change.
 
 First, update your connector configuration and models.
 
-```bash title="Update your source introspection:"
+```ddn title="Update your source introspection:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Then, update your model:"
+```ddn title="Then, update your model:"
 ddn model update <connector_name> <model_name>
 ```
 
 Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
 
-```bash title="Delete your existing relationship manually and add it again:"
+```ddn title="Delete your existing relationship manually and add it again:"
 ddn relationship add <connector_link_name> <collection_name>
 ```
 

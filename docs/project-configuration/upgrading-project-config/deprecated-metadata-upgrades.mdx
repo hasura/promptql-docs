@@ -28,7 +28,7 @@ to the new [`BooleanExpressionType`](/reference/metadata-reference/boolean-expre
 
 This enables filtering Models on nested objects and arrays, and based on relationships.
 
-```bash
+```ddn
 ddn codemod upgrade-object-boolean-expression-types
 ```
 
@@ -40,7 +40,7 @@ run the codemod against a different supergraph or subgraph.
 Add aggregates support to metadata through [`AggregateExpression`](/reference/metadata-reference/aggregate-expressions).
 Use aggregates (like sum, min, count, etc) in your GraphQL API.
 
-```bash
+```ddn
 ddn codemod upgrade-graphqlconfig-aggregate
 ```
 
@@ -50,7 +50,7 @@ The `GraphqlConfig` metadata object is required to be upgraded to enable aggrega
 
 Run against a specific supergraph.yaml or subgraph.yaml file
 
-```bash
+```ddn
 ddn codemod upgrade-graphqlconfig-aggregate --supergraph ./supergraph.cloud.yaml
 ddn codemod upgrade-graphqlconfig-aggregate --subgraph ./app/subgraph.yaml
 ```

@@ -15,23 +15,23 @@ VALUES
   ('Interesting perspective.', 3, 1);
 ```
 
-```bash title="Use the DDN CLI to introspect your PostgreSQL instance:"
+```ddn title="Use the DDN CLI to introspect your PostgreSQL instance:"
 ddn connector introspect my_pg
 ```
 
-```bash title="Then, add your model:"
+```ddn title="Then, add your model:"
 ddn model add my_pg comments
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

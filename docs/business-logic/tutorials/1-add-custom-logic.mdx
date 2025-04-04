@@ -40,7 +40,7 @@ ddn supergraph init lambda-tutorial
 
 <TabItem value="TypeScript" label="TypeScript">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_ts -i
 ```
 
@@ -54,7 +54,7 @@ the entrypoint for your connector.
 
 <TabItem value="Python" label="Python">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_python -i
 ```
 
@@ -68,7 +68,7 @@ be the entrypoint for your connector.
 
 <TabItem value="Go" label="Go">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_go -i
 ```
 
@@ -199,7 +199,7 @@ schema.
 
 <TabItem value="TypeScript" label="TypeScript">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
 ```
 
@@ -213,7 +213,7 @@ ddn command add my_ts encode
 
 <TabItem value="Python" label="Python">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_python
 ```
 
@@ -227,7 +227,7 @@ ddn command add my_python encode
 
 <TabItem value="Go" label="Go">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_go
 ```
 
@@ -246,15 +246,15 @@ generated Hasura metadata for each. Look for `Hello.hml` and `Encode.hml` to see
 
 ## Step 5. Create a new build and test
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your local console:"
+```ddn title="Open your local console:"
 ddn console --local
 ```
 

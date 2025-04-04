@@ -31,23 +31,23 @@ func FunctionShoutName(ctx context.Context, state *types.State, arguments *NameA
 }
 ```
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_go
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_go shoutName
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

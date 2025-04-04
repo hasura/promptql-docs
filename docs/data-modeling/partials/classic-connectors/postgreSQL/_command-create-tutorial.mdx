@@ -1,10 +1,10 @@
 First, show a list of resouces identified by the connector.
 
-```bash title="Use the DDN CLI to introspect your PostgreSQL database:"
+```ddn title="Use the DDN CLI to introspect your PostgreSQL database:"
 ddn connector introspect <connector_name>
 ```
 
-```bash
+```ddn
 ddn connector show-resources my_pg
 ```
 
@@ -17,13 +17,13 @@ ddn command add my_pg insert_users
 
 Rebuild your supergraph API.
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
 Serve your build.
 
-```bash title="Serve your build:"
+```ddn title="Serve your build:"
 ddn run docker-start
 ddn console --local
 ```

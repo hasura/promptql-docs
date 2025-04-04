@@ -253,11 +253,11 @@ An `Owner` or an `Admin` role can build and apply new supergraph and specify sub
 
 You can also list the available builds of subgraphs to use with:
 
-```bash
+```ddn
 ddn subgraph build get
 ```
 
-```bash title="Build a supergraph based on a specific build and with mutiple specific subgraphs"
+```ddn title="Build a supergraph based on a specific build and with mutiple specific subgraphs"
 ddn supergraph build create --subgraph-version <subgraph_name:subgraph_version> --subgraph-version <subgraph_name:subgraph_version>  --base-supergraph-version <supergraph_version>
 ```
 
@@ -268,11 +268,11 @@ See more about incremental builds [here](/deployment/hasura-ddn/incremental-buil
 An `Owner`, `Admin`, `Subgraph Admin` and `Subgraph Developer` role can build a single subgraph. All except
 `Subgraph Developer` can apply a single subgraph.
 
-```bash title="Build a single subgraph"
+```ddn title="Build a single subgraph"
 ddn subgraph build create --subgraph-version <subgraph_name:subgraph_version> --base-supergraph-version <supergraph_version>
 ```
 
-```bash title="Apply a single subgraph. Unavailable for Subgraph Developer role"
+```ddn title="Apply a single subgraph. Unavailable for Subgraph Developer role"
 ddn subgraph build apply --subgraph-version <subgraph_name:subgraph_version>
 ```
 

@@ -102,7 +102,7 @@ Metadata Language file to represent the `users` table from PostgreSQL in your AP
 
 <TabItem value="TypeScript" label="TypeScript">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_ts -i
 ```
 
@@ -116,7 +116,7 @@ the entrypoint for your connector.
 
 <TabItem value="Python" label="Python">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_python -i
 ```
 
@@ -130,7 +130,7 @@ be the entrypoint for your connector.
 
 <TabItem value="Go" label="Go">
 
-```bash title="Run the following command:"
+```ddn title="Run the following command:"
 ddn connector init my_go -i
 ```
 
@@ -221,7 +221,7 @@ func FunctionShoutName(ctx context.Context, state *types.State, arguments *Upper
 
 <TabItem value="TypeScript" label="TypeScript">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
 ```
 
@@ -234,7 +234,7 @@ ddn command add my_ts shoutName
 
 <TabItem value="Python" label="Python">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_python
 ```
 
@@ -247,7 +247,7 @@ ddn command add my_python shoutName
 
 <TabItem value="Go" label="Go">
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_go
 ```
 
@@ -284,15 +284,15 @@ definition:
 
 ## Step 7. Create a new build and test
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your local console:"
+```ddn title="Open your local console:"
 ddn console --local
 ```
 
