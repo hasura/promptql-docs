@@ -1,10 +1,12 @@
 ---
 sidebar_position: 5
 sidebar_label: "Permissions protect data"
-description: "Permissions allow you to control who can access your data and what they can do with it."
+description:
+  "Permissions allow you to control who can access your data and what they can do with it when using PromptQL."
 keywords:
   - permissions
   - data modeling
+  - PromptQL
 toc_max_heading_level: 4
 ---
 
@@ -12,7 +14,9 @@ toc_max_heading_level: 4
 
 ## Introduction
 
-Permissions keep data secure by allowing you to control what can be accessed via PromptQL by which user roles.
+Permissions keep data secure by allowing you to control what data can be accessed through PromptQL conversations by
+which user roles. This ensures that when users talk to their data using PromptQL, they only see the information they're
+authorized to access.
 
 When an authentication mode is enabled, the Hasura engine will look for session variables on every PromptQL request, it
 can then use permissions defined in metadata and the session variables to determine if the request is allowed to
@@ -20,7 +24,8 @@ proceed.
 
 ## Lifecycle
 
-Hasura DDN uses Role Based Access Control (RBAC) to determine which user roles can access which data.
+Hasura DDN uses Role Based Access Control (RBAC) to determine which user roles can access which data in your supergraph
+when interacting with PromptQL.
 
 The DDN CLI will automatically create permissions for your models and commands when they are added to your metadata for
 only the `admin` role by default.
@@ -31,9 +36,11 @@ All other permissions for all other user roles must be added manually.
 
 ### Row access
 
-You can create a `ModelPermission` object to implement row-level security and restrict which rows a user can access.
+You can create a `ModelPermission` object to implement row-level security and restrict which rows a user can access
+through PromptQL.
 
-For example, to only allow users to access their own records in the `Users` table:
+For example, to only allow users to access their own records in the `Users` table when talking to their data through
+PromptQL:
 
 ```yaml title=""
 ---
@@ -59,12 +66,12 @@ definition:
     #highlight-end
 ```
 
-The highlighted role above will filter responses from the `Users` field in your API to only those whose `id` matches the
-`x-hasura-user-id` passed in the header of the request.
+The highlighted role above will filter data accessed through PromptQL to only show `Users` records whose `id` matches
+the `x-hasura-user-id` passed in the header of the request.
 
 ### Field access
 
-To restrict which fields can be queried, you can create a `TypePermission` object.
+To restrict which fields can be accessed through PromptQL conversations, you can create a `TypePermission` object.
 
 Below, the user role can only access the `name` field, not the `id` field which the admin role can.
 
@@ -92,7 +99,8 @@ definition:
 
 ### Command (mutation) access
 
-To determine commands can be executed by which roles, you can create a `CommandPermission` object.
+To determine which commands can be executed by which roles when interacting with PromptQL, you can create a
+`CommandPermission` object.
 
 ```yaml title="In this example, we'll make it so a user can update their own record:"
 # e.g., UpdateUsersById.hml
@@ -114,11 +122,15 @@ definition:
       #highlight-end
 ```
 
+When a user asks PromptQL to update their information, these permissions ensure that they can only modify their own
+records.
+
 ## Update permissions
 
 Since all permissions are stored in metadata, you can use your text editor to find and update them easily.
 
-For example, to check everything which the `user` role can access, search for `- role: user` and analyze the results.
+For example, to check everything which the `user` role can access when talking to data through PromptQL, search for
+`- role: user` and analyze the results.
 
 ## Deleting permissions
 
