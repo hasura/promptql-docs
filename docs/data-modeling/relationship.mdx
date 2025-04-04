@@ -111,6 +111,12 @@ version: v1
 definition:
   sourceType: Customers # The existing source object type which also defines the model
   name: orders # A name we want to use when we query the Orders from the Customer
+  description: |
+    Links customers to their purchase orders.
+    One customer can have multiple orders.
+    This is a critical business relationship that supports order history lookups, 
+    customer purchase analysis, and revenue attribution.
+    Historical orders are retained even if customer becomes inactive.
   target:
     model: # The target can be a model or a command
       name: Orders # The existing model that we want to access when we query the Orders from the Customer
