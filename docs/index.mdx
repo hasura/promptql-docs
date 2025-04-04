@@ -32,6 +32,7 @@ import Quickstart from "@site/static/icons/cloud-lightning.svg";
 import Introduction from "@site/static/icons/award-02.svg";
 import CellTower from "@site/static/icons/general/cell-tower.svg";
 import Handshake from "@site/static/icons/general/handshake.svg";
+import Banking from "@site/static/icons/general/banking.svg";
 import Healthcare from "@site/static/icons/general/healthcare.svg";
 import { OverviewIconCard } from "@site/src/components/OverviewIconCard";
 import Link from "@docusaurus/Link";
@@ -75,17 +76,7 @@ import Link from "@docusaurus/Link";
 Check out these three demos to get a feel for how PromptQL works.
 
 <div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-telco/playground" className="demo-box">
-    <div className="icon-wrapper">
-      <CellTower className="demo-icon" />
-    </div>
-    <h3>Telco</h3>
-    <p>Explore how telecom companies use PromptQL to analyze customer data, optimize network performance, and deliver personalized services.</p>
-  </a>
-
-{" "}
-
-<a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box">
+  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box">
   <div className="icon-wrapper">
     <Handshake className="demo-icon" />
   </div>
@@ -96,13 +87,28 @@ Check out these three demos to get a feel for how PromptQL works.
   </p>
 </a>
 
-  <a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box">
-    <div className="icon-wrapper">
-      <Healthcare className="demo-icon" />
-    </div>
-    <h3>Healthcare</h3>
-    <p>Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve operational efficiency while maintaining compliance.</p>
-  </a>
+<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box">
+  <div className="icon-wrapper">
+    <Healthcare className="demo-icon" />
+  </div>
+  <h3>Healthcare</h3>
+  <p>
+    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
+    operational efficiency while maintaining compliance.
+  </p>
+</a>
+
+<a href="https://promptql.console.hasura.io/public/sandbox-aml/playground" className="demo-box">
+  <div className="icon-wrapper">
+    <Banking className="demo-icon" />
+  </div>
+  <h3>AML</h3>
+  <p>
+    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
+    transaction data, uncovering suspicious patterns, and enhancing compliance with regulatory requirements.
+  </p>
+</a>
+
 </div>
 
 <style>
