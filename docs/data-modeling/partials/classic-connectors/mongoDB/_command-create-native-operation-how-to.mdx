@@ -7,15 +7,15 @@ See the syntax for MongoDB native operations [here](/reference/connectors/mongod
 Store your native operation in an appropriate directory, possibly named for the operation type, in your connector's
 directory.
 
-```sh title="Introspect your MongoDB instance:"
+```ddn title="Introspect your MongoDB instance:"
 ddn connector introspect <connector_name>
 ```
 
-```sh title="Show the found resources:"
+```ddn title="Show the found resources:"
 ddn connector show-resources <connector_name>
 ```
 
-```sh title="Then, add your model:"
+```ddn title="Then, add your model:"
 ddn command add <connector_name> <operation_name>
 ```
 

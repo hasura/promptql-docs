@@ -30,7 +30,7 @@ a movie on a user's behalf.
 
 ### Step 1. Authenticate your CLI
 
-```sh title="Before you can create a new Hasura DDN project, you need to authenticate your CLI:"
+```ddn title="Before you can create a new Hasura DDN project, you need to authenticate your CLI:"
 ddn auth login
 ```
 
@@ -39,7 +39,7 @@ acknowledge your login, giving you access to Hasura Cloud resources.
 
 ### Step 2. Scaffold out a new local project
 
-```sh title="Next, create a new local project:"
+```ddn title="Next, create a new local project:"
 ddn supergraph init imdb-promptflix --with-promptql && cd imdb-promptflix
 ```
 
@@ -48,7 +48,7 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 
 ### Step 3. Initialize your PostgreSQL connector
 
-```sh title="In your project directory, run:"
+```ddn title="In your project directory, run:"
 ddn connector init imdb -i
 ```
 
@@ -63,7 +63,7 @@ You can press `ENTER` to advance through the remaining prompts.
 
 ### Step 4. Introspect the PostgreSQL database
 
-```sh title="Next, use the CLI to introspect your PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect your PostgreSQL database:"
 ddn connector introspect imdb
 ```
 
@@ -74,7 +74,7 @@ After running this, you should see a representation of your database's schema in
 
 Based on our sample database, a SQL schema will be generated. Let's track all the models to get started quickly.
 
-```sh title="Run the following command:"
+```ddn title="Run the following command:"
 ddn model add imdb "*"
 ```
 
@@ -86,7 +86,7 @@ The DDN CLI uses these HML files to represent PostgreSQL tables in your API as
 
 ### Step 6. Create a new build
 
-```sh title="To create a local build, run:"
+```ddn title="To create a local build, run:"
 ddn supergraph build local
 ```
 
@@ -94,7 +94,7 @@ The build is stored as a set of JSON files in `engine/build`.
 
 ### Step 7. Start your local services
 
-```sh title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
@@ -104,7 +104,7 @@ Your terminal will be taken over by logs for the different services.
 
 ### Step 1. Open the PromptQL Playground
 
-```sh title="In another terminal, run:"
+```ddn title="In another terminal, run:"
 ddn console --local
 ```
 
@@ -135,7 +135,7 @@ While it's great that we can ask questions about the data set, what if the appli
 Such as rent a movie for us? We can easily do this by adding custom business logic using one of our
 [lambda connectors](/business-logic/overview.mdx). In the example below, we'll use TypeScript.
 
-```sh title="Like before, let's initialize this connector:"
+```ddn title="Like before, let's initialize this connector:"
 ddn connector init promptflix -i
 ```
 
@@ -173,11 +173,11 @@ export function rentSingleMovieBySeriesTitle(seriesTitle: string): RentMovieResp
 This function simulates the action of renting a movie on behalf of a user. The JSDoc comments aid in providing context
 to the underlying LLM so that the application knows how to use the function.
 
-```sh title="Introspect your connector:"
+```ddn title="Introspect your connector:"
 ddn connector introspect promptflix
 ```
 
-```sh title="Add your function as a command:"
+```ddn title="Add your function as a command:"
 ddn command add promptflix "*"
 ```
 
@@ -207,11 +207,11 @@ definition:
     rootFieldKind: Mutation
 ```
 
-```sh title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```sh title="Bring your services down with CTRL+C and start them back up:"
+```ddn title="Bring your services down with CTRL+C and start them back up:"
 ddn run docker-start
 ```
 
@@ -233,7 +233,7 @@ If you click `Approve`, PromptQL will confirm that the rental was successful! ðŸ
 Until this point, we've been developing locally. However, we can easily create a cloud build of our project and then
 share it with others.
 
-```sh title="Run the following from your project's directory:"
+```ddn title="Run the following from your project's directory:"
 ddn supergraph build create
 ```
 

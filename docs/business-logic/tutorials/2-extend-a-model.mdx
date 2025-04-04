@@ -33,13 +33,13 @@ This tutorial should take about ten minutes.
 
 ## Step 1. Initialize a new local DDN project
 
-```sh title="Create a new project using the DDN CLI:"
+```ddn title="Create a new project using the DDN CLI:"
 ddn supergraph init lambda-tutorial
 ```
 
 ## Step 2. Prepare the PostgreSQL data
 
-```sh title="In your project directory, run:"
+```ddn title="In your project directory, run:"
 ddn connector init my_pg -i
 ```
 
@@ -84,11 +84,11 @@ You can verify this worked by using Adminer to query all records from the `users
 SELECT * FROM users;
 ```
 
-```sh title="Next, use the CLI to introspect your PostgreSQL database:"
+```ddn title="Next, use the CLI to introspect your PostgreSQL database:"
 ddn connector introspect my_pg
 ```
 
-```sh title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
 ddn models add my_pg users
 ```
 

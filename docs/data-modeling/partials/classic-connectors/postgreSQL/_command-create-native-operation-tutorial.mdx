@@ -27,7 +27,7 @@ RETURNING
 
 Arguments are passed to the native mutation as variables surrounded by double curly braces `{{ }}`.
 
-```sh title="Then, use the PostgreSQL connector's plugin to add the native mutation to your connector's configuration:"
+```ddn title="Then, use the PostgreSQL connector's plugin to add the native mutation to your connector's configuration:"
 ddn connector plugin \
   --connector app/connector/my_pg/connector.yaml \
   -- \
@@ -36,15 +36,15 @@ ddn connector plugin \
   --kind mutation
 ```
 
-```sh title="Introspect your PostgreSQL instance:"
+```ddn title="Introspect your PostgreSQL instance:"
 ddn connector introspect my_pg
 ```
 
-```sh title="Show the found resources:"
+```ddn title="Show the found resources:"
 ddn connector show-resources my_pg
 ```
 
-```sh title="Then, add your model:"
+```ddn title="Then, add your model:"
 ddn command add my_pg update_post_titles_by_age
 ```
 
