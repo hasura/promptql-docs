@@ -30,19 +30,31 @@ import GraphQLAPI from "@site/static/icons/graphql-logo.svg";
 import ChevronRight from "@site/static/icons/chevron-right.svg";
 import Quickstart from "@site/static/icons/cloud-lightning.svg";
 import Introduction from "@site/static/icons/award-02.svg";
+import CellTower from "@site/static/icons/general/cell-tower.svg";
+import Handshake from "@site/static/icons/general/handshake.svg";
+import Healthcare from "@site/static/icons/general/healthcare.svg";
 import { OverviewIconCard } from "@site/src/components/OverviewIconCard";
 import Link from "@docusaurus/Link";
 
-# Hasura DDN Documentation
+# Hasura PromptQL Documentation
 
 <div className={'front-matter'}>
   <div>
-    Hasura DDN streamlines the development and operation of modern federated data APIs, <Link to="/how-to-build-with-ddn/overview/">solving key challenges</Link> in the process.
+    Talk to your data accurately with natural language. 
+    
+    PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
+    tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
+    arbitrarily complex tasks.
 
-    With powerful tooling and a code-driven workflow, Hasura DDN is not just an improvement in the data access
-    portion of the product development lifecycle, but a complete game-changer in the way you create, run, and manage APIs.
+    PromptQL's data layer (Hasura DDN) comes with out of the box connectors to a wide range of data sources. These
+    connectors introspect your data sources and code and help you build a high quality realtime data product.
 
-    <Link to="/quickstart/" className="cta-button mb-5 xl:mb-0 xl:mt-8">
+    <ul>
+      <li>Semantic metadata with relationships</li>
+      <li>Fine grained entitlements and access control</li>
+    </ul>
+
+    <Link to="/quickstart/" className="cta-button mb-5 xl:mb-0 xl:mt-8 text-white hover:text-white">
       <span>Quickstart.</span> Free. Easy. Fast.
     </Link>
 
@@ -50,10 +62,96 @@ import Link from "@docusaurus/Link";
   <div className={'video-wrapper'}>
     <div className={'video-aspect-ratio'}>
       <iframe
-        src={"https://www.youtube.com/embed/wppOexzYOMw"}
+        src={"https://www.youtube.com/embed/nGcf09iVQbk"}
         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
         allowFullScreen
       />
     </div>
   </div>
 </div>
+
+## Demos
+
+Check out these three demos to get a feel for how PromptQL works.
+
+<div className="homepage-demo-grid">
+  <a href="https://promptql.console.hasura.io/public/sandbox-telco/playground" className="demo-box">
+    <div className="icon-wrapper">
+      <CellTower className="demo-icon" />
+    </div>
+    <h3>Telco</h3>
+    <p>Explore how telecom companies use PromptQL to analyze customer data, optimize network performance, and deliver personalized services.</p>
+  </a>
+
+{" "}
+
+<a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box">
+  <div className="icon-wrapper">
+    <Handshake className="demo-icon" />
+  </div>
+  <h3>GTM</h3>
+  <p>
+    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
+    drive strategic business decisions.
+  </p>
+</a>
+
+  <a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box">
+    <div className="icon-wrapper">
+      <Healthcare className="demo-icon" />
+    </div>
+    <h3>Healthcare</h3>
+    <p>Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve operational efficiency while maintaining compliance.</p>
+  </a>
+</div>
+
+<style>
+  {`
+  .homepage-demo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+  }
+
+  .homepage-demo-grid .demo-box {
+    background: var(--primary-neutral-800);
+    border: 1px solid var(--primary-neutral-700);
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    transition: transform 0.2s;
+    cursor: pointer;
+    text-decoration: none;
+    display: block;
+  }
+
+  .homepage-demo-grid .demo-box:hover {
+    transform: translateY(-5px);
+  }
+
+  .homepage-demo-grid .icon-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1rem;
+  }
+
+  .homepage-demo-grid .demo-icon {
+    width: 48px;
+    height: 48px;
+    fill: var(--ifm-color-primary);
+    filter: drop-shadow(0 0 8px var(--ifm-color-primary));
+  }
+
+  .homepage-demo-grid .demo-box h3 {
+    margin: 0;
+    color: var(--primary-neutral-200);
+  }
+
+  .homepage-demo-grid .demo-box p {
+    margin-top: 0.75rem;
+    color: var(--primary-neutral-400);
+    font-size: 0.9rem;
+  }
+`}
+</style>
