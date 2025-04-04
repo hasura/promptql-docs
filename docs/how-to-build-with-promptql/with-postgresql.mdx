@@ -1,0 +1,39 @@
+---
+sidebar_position: 11
+sidebar_label: With PostgreSQL
+description: "Learn the basics of Hasura DDN and how to get started with a Postgres database."
+keywords:
+  - hasura ddn
+  - promptql
+  - graphql api
+  - getting started
+  - guide
+  - postgres
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and PostgreSQL
+
+<BoilerplateOverview dataSourceName="PostgreSQL" time="twenty" />
+
+This tutorial assumes you're starting from scratch; you can use an existing PostgreSQL database that you have or the
+PostgreSQL docker image that ships with the data connector.
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/postgres` (you can type to filter the list).
+
+Provide your connection string. Hasura will never modify your source schema.
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="PostgreSQL" />

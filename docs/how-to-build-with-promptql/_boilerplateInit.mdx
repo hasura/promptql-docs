@@ -1,0 +1,23 @@
+### Step 1. Authenticate your CLI
+
+```sh title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```sh title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```sh title="In your project directory, run:"
+ddn connector init my_connector -i
+```

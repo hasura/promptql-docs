@@ -1,0 +1,38 @@
+---
+sidebar_position: 7
+sidebar_label: With HTTP
+description: "Learn the basics of Hasura DDN and how to get started with the HTTP connector."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - http
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and HTTP APIs
+
+<BoilerplateOverview dataSourceName="an HTTP API" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/http` (you can type to filter the list). Then, enter the following environment variables:
+
+The HTTP connector won't prompt you for any environment variables. When you initialize the connector, a `config.yaml`
+will be generated where you can list valid specs for your API(s).
+
+Learn more [here](/reference/connectors/http/index.mdx).
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="an HTTP API" />

@@ -1,0 +1,42 @@
+---
+sidebar_position: 5
+sidebar_label: With Elasticsearch
+description: "Learn the basics of Hasura DDN and how to get started with an Elasticsearch instance."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - elasticsearch
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Elasticsearch
+
+<BoilerplateOverview dataSourceName="Elasticsearch" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/elasticsearch` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV                           | Example                                   | Description                                                                                                                                                                |
+| ----------------------------- | ----------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ELASTICSEARCH_URL`           | `https://example.es.gcp.cloud.es.io:9200` | The comma-separated list of Elasticsearch host addresses for connection (Use `local.hasura.dev` instead of `localhost` if your connector is running on your local machine) |
+| `ELASTICSEARCH_USERNAME`      | `default`                                 | The username for authenticating to the Elasticsearch cluster                                                                                                               |
+| `ELASTICSEARCH_PASSWORD`      | `default`                                 | The password for the Elasticsearch user account                                                                                                                            |
+| `ELASTICSEARCH_API_KEY`       | `ABCzYWk0NEjNwTFIzbGoyUQ==`               | The Elasticsearch API key for authenticating to the Elasticsearch cluster                                                                                                  |
+| `ELASTICSEARCH_CA_CERT_PATH`  | `/etc/connector/cacert.pem`               | The path to the Certificate Authority (CA) certificate for verifying the Elasticsearch server's SSL certificate                                                            |
+| `ELASTICSEARCH_INDEX_PATTERN` | `hasura*`                                 | The pattern for matching Elasticsearch indices, potentially including wildcards, used by the connector                                                                     |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Elasticsearch" />

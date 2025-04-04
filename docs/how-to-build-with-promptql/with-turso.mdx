@@ -1,0 +1,38 @@
+---
+sidebar_position: 19
+sidebar_label: With Turso
+description: "Learn the basics of Hasura DDN and how to get started with a Turso-hosted database."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - turso
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Turso
+
+<BoilerplateOverview dataSourceName="Turso" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/turso` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV                | Example                             | Description                                                                                                                                        |
+| ------------------ | ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `TURSO_URL`        | `libsql://dbname-username.turso.io` | The connection string for the Turso database, using `libsql` protocol. You can generate this from the database's overview in your Turso dashboard. |
+| `TURSO_AUTH_TOKEN` | `eyJ...`                            | A Turso auth token with access to the same database; this is also available via the Turso dashboard.                                               |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Turso" />

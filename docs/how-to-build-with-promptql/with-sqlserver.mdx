@@ -1,0 +1,37 @@
+---
+sidebar_position: 15
+sidebar_label: With SQL Server
+description: "Learn the basics of Hasura DDN and how to get started with a SQL Server database."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - sqlserver
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and SQL Server
+
+<BoilerplateOverview dataSourceName="SQL Server" time="twenty" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/sqlserver` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV              | Example                                                                                                | Description                                                             |
+| ---------------- | ------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| `CONNECTION_URI` | `Server=local.hasura.dev,1433;Database=master;Uid=sa;Password=Password123;TrustServerCertificate=true` | `TrustServerCertificate=true` should only be added for local databases. |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="SQL Server" />

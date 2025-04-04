@@ -250,7 +250,7 @@ iframe {
 }
 
 .navbar__logo {
-  margin-right: 0.25rem;
+  margin-right: 1.25rem;
 }
 
 .navbar__logo img {
@@ -987,15 +987,11 @@ table td {
 }
 
 /* Buttons */
-.cta-button {
-  display: inline-block;
-  background-color: var(--ifm-color-primary);
-  padding: 12px 24px;
-  border-radius: 38px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
+.cta-button p {
+  color: var(--ifm-color-primary) !important;
+  font-weight: 800 !important;
 }
-
+/* 
 .cta-button:hover {
   background-color: var(--ifm-color-primary-darkest);
   text-decoration: none;
@@ -1026,7 +1022,7 @@ table td {
 
 .cta-button:hover p::after {
   transform: translateX(4px);
-}
+} */
 
 .button--primary {
   color: var(--primary-neutral-0);

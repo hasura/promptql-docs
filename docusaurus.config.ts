@@ -24,7 +24,7 @@ const BOT_ROUTES = {
 
 const config: Config = {
   title: 'Hasura PromptQL Docs',
-  tagline: 'Talk to your data with natural language',
+  tagline: 'Talk to all your data accurately with natural language',
   favicon: 'img/favicon.png',
 
   // Set the production url of your site here
@@ -94,7 +94,7 @@ const config: Config = {
           lastVersion: 'current',
           versions: {
             current: {
-              label: 'v3.x (DDN)',
+              label: 'PromptQL',
               badge: true,
             },
           },
@@ -156,7 +156,7 @@ const config: Config = {
         alt: 'Hasura Logo',
         src: 'img/logo-dark.svg',
         href: '/index',
-        srcDark: '/img/logo-light.svg',
+        srcDark: '/img/ql-logo-light.svg',
       },
       items: [
         {
@@ -164,6 +164,10 @@ const config: Config = {
           position: 'left',
           dropdownActiveClassDisabled: true,
           dropdownItemsAfter: [
+            {
+              href: 'https://hasura.io/docs/2.0/index/',
+              label: 'v3.x (DDN)',
+            },
             {
               href: 'https://hasura.io/docs/2.0/index/',
               label: 'v2.x',

@@ -1,0 +1,39 @@
+---
+sidebar_position: 2
+sidebar_label: With ClickHouse
+description: "Learn the basics of Hasura DDN and how to get started with a ClickHouse instance."
+keywords:
+  - hasura ddn
+  - graphql api
+  - getting started
+  - guide
+  - clickhouse
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and ClickHouse
+
+<BoilerplateOverview dataSourceName="ClickHouse" time="fifteen" />
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/clickhouse` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV                 | Example             | Description                                               |
+| ------------------- | ------------------- | --------------------------------------------------------- |
+| `CONNECTION_STRING` | `https://host:8123` | The HTTP(S) connection string to the ClickHouse instance. |
+| `USERNAME`          | `default`           | The database username.                                    |
+| `PASSWORD`          | `default`           | The database password.                                    |
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="ClickHouse" />
