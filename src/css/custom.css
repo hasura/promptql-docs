@@ -1244,3 +1244,94 @@ table td {
 .codeBlockLines_node_modules-\@docusaurus-theme-classic-lib-theme-CodeBlock-Content-styles-module {
   background-color: var(--primary-neutral-900) !important;
 }
+
+/* Index Page Demo Grid */
+.docs-doc-id-index .homepage-demo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin: 2rem 0;
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box {
+  background: var(--primary-neutral-800);
+  border: 1px solid var(--primary-neutral-700);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  transition: transform 0.2s;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box:hover {
+  transform: translateY(-5px);
+}
+
+.docs-doc-id-index .homepage-demo-grid .icon-wrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-icon {
+  width: 48px;
+  height: 48px;
+  fill: var(--ifm-color-primary);
+  filter: drop-shadow(0 0 8px var(--ifm-color-primary));
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box h3 {
+  margin: 0;
+  color: var(--primary-neutral-200);
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box p {
+  margin-top: 0.75rem;
+  color: var(--primary-neutral-400);
+  font-size: 0.9rem;
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box .demo-cta-button {
+  display: inline-block;
+  background-color: var(--ifm-color-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  color: #000000 !important;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.docs-doc-id-index .homepage-demo-grid .demo-box:hover .demo-cta-button {
+  background-color: var(--ifm-color-primary-darker);
+}
+
+.docs-doc-id-index .quickstart-button {
+  color: var(--ifm-color-primary) !important;
+}
+
+.docs-doc-id-index .cta-button-demos {
+  display: inline-block;
+  background-color: var(--ifm-color-primary);
+  padding: 0.2rem 0.8rem;
+  border-radius: 20px;
+  color: #000000 !important;
+  text-decoration: none;
+  font-weight: 500;
+  margin-top: 1rem;
+  transition: background-color 0.2s;
+}
+
+.docs-doc-id-index .cta-button-demos a p {
+  color: #000000 !important;
+}
+
+.docs-doc-id-index .cta-button-demos:hover {
+  background-color: var(--ifm-color-primary-darker);
+  text-decoration: none;
+  color: #000000 !important;
+}
