@@ -54,8 +54,8 @@ import Link from "@docusaurus/Link";
       <li>Fine grained entitlements and access control</li>
     </ul>
 
-    <Link to="/quickstart/" className="cta-button mb-5 xl:mb-0 xl:mt-8 text-white hover:text-white">
-      <span>Quickstart.</span> Free. Easy. Fast.
+    <Link to="/quickstart/" className="cta-button">
+      Quickstart here.
     </Link>
 
   </div>
@@ -152,6 +152,28 @@ Check out these three demos to get a feel for how PromptQL works.
     margin-top: 0.75rem;
     color: var(--primary-neutral-400);
     font-size: 0.9rem;
+  }
+
+  .cta-button-demos {
+    display: inline-block;
+    background-color: var(--ifm-color-primary);
+    padding: 0.2rem 0.8rem;
+    border-radius: 20px;
+    color: #000000 !important;
+    text-decoration: none;
+    font-weight: 500;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+  }
+
+  .cta-button-demos a p {
+    color: #000000 !important;
+  }
+
+  .cta-button-demos:hover {
+    background-color: var(--ifm-color-primary-darker);
+    text-decoration: none;
+    color: #000000 !important;
   }
 `}
 </style>
