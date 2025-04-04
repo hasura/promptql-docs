@@ -7,11 +7,16 @@ title: Test DDN Syntax Highlighting
 
 This page tests if the DDN syntax highlighting is working properly.
 
+```ddn
+ddn supergraph init imdb-promptflix --with-promptql
 ```
-ddn project create my-project
-ddn connector add postgres --name pg1
-ddn model create users --connector pg1
-ddn relationship create --from users --to posts
+
+```ddn
+ddn supergraph build local
+```
+
+```ddn
+ddn subgraph add --subgraph ./app/subgraph.yaml --target-supergraph ./supergraph.stg.yaml --target-supergraph ./supergraph.prod.yaml
 ```
 
 The above code block should have syntax highlighting for DDN commands.
