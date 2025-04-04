@@ -1,5 +1,5 @@
-You can run whatever arbitrary code you want in your Go connector and expose it as a GraphQL mutation or query in your
-supergraph API.
+You can run whatever arbitrary code you want in your Go connector and expose it for PromptQL to access, enabling your AI
+agents to accurately interact with your custom business logic.
 
 ```ddn title="Initialize a new connector and select hasura/go from the list:"
 ddn connector init my_go -i
@@ -24,7 +24,7 @@ type OutputResult struct {
 	MyOutput string `json:"myOutput"`
 }
 
-// ProcedureCustomCode is a native operation that can be called from the API.
+// ProcedureCustomCode is a native operation that can be called via PromptQL.
 func ProcedureCustomCode(ctx context.Context, state *types.State, arguments *InputArguments) (*OutputResult, error) {
 	// Do something with the input
 	return &OutputResult{
@@ -33,11 +33,11 @@ func ProcedureCustomCode(ctx context.Context, state *types.State, arguments *Inp
 }
 ```
 
-Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutation in our API. Prefixing with
-`Function` identifies it as a function to be exposed as a query in your API.
+Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutation in your supergraph. Prefixing with
+`Function` identifies it as a function to be exposed as a query. Both will be accessible through PromptQL.
 
-Both have typed input arguments and return strings, which the connector will use to generate the corresponding GraphQL
-schema.
+Both have typed input arguments and return strings, which the connector will use to generate the corresponding schema
+for your supergraph.
 
 ```ddn title="Introspect the connector:"
 ddn connector introspect my_go
@@ -59,16 +59,4 @@ ddn run docker-start
 ddn console --local
 ```
 
-```graphql title="You can now query your native operation:"
-query MyCustomCode {
-  customCode(myInput: "My input")
-}
-```
-
-```json title="You will see a response like this:"
-{
-  "data": {
-    "myCustomCode": "My output"
-  }
-}
-```
+Once your connector and custom function are set up, you can use PromptQL to talk to your data using natural language.

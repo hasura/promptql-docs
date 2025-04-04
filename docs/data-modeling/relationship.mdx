@@ -1,34 +1,36 @@
 ---
 sidebar_position: 4
 sidebar_label: "Relationships connect data"
-description: "Relationships allow you to connect data across different models."
+description: "Relationships allow you to connect data across different models for PromptQL to understand and access."
 keywords:
   - relationship
   - data modeling
+  - promptql
+  - ai
+  - llm
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import PostgresRelationshipCreateModelToModel from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_relationship-create-model-to-model.mdx";
-import MongoDBRelationshipCreateModelToModel from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_relationship-create-model-to-model.mdx";
-import ClickHouseRelationshipCreateModelToModel from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_relationship-create-model-to-model.mdx";
-
 # Relationships Connect Data
 
 ## Introduction
 
-Relationships allow you to connect data, enabling you to query data across multiple entities.
+Relationships allow you to connect your data, enabling PromptQL to understand the semantic connections between your data
+entities and accurately talk to all your data. By defining these relationships, PromptQL can generate intelligent query
+plans that navigate complex data structures to provide meaningful insights.
 
-Examples include:
+Examples of how PromptQL uses relationships to deliver powerful insights:
 
-- Querying a `Customer` and at the same time getting their `Orders` and each `Product` item in those orders. (Model to
+- When asking PromptQL about a customer's purchasing patterns, it can understand the relationship between `Customer`,
+  their `Orders`, and each `Product` item in those orders, delivering comprehensive purchasing analysis. (Model to
   Model)
-- Querying a `Customer` and also getting the analytics of their app usage from another data source. (Model to Model in
-  another subgraph or data connector)
-- Querying an `Order` and also getting a live currency conversion for the value of the order enabled with a lambda data
-  connector with a connection to a currency exchange API. (Model to Command)
+- When requesting customer behavior analytics, PromptQL can correlate a `Customer` with their app usage metrics from
+  another data source, providing cross-data-source insights. (Model to Model in another subgraph or data connector)
+- When analyzing international sales performance, PromptQL can combine `Order` data with live currency conversions from
+  an external API through a lambda data connector, delivering real-time financial analysis. (Model to Command)
 
 Relationships can be added between _any_ kind of semantically related models and/or commands. They do not need to be
 related in the data source by, for example, a foreign key. They also do not need to be backed by the same data source or
@@ -42,8 +44,8 @@ keys. In such cases the lifecycle in creating a relationship in your metadata is
 1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
 2. Add the detected relationships to your metadata with the DDN CLI.
 3. Create a build of your supergraph API with the DDN CLI.
-4. Serve your build as your API with the Hasura engine either locally or in the cloud.
-5. Iterate on your API by repeating this process or by editing your metadata manually as needed.
+4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
+5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
 
@@ -58,8 +60,8 @@ Relationships are defined in metadata from an
 models and commands are also defined with object types, you can think of relationships as being between models and/or
 commands.
 
-The target command can be enabled with a a custom piece of business logic on a lambda data connector, or a native
-mutation operation.
+The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
+operation.
 
 ### Using the DDN CLI
 
@@ -99,7 +101,8 @@ Relationships can also be manually added to your metadata.
 The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you to author
 relationships.
 
-For example, you can configure a relationship so that you can also get Orders when querying a Customer.
+For example, you can configure a relationship so that when a user asks PromptQL about a Customer's purchasing history,
+it can also access their Orders data.
 
 ```yaml title="Create a relationship in your metadata:"
 ---
@@ -108,6 +111,12 @@ version: v1
 definition:
   sourceType: Customers # The existing source object type which also defines the model
   name: orders # A name we want to use when we query the Orders from the Customer
+  description: |
+    Links customers to their purchase orders.
+    One customer can have multiple orders.
+    This is a critical business relationship that supports order history lookups, 
+    customer purchase analysis, and revenue attribution.
+    Historical orders are retained even if customer becomes inactive.
   target:
     model: # The target can be a model or a command
       name: Orders # The existing model that we want to access when we query the Orders from the Customer
@@ -121,9 +130,9 @@ definition:
           - fieldName: customerId # The existing field on the target model that we want to map to the source object type
 ```
 
-By defining this `Relationship` object, all other [models](/reference/metadata-reference/models.mdx) or
-[commands](/reference/metadata-reference/commands.mdx) whose output type is the source object type in the relationship
-will now have a connection to the target model or command.
+By defining this `Relationship` object, PromptQL will understand that customers and orders are connected, allowing it to
+generate accurate query plans that can navigate from customer data to their associated orders when responding to user
+queries about customer purchasing behavior.
 
 Learn more about the [Relationship](/reference/metadata-reference/relationships.mdx) object.
 
@@ -154,169 +163,6 @@ Or you can update the `Relationship` object manually. Learn more about the
 [Relationship](/reference/metadata-reference/relationships.mdx) object.
 
 ## Delete a relationship
-
-If you no longer need a relationship, simply delete the `Relationship` metadata object manually. It is fully
-self-contained.
-
-## Tutorials
-
-These tutorials follow on from the tutorials in the
-[How to Build with DDN section](/how-to-build-with-promptql/overview.mdx).
-
-### Creating a relationship
-
-#### Between a model and a model
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-
-<PostgresRelationshipCreateModelToModel />
-
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-
-<MongoDBRelationshipCreateModelToModel />
-
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-
-<ClickHouseRelationshipCreateModelToModel />
-
-  </TabItem>
-</Tabs>
-
-#### Between a model and a command
-
-We will use a business logic function defined in a lambda data connector to build a model to command relationship for
-all connector types.
-
-<details>
-  <summary>Create a custom function with the TypeScript lambda data connector to use in the tutorials</summary>
-
-Initialize a new data connector with the TypeScript connector.
-
-```ddn title="Run the following command in your DDN project directory:"
-ddn connector init my_ts -i
-```
-
-- Select `hasura/nodejs` from the list of connectors.
-- Accept the suggested port.
-- Edit the `functions.ts` file in the connector directory with the `shoutName` function.
-
-```ts
-export function shoutName(name: string) {
-  return `${name.toUpperCase()}`;
-}
-```
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_ts
-```
-
-Then, we can add the model made available from the introspection.
-
-```ddn title="Track the function:"
-ddn command add my_ts shoutName
-```
-
-</details>
-
-To create a relationship between the `Users` model and the `shoutName` function (see the drop-down above for how to
-implement this function) we can create the following relationship. Using the
-[VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) makes the authoring and
-validation of the relationship easier.
-
-```yaml title="Create a relationship:"
----
-kind: Relationship
-version: v1
-definition:
-  name: shoutName # Define a name to expose in the supergraph API
-  sourceType: Users # The existing source object type (which also defines the source model Users)
-  target:
-    command: # The target is a command
-      name: ShoutName # The name of the existing command we have defined in metadata
-      subgraph: app # The existing subgraph the command is defined in
-  mapping:
-    - source:
-        fieldPath:
-          - fieldName: name # The field on the source object type that we want to provide to the target command as an argument
-      target:
-        argument:
-          argumentName: name # The name of the argument on the target command that we want to map to the source field
-```
-
-```ddn title="Create a build of your supergraph API:"
-ddn supergraph build local
-```
-
-```ddn title="Serve your build as your API locally:"
-ddn run docker-start
-ddn console --local
-```
-
-We can now query the `Users` model and also return the result of the `shoutName` function with its default argument of
-`name`.
-
-```graphql title="Query the Users model:"
-query {
-  users {
-    name
-    shoutName
-  }
-}
-```
-
-```json title="Result:"
-{
-  "data": {
-    "users": [
-      {
-        "name": "Alice",
-        "shoutName": "ALICE"
-      },
-      {
-        "name": "Bob",
-        "shoutName": "BOB"
-      },
-      {
-        "name": "Charlie",
-        "shoutName": "CHARLIE"
-      }
-    ]
-  }
-}
-```
-
-With relationships and custom commands we can transform or enrich any data.
-
-### Updating a relationship
-
-Your underlying data source may change over time. You can update your relationship to reflect these changes.
-
-If you have an automatically detected relationship and a property on the source object type has changed, you can update
-the relationship to reflect this change.
-
-First, update your connector configuration and models.
-
-```ddn title="Update your source introspection:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Then, update your model:"
-ddn model update <connector_name> <model_name>
-```
-
-Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
-
-```ddn title="Delete your existing relationship manually and add it again:"
-ddn relationship add <connector_link_name> <collection_name>
-```
-
-Or you can update the `Relationship` object manually. Learn more about the
-[Relationship](/reference/metadata-reference/relationships.mdx) object.
-
-### Deleting a relationship
 
 If you no longer need a relationship, simply delete the `Relationship` metadata object manually. It is fully
 self-contained.

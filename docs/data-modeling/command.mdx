@@ -1,56 +1,48 @@
 ---
 sidebar_position: 4
 sidebar_label: "Commands act on data"
-description: "Commands allow you to act on data in your data source."
+description: "Commands allow PromptQL to act on your data in various data sources."
 toc_max_heading_level: 4
 keywords:
   - command
   - data modeling
+  - promptql
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import CommandCreateClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-tutorial.mdx";
 import CommandCreateClickHouseNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-native-operation-how-to.mdx";
-import CommandCreateClickHouseNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-native-operation-tutorial.mdx";
-import CommandCreateLambdaGo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-tutorial.mdx";
 import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaPython from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-tutorial.mdx";
 import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaTypescript from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-tutorial.mdx";
 import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
-import CommandCreateMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-tutorial.mdx";
 import CommandCreateMongoDBNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-native-operation-how-to.mdx";
-import CommandCreateMongoDBNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-native-operation-tutorial.mdx";
-import CommandCreatePostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-tutorial.mdx";
 import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
-import CommandCreatePostgreSQLNativeOperationTutorial from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-tutorial.mdx";
-import CommandUpdateClickHouse from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-update-tutorial.mdx";
-import CommandUpdateLambdaGo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-update-tutorial.mdx";
-import CommandUpdateLambdaPython from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-update-tutorial.mdx";
-import CommandUpdateLambdaTypescript from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-update-tutorial.mdx";
-import CommandUpdateMongoDB from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-update-tutorial.mdx";
-import CommandUpdatePostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-update-tutorial.mdx";
 
-# Commands Modify Data
+# Commands Enable PromptQL to Modify Data
 
 ## Introduction
 
-In DDN, commands represent operations in your API that can be executed such as those which modify data in your data
-sources, (inserts, updates, deletes), or that perform complex read operations or execute custom business logic.
+Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
+query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
+updates, deletes), executing complex operations, or implementing custom business logic across your connected data
+sources.
+
+When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
+incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
+action taken.
 
 ## Lifecycle
 
-The lifecycle in creating a command in your metadata is as follows:
+When setting up commands for use with PromptQL, follow this lifecycle:
 
-1. Have some operation in your data source that you want to make executable via your API.
+1. Have some operation in your data source that you want to make executable via PromptQL.
 2. Introspect your data source using the DDN CLI with the relevant data connector to fetch the operation resources.
 3. Add the command to your metadata with the DDN CLI.
 4. Create a build of your supergraph API with the DDN CLI.
 5. Serve your build as your API with the Hasura engine either locally or in the cloud.
-6. Iterate on your API by repeating this process or by editing your metadata manually as needed.
+6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
 
@@ -91,11 +83,10 @@ Some data connectors support the ability to add commands via native operations s
 not supported by the automatic introspection process.
 
 For classic database connectors, this will be native query code for that source. This can be, for example, a more
-complex read operation or a way to run custom business logic, which can be exposed as queries or mutations in the
-GraphQL API.
+complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
 
 For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
-other side-effects) that can also be exposed as a query or mutation in the GraphQL API.
+other side-effects) that PromptQL can use to execute specialized operations on your data.
 
 <Tabs groupId="source-preference" className="api-tabs">
   <TabItem value="PostgreSQL" label="PostgreSQL">
@@ -118,14 +109,13 @@ other side-effects) that can also be exposed as a query or mutation in the Graph
   </TabItem>
 </Tabs>
 
-You can now build your supergraph API, serve it, and execute your commands.
-
-For a walkthrough on how to create a command, see the [Command Tutorials](#command-tutorials) section below.
+Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
+enabling accurate data modifications and complex operations through natural language interactions.
 
 ## Update a command
 
-If you want to update your command to reflect a change that happened in the underlying data source you should first
-introspect to get the latest resources and then update the relevant command.
+When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
+accuracy in its operations:
 
 ```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
@@ -137,7 +127,8 @@ ddn command update <connector_link_name> <command_name>
 
 You will see an output which explains how new resources were added or updated in the command.
 
-You can now build your supergraph API, serve it, and execute your commands with the updated definitions.
+After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
+interactions with their data remain accurate and up-to-date.
 
 You can also update the command by editing the command's metadata manually.
 
@@ -147,92 +138,8 @@ You can also update the command by editing the command's metadata manually.
 ddn command remove <command_name>
 ```
 
-Along with the command itself, the associated metadata is also removed.
-
-## Tutorials {#command-tutorials}
-
-The tutorials below follow on from each particular tutorial in the
-[How to Build with DDN](/how-to-build-with-promptql/overview.mdx) section. Select the relevant data connector to follow
-the tutorial.
-
-### Creating a command
-
-To modify data, you first need to create a command that maps to a specific operation within your data source.
-
-#### From a source operation
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandCreatePostgreSQL />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandCreateMongoDB />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandCreateClickHouse />
-  </TabItem>
-</Tabs>
-
-#### Via native operations {#via-native-operation-tutorials}
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandCreatePostgreSQLNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandCreateMongoDBNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandCreateClickHouseNativeOperationTutorial />
-  </TabItem>
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandCreateLambdaTypescript />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandCreateLambdaPython />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandCreateLambdaGo />
-  </TabItem>
-</Tabs>
-
-:::info Lambda connectors
-
-Lambda connectors allow you to execute custom business logic directly via your API. You can learn more about Lambda
-connectors in the [docs](/business-logic/overview.mdx).
-
-:::
-
-### Updating a command
-
-Your underlying data source may change over time. You can update your command to reflect these changes.
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="PostgreSQL" label="PostgreSQL">
-    <CommandUpdatePostgreSQL />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandUpdateMongoDB />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandUpdateClickHouse />
-  </TabItem>
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandUpdateLambdaTypescript />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandUpdateLambdaPython />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandUpdateLambdaGo />
-  </TabItem>
-</Tabs>
-
-### Deleting a command
-
-```ddn title="If you no longer need a command, you can delete it with the CLI:"
-ddn command remove <command_name>
-```
+Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
+in its query planning.
 
 ## Reference
 

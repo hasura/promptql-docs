@@ -1,5 +1,5 @@
-You can run whatever arbitrary code you want in your TypeScript connector and expose it as a GraphQL mutation or query
-in your supergraph API.
+You can create custom TypeScript functions in your connector to expand PromptQL's capabilities, enabling it to interact
+with your data in more sophisticated ways through natural language conversations.
 
 ```ddn title="Initalize a new connector and select hasura/nodejs from the list:"
 ddn connector init my_ts -i
@@ -15,9 +15,8 @@ export function myCustomCode(myInput: string): string {
 }
 ```
 
-By adding the `@readonly` tag, we are indicating that this function is a read-only operation to be exposed as an NDC
-function which will ulitmately show up as a GraphQL query. Leaving the tag off will expose the function as an NDC
-procedure which will be a GraphQL mutation.
+The `@readonly` tag indicates this function is a read-only operation. PromptQL will recognize this as a data retrieval
+function when building query plans. Without this tag, PromptQL will treat it as an action that can modify data.
 
 ```ddn title="Introspect the connector:"
 ddn connector introspect my_ts
@@ -39,16 +38,7 @@ ddn run docker-start
 ddn console --local
 ```
 
-```graphql title="You can now query your native operation:"
-query MyCustomCode {
-  myCustomCode(myInput: "My input")
-}
-```
+Once set up, you can interact with your custom function through PromptQL conversations.
 
-```json title="You will see a response like this:"
-{
-  "data": {
-    "myCustomCode": "My output"
-  }
-}
-```
+By adding custom functions to your supergraph, you extend PromptQL's capabilities to talk to your data in ways specific
+to your business needs.
