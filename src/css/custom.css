@@ -1120,10 +1120,14 @@ table td {
 }
 
 /* Code Block Titles */
-[class*='codeBlockTitle'] {
+[class^='codeBlockTitle_'] {
+  background-color: var(--primary-neutral-800) !important;
   border-bottom: none !important;
-  font-style: italic;
-  font-size: 0.9rem !important;
+}
+
+/* Code Block Lines */
+[class^='codeBlockLines_'] {
+  background-color: var(--primary-neutral-900) !important;
 }
 
 /* Vendor Table */
@@ -1270,14 +1274,4 @@ table td {
   .pagination-nav__link--next {
     margin-top: 1rem;
   }
-}
-
-/* -------------- CODEBLOCKS -------------- */
-
-.codeBlockTitle_node_modules-\@docusaurus-theme-classic-lib-theme-CodeBlock-Content-styles-module {
-  background-color: var(--primary-neutral-800) !important;
-}
-
-.codeBlockLines_node_modules-\@docusaurus-theme-classic-lib-theme-CodeBlock-Content-styles-module {
-  background-color: var(--primary-neutral-900) !important;
 }
