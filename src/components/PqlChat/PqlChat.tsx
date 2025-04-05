@@ -1,5 +1,6 @@
 import React from 'react';
 import styles from './PqlChat.module.css';
+import PqlIconSvg from './pq.svg';
 
 interface PqlChatProps {
   children: React.ReactNode;
@@ -16,23 +17,6 @@ interface PqlProps {
 interface QueryPlanProps {
   children: React.ReactNode;
 }
-
-const PqlIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 26 24" fill="none">
-    <path
-      d="M13.9022 10.8696C13.9022 7.52174 11.4674 6 9.18478 6H6.36957C4.01087 6 1.5 7.29348 1.5 10.6413C1.5 13.9891 4.3913 15.3587 6.67391 15.3587H10.25L13.3696 18.4783H13.9022V10.8696Z"
-      stroke="#18222F"
-      stroke-width="1.5"
-      stroke-miterlimit="10"
-    />
-    <path
-      d="M25.5 18.4022H20.2925C18.783 18.4022 17.5 17.1087 17.5 15.5109V6"
-      stroke="#18222F"
-      stroke-width="1.5"
-      stroke-miterlimit="10"
-    />
-  </svg>
-);
 
 export const PqlChat: React.FC<PqlChatProps> = ({ children }) => {
   return <div className={styles.chatContainer}>{children}</div>;
@@ -52,7 +36,7 @@ export const Pql: React.FC<PqlProps> = ({ children }) => {
   return (
     <div className={styles.messageContainer}>
       <div className={styles.avatar}>
-        <PqlIcon />
+        <PqlIconSvg />
       </div>
       <div className={styles.messageContent}>
         <div className={styles.pqlMessage}>{children}</div>
