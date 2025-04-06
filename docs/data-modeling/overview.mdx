@@ -19,11 +19,13 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-Hasura DDN defines your API schema declaratively. An approach that centralizes all your data collections, operations,
-relationships, and permissions in one place. This makes it easy to organize, modify, secure, reason about, and grow the
-schema which represents your API.
+To power PromptQL, Hasura DDN defines your API schema declaratively. An approach that centralizes all your data
+collections, operations, relationships, and permissions in one place. This makes it easy to organize, modify, secure,
+reason about, and grow the schema which represents your API which is is accessed via PromptQL.
 
 ## Lifecycle
+
+PromptQL uses Hasura DDN to define your API schema.
 
 Hasura DDN uses data connectors to connect to your data sources.
 
@@ -31,7 +33,8 @@ Data connectors introspect the source to understand the source schema.
 
 The DDN CLI uses the introspection results to generate the API schema metadata objects. This can also be done manually.
 
-The metadata is then "built" by the DDN CLI into a format which the Hasura GraphQL engine can use to serve your API.
+The metadata is then "built" by the DDN CLI into a format which the Hasura engine can use to provide information to
+PromptQL.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
 
