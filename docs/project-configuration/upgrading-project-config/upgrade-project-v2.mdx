@@ -82,7 +82,7 @@ Note that the above will overwrite your current DDN CLI revision. You can re-ins
 
 Run:
 
-```bash
+```ddn
 ddn supergraph init --dir <new-proj-dir>
 ```
 
@@ -114,7 +114,7 @@ Follow the below steps:
 
 Run:
 
-```bash
+```ddn
 ddn subgraph init <subgraph-name>
 ```
 
@@ -143,7 +143,7 @@ Follow the steps below:
 
 Run:
 
-```bash
+```ddn
 ddn connector init <connector-name> --subgraph <subgraph-name> --hub-connector <connector-type>
 ```
 
@@ -197,7 +197,7 @@ CONNECTION_URI=<your_pg_url>
 
 Run:
 
-```bash
+```ddn
 ddn connector introspect --connector <subgraph-name>/connector/<connector-name>/connector.cloud.yaml
 ```
 
@@ -281,7 +281,7 @@ For each data connector deployed on Hasura DDN in your subgraphs, i.e. `Connecto
 
 Run:
 
-```bash
+```ddn
 ddn connector build create --connector <subgraph-name>/connector/<connector-name>/connector.cloud.yaml
 ```
 
@@ -355,7 +355,7 @@ definition:
 
 Run:
 
-```bash
+```ddn
 ddn supergraph build create --supergraph ./supergraph.cloud.yaml
 ```
 
