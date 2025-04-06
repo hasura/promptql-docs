@@ -61,7 +61,7 @@ ddn completion zsh > $(brew --prefix)/share/zsh/site-functions/_ddn
 
 #### Linux
 
-```sh title="Execute the following:"
+```ddn title="Execute the following:"
 ddn completion zsh > "${fpath[1]}/_ddn"
 ```
 
@@ -88,13 +88,13 @@ source <(ddn completion bash)
 
 #### macOS
 
-```sh title="Execute the following:"
+```ddn title="Execute the following:"
 ddn completion bash > $(brew --prefix)/etc/bash_completion.d/ddn
 ```
 
 #### Linux
 
-```sh title="Execute the following:"
+```ddn title="Execute the following:"
 ddn completion bash > /etc/bash_completion.d/ddn
 ```
 
@@ -112,7 +112,7 @@ Try using the DDN CLI with auto-completion by typing part of a command and press
 
 Run the following command to generate the script for enabling auto-completion:
 
-```sh
+```ddn
 ddn completion powershell | Out-String | Invoke-Expression
 ```
 
@@ -155,13 +155,13 @@ Try using the DDN CLI with auto-completion by typing part of a command and press
 
 **Temporary set up**
 
-```sh title="Execute the following:"
+```ddn title="Execute the following:"
 ddn completion fish | source
 ```
 
 **Permanent set up**
 
-```sh title="Execute the following:"
+```ddn title="Execute the following:"
 ddn completion fish > ~/.config/fish/completions/ddn.fish
 ```
 

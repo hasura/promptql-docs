@@ -57,21 +57,21 @@ get to that point.
 Some data connectors support the ability to introspect your data source to discover the commands that can be added to
 your supergraph automatically.
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Show the resources discovered from your data source:"
+```ddn title="Show the resources discovered from your data source:"
 ddn connector show-resources <connector_name>
 ```
 
-```bash title="Add the command from the discovered resources to your metadata:"
+```ddn title="Add the command from the discovered resources to your metadata:"
 ddn command add <connector_link_name> <operation_name>
 ```
 
 Or you can optionally add all the commands by specifying `"*"`.
 
-```bash title="Add all commands from your data source:"
+```ddn title="Add all commands from your data source:"
 ddn command add <connector_link_name> "*"
 ```
 
@@ -117,11 +117,11 @@ enabling accurate data modifications and complex operations through natural lang
 When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
 accuracy in its operations:
 
-```bash title="Introspect your data source:"
+```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
-```bash title="Then, update your existing command:"
+```ddn title="Then, update your existing command:"
 ddn command update <connector_link_name> <command_name>
 ```
 
@@ -134,7 +134,7 @@ You can also update the command by editing the command's metadata manually.
 
 ## Delete a command
 
-```bash title="If you no longer need a command, you can delete it:"
+```ddn title="If you no longer need a command, you can delete it:"
 ddn command remove <command_name>
 ```
 

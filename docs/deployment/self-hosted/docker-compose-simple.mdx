@@ -98,13 +98,13 @@ browser, you will need to use a personal access token.
 
 On your local machine, once you are logged in with `ddn auth login` run:
 
-```bash
+```ddn
 ddn auth print-access-token
 ```
 
 This will print out your personal access token. Copy it and on the cloud server run:
 
-```bash
+```ddn
 ddn auth login --access-token <access-token>
 ```
 
@@ -112,7 +112,7 @@ This will authenticate the DDN CLI with your Hasura account.
 
 ## Step 4. Build your supergraph
 
-```bash
+```ddn
 ddn supergraph build local
 ```
 
@@ -126,7 +126,7 @@ for all IPv4 sources.
 
 ## Step 6. Start your services
 
-```bash
+```ddn
 ddn run docker-start
 ```
 

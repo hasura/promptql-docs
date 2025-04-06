@@ -36,7 +36,7 @@ project, you're creating a resource on Hasura DDN. Eventually, this can be used 
 
 Let's start by creating the project on Hasura DDN.
 
-```bash title="From any directory, run:"
+```ddn title="From any directory, run:"
 ddn project init
 ```
 
@@ -112,7 +112,7 @@ file.
 You're ready to deploy your supergraph! The following command will build and deploy your data connectors, update the
 connectors' URLs in your `.env.cloud` file, and — finally — create a new build of your supergraph and deploy it 🎉
 
-```bash title="Run:"
+```ddn title="Run:"
 ddn supergraph build create
 ```
 
@@ -121,13 +121,13 @@ ddn supergraph build create
 After you check out your newly-deployed supergraph, we recommend applying a build so it's served by your project. You
 can do that from the `GraphiQL` tab of the console, or using the CLI.
 
-```bash title="First, get the list of all builds:"
+```ddn title="First, get the list of all builds:"
 ddn supergraph build get
 ```
 
 After the CLI returns the list of builds, you can apply one using its build version:
 
-```bash title="Pass a build version to apply it:"
+```ddn title="Pass a build version to apply it:"
 ddn supergraph build apply <supergraph-build-version>
 ```
 
