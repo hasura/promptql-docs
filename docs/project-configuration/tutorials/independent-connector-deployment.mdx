@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 6
 sidebar_label: Deploy connectors independently
 description: "Learn how to manage independent deployments for connectors and the supergraph"
 keywords:
@@ -139,7 +139,8 @@ definition:
   scripts:
     docker-start:
       bash: HASURA_DDN_PAT=$(ddn auth print-access-token) docker compose --env-file .env up --build --pull always -d
-      powershell: $Env:HASURA_DDN_PAT = (ddn auth print-access-token); docker compose --env-file .env up --build --pull always -d
+      powershell:
+        $Env:HASURA_DDN_PAT = (ddn auth print-access-token); docker compose --env-file .env up --build --pull always -d
     #highlight-start
     build-supergraph:
       bash:

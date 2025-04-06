@@ -1,0 +1,97 @@
+---
+title: Realtime Chat with the BART API
+sidebar_position: 5
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: Realtime Chat with the BART API
+keywords:
+  - examples
+  - tutorials
+  - bart
+  - api
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# AI Assistant for BART (Bay Area Rapid Transit)
+
+This is a simple example of exposing PromptQL to real-time public data using the BART API. The BART API is a public API
+that provides real-time data on the Bay Area Rapid Transit system. This example demonstrates how to use PromptQL to
+create a real-time chat application that allows a user to talk to the BART API and get real-time information on
+departures.
+
+Check out the [GitHub repo](https://github.com/robertjdominguez/example-promptql-bart).
+
+Here's a sample of what you can ask:
+
+- What time is the next train arriving at Embarcadero?
+- If I leave 576 Folsom St now, can I make the next train at Montgomery?
+
+<Thumbnail src="/img/get-started/bart-assistant.jpeg" alt="Bart AI Assistant" />
+
+<Prereqs />
+
+## Setup the Bart API
+
+**Step 1: Clone the project**
+
+```bash copy
+git clone git@github.com:robertjdominguez/example-promptql-bart.git
+cd example-promptql-bart
+```
+
+**Step 2: Add Anthropic API key to .env**
+
+Set up your .env file with your Anthropic (or OpenAI) API key and GitHub API token.
+
+```bash copy
+cp .env.example .env
+```
+
+Get an api key from https://console.anthropic.com/settings/keys
+
+```bash
+# .env
+...
+...
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+```
+
+To use an OpenAI key instead, you'll have to set `OPENAI_API_KEY` in your .env file and change the environment variable
+`LLM` to `openai` in the compose.yaml file.
+
+## Build your PromptQL app
+
+Now, let's set up the Hasura DDN project with PromptQL to start exploring the data in natural language!
+
+- Set up the Hasura DDN project already scaffolded in the repo:
+
+In the root directory of the repo, run the following commands:
+
+```ddn
+ddn project init
+```
+
+Create a build:
+
+```ddn
+ddn supergraph build local
+```
+
+- Start the DDN project
+
+Let's start the DDN project by executing the following command:
+
+```ddn
+ddn run docker-start
+```
+
+- Open the local DDN Console to start exploring:
+
+```ddn
+ddn console --local
+```
+
+This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
+something like:
+[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)

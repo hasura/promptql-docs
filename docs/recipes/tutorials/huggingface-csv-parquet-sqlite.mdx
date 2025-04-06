@@ -1,0 +1,161 @@
+---
+title: Huggingface Datasets
+sidebar_position: 4
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: Huggingface Datasets
+keywords:
+  - examples
+  - tutorials
+  - huggingface
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# Huggingface Datasets
+
+In this guide, you will learn how to import any dataset from Huggingface (like CSV, Parquet, and SQLite files) and
+connect it to PromptQL to be able to query using natural language.
+
+Check out the [GitHub repo](https://github.com/hasura/huggingface-dataset-promptql).
+
+<Prereqs />
+
+## Import your Huggingface Dataset
+
+**Step 1: Clone the project**
+
+```bash copy
+git clone git@github.com:hasura/huggingface-dataset-promptql.git
+cd huggingface-dataset-promptql
+```
+
+**Step 2: Get the Huggingface Dataset ID handy**
+
+In order to import the dataset, we need to configure the Dataset ID with the path to the file(s).
+
+For example, here's a top 1000 IMDB dataset -
+[https://huggingface.co/datasets/drossi/EDA_on_IMDB_Movies_Dataset](https://huggingface.co/datasets/drossi/EDA_on_IMDB_Movies_Dataset).
+Now the dataset ID for this would be something like:
+
+```bash copy
+drossi/EDA_on_IMDB_Movies_Dataset/*.csv
+```
+
+Notice the usage of glob patterns for selecting all the CSV files. Replace this with the dataset of choice along with
+the path to the files. This should work for any ".csv", ".parquet" or ".sqlite" files in Huggingface.
+
+Refer to this [DuckDB blog](https://duckdb.org/2024/05/29/access-150k-plus-datasets-from-hugging-face-with-duckdb.html)
+for more examples of this format.
+
+**Step 3: Add Anthropic API key to .env**
+
+Set up your .env file with your Anthropic (or OpenAI) API key and GitHub API token.
+
+```bash copy
+cp .env.example .env
+```
+
+Get an api key from https://console.anthropic.com/settings/keys
+
+```bash
+# .env
+...
+...
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+```
+
+To use an OpenAI key instead, you'll have to set `OPENAI_API_KEY` in your .env file and change the environment variable
+`LLM` to `openai` in the compose.yaml file.
+
+**Step 4: Configure .env for huggingface**
+
+Head to the `app/connector/huggingface` directory to now configure the Dataset.
+
+```bash copy
+cd app/connector/huggingface
+cp .env.sample .env
+```
+
+Modify the values for the `HUGGINGFACE_DATASET` ENV. It is of the format: "user/dataset/file-path".
+
+For example:
+
+```bash copy
+HUGGINGFACE_DATASET="drossi/EDA_on_IMDB_Movies_Dataset/*.csv"
+```
+
+The IMDB example mentioned in the sample env is available as a sample dataset to choose. Feel free to configure the
+dataset that you would like to.
+
+**Step 5: Introspect the Huggingface Connector**
+
+```ddn
+ddn connector introspect huggingface --log-level=DEBUG
+```
+
+**Note**: Depending on how big the dataset is, it should take sometime to fully import the data. The schema will be
+initialized quickly and the data import happens in the background, so you can proceed to follow the steps below.
+
+The above command runs in DEBUG mode to make it easy to catch errors for invalid files.
+
+**Step 6: Add Models**
+
+Based on the dataset imported, a SQL schema would be generated. Let's track all the models to get started quickly.
+
+```ddn
+ddn model add huggingface "*"
+```
+
+## Build your PromptQL app
+
+Now, let's set up the Hasura DDN project with PromptQL to start exploring the data in natural language!
+
+- Set up the Hasura DDN project already scaffolded in the repo:
+
+In the root directory of the repo, run the following commands:
+
+```ddn
+ddn supergraph build local
+ddn project init
+```
+
+- Start the DDN project
+
+Let's start the DDN project by executing the following command:
+
+```ddn
+ddn run docker-start
+```
+
+- Open the local DDN Console to start exploring:
+
+```ddn
+ddn console --local
+```
+
+This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
+something like:
+[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+
+## Ask questions about your dataset
+
+The app will have metadata about the dataset that you just imported above. You should be able to ask domain specific
+questions and play around with the data.
+
+Here's a sample of what you can ask to get started.
+
+- Hi, what can you do?
+
+Depending on the dataset schema, PromptQL will tell you what it can answer and you can go from there.
+
+## Clean up and restart your app
+
+If you want to reset the data and start from scratch:
+
+You can stop the `ddn run docker-start` command, whereever it is running and you can execute the following in the root
+directory of the repo:
+
+```bash copy
+docker compose down -v && ddn run docker-start
+```

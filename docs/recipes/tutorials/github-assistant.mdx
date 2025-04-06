@@ -1,0 +1,151 @@
+---
+title: GitHub Assistant
+sidebar_position: 2
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: GitHub Assistant
+keywords:
+  - examples
+  - tutorials
+  - github
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# GitHub Assistant
+
+In this guide, you'll get hands on experience with PromptQL and the GitHub connector. We will be building a "Github
+Issues" assistant.
+
+You will learn how to:
+
+- Set up PromptQL to work with a GitHub issues and pull requests.
+  - You will be able to do natural language query to triage feature requests, bugs and other issues with your connected
+    Github repository.
+- Create and configure the necessary API keys.
+- Run your PromptQL project in a local environment.
+- Ask your questions with PromptQL playground.
+
+<Prereqs />
+
+## Build your PromptQL app
+
+##ge# Clone the example project
+
+The [example project](https://github.com/hasura/example-promptql-github) is already set up to connect PromptQL to any
+GitHub repo.
+
+```bash copy
+git clone git@github.com:hasura/example-promptql-github.git
+cd example-promptql-github
+```
+
+### Set up your .env file
+
+Set up your .env file with your GitHub API token.
+
+```bash copy
+cp .env.example .env
+```
+
+**Add GitHub API token to .env**
+
+For the Github integration. Create an API token from https://github.com/settings/tokens
+
+```bash
+# .env
+
+...
+GITHUB_API_TOKEN=<GITHUB_API_TOKEN>
+```
+
+This token only needs read access to the repo you are interested in.
+
+<Thumbnail src="/img/get-started/github-permissions-dark.png" alt="Example: PromptQL on GitHub" />
+
+### Set up your GitHub repo
+
+Head to `app/connector/github/index.ts` and change the org name and the repo name to something you'd like:
+
+```typescript
+// index.ts
+
+...
+  const manager = new GitHubIssueSyncManager('<org-name>', '<repo-name>');
+  if (!process.env.GITHUB_API_TOKEN) {
+...
+```
+
+### Setup your DDN project
+
+This will create a Hasura DDN cloud project and set up PromptQL keys to connect to the PromptQL runtime.
+
+```ddn
+ddn project init
+```
+
+### Fire up your PromptQL project
+
+Build your supergraph.
+
+```ddn
+ddn supergraph build local
+```
+
+Then bring up the PromptQL API server, the engine and the connector
+
+```ddn
+ddn run docker-start
+```
+
+You'll notice in amongst your Docker logs that your github synchronization has started.
+
+<details>
+  <summary>Docker logs</summary>
+  [2024-01-01 12:00:01] Starting GitHub sync...
+  <br />
+  [2024-01-01 12:00:02] Fetching repository metadata...
+  <br />
+  [2024-01-01 12:00:03] Syncing issues and pull requests...
+  <br />
+  [2024-01-01 12:00:04] Loading repository contents...
+  <br />
+  [2024-01-01 12:00:05] GitHub sync complete
+</details>
+
+If the specified repo has many issues or comments it may take some time to get them all and you may be rate limited.
+That's ok, you can go ahead and try PromptQL without the process having fully finished yet.
+
+If you notice some logs regarding GitHub permissions, check that your GitHub API token has the correct permissions for
+the repo you're trying to access.
+
+### Restarting the app
+
+If you made a mis-step or want to start from scratch, simply restarting the docker containers will reset all state
+including any loaded data.
+
+```ddn
+ddn run docker-start
+```
+
+## Act on your data
+
+### Open the PromptQL playground
+
+In another terminal, run
+
+```ddn
+ddn console --local
+```
+
+### Ask questions about your GitHub repo
+
+The console is a web app hosted at console.hasura.io that connects to your local PromptQL API and data sources. Your
+data is processed in the DDN PromptQL runtime but isn't persisted externally.
+
+Head over to the console and ask a few questions about your GitHub repo.
+
+```text copy
+> What are the open pull requests?
+> What kind of questions can I ask?
+```

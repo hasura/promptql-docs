@@ -1,0 +1,164 @@
+---
+title: Apple Health Assistant
+sidebar_position: 3
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: Apple Health Assistant
+keywords:
+  - examples
+  - tutorials
+  - apple health
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# Apple Health Assistant
+
+In this guide, you will learn how to set up an Apple Health Assistant using PromptQL and Hasura. This assistant empowers
+you to analyze your own Apple Health data by interacting in natural language. You’ll import your health metrics from an
+iPhone into a PostgreSQL database, connect it with PromptQL, and interact with the data.
+
+Here’s a sample conversation:
+
+<Thumbnail src="/img/get-started/fitness-activity.jpeg" alt="Apple Health Fitness Activity" />
+
+Check out the [GitHub repo](https://github.com/praveenweb/apple-health-ai-assistant).
+
+<Prereqs />
+
+## Export your Apple Health Data
+
+This is a private health assistant and it relies on the Apple Health data of the user. In order to export the Health
+data from your iPhone, follow the instructions below:
+
+- Go to the Health app on your iPhone.
+- Tap your picture or initials at the top right.
+- If you don’t see your picture or initials, tap Summary or Browse at the bottom of the screen, then scroll to the top
+  of the screen.
+- Tap Export All Health Data, then choose a method for sharing your data. If you have a Macbook, share it via AirDrop to
+  get started quickly. Otherwise, use Google Drive to save and download.
+
+Here are the docs on
+[Apple Support](https://support.apple.com/guide/iphone/share-your-health-data-iph5ede58c3d/ios#iphe962dcbd2) around
+this. Do note that the export can take some time depending on how much data you have. Ensure your phone doesn't lock
+during the export to prevent interruption.
+
+## Import your Apple Health data into PostgreSQL
+
+Step 1: Clone the project
+
+```bash copy
+git clone git@github.com:praveenweb/apple-health-ai-assistant.git
+cd apple-health-ai-assistant
+```
+
+Step 2: Copy Apple Health export.zip
+
+Copy the `export.zip` file obtained from the Apple Health export above into the root directory of the git repo you just
+cloned.
+
+Step 3: Configure environment variables
+
+```bash copy
+cp .env.sample .env
+```
+
+The default Postgres credentials should work. Feel free to change them as necessary.
+
+Step 4: Start the data import using docker compose
+
+```bash copy
+docker compose up -d –build
+```
+
+This should run the Python program, which takes in the `export.zip` that was placed in the root directory, unpacks and
+parses the XML data, and inserts it into the PostgreSQL database.
+
+**Note**: Depending on how big your health export is, it should take anywhere between 30 seconds to 2 minutes to fully
+import the data. The schema will be initialized quickly and the data import happens in the background, so you can
+proceed to follow the steps below.
+
+## Build your PromptQL app
+
+Now, let's set up the Hasura DDN project with PromptQL to start exploring the data in natural language!
+
+- Set up the Hasura DDN project already scaffolded in the repo:
+
+```bash copy
+cd ddn-project
+ddn supergraph build local
+ddn project init
+```
+
+- Add Anthropic API key to the`.env`.
+
+Get an api key from https://console.anthropic.com/settings/keys
+
+```.env file
+...
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
+```
+
+To use an OpenAI API key instead, you’ll have to set the `OPENAI_API_KEY` key-value in your `.env` file and change the
+environment variable LLM to `openai` in the compose.yaml file.
+
+- Start the DDN project
+
+Let's start the DDN project by executing the following command:
+
+```ddn
+ddn run docker-start
+```
+
+- Open the local DDN Console to start exploring:
+
+```ddn
+ddn console --local
+```
+
+This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
+something like:
+[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+
+## Ask questions about personal health
+
+The app has metadata about various health metrics and it can answer a range of questions; as simple as "What’s my step
+count per day?" to as complicated as, "Give me a nutrition plan based on my weight / BMR, activity and heart health to
+reduce 1 pound every 2 weeks."
+
+Here's a sample of what you can ask:
+
+- What's my average walking per day?
+- How much time am I spending outdoors?
+- Based on my weight and BMR, tell me if I'm on track to lose weight and what should my calorie intake be for losing 1
+  pound per week. Analyze data over the last 3 months.
+- Am I being exposed to a lot of noise in the environment? Check the impact on my hearing health.
+- How is my heart health?
+- How active have I been over the last few months? Are there any patterns and anomalies in my activity?
+- How much exercise activity did I do in the last year? What's the trend looking like?
+
+## Clean up and restart your app
+
+If you want to reset the Apple Health data and start from scratch, you can execute the following in the root directory
+of the repo:
+
+```bash copy
+docker compose down -v && docker compose up -d --build
+```
+
+## Interactive demo
+
+Here is an interactive demo of the AI Assistant. We'll start by looking at the exported data and then talk to it with
+PromptQL! You can click the `Replay` button at any point to restart the demo.
+
+<div style={{ position: "relative", paddingBottom: "calc(49.14021164021164% + 41px)", height: 0, width: "100%" }}>
+  <iframe
+    src="https://demo.arcade.software/nsce2VetitXx7SAwQ3BB?embed&embed_mobile=tab&embed_desktop=inline&show_copy_link=true"
+    title="PromptQL: Apple Health AI Assistant"
+    frameBorder="0"
+    loading="lazy"
+    allowFullScreen
+    allow="clipboard-write"
+    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", colorScheme: "light" }}
+  />
+</div>
