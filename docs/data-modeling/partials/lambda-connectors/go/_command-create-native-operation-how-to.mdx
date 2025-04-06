@@ -1,7 +1,7 @@
 You can run whatever arbitrary code you want in your Go connector and expose it for PromptQL to access, enabling your AI
 agents to accurately interact with your custom business logic.
 
-```sh title="Initialize a new connector and select hasura/go from the list:"
+```ddn title="Initialize a new connector and select hasura/go from the list:"
 ddn connector init my_go -i
 ```
 
@@ -39,23 +39,23 @@ Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutat
 Both have typed input arguments and return strings, which the connector will use to generate the corresponding schema
 for your supergraph.
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_go
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_go customCode
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

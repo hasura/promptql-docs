@@ -24,7 +24,7 @@ Check out the [quickstart](/quickstart.mdx) for more information on how to get s
 
 ### Step 1: Create a project on Hasura DDN
 
-```bash title="Initialize a project on Hasura DDN"
+```ddn title="Initialize a project on Hasura DDN"
 ddn project init
 ```
 
@@ -45,7 +45,7 @@ local `.env.cloud` file yourself.
 
 ### Step 2: Create a supergraph build on Hasura DDN
 
-```bash
+```ddn
 ddn supergraph build create
 ```
 
@@ -61,13 +61,13 @@ You can now use the console to explore the supergraph build by browsing to the c
 The build is not yet the "official" applied API for the project. A project can have multiple builds with their own API
 endpoints but only one applied at a time as the "official" API.
 
-```bash
+```ddn
 ddn supergraph build apply <build-version>
 ```
 
 eg:
 
-```bash
+```ddn
 ddn supergraph build apply 85b0961544
 ```
 
