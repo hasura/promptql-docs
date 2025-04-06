@@ -1,0 +1,97 @@
+---
+title: DuckDuckGo Web Search
+sidebar_position: 8
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: DuckDuckGo Web Search
+keywords:
+  - examples
+  - tutorials
+  - duckduckgo
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# AI Assistant for DuckDuckGo Web Search with Agentic Query Planning
+
+Supports web search in realtime to query DuckDuckGo and return a list of search results that PromptQL can operate on.
+
+- Query for keywords (including multiple at the same time)
+- Can return a maximum of 20 results for each keyword.
+- Uses the "us-en" region as default, but can be changed.
+
+<Thumbnail src="/img/get-started/duckduckgo-search.jpeg" alt="AI Assistant for DuckDuckGo Search" />
+
+In this guide, you will learn how to setup DuckDuckGo web search functionality and connect it to PromptQL to be able to
+query using natural language and perform programmatic analysis or computation on search results.
+
+Check out the [GitHub repo](https://github.com/hasura/duckduckgo-search).
+
+<Prereqs />
+
+## Setup DuckDuckGo Search Connector
+
+**Step 1: Clone the project**
+
+```bash copy
+git clone git@github.com:hasura/duckduckgo-search.git
+cd duckduckgo-search
+```
+
+**Step 2: Introspect the DuckDuckGo Connector**
+
+```ddn
+ddn connector introspect duckduckgo --log-level=DEBUG
+```
+
+The above command runs in DEBUG mode to make it easy to catch errors in case there are any issues.
+
+**Step 3: Add Commands**
+
+Let's track all the commands that enable web search on DuckDuckGo to get started quickly.
+
+```ddn
+ddn model add duckduckgo "*"
+```
+
+## Build your PromptQL app
+
+Now, let's set up the Hasura DDN project with PromptQL to start exploring the data in natural language!
+
+- Set up the Hasura DDN project already scaffolded in the repo:
+
+In the root directory of the repo, run the following commands:
+
+```ddn
+ddn supergraph build local
+ddn project init
+```
+
+- Start the DDN project
+
+Let's start the DDN project by executing the following command:
+
+```ddn
+ddn run docker-start
+```
+
+- Open the local DDN Console to start exploring:
+
+```ddn
+ddn console --local
+```
+
+This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
+something like:
+[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+
+## Ask questions with access to DuckDuckGo search
+
+The app will have metadata about the web search functionality of DuckDuckGo.
+
+Here's a sample of what you can ask to get started.
+
+- Hi, what can you do? (PromptQL will tell you what it can answer and you can go from there)
+- give me just the URLs and title tags for the top 20 results ranking for the keyword "hasura".
+- summarize the top 3 results for "promptql"
+- for "promptql", classify the results as informational or product intent.
