@@ -16,33 +16,40 @@ import Gallery from "@site/src/components/ConnectorGallery";
 
 ## What is a data source?
 
-When we talk about data, many people first think of structured tables in a database. While that’s a significant part of
-the picture, data comes in many forms—some structured, others not. A data source, in the context of Hasura DDN, can be
-as straightforward as a relational database or as dynamic as the output of a custom function.
+In PromptQL, a data source is anything you can ask questions about.
 
-With Hasura DDN, you can connect it all and serve it from a single endpoint.
+That includes traditional databases like Postgres and MySQL, but also REST APIs, GraphQL endpoints, and even custom
+functions or services. If it returns data, it can be a data source.
 
-## How do I connect my data to Hasura DDN?
+## How do I connect my data (and what happens next)?
 
-We use **native data connectors** to make your data accessible through a GraphQL API. These connectors are tailored for
-specific sources, including relational databases, NoSQL, external GraphQL APIs, REST APIs, and more.
+We use **native data connectors** to make your data accessible through PromptQL. These connectors are designed for
+specific systems: relational databases, NoSQL, REST APIs, GraphQL APIs, and more.
 
-We have the following data connectors available today:
+Once your data sources are connected, PromptQL acts as the interface. You ask a question in plain language, and PromptQL
+figures out what data it needs, pulls the right pieces from one or more sources, and assembles an accurate, reliable
+result.
+
+You don't need to worry about where the data lives — PromptQL can traverse across your connected sources to answer your
+question.
+
+You can get started by choosing one of the supported connectors:
 
 <Gallery />
 
-## Building your own data connector
+## Building your own connector
 
-You are also able to build your own data connector. This is useful if you have a custom data source that is not
-supported. You can find information for this in the [NDC Spec](https://github.com/hasura/ndc-spec) and the rendered
-[NDC Spec data connector tutorial](https://hasura.github.io/ndc-spec/tutorial/index.html) as well as the SDKs for
-various languages:
+If you’re working with a custom data source, you can create your own connector. The
+[NDC Spec](https://github.com/hasura/ndc-spec) describes how this works, and we offer SDKs and a full tutorial to guide
+you.
 
-- [Rust](https://github.com/hasura/ndc-sdk-rs)
-- [TypeScript](https://github.com/hasura/ndc-sdk-typescript)
-- [Python](https://github.com/hasura/ndc-sdk-python)
-- [Go](https://github.com/hasura/ndc-sdk-go)
+- [Tutorial](https://hasura.github.io/ndc-spec/tutorial/index.html)
+- SDKs:
+  - [Rust](https://github.com/hasura/ndc-sdk-rs)
+  - [TypeScript](https://github.com/hasura/ndc-sdk-typescript)
+  - [Python](https://github.com/hasura/ndc-sdk-python)
+  - [Go](https://github.com/hasura/ndc-sdk-go)
 
-## Get started
+## Next steps
 
-- Learn how to [connect your data](/data-sources/connect-to-a-source.mdx)
+- [Connect your data](/data-sources/connect-to-a-source.mdx)

@@ -70,9 +70,9 @@ You may have not re-run the introspection steps. Remember, each time your data s
 re-run this command to make Hasura DDN aware of the new schema. Follow the guide
 [here](/data-sources/introspect-a-source.mdx).
 
-### My connector isn't reflecting schema changes in my API
+### My connector isn't reflecting schema changes in my application
 
-If you've modified your metadata and are getting errors when trying to use your API, you may need to force a rebuild of
+If you've modified your metadata and are getting errors when trying to use PromptQL, you may need to force a rebuild of
 the connector.
 
 Identify the connector's container and image; kill the container and delete the image. Then, re-run the
@@ -148,20 +148,11 @@ ddn supergraph build <local|create>
 
 :::info I need all of my tables
 
-If all tracked tables are needed, and you're running into build issues,
-[raise a ticket or drop us a line on Discord](/help/overview.mdx).
+If all tracked tables are needed, and you're running into build issues, [raise a ticket](/help/overview.mdx).
 
 :::
 
 ## Get help
-
-### Discord
-
-We're available on Discord! Check out
-[the `#v3-help-forum`](https://discord.com/channels/407792526867693568/1205357708677480468) to post your question and
-get help from the community and Hasura team members!
-
-### GitHub
 
 Each connector has a public repository on GitHub. Typically, they'll follow the naming convention of
 `hasura/ndc-<connector-name>`. Create issues on these repositories to get help directly from the teams responsible for
