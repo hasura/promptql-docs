@@ -1,7 +1,7 @@
 You can create Python connectors with custom code to enhance PromptQL's ability to talk to all your data. These
 connectors become available in your supergraph, allowing PromptQL to include them in its dynamic query plans.
 
-```sh title="Initialize a new connector and select hasura/python from the list:"
+```ddn title="Initialize a new connector and select hasura/python from the list:"
 ddn connector init my_py -i
 ```
 
@@ -24,23 +24,23 @@ When you add the `@connector.register_query` decorator, you're creating a functi
 its query planning. If you use `@connector.register_mutation` instead, the function will be available for data
 modification operations in PromptQL's query plans.
 
-```bash title="Introspect the connector:"
+```ddn title="Introspect the connector:"
 ddn connector introspect my_py
 ```
 
-```bash title="Track the function:"
+```ddn title="Track the function:"
 ddn command add my_py my_custom_code
 ```
 
-```bash title="Create a new build:"
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
-```bash title="Start your services:"
+```ddn title="Start your services:"
 ddn run docker-start
 ```
 
-```bash title="Open your development console:"
+```ddn title="Open your development console:"
 ddn console --local
 ```
 

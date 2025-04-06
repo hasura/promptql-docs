@@ -90,7 +90,7 @@ overall API.
 
 This will serve as the parent project.
 
-```sh
+```ddn
 ddn supergraph init <parent-project> && cd <parent-project> && git init
 ```
 
@@ -100,7 +100,7 @@ This will scaffold the local configuration for your DDN project and initialize a
 
 This is based on the local parent project.
 
-```sh
+```ddn
 ddn project init
 ```
 
@@ -120,7 +120,7 @@ Push this repository to your preferred hosting service to share it with collabor
 If you know the subgraphs to include, you can provision them using the DDN CLI. Replace `<subgraph-name>` with the
 desired name:
 
-```sh
+```ddn
 ddn project subgraph create <subgraph-name>
 ```
 
@@ -134,7 +134,7 @@ Subgraphs can be added as needed when collaborators are onboarded.
 
 ### Step 5. Create a base build of the cloud parent project
 
-```sh
+```ddn
 ddn supergraph build create
 ```
 
@@ -163,7 +163,7 @@ The invited user will need to create a new supergraph on their machine with a ne
 
 They will use the same name for the subgraph as was created in the parent project.
 
-```sh
+```ddn
 ddn supergraph init <subgraph-name-as-supergraph-name> --create-subgraph <subgraph-name> && cd <subgraph-name> && git init
 ```
 
@@ -173,7 +173,7 @@ This scaffolds the necessary structure and initializes a Git repository.
 
 This will initialize the cloud project as the parent project.
 
-```sh
+```ddn
 ddn project init --with-project <parent-project-name>
 ```
 
@@ -187,7 +187,7 @@ You can add data sources and develop locally at this point. Check out relevant t
 
 ### Step 3. Set the subgraph context
 
-```sh
+```ddn
 ddn context set subgraph ./<subgraph-name>/subgraph.yaml
 ```
 
@@ -195,7 +195,7 @@ This sets the subgraph as the default for future CLI commands.
 
 ### Step 4. Create a subgraph build
 
-```sh
+```ddn
 ddn subgraph build create
 ```
 
@@ -203,13 +203,13 @@ The CLI returns a build version for later integration into the parent supergraph
 
 ### Step 5. Integrate the subgraph build into the parent project
 
-```sh
+```ddn
 ddn supergraph build get
 ```
 
 Use the latest build version from the parent supergraph and the subgraph build version in the following command:
 
-```sh
+```ddn
 ddn supergraph build create --subgraph-version <subgraph-name:build-version> --base-supergraph-version <parent-build-id>
 ```
 
@@ -217,14 +217,14 @@ This integrates the subgraph changes into an existing build of the parent superg
 
 ### Step 6. Apply the build
 
-```sh
+```ddn
 ddn supergraph build apply <supergraph-build-version>
 ```
 
 This finalizes the integration, making the changes available to all collaborators. This command is only available to
 `Owner` and `Admin` roles. A `Subgraph Admin` can run:
 
-```sh title="Apply a single subgraph. Unavailable for Subgraph Developer role"
+```ddn title="Apply a single subgraph. Unavailable for Subgraph Developer role"
 ddn subgraph build apply <subgraph-build-version>
 ```
 
@@ -253,11 +253,11 @@ An `Owner` or an `Admin` role can build and apply new supergraph and specify sub
 
 You can also list the available builds of subgraphs to use with:
 
-```bash
+```ddn
 ddn subgraph build get
 ```
 
-```bash title="Build a supergraph based on a specific build and with mutiple specific subgraphs"
+```ddn title="Build a supergraph based on a specific build and with mutiple specific subgraphs"
 ddn supergraph build create --subgraph-version <subgraph_name:subgraph_version> --subgraph-version <subgraph_name:subgraph_version>  --base-supergraph-version <supergraph_version>
 ```
 
@@ -268,11 +268,11 @@ See more about incremental builds [here](/deployment/hasura-ddn/incremental-buil
 An `Owner`, `Admin`, `Subgraph Admin` and `Subgraph Developer` role can build a single subgraph. All except
 `Subgraph Developer` can apply a single subgraph.
 
-```bash title="Build a single subgraph"
+```ddn title="Build a single subgraph"
 ddn subgraph build create --subgraph-version <subgraph_name:subgraph_version> --base-supergraph-version <supergraph_version>
 ```
 
-```bash title="Apply a single subgraph. Unavailable for Subgraph Developer role"
+```ddn title="Apply a single subgraph. Unavailable for Subgraph Developer role"
 ddn subgraph build apply --subgraph-version <subgraph_name:subgraph_version>
 ```
 
@@ -284,27 +284,27 @@ independent subgraph development, follow these steps:
 1. Choose which project will be the main project and which will be the subgraph project
 2. In the main project, create a new subgraph placeholder:
 
-```sh
+```ddn
 ddn project subgraph create <subgraph-name>
 ```
 
 3. Invite the subgraph project collaborators with appropriate permissions
 4. Once collaborators accept the invitation, they should set their project context:
 
-```sh
+```ddn
 ddn context set project <main-project-name>
 ```
 
 5. Set up subgraph prefixes if needed to prevent naming conflicts
 6. Create a subgraph build on the main project:
 
-```sh
+```ddn
 ddn subgraph build create
 ```
 
 7. The main project owner/admin can then apply the subgraph build:
 
-```sh
+```ddn
 ddn subgraph build apply <subgraph-build-version>
 ```
 

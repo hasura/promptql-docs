@@ -37,7 +37,7 @@ versions **\< v2.0.0** are now deprecated.
 Named contexts are introduced. You can now create multiple contexts to easily switch between different deployment
 scenarios. e.g.
 
-```bash
+```ddn
 ddn supergraph build create --context staging  # will use cloudEnvFile from staging context, e.g. .env.stg
 ddn supergraph build create --context prod  # will use cloudEnvFile from prod context, e.g. .env.prod
 ```
@@ -52,14 +52,14 @@ You can set environment files for local development and cloud builds using the `
 the context. **If you're using a shared supergraph config file for both local and cloud environments**, you can specify
 both environment files in your context to manage local and cloud deployments within the same context.
 
-```bash title="In project root with single top-level env files:"
+```ddn title="In project root with single top-level env files:"
 ddn context set localEnvFile .env
 ddn context set cloudEnvFile .env.cloud
 ```
 
 You can then run supergraph build command for both local and DDN using the same context.
 
-```bash
+```ddn
 ddn supergraph build local  # will use localEnvFile from context, i.e. .env
 ddn supergraph build create  # will use cloudEnvFile from context, i.e. .env.cloud
 ```
@@ -157,7 +157,7 @@ Note that the above will overwrite your current DDN CLI revision. You can re-ins
 
 You can update your existing local project by running the following in your project directory:
 
-```bash title="in project root directory, run:"
+```ddn title="in project root directory, run:"
 ddn codemod upgrade-project-config-v2-to-v3 --dir .
 ```
 
