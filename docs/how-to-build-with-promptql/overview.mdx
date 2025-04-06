@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-sidebar_label: Basics
+sidebar_label: Common Patterns
 description: "Learn how to get started with PromptQL and your data."
 keywords:
   - promptql
@@ -14,43 +14,37 @@ import { OverviewPlainCard } from "@site/src/components/OverviewPlainCard";
 import Icon from "@site/static/icons/speedometer-04.svg";
 import Link from "@docusaurus/Link";
 
-# Basics
+# Common Patterns
 
 ## Introduction
 
-PromptQL is powered by Hasura DDN, which enables a powerful, yet simple-to-create AI-enabled API on your data.
+PromptQL, powered by Hasura DDN, makes it simple to build AI-ready APIs on your data — no matter where it lives.
 
-Each tutorial in this section will guide you through creating your PromptQL project on top of your preferred data
-source. First, let's go over the broad stokes of how it works.
+You’ll connect your data using **native connectors**, configure your API using **Hasura Metadata Language (HML)**, and
+create an immutable **build** that will serve your application.
 
-### You have data
+Then, you'll use **PiQL**, our built-in GUI, or the **PromptQL API** to talk to your data.
 
-Your data can live in a variety of places - relational or non-relational databases, OLAP or OLTP databases, vector
-stores, third-party services, or output by your code. With PromptQL, you can talk to all of it from a single endpoint.
+## Let's build something
 
-### You connect it to PromptQL
+To get started, it’s helpful to look at common patterns for building PromptQL applications based on the datasource(s)
+you want to include:
 
-Regardless of where your data lives, you'll connect it to your API using a **native data connector**. These connectors
-will introspect your data sources and generate metadata that Hasura DDN will use to build and power your PromptQL
-application.
+- [With a persistent datasource](with-a-datasource-and-custom-business-logic.mdx)
+- [With API endpoints](with-api-endpoints.mdx)
+- [With bulk API data](with-apis-with-bulk-data.mdx)
 
-### You configure your API in metadata
+:::info Mix and match
 
-This **semantic metadata layer** is written as Hasura Metadata Language (HML), which is an extension of YAML. You can
-use the DDN CLI and your text editor to fine-tune and configure the API to your liking; this includes easily creating
-metadata objects for permissions, relationships, configuring authentication, etc.
+Keep in mind: these are simply broad buckets for you to get started. Any sources we support can be added to the same
+project to create a unified supergraph which feeds data to PromptQL.
 
-### You talk to your data
+:::
 
-To convert your metadata into something that you can talk with, you'll create a build - an immutable snapshot of your
-API at that point in time which the Hasura Engine can run and via PromptQL. You can then use the **PiQL** (pronounced
-_pickle_) - our GUI - to talk to your data, or integrate it with your client apps via the **PromptQL API**.
-
-## Get started with your favorite source
+Or, dive straight into a guide for your preferred source:
 
 - [PostgreSQL](/how-to-build-with-promptql/with-postgresql.mdx)
 - [MongoDB](/how-to-build-with-promptql/with-mongodb.mdx)
 - [ClickHouse](/how-to-build-with-promptql/with-clickhouse.mdx)
-- [Oracle](/how-to-build-with-promptql/with-oracle.mdx)
 
-See the whole list in the sidenav to the left!
+See the full list in the sidebar to the left!

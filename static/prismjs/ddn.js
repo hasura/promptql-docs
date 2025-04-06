@@ -1,4 +1,9 @@
 Prism.languages.ddn = {
+  comment: {
+    pattern: /#.*/,
+    greedy: true,
+    alias: 'comment',
+  },
   cli: {
     pattern: /\bddn\b/,
     alias: 'keyword',

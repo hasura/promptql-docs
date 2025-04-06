@@ -1,0 +1,184 @@
+---
+sidebar_position: 1.3
+sidebar_label: With Bulk API Data
+description:
+  "Learn how to connect a single data source and give PromptQL the abilty to act on your behalf via custom business
+  logic."
+keywords:
+  - hasura ddn
+  - data
+  - custom business logic
+  - getting started
+  - guide
+sidebar_class_name: sidebar-divider-bottom
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# With Bulk API Data
+
+In this tutorial we'll see how to connect to an API source that has some bulk data we want to bring into PromptQL.
+
+This is what we'll do:
+
+- We will set up a connector that has a DuckDB source
+- We will set up a job to load data from our API source
+
+We're loading data into DuckDB for this example, but you could load data into any database that has a supported
+connector (e.g., PostgreSQL, MongoDB, ClickHouse). We're going to use TypeScript to write a loading script to load data
+— but how you choose to load data is completely up to you.
+
+<Prereqs />
+
+## Tutorial
+
+### Step 1. Scaffold out a new local project
+
+```ddn
+ddn supergraph init bulk-data --with-promptql && cd bulk-data
+```
+
+### Step 2. Add the `hasura/duckduckapi` connector
+
+```ddn title="Initialize the connector and choose hasura/duckduckapi from the list:"
+ddn connector init github -i
+```
+
+```bash title="Move into the connector directory and install the dependencies:"
+cd app/connector/github && npm i
+```
+
+### Step 3. Initialize a table and sample data
+
+Open the file `app/connector/github/index.ts` and define your DuckDB schema there.
+
+```ts title="We'll start by creating a repoistories entity:"
+// ...
+
+const connectorConfig: duckduckapi = {
+  dbSchema: \`
+    -- Create repositories table with commonly needed fields
+    DROP TABLE IF EXISTS repositories;
+    CREATE TABLE repositories (
+        id INTEGER PRIMARY KEY,
+        name VARCHAR NOT NULL,
+        description TEXT
+    );
+
+    -- Sample data
+    INSERT INTO repositories (id, name, description)
+    VALUES (1, 'my-project', 'A sample repository');
+  \`,
+  functionsFilePath: path.resolve(__dirname, './functions.ts'),
+};
+
+// ...
+```
+
+:::info Why are we doing this?
+
+The `hasura/duckduckapi` connector uses a convention wherein you'll create a schema in an underlying DuckDB database
+that represents your API's bulk data. Later, we'll create a loader function that will then use this schema to persist
+bulk data from your API in this DuckDB instance.
+
+:::
+
+### Step 4. Add the metadata
+
+Once we create new entities in our sources, we need to get them into our project's metadata. This allows the AI
+assistant to access that data via PromptQL.
+
+```ddn
+# Grab the model definitions
+ddn connector introspect github
+
+# Check out what models are available to track. You'll see some sample ones which you can ignore for now.
+ddn model list github
+
+# Add the repositories model
+ddn model add github repositories
+```
+
+### Step 5. Create and run a new build
+
+```ddn title="Create a new local build:"
+ddn supergraph build local
+```
+
+```ddn title="Run your services:"
+ddn run docker-start
+```
+
+```ddn title="In a new terminal tab, open the devlopment console:"
+ddn console --local
+```
+
+Head over to the PromptQL Playground and see if the AI assistant is able to access your repositories.
+
+```plaintext
+What repositories do I have?
+```
+
+PromptQL will return something like:
+
+```
+You have one repository in your account. This repository is named "my-project" and is described as "A sample repository".
+```
+
+### Step 6. Set up a job to continuously load data (optional)
+
+Adding a job to load data can be done by kicking off an async task from our DuckDuckAPI connector.
+
+Head over to `app/connector/github/index.ts` and add the following code right after the connector starts:
+
+```ts
+// import statements...
+// schema initialization...
+
+async function insertData() {
+  const db = await getDB();
+
+  setInterval(async () => {
+    try {
+      const timestamp = new Date().toISOString();
+      await db.all(\`
+        INSERT INTO repositories (id, name, description)
+        VALUES (
+          (SELECT COALESCE(MAX(id), 0) + 1 FROM repositories),
+          'project-\${timestamp}',
+          'Automatically inserted at \${timestamp}'
+        )
+      \`);
+      console.log(\`Inserted new repository at \${timestamp}\`);
+    } catch (err) {
+      console.error('Error inserting data:', err);
+    }
+  }, 1000);
+}
+
+(async () => {
+  const connector = await makeConnector(connectorConfig);
+  start(connector);
+
+  // Kick off an insert data job
+  insertData();
+})();
+```
+
+## A real-world example
+
+The steps above help you get started by understanding how to setup DuckDB, how to get a connection to it and how to
+start inserting data into it that comes from another source.
+
+In a production ready example, you'll need to:
+
+1. Connect to another API securely
+2. Incrementally pull in updates after the initial sync is done
+3. Handle API rate limits
+4. Persist data incrementally
+5. Recover from failures and process restarts
+
+Check out the code at [PromptQL Github example](https://github.com/hasura/example-promptql-github) and start reading
+through the code at
+[app/connector/github/index.ts](https://github.com/hasura/example-promptql-github/blob/main/app/connector/github/index.ts)
+to see how to put together a real-world bulk data from an API connector!
