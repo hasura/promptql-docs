@@ -55,9 +55,7 @@ import Link from "@docusaurus/Link";
       <li>Fine grained entitlements and access control</li>
     </ul>
 
-    <Link to="/quickstart/" className="cta-button">
-      Quickstart here.
-    </Link>
+    <Link to="/quickstart/">Quickstart.</Link>
 
   </div>
   <div className={'video-wrapper'}>
@@ -76,7 +74,7 @@ import Link from "@docusaurus/Link";
 Check out these three demos to get a feel for how PromptQL works.
 
 <div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box">
+  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Handshake className="demo-icon" />
   </div>
@@ -85,9 +83,10 @@ Check out these three demos to get a feel for how PromptQL works.
     See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
     drive strategic business decisions.
   </p>
+  <div class="demo-cta-button">Explore the GTM demo</div>
 </a>
 
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box">
+<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Healthcare className="demo-icon" />
   </div>
@@ -96,90 +95,19 @@ Check out these three demos to get a feel for how PromptQL works.
     Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
     operational efficiency while maintaining compliance.
   </p>
+  <div class="demo-cta-button">Explore the Healthcare demo</div>
 </a>
 
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/playground" className="demo-box">
+<a href="https://promptql.console.hasura.io/public/sandbox-aml/playground" className="demo-box" target="_blank">
   <div className="icon-wrapper">
     <Banking className="demo-icon" />
   </div>
   <h3>AML</h3>
   <p>
     Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
-    transaction data, uncovering suspicious patterns, and enhancing compliance with regulatory requirements.
+    transaction data, uncovering suspicious patterns, and enhancing compliance.
   </p>
+  <div class="demo-cta-button">Explore the AML demo</div>
 </a>
 
 </div>
-
-<style>
-  {`
-  .homepage-demo-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 2rem;
-    margin: 2rem 0;
-  }
-
-  .homepage-demo-grid .demo-box {
-    background: var(--primary-neutral-800);
-    border: 1px solid var(--primary-neutral-700);
-    border-radius: 12px;
-    padding: 2rem;
-    text-align: center;
-    transition: transform 0.2s;
-    cursor: pointer;
-    text-decoration: none;
-    display: block;
-  }
-
-  .homepage-demo-grid .demo-box:hover {
-    transform: translateY(-5px);
-  }
-
-  .homepage-demo-grid .icon-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1rem;
-  }
-
-  .homepage-demo-grid .demo-icon {
-    width: 48px;
-    height: 48px;
-    fill: var(--ifm-color-primary);
-    filter: drop-shadow(0 0 8px var(--ifm-color-primary));
-  }
-
-  .homepage-demo-grid .demo-box h3 {
-    margin: 0;
-    color: var(--primary-neutral-200);
-  }
-
-  .homepage-demo-grid .demo-box p {
-    margin-top: 0.75rem;
-    color: var(--primary-neutral-400);
-    font-size: 0.9rem;
-  }
-
-  .cta-button-demos {
-    display: inline-block;
-    background-color: var(--ifm-color-primary);
-    padding: 0.2rem 0.8rem;
-    border-radius: 20px;
-    color: #000000 !important;
-    text-decoration: none;
-    font-weight: 500;
-    margin-top: 1rem;
-    transition: background-color 0.2s;
-  }
-
-  .cta-button-demos a p {
-    color: #000000 !important;
-  }
-
-  .cta-button-demos:hover {
-    background-color: var(--ifm-color-primary-darker);
-    text-decoration: none;
-    color: #000000 !important;
-  }
-`}
-</style>
