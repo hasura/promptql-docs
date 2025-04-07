@@ -3,8 +3,7 @@ sidebar_position: 5
 sidebar_label: Comment on Metadata
 description: "Collaborate with your peers by commenting on your Supergraph Metadata"
 keywords:
-  - hasura ddn
-  - graphql api
+  - promptql
   - quickstart
   - getting started
   - guide
@@ -18,8 +17,8 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-Hasura DDN provides a commenting feature that allows your API producers and consumers to start conversations directly on
-the API metadata. This feature enhances collaboration by closing the feedback loop and helps teams communicate more
+Hasura provides a commenting feature that allows your API producers and consumers to start conversations directly on the
+API metadata. This feature enhances collaboration by closing the feedback loop and helps teams communicate more
 effectively about their API design and implementation.
 
 :::tip Getting Access
@@ -51,7 +50,6 @@ suggest improvements directly on specific metadata elements.
 - **Models → General**
   - **Description** – Clarify the model’s purpose and usage for better documentation.
   - **Signature** – Discuss function signatures, return types, and argument structures.
-  - **GraphQL Root Fields** – Suggest improvements or changes to the root field definitions.
 - **Models → Fields & Relationships**
   - **Output Fields** – Ask questions or provide insights on field usage and expected data.
   - **Arguments** – Discuss argument types, required vs. optional parameters, and potential defaults.
@@ -64,22 +62,6 @@ This feature is especially useful for teams working on large-scale API projects,
 API structure and permissions.
 
 <Thumbnail src="/img/get-started/comments_explorer.png" alt="Comments on Explorer" width="800" />
-
----
-
-### GraphiQL Tab
-
-The **GraphiQL Tab** is where users can interactively query the API and test GraphQL operations. Commenting here allows
-for real-time feedback on API responses, query structures, and potential performance optimizations.
-
-- Discuss unexpected query results and suggest potential schema modifications.
-- Collaborate on best practices for query structuring and field selection.
-- Provide feedback on performance concerns, such as response times and pagination strategies.
-- Leave notes on commonly used queries to improve team-wide API consistency.
-
-By adding comments directly in GraphiQL, teams can streamline debugging and optimize API queries collaboratively.
-
-<Thumbnail src="/img/get-started/comments_graphiql.png" alt="Comments on GraphiQL" width="800" />
 
 ---
 

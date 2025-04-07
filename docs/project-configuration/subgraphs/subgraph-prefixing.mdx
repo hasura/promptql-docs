@@ -11,8 +11,7 @@ keywords:
   - graphqlRootFieldPrefix
   - graphqlTypeNamePrefix
   - supergraph modeling
-  - hasura ddn
-  - graphql api
+  - promptql
   - subgraphs
   - supergraph
   - data connectors
@@ -21,10 +20,10 @@ keywords:
 seoFrontMatterUpdated: true
 ---
 
-# Subgraph GraphQL Root Field and Type Name Prefixing
+# Subgraph Prefixing
 
 Subgraphs are namespaced and metadata object names are independent from one another and cannot conflict. However, the
-GraphQL API is where the subgraphs meet, potentially leading to naming collisions.
+PromptQL layer is where the subgraphs meet, potentially leading to naming collisions.
 
 To avoid collisions between GraphQL root fields and type names across when federating subgraphs, you can optionally
 customize the prefixes for each.
