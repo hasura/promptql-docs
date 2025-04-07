@@ -10,7 +10,7 @@ sidebar_label: Type Permissions
 
 # Type Permissions
 
-To make API **fields** available to a role in your supergraph, you define a `TypePermissions` object.
+To make API **fields** available to a role, you define a `TypePermissions` object.
 
 You can think of TypePermissions as being similar to column-level permissions in a relational database. Just as you can
 restrict access to specific columns in a table based on the user's role, TypePermissions allow you to control access to
@@ -25,7 +25,7 @@ Each item in the array should have a `role` field and an `output` field. The `ou
 `allowedFields` array, which lists the fields that are accessible to the role when the type is used in an output
 context.
 
-To make a new `TypePermission` object or role available in your supergraph, you'll need to
+To make a new `TypePermission` object or role available in your application, you'll need to
 [create a new build](/reference/cli/commands/ddn_supergraph_build_local.mdx) using the CLI.
 
 ## Example

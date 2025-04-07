@@ -4,7 +4,7 @@ sidebar_label: Limit data to users
 description: "Learn how to return only data belonging to a user."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - authorization
   - user access
   - tutorial
@@ -19,14 +19,14 @@ seoFrontMatterUpdated: false
 In this tutorial, you'll learn how to configure [permissions](/reference/metadata-reference/permissions.mdx) to limit
 users to accessing only their data.
 
-This can be done by passing a value in the header of each request to your supergraph; Hasura will then use that value to
-return only the data which matches conditions you specify.
+This can be done by passing a value in the header of each request to your application; Hasura will then use that value
+to return only the data which matches conditions you specify.
 
 :::info Prerequisites
 
 Before continuing, ensure you have:
 
-- A local Hasura DDN project.
+- A local Hasura project.
 - Either JWT or Webhook mode enabled in your [AuthConfig](/reference/metadata-reference/auth-config.mdx).
 
 :::
@@ -118,9 +118,7 @@ If you want to restrict which fields the new role can access, simply omit them f
 
 ### Step 3. Test your permissions
 
-Create a new build of your supergraph:
-
-```ddn
+```ddn title="Create a new build:"
 ddn supergraph build local
 ```
 
@@ -133,9 +131,9 @@ and — when executing a query — only see data meeting the filtering rule you 
 In this guide, you learned how to limit a user to see only their own data from a single type. However, you can use this
 same tutorial and apply it to a variety of scenarios.
 
-As you continue building out your supergraph, keep in mind that authentication and authorization are crucial components.
-Always validate your configuration and regularly test your setup to ensure it functions as expected across different
-roles and environments.
+As you continue building out your application, keep in mind that authentication and authorization are crucial
+components. Always validate your configuration and regularly test your setup to ensure it functions as expected across
+different roles and environments.
 
 ## Learn more about permissions and auth
 

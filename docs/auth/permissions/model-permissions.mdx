@@ -10,8 +10,8 @@ sidebar_label: Model Permissions
 
 # Model Permissions
 
-To limit what **data** in a model is available to a role in your supergraph, you define a `ModelPermissions` object with
-a `filter` expression.
+To limit what **data** in a model is available to a role, you define a `ModelPermissions` object with a `filter`
+expression.
 
 By default, whenever a new model is created in your supergraph, all records are only accessible to the `admin` role. You
 can think of these as permissions on rows in a typical relational database table.
@@ -20,7 +20,7 @@ You can restrict access to certain data by adding a new item to the `permissions
 object. Each item in the array should have a `role` field and a `select` field. The `select` field should contain a
 `filter` expression that determines which rows are accessible to the role when selecting from the model.
 
-Most commonly, you'll use session variables — accessed by Hasura Engine via your configured
+Most commonly, you'll use session variables — accessed by Hasura via your configured
 [authentication mechanism](/auth/overview.mdx) in a JWT or body of a webhook response — to restrict access to rows based
 on the user's role, identity or other criteria.
 
@@ -34,10 +34,13 @@ This filter expression can reference
 - `null`
 
 :::info Remote Relationships in Permissions
-Remote relationships (relationships between different data connectors) across subgraphs are not supported in permission filters.
+
+Remote relationships (relationships between different data connectors) across subgraphs are not supported in permission
+filters.
+
 :::
 
-To make a new `ModelPermission` or role available in your supergraph, after updating your metadata, you'll need to
+To make a new `ModelPermission` or role available in your application, after updating your metadata, you'll need to
 [create a new build](/reference/cli/commands/ddn_supergraph_build_local.mdx) using the CLI.
 
 ### Examples
