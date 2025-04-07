@@ -1,0 +1,78 @@
+---
+sidebar_position: 5
+sidebar_label: Troubleshooting
+description: "Learn how to troubleshoot common issues with the PromptQL Playground."
+keywords:
+  - hasura ddn
+  - playground
+  - troubleshooting
+---
+
+# Troubleshooting
+
+## Introduction
+
+Below, you'll find common errors and how to troubleshoot them.
+
+## Error streaming from LLM: Illegal header value b'Bearer
+
+This error happens when the PromptQL playground has not been started with a PromptQL Secret key.
+
+This typically indicates that a DDN project was not initialized with the local project or the project does not have an
+associated PromptQL Secret key.
+
+```ddn title="To check if the project was initialized, run this in the project directory:"
+ddn context get project
+```
+
+### Case 1: Project has not been initialized
+
+If you get the error `Key "project" is not set.`, you need to initialize a DDN project.
+
+```ddn title="Run the following command in the project directory:"
+ddn project init
+```
+
+Restarting the local services post this should fix the issue.
+
+### Case 2: Project has been initialized but does not have a PromptQL Secret key
+
+If you already have a project initialized, you might need to generate the PromptQL Secret key for the project.
+
+```ddn title="Run the following command in the project directory to generate a PromptQL Secret key:"
+ddn auth generate-promptql-secret-key
+```
+
+:::info Use the latest version of the CLI
+
+Ensure you're using the latest version of the CLI:
+
+```ddn
+ddn update-cli
+```
+
+:::
+
+Restarting the local services post this should fix the issue.
+
+## Error streaming from LLM: Client error '403 Forbidden' for url `https://llm.promptql.pro.hasura.io/stream` For more information check: `https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/403`
+
+This error happens when the PromptQL playground has been started with an invalid PromptQL Secret key.
+
+This typically happens if an existing PromptQL Secret key is deleted or becomes invalid.
+
+```ddn title="Run the following command in the project directory to generate a new PromptQL Secret key:"
+ddn auth generate-promptql-secret-key
+```
+
+:::info Use the latest version of the CLI
+
+Ensure you're using the latest version of the CLI:
+
+```ddn
+ddn update-cli
+```
+
+:::
+
+Restarting the local services post this should fix the issue.

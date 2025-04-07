@@ -1,6 +1,6 @@
 {
   "label": "Projects",
-  "position": 7,
+  "position": 10,
   "className": "project-configuration",
   "customProps": {
     "sidebar_pathname": "project-configuration"

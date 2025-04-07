@@ -1,6 +1,6 @@
 {
   "label": "PromptQL APIs",
-  "position": 5,
+  "position": 6,
   "className": "promptql-apis",
   "customProps": {
     "sidebar_pathname": "promptql-apis"
