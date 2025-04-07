@@ -27,6 +27,7 @@ import Quickstart from '@site/static/icons/speedometer-04.svg';
 import Recipe from '@site/static/icons/beaker.svg';
 import SupergraphModeling from '@site/static/icons/cpu-chip-01.svg';
 import Upgrade from '@site/static/icons/cloud-lightning.svg';
+import Schema from '@site/static/icons/features/schema.svg';
 
 import { useColorMode } from '@docusaurus/theme-common';
 
@@ -136,6 +137,9 @@ export function addIconsToLabel(label, className) {
       break;
     case 'recipes':
       icons = <Recipe style={iconStyle} />;
+      break;
+    case 'promptql-apis':
+      icons = <Schema style={iconStyle} />;
       break;
   }
 

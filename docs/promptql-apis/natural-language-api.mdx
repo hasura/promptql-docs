@@ -1,0 +1,221 @@
+---
+sidebar_position: 2
+sidebar_label: Natural Language API
+description: ""
+keywords:
+  - hasura ddn
+  - natural language
+  - apis
+toc_max_heading_level: 4
+---
+
+# Natural Language API
+
+The Natural Language Query API allows you to interact with PromptQL directly, sending messages and receiving responses
+with support for streaming. This API is particularly useful for building interactive applications that need to
+communicate with PromptQL in real-time.
+
+## API Reference
+
+### Query Endpoint
+
+Send messages to PromptQL and receive responses, optionally in a streaming format.
+
+#### Request
+
+`POST https://api.promptql.pro.hasura.io/query`
+
+**Headers**
+
+```
+Content-Type: application/json
+```
+
+**Request Body**
+
+```json
+{
+  "version": "v1",
+  "promptql_api_key": "<promptql api key created from project settings>",
+  "llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "<project sql endpoint url>",
+    "headers": {}
+  },
+  "artifacts": [],
+  "system_instructions": "Optional system instructions for the LLM",
+  "timezone": "America/Los_Angeles",
+  "interactions": [
+    {
+      "user_message": {
+        "text": "Your message here"
+      },
+      "assistant_actions": [
+        {
+          "message": "Previous assistant message",
+          "plan": "Previous execution plan",
+          "code": "Previously executed code",
+          "code_output": "Previous code output",
+          "code_error": "Previous error message if any"
+        }
+      ]
+    }
+  ],
+  "stream": false
+}
+```
+
+**Request Body Fields**
+
+| Field                 | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
+| --------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`             | string  | Yes      | Must be set to "v1"                                                                                                                                                                                                                                                                               |
+| `promptql_api_key`    | string  | Yes      | PromptQL API key created from project settings                                                                                                                                                                                                                                                    |
+| `llm`                 | object  | No       | Configuration for the main LLM provider                                                                                                                                                                                                                                                           |
+| `ai_primitives_llm`   | object  | No       | Optional Configuration for the AI primitives LLM provider. If this is missing, the main LLM provider is used                                                                                                                                                                                      |
+| `ddn`                 | object  | Yes      | DDN configuration including URL and headers                                                                                                                                                                                                                                                       |
+| `artifacts`           | array   | No       | List of existing artifacts to provide context                                                                                                                                                                                                                                                     |
+| `system_instructions` | string  | No       | Custom system instructions for the LLM                                                                                                                                                                                                                                                            |
+| `timezone`            | string  | Yes      | IANA timezone for interpreting time-based queries                                                                                                                                                                                                                                                 |
+| `interactions`        | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
+| `stream`              | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
+
+**LLM Provider Options**
+
+The `llm` and `ai_primitives_llm` fields support the following providers:
+
+1. Hasura:
+
+```json
+{
+  "provider": "hasura"
+}
+```
+
+:::info Free credits
+
+You get $10 worth of free credits with Hasura's built-in provider when you get started.
+
+:::
+
+2. Anthropic:
+
+```json
+{
+  "provider": "anthropic",
+  "api_key": "<your anthropic api key>"
+}
+```
+
+3. OpenAI:
+
+```json
+{
+  "provider": "openai",
+  "api_key": "<your openai api key>"
+}
+```
+
+#### Response
+
+The response format depends on the `stream` parameter:
+
+**Non-streaming Response** (application/json)
+
+```json
+{
+  "assistant_actions": [
+    {
+      "message": "Response message",
+      "plan": "Execution plan",
+      "code": "Executed code",
+      "code_output": "Code output",
+      "code_error": "Error message if any"
+    }
+  ],
+  "modified_artifacts": [
+    {
+      "identifier": "artifact_id",
+      "title": "Artifact Title",
+      "artifact_type": "text|table",
+      "data": "artifact_data"
+    }
+  ]
+}
+```
+
+**Streaming Response** (text/event-stream)
+
+The streaming response sends chunks of data in Server-Sent Events (SSE) format:
+
+```JSON
+data: {
+  "message": "Chunk of response message",
+  "plan": null,
+  "code": null,
+  "code_output": null,
+  "code_error": null,
+  "type": "assistant_action_chunk",
+  "index": 0
+}
+
+data: {
+  "type": "artifact_update_chunk",
+  "artifact": {
+    "identifier": "artifact_id",
+    "title": "Artifact Title",
+    "artifact_type": "text|table",
+    "data": "artifact_data"
+  }
+}
+```
+
+#### Response Fields
+
+| Field                | Type  | Description                                                  |
+| -------------------- | ----- | ------------------------------------------------------------ |
+| `assistant_actions`  | array | List of actions taken by the assistant                       |
+| `modified_artifacts` | array | List of artifacts created or modified during the interaction |
+
+**Assistant Action Fields**
+
+| Field         | Type   | Description                            |
+| ------------- | ------ | -------------------------------------- |
+| `message`     | string | Text response from the assistant       |
+| `plan`        | string | Execution plan if any                  |
+| `code`        | string | Code that was executed                 |
+| `code_output` | string | Output from code execution             |
+| `code_error`  | string | Error message if code execution failed |
+
+#### Error Response
+
+```json
+{
+  "type": "error_chunk",
+  "error": "Error message describing what went wrong"
+}
+```
+
+## Notes for using the Natural Language API
+
+1. **Streaming vs Non-streaming**
+
+   - Use streaming (`stream: true`) for real-time interactive applications
+   - Use non-streaming (`stream: false`) for batch processing or when you need the complete response at once
+
+2. **Artifacts**
+
+   - You can pass existing artifacts to provide context for the conversation
+   - Both text and table artifacts are supported
+   - Artifacts can be modified or created during the interaction
+
+3. **Timezone Handling**
+
+   - Always provide a timezone to ensure consistent handling of time-based queries
+   - Use standard IANA timezone formats (e.g., "America/Los_Angeles", "Europe/London")
+
+4. **Error Handling**
+   - Always check for error responses, especially in streaming mode
+   - Implement appropriate retry logic for transient failures
