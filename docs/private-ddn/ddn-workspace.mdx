@@ -58,14 +58,16 @@ been provisioned, it can be launched from the [Private DDN page](https://console
 
 :::info Prerequisite
 
-In order to perform a `ddn auth login --access-token <service-account-token>`, you need to have a project created in your data plane under which a `<service-account-token>` has been generated.
-If you have already done this, continue to the next step.  Otherwise, proceed with the steps below and ensure that you are executing this on your local machine since a browser login is required
-during this step.
+In order to perform a `ddn auth login --access-token <service-account-token>`, you need to have a project created in
+your data plane under which a `<service-account-token>` has been generated. If you have already done this, continue to
+the next step. Otherwise, proceed with the steps below and ensure that you are executing this on your local machine
+since a browser login is required during this step.
 
 **Alternate Approach:**
 
-If you are unable to generate a `<service-account-token>`, you can instead create a Personal Access Token (PAT) by heading on over to [Hasura dashboard](https://cloud.hasura.io/account-settings/access-tokens)
-and creating a new access token there.
+If you are unable to generate a `<service-account-token>`, you can instead create a Personal Access Token (PAT) by
+heading on over to [Hasura dashboard](https://cloud.hasura.io/account-settings/access-tokens) and creating a new access
+token there.
 
 :::
 
@@ -80,8 +82,6 @@ You can find all the Data Planes you have access to on this page: https://consol
 - ddn_base
 - ddn_advanced
 
-Read more about plans [here](/reference/pricing.mdx)
-
 :::
 
 ```sh title="Login & create project:"
@@ -92,12 +92,13 @@ ddn auth login
 ddn project create --data-plane-id <data-plane-id> --plan <plan-name>
 ```
 
-Next, follow [these](/project-configuration/project-management/service-accounts/#how-to-create-service-account) steps to generate a `<service-account-token>`.
+Next, follow [these](/project-configuration/project-management/service-accounts/#how-to-create-service-account) steps to
+generate a `<service-account-token>`.
 
 ## Step 3. Authenticate the DDN CLI
 
-Once you're logged into the DDN Workspace, you will be greeted with the familiar VS Code UI. You can perform all typical development tasks, such as
-installing extensions, customizing key bindings, and applying themes—all within your browser.
+Once you're logged into the DDN Workspace, you will be greeted with the familiar VS Code UI. You can perform all typical
+development tasks, such as installing extensions, customizing key bindings, and applying themes—all within your browser.
 
 Bring up the terminal using the shortcut `Ctrl` + `` ` ``.
 
@@ -129,8 +130,8 @@ structure by running `ls` in the terminal or by exploring it in the VS Code inte
 :::tip
 
 If you have established private connectivity to your data source, you will need to ensure that you are using a
-hostname/IP for your database which is specific to your private connectivity connection.
-This hostname/IP will be communicated to you by the Hasura team during the coordination of the private connectivity setup.
+hostname/IP for your database which is specific to your private connectivity connection. This hostname/IP will be
+communicated to you by the Hasura team during the coordination of the private connectivity setup.
 
 :::
 
@@ -177,8 +178,7 @@ the metadata is generated, create a cloud project and deploy your supergraph to 
 
 :::info
 
-In this step, use the `<project-name>` from Step 2.
-:::
+In this step, use the `<project-name>` from Step 2. :::
 
 ```ddn title="Initiate against an existing project on your data plane:"
 ddn project init --with-project <project-name>

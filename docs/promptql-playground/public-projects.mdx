@@ -1,0 +1,79 @@
+---
+sidebar_position: 2
+sidebar_label: Public Projects
+description: "Learn how to share projects publicly so anyone can access them."
+keywords:
+  - hasura ddn
+  - playground
+  - public
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Public Projects
+
+## Introduction
+
+PromptQL allows you to make your project accessible to anyone with a unique URL. This feature enables easy sharing and
+collaboration without the need for explicit access grants.
+
+## Enabling Public PromptQL Playground
+
+### Step 1. Access PromptQL Settings
+
+Navigate to the PromptQL settings by clicking the gear icon in the bottom left corner of the console project page. From
+there, select the PromptQL section.
+
+### Step 2. Locate Public PromptQL Playground Section
+
+Find the "Enable Public PromptQL Playground" option on the PromptQL settings page.
+
+<Thumbnail alt="Enable Public PromptQL Playground" src="/img/get-started/public-promptql.png" />
+
+### Step 3. Enable and Save
+
+Toggle the switch to enable the Public PromptQL Playground and save your changes.
+
+### Step 4. Get Shareable URL
+
+After enabling, a unique URL will be generated. This URL can be shared with anyone you want to give access to your
+PromptQL project.
+
+:::info Authentication
+
+When users access your public PromptQL project via the shared URL, they only need to log in to Hasura. No additional
+access granting is required, making it truly public in nature.
+
+:::
+
+## Custom Project README
+
+When a project is set to public mode, project administrators can create a custom README in Markdown format. This README
+is visible to all users who access the project's public URL, providing essential context and information.
+
+To add a custom README:
+
+1. Navigate to the "README" section in the Project sidebar
+2. Compose or paste your Markdown content
+3. Click the Save button to apply changes
+4. For enabled public PromptQL projects, a public URL is displayed at the top of the page
+
+<Thumbnail alt="Custom Project README" src="/img/get-started/promptql-readme.png" />
+
+The custom README feature allows you to:
+
+- Provide project context and background
+- Offer usage instructions or guidelines
+- Share relevant documentation or resources
+- Highlight key features or functionalities
+- Set expectations for your users
+
+By utilizing this feature effectively, you can enhance the user experience and facilitate better understanding of your
+public PromptQL project.
+
+:::info Token Usage and Billing
+
+By default, token usage for public projects will be billed from the user's PromptQL credits. Project owners have the
+option to configure a custom LLM if they prefer to handle the token usage differently.
+
+:::

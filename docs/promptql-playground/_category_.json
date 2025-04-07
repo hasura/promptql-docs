@@ -1,0 +1,8 @@
+{
+  "label": "PromptQL Playground",
+  "position": 5,
+  "className": "hasura-cli-icon",
+  "customProps": {
+    "sidebar_pathname": "promptql-playground"
+  }
+}

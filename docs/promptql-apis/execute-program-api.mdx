@@ -1,0 +1,214 @@
+---
+sidebar_position: 3
+sidebar_label: Execute Program API
+description: ""
+keywords:
+  - hasura ddn
+  - execute program
+  - apis
+toc_max_heading_level: 4
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Execute Program API
+
+The PromptQL agent creates PromptQL programs that work on your data. Usually, these programs are created and invoked by
+interacting within the PromptQL playground.
+
+However, you can also use an API to run these programs dynamically.
+
+## API Reference
+
+### Execute Program Endpoint
+
+Execute a PromptQL program with your data.
+
+#### Request
+
+`POST https://api.promptql.pro.hasura.io/execute_program`
+
+**Headers**
+
+```
+Content-Type: application/json
+```
+
+**Request Body**
+
+```json
+{
+  "code": "<your promptql program code>",
+  "promptql_api_key": "<promptql api key created from project settings>",
+  "ai_primitives_llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "<project sql endpoint url>",
+    "headers": {}
+  },
+  "artifacts": []
+}
+```
+
+**Request Body Fields**
+
+| Field               | Type   | Required | Description                                              |
+| ------------------- | ------ | -------- | -------------------------------------------------------- |
+| `code`              | string | Yes      | The PromptQL program code to execute                     |
+| `promptql_api_key`  | string | Yes      | PromptQL API key created from project settings           |
+| `ai_primitives_llm` | object | Yes      | Configuration for the AI primitives LLM provider         |
+| `ddn`               | object | Yes      | DDN configuration including URL and headers              |
+| `artifacts`         | array  | Yes      | List of artifacts to provide as context or initial state |
+
+**LLM Provider Options**
+
+The `ai_primitives_llm` field supports the following providers:
+
+1. Hasura:
+
+```json
+{
+  "provider": "hasura"
+}
+```
+
+2. Anthropic:
+
+```json
+{
+  "provider": "anthropic",
+  "api_key": "<your anthropic api key>"
+}
+```
+
+3. OpenAI:
+
+```json
+{
+  "provider": "openai",
+  "api_key": "<your openai api key>"
+}
+```
+
+**Artifacts**
+
+The `artifacts` array can contain both text and table artifacts:
+
+1. Text Artifact:
+
+```json
+{
+  "identifier": "my_text",
+  "title": "My Text Document",
+  "artifact_type": "text",
+  "data": "Text content here"
+}
+```
+
+2. Table Artifact:
+
+```json
+{
+  "identifier": "my_table",
+  "title": "My Data Table",
+  "artifact_type": "table",
+  "data": [
+    {
+      "column1": "value1",
+      "column2": "value2"
+    }
+  ]
+}
+```
+
+#### Response
+
+```json
+{
+  "output": "<program output>",
+  "error": null,
+  "accessed_artifact_ids": ["artifact1", "artifact2"],
+  "modified_artifacts": [
+    {
+      "identifier": "new_artifact",
+      "title": "New Artifact",
+      "artifact_type": "table",
+      "data": [
+        {
+          "column1": "value1",
+          "column2": "value2"
+        }
+      ]
+    }
+  ],
+  "llm_usages": [
+    {
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "input_tokens": 691,
+      "output_tokens": 33
+    }
+  ]
+}
+```
+
+#### Response Fields
+
+| Field                   | Type         | Description                                                      |
+| ----------------------- | ------------ | ---------------------------------------------------------------- |
+| `output`                | string       | The program's output, similar to what you see in the playground  |
+| `error`                 | string\|null | Error message if execution failed, null otherwise                |
+| `accessed_artifact_ids` | array        | List of artifact identifiers that were accessed during execution |
+| `modified_artifacts`    | array        | List of artifacts that were created or modified during execution |
+| `llm_usages`            | array        | Details about LLM usage during execution                         |
+
+**LLM Usage Fields**
+
+| Field           | Type    | Description                                                   |
+| --------------- | ------- | ------------------------------------------------------------- |
+| `provider`      | string  | The LLM provider used (e.g., "hasura", "anthropic", "openai") |
+| `model`         | string  | The specific model used                                       |
+| `input_tokens`  | integer | Number of input tokens consumed                               |
+| `output_tokens` | integer | Number of output tokens generated                             |
+
+#### Error Response
+
+When the API encounters an error, it will return a 422 status code with a validation error response:
+
+```json
+{
+  "detail": [
+    {
+      "loc": ["field_name"],
+      "msg": "error message",
+      "type": "error_type"
+    }
+  ]
+}
+```
+
+## Notes for using the Execute Program API
+
+1. **Program Code**
+
+   - Ensure your PromptQL program code is properly formatted and tested
+   - You can export working programs from the PromptQL playground using the "Export as API" button
+
+2. **Artifacts**
+
+   - Provide all necessary artifacts that your program needs to run
+   - Make sure artifact identifiers match those referenced in your program code
+   - Both text and table artifacts are supported
+
+3. **Error Handling**
+   - Always check the error field in the response
+   - Implement appropriate retry logic for transient failures
+   - Validate your inputs against the API schema to catch issues early
+
+## Get PromptQL programs from the playground
+
+You can get PromptQL programs from PromptQL playground interactions by clicking on the "Export as API" button next to
+the Query Plan in the playground.
+
+<Thumbnail src="/img/get-started/export-as-api.png" alt="Export as API" />

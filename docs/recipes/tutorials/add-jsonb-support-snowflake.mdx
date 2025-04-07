@@ -1,0 +1,220 @@
+---
+title: Add JSONB Support for Snowflake
+sidebar_position: 10
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: Add JSONB Support for Snowflake
+keywords:
+  - examples
+  - tutorials
+  - snowflake
+  - jsonb
+---
+
+# Add JSONB Support for Snowflake
+
+## Introduction
+
+This guide shows you how to enable JSONB support in PromptQL for Snowflake data sources using native queries in Hasura
+DDN. It should be used as a template and modified to fit your own schema.
+
+For JSONB support, we need two things:
+
+- A native query — which is your own custom SQL — to retrieve the relevant information.
+- Descriptions added to the metadata to augment PromptQL's knowledge of the data source.
+
+## Tutorial
+
+### Step 1. Create a new project with the Snowflake connector enabled
+
+If you haven't done so already, complete the steps in our
+[guide for connecting Snowflake to PromptQL](/how-to-build-with-promptql/with-snowflake.mdx).
+
+### Step 2. Create a native query
+
+Native queries enable you to write your own SQL and expose it as a root-level field in your GraphQL API. This field will
+then also be available to PromptQL for retrieving data from your Snowflake instance. We can use the existing JSON
+operator built into Snowflake to transform a column's value into structured JSON.
+
+As an example, imagine we have a table called `USERS` in an database called `ECOMM`; if the `user_details` are stored as
+a string — but are in fact JSON — we can use a native query to return the structured output to our API:
+
+```sql
+--- This will return the user_id and email in their existing format, while transforming the user_details to JSON:
+select user_id, email, TO_JSON(user_details) as user_details, created_at from PUBLIC.ECOMM.USERS
+```
+
+We can then include this SQL in a native query by adding it to the `nativeQueries` object of our `configuration.json`
+found in our connector's directory:
+
+```sql copy
+  "nativeQueries": {
+  "ECOMM_USERS": {
+    "sql": {
+      "parts": [
+        {
+          "type": "text",
+          "value": "select user_id, email, TO_JSON(user_details) as user_details, created_at from PUBLIC.ECOMM.USERS"
+        }
+      ]
+    },
+    "columns": {
+      "USER_DETAILS": {
+        "type": "named",
+        "name": "STRING"
+      },
+      "USER_ID": {
+        "type": "named",
+        "name": "BIGINTEGER"
+      },
+      "CREATED_AT": {
+        "type": "named",
+        "name": "TIMESTAMP"
+      },
+      "EMAIL": {
+        "type": "named",
+        "name": "STRING"
+      }
+    },
+    "arguments": {},
+    "description": null,
+    "isProcedure": false
+  }
+}
+```
+
+The **key** of the new object is the name which will be exposed as a top-level field in your API. After adding your
+custom SQL, include the returned columns along with their types.
+
+<details>
+<summary>Click to see an explanation of the fields</summary>
+<br />
+
+`nativeQueries`
+
+**Description:** A top-level object containing all native query definitions.  
+**Structure:** Each key represents the name of a native query, and the value defines its configuration.
+
+**Query Name (e.g., ECOMM_USERS)**  
+**Description:** A unique identifier for the native query. This name is used to reference the query in the application.
+
+`sql`
+
+**Description:** Specifies the SQL query for the native query.  
+**Structure:** Contains a `parts` array where each part has:
+
+- **type:** Indicates the type of part. Currently, only `text` is supported.
+- **value:** The actual SQL query as a string.
+
+`columns`
+
+**Description:** Maps the output columns of the SQL query to their types.  
+**Structure:** An object where each key represents a column name and the value specifies its type.
+
+- **type:** Defines how the column type is specified. Typically `named`.
+- **name:** The name of the data type. The data type must match the types supplied by the connector in the data
+  connector link configuration.
+
+`arguments`
+
+**Description:** Defines any arguments required by the query. Used for parameterized queries.  
+**Structure:** An object where each key is the argument name and the value specifies its type and properties. If no
+arguments are needed, this is an empty object.
+
+`description`
+
+**Description:** An optional field for adding a human-readable description of the query.  
+**Structure:** A string value or `null` if no description is provided.
+
+`isProcedure`
+
+**Description:** Indicates whether the native query represents a mutation or a query.  
+**Structure:** A boolean value (`true` for mutations and `false` for queries).
+
+</details>
+
+### Step 3. Re-introspect your connector
+
+As you've made a new field available in your connector's configuration, you'll need to re-introspect your connector:
+
+```ddn
+ddn connector introspect <connector-name>
+```
+
+### Step 4. Add the model
+
+Then, add the new model **using the name you provided in your native query's key**:
+
+```ddn
+# E.g., ddn model add my_snowflake "ECOMM_USERS"
+ddn model add <connector-name> "<model-name>"
+```
+
+This will generate an HML file, which you'll use in the next step, representing your model.
+
+### Step 5. Augment the metadata description
+
+The more context afforded to PromptQL, the better it understands your data and the ways it can interact with it. If we
+add a description to the metadata object, PromptQL will infer that structured JSON will be returned.
+
+For example:
+
+```yaml {11-15}
+kind: ObjectType
+version: v1
+definition:
+  name: EcommUsers
+  fields:
+    - name: createdAt
+      type: Timestamp!
+    - name: email
+      type: String_1!
+    - name: userDetails
+      type: String_1!
+      description:
+        "This is stringified JSON it has the following fields: address, shipping_state, phone, preferences is an object
+        which has newsletter and theme {address: '123 Main St', shipping_state: 'CA', phone: '555-555-5555',
+        preferences: {newsletter: true, theme: 'dark'}}"
+    - name: userId
+      type: Biginteger!
+  graphql:
+    typeName: EcommUsers
+    inputTypeName: EcommUsersInput
+  dataConnectorTypeMapping:
+    - dataConnectorName: snow
+      dataConnectorObjectType: ECOMM_USERS
+      fieldMapping:
+        createdAt:
+          column:
+            name: CREATED_AT
+        email:
+          column:
+            name: EMAIL
+        userDetails:
+          column:
+            name: USER_DETAILS
+        userId:
+          column:
+            name: USER_ID
+```
+
+Here, we're not only explaining that this is stringified JSON, but also an example of what can be expected to be
+returned.
+
+### Step 6. Create a new build and start your services
+
+```ddn title="First, create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Then, start your services:"
+ddn run docker-start
+```
+
+```ddn title="And open the development console:"
+ddn console --local
+```
+
+### Step 7. Talk to your data
+
+Ask any questions you wish about your Snowflake data...including those that utilize your structured JSON directly from
+Snowflake!

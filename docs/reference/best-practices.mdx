@@ -1,0 +1,71 @@
+---
+title: Best Practices
+sidebar_position: 2
+description: "Learn more about the best practices for using PromptQL with your data."
+sidebar_label: Best Practices
+keywords:
+  - reference
+  - promptql
+  - best practices
+  - troubleshooting
+---
+
+# Best Practices
+
+## Introduction
+
+PromptQL utilizes LLMs to analyze your data and generate responses. As such, the more attention you pay to the way and
+types of questions you ask, the better your results will be. Consider the guidelines below when interacting with
+PromptQL.
+
+## Guidelines for Asking Effective Questions
+
+To get the most accurate and helpful responses, follow these best practices for framing your questions:
+
+1. **Be specific and clear**: Precise questions yield better answers. For example, instead of asking "How's our business
+   doing?", try "What was our total revenue for Q2 2023?"
+
+2. **Provide context**: When questions relate to specific data or situations, include that context. For example,
+   "Considering our recent expansion into the European market, how have our sales trends changed?"
+
+3. **Break down complex queries**: For multi-faceted questions, break them into smaller, manageable parts. This approach
+   leads to a more structured and thorough analysis.
+
+4. **Specify the preferred format**: If you need the answer in a specific format (e.g., table, list, summary), mention
+   this in your request.
+
+5. **Indicate time frames**: When asking about trends or historical data, specify the period of interest.
+
+6. **Ask for clarification**: If you’re unsure about certain details, request an explanation or further information on
+   specific points.
+
+7. **Be open to follow-ups**: If more information is needed for an accurate answer, be prepared to answer clarifying
+   questions.
+
+8. **Specify the level of detail**: Indicate if you want a high-level summary or an in-depth analysis.
+
+9. **Mention specific metrics or KPIs**: When looking for particular performance indicators, list them explicitly.
+
+10. **Ask about data sources**: If data origin is important, inquire about the sources used.
+
+11. **Request comparisons**: If you want to compare aspects of the business, request direct comparisons to get clear
+    insights.
+
+12. **Share your end goal**: If you have a specific objective, sharing it can help tailor the information more
+    effectively.
+
+## Check the question after a response
+
+If you're curious how PromptQL arrived at a response — or want to cross-reference its results — try the following:
+
+```plaintext
+Explain the response by running each step in the query plan above one by one and store the response of each step, also mention any assumptions that you made which were not explicitly mentioned in the query plan.
+```
+
+## General Troubleshooting
+
+### Passing authentication headers
+
+If your underlying Hasura DDN project utilizes JWTs or a webhook for authentication, you can pass the appropriate values
+by clicking the `HTTP` button on the left-hand side of the chat dialogue when starting a new thread. To learn more about
+authentication and Hasura DDN, check out [the docs](/auth/overview.mdx).

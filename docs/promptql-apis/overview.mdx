@@ -1,0 +1,32 @@
+---
+sidebar_position: 1
+sidebar_label: Basics
+description: ""
+keywords:
+  - hasura ddn
+  - promptql apis
+  - apis
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# PromptQL APIs
+
+## Introduction
+
+Typically, you'll interact with a PromptQL application via PiQL — our built-in GUI — but, PromptQL APIs let you embed
+AI-native features — like natural language querying and intelligent program execution — directly into your app, powered
+by Hasura DDN. Whether you're building chat-based experiences or running exported PromptQL programs, these flexible
+endpoints make it easy to create interactive, dynamic, and intelligent data flows.
+
+## Available APIs
+
+- **[Natural Language API](/promptql-apis/natural-language-api.mdx)** – Enable conversational access to your data. This
+  API lets you send user messages, stream assistant responses, and manage artifacts like text and tables as part of the
+  interaction.
+
+- **[Execute Program API](/promptql-apis/execute-program-api.mdx)** – Run exported PromptQL programs with your data
+  using a single endpoint. This API is ideal for more structured interactions or automations.
+
+Each API is backed by Hasura DDN, meaning you can connect your own project, pass context via artifacts, and control
+behavior using system instructions and customizations.

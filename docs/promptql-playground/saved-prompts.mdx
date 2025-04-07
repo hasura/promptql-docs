@@ -1,0 +1,42 @@
+---
+sidebar_position: 3
+sidebar_label: Saved Prompts
+description: "Learn how to save and share a prompt with another user for easy interaction and execution."
+keywords:
+  - hasura ddn
+  - playground
+  - saved prompts
+---
+
+# Saved Prompts
+
+Saved and Shareable Prompts allow you to streamline collaboration and user onboarding in PromptQL projects. By appending
+a predefined prompt to a URL, you can guide users directly into a conversation with the prompt pre-filled in the input
+chat box, ready for execution.
+
+## How It Works
+
+Saved and Shareable Prompts utilize URL parameters to embed predefined prompts within a link. When a user clicks the
+link, the specified prompt is automatically loaded into the chat box, ensuring a seamless experience.
+
+## URL Format
+
+To create a shareable prompt, append the prompt query parameter to a PromptQL playground URL:
+
+```code
+https://promptql.console.hasura.io/public/<your_project>/playground?prompt=<encoded_prompt>
+```
+
+For example:
+
+```code
+https://promptql.console.hasura.io/public/duckduckgo/playground?prompt=find%20the%20top%2010%20results%20for%20hasura
+```
+
+In this case, the prompt `find the top 10 results for hasura` is URL-encoded and pre-filled in the chat input when the
+link is opened.
+
+## URL Encoding
+
+Special characters in the prompt are automatically escaped to ensure proper functionality. This ensures that even
+complex prompts with spaces or special symbols can be shared without issues.
