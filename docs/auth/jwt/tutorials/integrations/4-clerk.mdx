@@ -1,10 +1,10 @@
 ---
 sidebar_position: 5
 sidebar_label: Clerk
-description: "Learn how to connect Clerk to your Hasura DDN supergraph."
+description: "Learn how to connect Clerk to your PromptQL application."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - authentication
   - jwt
   - clerk
@@ -29,7 +29,7 @@ Before continuing, ensure you have:
 
 - A [Clerk application](https://clerk.com/docs/quickstarts/setup-clerk).
 - A local application that can integrate with Clerk for authentication.
-- A local Hasura DDN project.
+- A local Hasura project.
 
 ### Step 1. Create a JWT template
 
@@ -51,8 +51,8 @@ In the claims editor, add the following:
 }
 ```
 
-This will add the required Hasura namespace with the keys that Hasura DDN expects when decoding a JWT. You can modify
-the keys to suit your Hasura DDN [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
+This will add the required Hasura namespace with the keys that Hasura expects when decoding a JWT. You can modify the
+keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
 
 You can also see that we're hard-coding the user's role. You can dynamically set a user's role using Clerk's metadata to
 set a `role` field on the `User` object whenever a user registers. You can learn more
@@ -63,7 +63,7 @@ This enables you to then pass the value of `{{user.publicMetadata.role}}` in the
 :::tip Custom claims
 
 You can create any custom keys you wish and reference them in your permissions using session variables. Above,
-`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura DDN Engine.
+`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura.
 
 :::
 
@@ -89,7 +89,7 @@ definition:
         name: Auth-Token
 ```
 
-Then, create a new build of your supergraph:
+Then, create a new build:
 
 ```ddn
 ddn supergraph build local
@@ -110,7 +110,7 @@ const jwt = await session.getToken({ template: "hasura" });
 
 ## Wrapping up
 
-In this guide, you learned how to integrate Clerk with Hasura DDN to create a secure and scalable identity management
+In this guide, you learned how to integrate Clerk with PromptQL to create a secure and scalable identity management
 solution using JWTs. By leveraging custom claims in conjunction with
 [permissions](/reference/metadata-reference/permissions.mdx), you can define precise access-control rules, ensuring that
 your application remains secure and meets your users' needs.
