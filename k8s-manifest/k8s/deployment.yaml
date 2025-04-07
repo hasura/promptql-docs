@@ -2,14 +2,14 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: v3-docs-hasura
-  name: v3-docs-hasura
+    app: promptql-docs
+  name: promptql-docs
   namespace: hasura
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: v3-docs-hasura
+      app: promptql-docs
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -18,11 +18,11 @@ spec:
   template:
     metadata:
       labels:
-        app: v3-docs-hasura
+        app: promptql-docs
     spec:
       containers:
-        - name: v3-docs-hasura
-          image: us-west1-docker.pkg.dev/websitecloud-352908/v3-docs-hasura/v3-docs-hasura:latest
+        - name: promptql-docs
+          image: us-west1-docker.pkg.dev/websitecloud-352908/promptql-docs/promptql-docs:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
