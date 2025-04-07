@@ -5,7 +5,7 @@ description:
   "Learn how to organize your supergraph into multiple subgraphs, each of which can be owned by separate teams."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - multiple subgraphs
   - tutorial
 ---
@@ -14,9 +14,9 @@ keywords:
 
 ## Introduction
 
-Learn how to manage multiple subgraphs in Hasura DDN to streamline team ownership, enforce clear data boundaries, and
-scale your API easily. This tutorial will show you how to structure your project for flexibility and collaboration,
-ensuring efficient and adaptable API development.
+Learn how to manage multiple subgraphs to streamline team ownership, enforce clear data boundaries, and scale your
+application easily. This tutorial will show you how to structure your project for flexibility and collaboration,
+ensuring efficient and adaptable application development.
 
 In this tutorial, you'll learn how to:
 
@@ -35,12 +35,12 @@ This tutorial should take less than twenty minutes.
 ### Step 1. Initialize a new local project
 
 ```ddn title="Create the project directory and move into it:"
-ddn supergraph init subgraph-example && cd subgraph-example
+ddn supergraph init subgraph-example --with-promptql && cd subgraph-example
 ```
 
 ### Step 2. Add a data source and seed data
 
-In this tutorial, we'll use the PostgreSQL connector and our sample PostgreSQL database:
+In this tutorial, we'll use the PostgreSQL connector and a sample PostgreSQL database:
 
 ```plaintext
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
@@ -64,10 +64,10 @@ ddn models add customers_pg users
 ```
 
 Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The DDN CLI will use this Hasura
-Metadata Language file to represent the `users` table from PostgreSQL in your API as a
+Metadata Language file to represent the `users` table from PostgreSQL in your application as a
 [model](/reference/metadata-reference/models.mdx).
 
-### Step 4. Create a new local build and test the API
+### Step 4. Create a new local build and test the application
 
 ```ddn title="To create a local build, run:"
 ddn supergraph build local
@@ -75,7 +75,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura instance and PostgreSQL connector:"
 ddn run docker-start
 ```
 
@@ -85,42 +85,10 @@ Your terminal will be taken over by logs for the different services.
 ddn console --local
 ```
 
-```graphql title="In the GraphiQL explorer of the console, write this query:"
-query GET_USERS {
-  users {
-    id
-    name
-  }
-}
-```
+From the PromptQL Playground, talk to your data.
 
-```json title="You'll get the following response:"
-{
-  "data": {
-    "users": [
-      {
-        "id": "7cf0a66c-65b7-11ed-b904-fb49f034fbbb",
-        "name": "Sean"
-      },
-      {
-        "id": "82001336-65b7-11ed-b905-7fa26a16d198",
-        "name": "Rob"
-      },
-      {
-        "id": "86d5fba0-65b7-11ed-b906-afb985970e2e",
-        "name": "Marion"
-      },
-      {
-        "id": "8dea1160-65b7-11ed-b907-e3c5123cb650",
-        "name": "Sandeep"
-      },
-      {
-        "id": "9bd9d300-65b7-11ed-b908-571fef22d2ba",
-        "name": "Abby"
-      }
-    ]
-  }
-}
+```plaintext title="E.g.:"
+Show me all the users in my application.
 ```
 
 ## Add a subgraph
@@ -154,6 +122,12 @@ definition:
     # highlight-end
 ```
 
+```ddn title="We'll also create a companion subgraph in the cloud project:"
+ddn project subgraph create billing
+```
+
+This will provision the subgraph as part of the cloud project that was initialized in our first step.
+
 ### Step 6. Switch contexts {#switch-contexts}
 
 ```ddn title="Switch contexts to the billing subgraph:"
@@ -165,7 +139,7 @@ required — we're referencing the `billing` subgraph.
 
 ### Step 7. Add a data source and seed data
 
-As before, we'll use the PostgreSQL connector with our sample database:
+As before, we'll use the PostgreSQL connector with the same sample database:
 
 ```plaintext
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
@@ -199,7 +173,7 @@ Open the `billing/metadata` directory and you'll find a newly-generated file: `P
 use this Hasura Metadata Language file to represent the `payment_information` table from PostgreSQL in your API as a
 [model](/reference/metadata-reference/models.mdx).
 
-### Step 9. Create a new local build and test the API
+### Step 9. Create a new local build and test the application
 
 ```ddn title="To create a local build, run:"
 ddn supergraph build local
@@ -217,14 +191,12 @@ ddn run docker-start
 ddn console --local
 ```
 
-You should see both root-level fields for `users` and `orders` in your GraphQL API. Additionally, if you navigate to the
-`Explorer` tab in the left-hand navigation, you should see your supergraph's data domains organized into two separate
-subgraphs.
+From your Console's Explorer view, you should see separate subgraphs organized under your supergraph.
 
 ### Step 10. Create a relationship across subgraphs
 
 As our models are in different subgraphs, we'll need to explicitly define a
-[relationship](/reference/metadata-reference/relationships.mdx) between these using Hasura metadata.
+[relationship](/reference/metadata-reference/relationships.mdx) between these using metadata.
 
 ```yaml title="Add the following to your Users.hml file:"
 ---
@@ -261,97 +233,13 @@ ddn supergraph build local
 ddn run docker-start
 ```
 
-```graphql title="You can now query across subgraphs:"
-query GET_USERS_AND_ORDERS {
-  users {
-    id
-    name
-    orders {
-      id
-      createdAt
-      status
-    }
-  }
-}
+You can now ask PromptQL for information about both customers and orders.
+
+```plaintext title="E.g.:"
+Tell me about each customers' order histories.
 ```
 
-```json title="And get a response like:"
-{
-  "data": {
-    "users": [
-      {
-        "id": "7cf0a66c-65b7-11ed-b904-fb49f034fbbb",
-        "name": "Sean",
-        "orders": [
-          {
-            "id": "7ff13435-b590-4d6b-957f-f7fd39d4528a",
-            "createdAt": "2023-10-29T17:02:50.958076+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "82001336-65b7-11ed-b905-7fa26a16d198",
-        "name": "Rob",
-        "orders": [
-          {
-            "id": "9891596a-a732-4c1c-902c-1a112da48fec",
-            "createdAt": "2023-10-29T17:02:51.150084+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "86d5fba0-65b7-11ed-b906-afb985970e2e",
-        "name": "Marion",
-        "orders": [
-          {
-            "id": "85581445-752a-4aef-9684-b648eb5d5f42",
-            "createdAt": "2023-10-29T17:02:51.085229+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "8dea1160-65b7-11ed-b907-e3c5123cb650",
-        "name": "Sandeep",
-        "orders": [
-          {
-            "id": "c7406b75-6b24-41e4-9c5b-ff3feada9447",
-            "createdAt": "2023-10-29T17:02:50.889261+00:00",
-            "status": "processing"
-          }
-        ]
-      },
-      {
-        "id": "9bd9d300-65b7-11ed-b908-571fef22d2ba",
-        "name": "Abby",
-        "orders": [
-          {
-            "id": "98612470-1feb-4b91-88f7-9289d652ee87",
-            "createdAt": "2023-10-29T17:02:51.021317+00:00",
-            "status": "complete"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
-
-### Step 11. Create a cloud project
-
-```ddn title="Using your default context, create a new cloud project:"
-ddn project init
-```
-
-Your `.hasura/context.yaml` will be updated to reflect the new project name. The `default` context of this project is
-now linked to the cloud project you just created.
-
-Additionally, the CLI will output information about each subgraph that it generated in your cloud project, including
-`billing`.
-
-### Step 12. Create a new build on your production project
+### Step 11. Create a new build on your production project
 
 ```ddn title="Finally, create a new build on your cloud project:"
 ddn supergraph build create
@@ -359,14 +247,6 @@ ddn supergraph build create
 
 The CLI will return a console URL which you can navigate to; within the `Explorer` tab, you'll find your project's
 subgraphs, including `billing`.
-
-:::info Adding subgraphs after project initialization
-
-When you **initialize a cloud project**, the subgraphs in your local metadata will automatically be generated in your
-cloud project. **If you add subgraphs after initialization, you'll have to manually add the subgraphs to the cloud
-project as well.** Learn more [here](project-configuration/subgraphs/create-a-subgraph.mdx#cloud).
-
-:::
 
 ## Next steps
 

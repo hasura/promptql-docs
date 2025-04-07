@@ -4,7 +4,7 @@ sidebar_label: Work with multiple subgraphs
 description: "Learn how to use contexts to switch between subgraphs for easy CLI management."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - subgraphs
   - multiple subgraphs
   - subgraph relationship
@@ -26,8 +26,8 @@ namespacing, and establishing relationships across them to create a unified supe
 ## Subgraph Namespacing
 
 Each subgraph in your project operates in its own namespace, which means internal metadata objects (like models,
-relationships, and permissions) cannot conflict with other subgraphs. However, the GraphQL API is where all subgraphs
-come together, and conflicts can occur with root field and type names.
+relationships, and permissions) cannot conflict with other subgraphs. However, interacting via PromptQL is where all
+subgraphs come together, and conflicts can occur with root field and type names.
 
 To prevent naming conflicts, you can:
 
@@ -159,21 +159,8 @@ the relationship in action, you'll need to follow these steps:
 Remember, cross-repo relationships only come into effect when the subgraphs are combined in the DDN environment. Local
 development and testing are limited to the scope of your current repository.
 
-With this relationship defined, you can now query the `favorite_product` field on the `User` type to retrieve the
-related `Product`.
-
-```graphql
-query {
-  users {
-    id
-    name
-    favorite_product {
-      id
-      name
-    }
-  }
-}
-```
+With this relationship defined, you can now ask PromptQL about the `favorite_product` field on the `User` type to
+retrieve the related `Product`.
 
 ## Next steps
 

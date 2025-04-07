@@ -4,7 +4,7 @@ sidebar_label: Work with multiple repositories
 description: "Learn how to split your Hasura DDN across multiple repositories."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - multiple subgraphs
   - multiple repositories
   - multi-repo
@@ -16,9 +16,9 @@ toc_max_heading_level: 4
 
 ## Introduction
 
-Managing multiple repositories in Hasura DDN lets you distribute development across independent subgraphs located in
-separate repositories while maintaining a unified supergraph. This approach provides flexibility for teams to work
-autonomously in their respective data domains, while contributing to a single coordinated API.
+Managing multiple repositories lets you distribute development across independent subgraphs located in separate
+repositories while maintaining a unified supergraph. This approach provides flexibility for teams to work autonomously
+in their respective data domains, while contributing to a single coordinated application.
 
 By organizing your project into multiple repositories, you can iterate and deploy changes efficiently without impacting
 other subgraphs, ensuring a smooth and collaborative development experience.
@@ -50,26 +50,18 @@ provisioning subgraphs, inviting collaborators, and managing the API as a whole.
 ### Step 1. Initialize a new local project
 
 ```ddn title="Create a new local project and initialize a git repository:"
-ddn supergraph init parent-project && cd parent-project && git init
+ddn supergraph init parent-project --with-promptql && cd parent-project && git init
 ```
 
 This will scaffold out the local configuration for a DDN project and initialize a git repository.
 
-### Step 2. Create a cloud project
-
-```ddn title="From the local project directory, create a new cloud project:"
-ddn project init
-```
-
-In `.hasura/context.yaml`, you'll see a new `project` key-value pair with the name of the project returned from the CLI.
-
-### Step 3. Create a commit
+### Step 2. Create a commit
 
 ```sh title="Create an initial commit with your local project mapped to the cloud project via context:"
 git add . && git commit -m "Initial commit"
 ```
 
-### Step 4. Provision subgraphs
+### Step 3. Provision subgraphs
 
 We'll add two subgraphs to this supergraph: `customers` and `billing`.
 
@@ -77,7 +69,7 @@ We'll add two subgraphs to this supergraph: `customers` and `billing`.
 ddn project subgraph create customers && ddn project subgraph create billing
 ```
 
-### Step 5. Create a supergraph build
+### Step 4. Create a supergraph build
 
 ```ddn title="Create an initial supergraph build:"
 ddn supergraph build create
@@ -85,7 +77,7 @@ ddn supergraph build create
 
 This will serve as the foundation for your first **subgraph** build to expand upon.
 
-### Step 6. Invite collaborators
+### Step 5. Invite collaborators
 
 Head to the project's console at [console.hasura.io](https://console.hasura.io) and navigate to
 `Setetings/Collaborators`. Then, invite collaborators based on their role:
@@ -112,21 +104,13 @@ initializing a new repository below.
 
 #### Step 1. Create a new repo for the `customers` subgraph
 
-```ddn title="Initialize a new local project and git repo:"
-ddn supergraph init customer-team --create-subgraph customers && cd customer-team && git init
+```ddn title="Initialize a new local project and git repo while also mapping to the existing cloud project:"
+ddn supergraph init customer-team --create-subgraph customers --with-project <project-name> --with-promptql && cd customer-team && git init
 ```
 
 This will scaffold out the necessary project structure along with initializing a git repository for version control.
 
-#### Step 2. Map the local project to the existing cloud project
-
-```ddn title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
-ddn project init --with-project <project-name>
-```
-
-You'll see the `project` key-value pair updated in your `.hasura/context.yaml` file.
-
-#### Step 3. Set the subgraph context
+#### Step 2. Set the subgraph context
 
 ```ddn title="Change the context to your subgraph's configuration file:"
 ddn context set subgraph ./customers/subgraph.yaml
@@ -134,7 +118,7 @@ ddn context set subgraph ./customers/subgraph.yaml
 
 This will set your unique subgraph in your `.hasura/context.yaml` file and make the CLI commands below more concise.
 
-#### Step 4. Add prefixing
+#### Step 3. Add prefixing
 
 ```sh title="Next, open the customers/subgraph.yaml file and add the following:"
 kind: Subgraph
@@ -143,7 +127,7 @@ definition:
   name: customers
   generator:
     rootPath: .
-    namingConvention: graphql
+    namingConvention: snake_case
     #highlight-start
     graphqlRootFieldPrefix: customers_
     graphqlTypeNamePrefix: customers_
@@ -152,11 +136,11 @@ definition:
     - metadata
 ```
 
-These will prevent collisions of GraphQL root fields and GraphQL types when your supergraph is built.
+These will prevent collisions of root fields and types when your supergraph is built.
 
-#### Step 5. Add a data source and generate your first local build
+#### Step 4. Add a data source and generate your first local build
 
-In this tutorial, we'll use the PostgreSQL connector and our sample PostgreSQL database:
+In this tutorial, we'll use the PostgreSQL connector and a sample PostgreSQL database:
 
 ```plaintext
 postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
@@ -181,10 +165,10 @@ ddn models add customers_pg users
 ```
 
 Open the `customers/metadata` directory and you'll find a newly-generated file: `Users.hml`. The DDN CLI will use this
-Hasura Metadata Language file to represent the `users` table from PostgreSQL in your API as a
+Hasura Metadata Language file to represent the `users` table from PostgreSQL in your application as a
 [model](/reference/metadata-reference/models.mdx).
 
-##### Create a new local build and test the API
+##### Create a new local build and test the application
 
 ```ddn title="To create a local build, run:"
 ddn supergraph build local
@@ -192,7 +176,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
@@ -202,56 +186,24 @@ Your terminal will be taken over by logs for the different services.
 ddn console --local
 ```
 
-```graphql title="In the GraphiQL explorer of the console, write this query:"
-query GET_USERS {
-  customers_users {
-    id
-    name
-  }
-}
+From the PromptQL Playground, you should be able to ask questions about your users.
+
+```plaintext title="E.g.:"
+Show me all my customers' IDs and names.
 ```
 
-```json title="You'll get the following response:"
-{
-  "data": {
-    "customers_users": [
-      {
-        "id": "7cf0a66c-65b7-11ed-b904-fb49f034fbbb",
-        "name": "Sean"
-      },
-      {
-        "id": "82001336-65b7-11ed-b905-7fa26a16d198",
-        "name": "Rob"
-      },
-      {
-        "id": "86d5fba0-65b7-11ed-b906-afb985970e2e",
-        "name": "Marion"
-      },
-      {
-        "id": "8dea1160-65b7-11ed-b907-e3c5123cb650",
-        "name": "Sandeep"
-      },
-      {
-        "id": "9bd9d300-65b7-11ed-b908-571fef22d2ba",
-        "name": "Abby"
-      }
-    ]
-  }
-}
-```
+#### Step 5. Create a subgraph build
 
-#### Step 6. Create a subgraph build
+Now that we've tested our local application and are happy with its state, we can create a build of our independent
+subgraph on our cloud project.
 
-Now that we've tested our local API and are happy with its state, we can create a build of our independent subgraph on
-our cloud project.
-
-```ddn title="Create a subgraph build on your DDN project:"
+```ddn title="Create a subgraph build on your cloud project:"
 ddn subgraph build create
 ```
 
 The CLI will return the subgraph's build version; you'll need this value in the next step.
 
-#### Step 7. Create a supergraph build
+#### Step 6. Create a supergraph build
 
 ```ddn title="Begin by listing the available supergraph builds:"
 ddn supergraph build get
@@ -270,8 +222,8 @@ before applying the build to the supergraph. In order to apply the build, you mu
 ddn supergraph build apply <supergraph-build-version>
 ```
 
-:::tip Streamline team collaboration
-For more efficient development across multiple repositories, you can create and apply the supergraph build in a single command using
+:::tip Streamline team collaboration For more efficient development across multiple repositories, you can create and
+apply the supergraph build in a single command using
 `ddn supergraph build create  --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id> --apply`
 :::
 
@@ -290,20 +242,12 @@ The steps below will allow you to incorporate your independent `billing` subgrap
 #### Step 1. Create a new repo for the `billing` subgraph
 
 ```ddn title="Initialize a new local project and git repo:"
-ddn supergraph init billing-team --create-subgraph billing && cd billing-team && git init
+ddn supergraph init billing-team --with-project <project-name> --create-subgraph billing --with-promptql && cd billing-team && git init
 ```
 
 This will scaffold out the necessary project structure along with initializing a git repository for version control.
 
-#### Step 2. Map the local project to the existing cloud project
-
-```ddn title="Use the --with-project flag to map the local directory to the parent cloud project, replacing the name with your parent project's name:"
-ddn project init --with-project <project-name>
-```
-
-You'll see the `project` key-value pair updated in your `.hasura/context.yaml` file.
-
-#### Step 3. Set the subgraph context
+#### Step 2. Set the subgraph context
 
 ```ddn title="Change the context to your subgraph's configuration file:"
 ddn context set subgraph ./billing/subgraph.yaml
@@ -311,7 +255,7 @@ ddn context set subgraph ./billing/subgraph.yaml
 
 This will set your unique subgraph in your `.hasura/context.yaml` file and make the CLI commands below more concise.
 
-#### Step 4. Add prefixing
+#### Step 3. Add prefixing
 
 ```sh title="Next, open the billing/subgraph.yaml file and add the following:"
 kind: Subgraph
@@ -320,7 +264,7 @@ definition:
   name: billing
   generator:
     rootPath: .
-    namingConvention: graphql
+    namingConvention: snake_case
     #highlight-start
     graphqlRootFieldPrefix: billing_
     graphqlTypeNamePrefix: billing_
@@ -331,7 +275,7 @@ definition:
 
 Like before, this will ensure the types an fields are namespaced to your subgraph.
 
-#### Step 5. Add a data source and generate your first local build
+#### Step 4. Add a data source and generate your first local build
 
 As before, we'll use the PostgreSQL connector with our sample database:
 
@@ -357,7 +301,7 @@ ddn models add billing_pg orders
 ```
 
 Open the `billing/metadata` directory and you'll find a newly-generated file: `Orders.hml`. The DDN CLI will use this
-Hasura Metadata Language file to represent the `orders` table from PostgreSQL in your API as a
+Hasura Metadata Language file to represent the `orders` table from PostgreSQL in your application as a
 [model](/reference/metadata-reference/models.mdx).
 
 ##### Create a new local build and test the API
@@ -368,7 +312,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Start your local Hasura Engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
@@ -378,53 +322,15 @@ Your terminal will be taken over by logs for the different services.
 ddn console --local
 ```
 
-```graphql title="In the GraphiQL explorer of the console, write this query:"
-query GET_ORDERS {
-  billing_orders {
-    id
-    createdAt
-    status
-  }
-}
+You can test this by visiting the PromptQL Playground and asking questions about your orders.
+
+```plaintext title="E.g.:"
+Give me the ID, status, and when each order was created.
 ```
 
-```json title="You'll get the following response:"
-{
-  "data": {
-    "billing_orders": [
-      {
-        "id": "c7406b75-6b24-41e4-9c5b-ff3feada9447",
-        "createdAt": "2023-10-29T17:02:50.889261+00:00",
-        "status": "processing"
-      },
-      {
-        "id": "7ff13435-b590-4d6b-957f-f7fd39d4528a",
-        "createdAt": "2023-10-29T17:02:50.958076+00:00",
-        "status": "complete"
-      },
-      {
-        "id": "98612470-1feb-4b91-88f7-9289d652ee87",
-        "createdAt": "2023-10-29T17:02:51.021317+00:00",
-        "status": "complete"
-      },
-      {
-        "id": "85581445-752a-4aef-9684-b648eb5d5f42",
-        "createdAt": "2023-10-29T17:02:51.085229+00:00",
-        "status": "complete"
-      },
-      {
-        "id": "9891596a-a732-4c1c-902c-1a112da48fec",
-        "createdAt": "2023-10-29T17:02:51.150084+00:00",
-        "status": "complete"
-      }
-    ]
-  }
-}
-```
+#### Step 5. Create a subgraph build
 
-#### Step 6. Create a subgraph build
-
-```ddn title="Once your local metadata is in its desired state, create a subgraph build on your DDN project:"
+```ddn title="Once your local metadata is in its desired state, create a subgraph build on your cloud project:"
 ddn subgraph build create
 ```
 
@@ -449,8 +355,8 @@ before applying the build to the supergraph. In order to apply the build, you mu
 ddn supergraph build apply <supergraph-build-version>
 ```
 
-:::tip Streamline team collaboration
-For more efficient development across multiple repositories, you can create and apply the supergraph build in a single command using
+:::tip Streamline team collaboration For more efficient development across multiple repositories, you can create and
+apply the supergraph build in a single command using
 `ddn supergraph build create --subgraph-version billing:<build-version> --base-supergraph-version <supergraph-build-id> --apply`
 :::
 
@@ -465,7 +371,7 @@ killed all active services before proceeding to the next step.
 ## Add a cross-subgraph relationship
 
 **We can create relationships across subgraphs that are testable on a Hasura Cloud project**. As your locally-running
-engine will only have access to your local subgraphs and their accompanying metadata, you'll need to define
+instance will only have access to your local subgraphs and their accompanying metadata, you'll need to define
 relationships using your knowledge of other subgraphs and then test them using a supergraph build in your hosted
 environment.
 
@@ -502,87 +408,15 @@ ddn supergraph build get
 ddn supergraph build create --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id>
 ```
 
-```graphql title="Now, you can test your nested query across subgraphs:"
-query GET_USERS_AND_ORDERS {
-  customers_users {
-    id
-    name
-    orders {
-      id
-      createdAt
-      status
-    }
-  }
-}
-```
+Now, you can ask PromptQL about customers and their orders:
 
-```json title="With a repsonse like this:"
-{
-  "data": {
-    "customers_users": [
-      {
-        "id": "7cf0a66c-65b7-11ed-b904-fb49f034fbbb",
-        "name": "Sean",
-        "orders": [
-          {
-            "id": "7ff13435-b590-4d6b-957f-f7fd39d4528a",
-            "createdAt": "2023-10-29T17:02:50.958076+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "82001336-65b7-11ed-b905-7fa26a16d198",
-        "name": "Rob",
-        "orders": [
-          {
-            "id": "9891596a-a732-4c1c-902c-1a112da48fec",
-            "createdAt": "2023-10-29T17:02:51.150084+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "86d5fba0-65b7-11ed-b906-afb985970e2e",
-        "name": "Marion",
-        "orders": [
-          {
-            "id": "85581445-752a-4aef-9684-b648eb5d5f42",
-            "createdAt": "2023-10-29T17:02:51.085229+00:00",
-            "status": "complete"
-          }
-        ]
-      },
-      {
-        "id": "8dea1160-65b7-11ed-b907-e3c5123cb650",
-        "name": "Sandeep",
-        "orders": [
-          {
-            "id": "c7406b75-6b24-41e4-9c5b-ff3feada9447",
-            "createdAt": "2023-10-29T17:02:50.889261+00:00",
-            "status": "processing"
-          }
-        ]
-      },
-      {
-        "id": "9bd9d300-65b7-11ed-b908-571fef22d2ba",
-        "name": "Abby",
-        "orders": [
-          {
-            "id": "98612470-1feb-4b91-88f7-9289d652ee87",
-            "createdAt": "2023-10-29T17:02:51.021317+00:00",
-            "status": "complete"
-          }
-        ]
-      }
-    ]
-  }
-}
+```plaintext title="E.g.:"
+Provide me with a listing of all customers and their orders.
 ```
 
 ## Recap
 
 By organizing your project into multiple repositories, you can create a flexible and collaborative workflow for subgraph
-development in Hasura DDN. Starting with a parent project, you learned how to provision subgraphs, invite collaborators,
-and manage builds to integrate subgraph changes into a unified supergraph. This structure ensures teams can work
-independently while maintaining seamless integration and coordination across the entire API.
+development in Hasura. Starting with a parent project, you learned how to provision subgraphs, invite collaborators, and
+manage builds to integrate subgraph changes into a unified supergraph. This structure ensures teams can work
+independently while maintaining seamless integration and coordination across the entire application.

@@ -1,10 +1,10 @@
 ---
 sidebar_position: 1
 sidebar_label: Basics
-description: "Learn how metadata is configured in Hasura DDN with projects and subgraphs and how to create builds."
+description: "Learn how metadata is configured in PromptQL with projects and subgraphs and how to create builds."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - project configuration
   - hasura projects
   - hasura builds
@@ -16,9 +16,10 @@ keywords:
 
 ## Introduction
 
-A **project** in Hasura DDN is the foundation for building and managing your API. It contains a structured collection of
-metadata files that define the behavior, relationships, and permissions for your API. These metadata files are organized
-into **subgraphs**, each representing a distinct data domain.
+A **project** in PromptQL is the foundation for building and managing your application. This foundational layer is known
+as the **Hasura DDN (Data Delivery Network)** and contains a structured collection of metadata files that define the
+behavior, relationships, and permissions for your application. These metadata files can be organized into **subgraphs**,
+each representing a distinct data domain.
 
 Projects are designed to support both local development and cloud deployment. During development, you work with a local
 version of your project, which is linked to a cloud project through a
@@ -28,9 +29,9 @@ different environments, with unique configurations for environment variables and
 
 ## Data domains
 
-A **data domain** in Hasura DDN represents a distinct area of responsibility or focus within your project, typically
-aligned with a specific team or business function. These domains are managed as **subgraphs**, which are collections of
-metadata files that describe the relationships, permissions, and structure for the data within that domain.
+A **data domain** represents a distinct area of responsibility or focus within your project, typically aligned with a
+specific team or business function. These domains are managed as **subgraphs**, which are collections of metadata files
+that describe the relationships, permissions, and structure for the data within that domain.
 
 Organizing your project into subgraphs provides several benefits:
 
@@ -38,25 +39,25 @@ Organizing your project into subgraphs provides several benefits:
   simpler and reducing bottlenecks.
 - **Clear Boundaries**: Subgraphs establish clear boundaries between domains, making it easier to define and enforce
   data access permissions and relationships.
-- **Scalability**: By breaking your project into manageable pieces, you can scale your API incrementally as your
+- **Scalability**: By breaking your project into manageable pieces, you can scale your application incrementally as your
   organization and data requirements grow.
 - **Flexibility**: Subgraphs can be independently updated and extended, allowing you to adapt your project to changing
-  needs without disrupting the overall API.
+  needs without disrupting the overall application.
 
 This structure ensures that your project remains organized, collaborative, and adaptable, enabling you to build and
-maintain robust APIs efficiently.
+maintain robust applications efficiently.
 
 :::info Multi-repo projects
 
-Hasura DDN also supports multi-repository setups, giving teams greater autonomy in their development process. With this
+PromptQL also supports multi-repository setups, giving teams greater autonomy in their development process. With this
 setup:
 
 - Each team can maintain their **subgraph** in a separate repository while still contributing to the shared
   **supergraph**.
 - Teams can develop, test, and deploy their subgraphs independently, enabling faster iteration and minimizing
   dependencies on other teams.
-- The supergraph integrates these subgraphs into a single API, ensuring that the overall API remains consistent and
-  cohesive.
+- The supergraph integrates these subgraphs into a single application, ensuring that the overall application remains
+  consistent and cohesive.
 
 This approach is ideal for large organizations where multiple teams work on distinct data domains but need to
 collaborate through a unified API. For more information, check out
@@ -70,4 +71,3 @@ collaborate through a unified API. For more information, check out
 - [Learn more about the supergraph concept](/project-configuration/supergraph.mdx)
 - [Learn more about provisioning subgraphs](/project-configuration/subgraphs/index.mdx)
 - [Learn how to manage a project across environments](/project-configuration/project-management/index.mdx)
-- [Learn how to upgrade a legacy configuration](/project-configuration/upgrading-project-config/index.mdx)

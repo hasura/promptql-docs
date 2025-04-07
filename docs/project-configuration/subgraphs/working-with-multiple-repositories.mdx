@@ -4,7 +4,7 @@ sidebar_label: Split Subgraphs across repositories
 description: "Learn how to split subgraphs across multiple repositories."
 keywords:
   - hasura
-  - hasura ddn
+  - promptql
   - subgraphs
   - multiple subgraphs
   - parent repo
@@ -36,7 +36,7 @@ domain (e.g., users, orders, products) and can be managed by different teams.
 - Supergraph and subgraph builds are immutable and have unique IDs
 - A subgraph must exist in the DDN project before inviting collaborators to it
 - Each subgraph is namespaced and internal metadata objects cannot conflict with other subgraphs
-- The GraphQL API is where subgraphs meet and conflicts can occur with root field and type names
+- The PromptQL Playground is where subgraphs meet and conflicts can occur with root field and type names
 - [Subgraph prefixing](/project-configuration/subgraphs/subgraph-prefixing.mdx) can automatically remedy naming
   conflicts
 
@@ -228,8 +228,8 @@ This finalizes the integration, making the changes available to all collaborator
 ddn subgraph build apply <subgraph-build-version>
 ```
 
-:::tip Simplify multi-team workflows
-For more efficient collaboration across repositories, you can create and apply the supergraph build in a single command using
+:::tip Simplify multi-team workflows For more efficient collaboration across repositories, you can create and apply the
+supergraph build in a single command using
 `ddn supergraph build create --subgraph-version <subgraph-name:build-version> --base-supergraph-version <parent-build-id> --apply`
 :::
 

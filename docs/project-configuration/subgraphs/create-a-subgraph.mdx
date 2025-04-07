@@ -13,8 +13,8 @@ keywords:
 
 ## Introduction
 
-You can easily create subgraphs using the CLI and — for cloud projects — the Hasura DDN console. By default, the CLI
-will generate an `app` subgraph when a new project is initialized.
+You can easily create subgraphs using the CLI. By default, the CLI will generate an `app` subgraph when a new project is
+initialized.
 
 ## In your local metadata {#local}
 
@@ -46,15 +46,9 @@ By default, when a cloud project is initialized, any subgraphs present in your s
 initialized as well. However, to explicitly add a new subgraph to a cloud project — such as when iterating on an
 existing project — follow these steps:
 
-### Using the CLI
-
 ```ddn title="The folowing will create a new subgraph on the current context's cloud project:"
 ddn project subgraph create <subgraph-name>
 ```
-
-### Using the console
-
-Under `Settings` > `Subgraphs` click `+ Create New Subgraph`.
 
 :::info Subgraph mapping
 
