@@ -1,0 +1,204 @@
+---
+title: Add Support for Weaviate
+sidebar_position: 11
+description: "See PromptQL examples and learn how to build with them."
+sidebar_label: Add Support for Weaviate
+keywords:
+  - examples
+  - tutorials
+  - weaviate
+---
+
+# Add Support for Weaviate
+
+## Introduction
+
+This tutorial shows you how to connect your Weaviate cluster and perform semantic search with PromptQL.
+
+## Prerequisites
+
+In this example, we'll use a Weaviate Cluster on Cloud.
+
+1. Create a cluster on Weaviate
+2. You will need the Weaviate REST API URL and API Key, both available on Weaviate Cloud.
+3. You'll also need a Cohere API key for the embeddings.
+
+## Tutorial
+
+### Step 1. Clone the project
+
+```bash
+git clone git@github.com:hasura/weaviate-promptql-quickstart.git
+cd promptql-weaviate-quickstart
+```
+
+### Step 2. Add your API keys for Weaviate and Cohere
+
+We'll be using the Cohere API key to create embeddings for our unstructured data via Weaviate Client. We also need the
+Weaviate Cloud URL and Weaviate API Key. Both can be obtained from Weaviate Cloud.
+
+In your project directory, add the key to your `.env` file.
+
+First, copy the `env.sample` file to `.env`
+
+```sh
+cp env.sample .env
+```
+
+```sh title="Now, update the API keys:"
+APP_PYTHON_COHERE_API_KEY='....'
+APP_PYTHON_WCD_URL='....'
+APP_PYTHON_WCD_API_KEY='....'
+```
+
+:::info Embeddings are up to you
+
+Feel free to modify the embedding configuration in Weaviate Client to use something other than Cohere and configure the
+API key accordingly.
+
+:::
+
+### Step 3. Create a collection and load data
+
+After configuring the `.env` values with the above credentials, continue with the data loading into Weaviate.
+
+```sh title="Head to app/connector/python and execute:"
+python3 load-data.py
+```
+
+This will create a movie collection and load sample movie data with vector embedding using Cohere.
+
+### Step 4. Write custom functions
+
+In `app/connector/python/functions.py`, we already have two functions:
+
+- `semantic_search`
+- `keyword_search`
+
+They are exposed as functions to PromptQL. Add more per your requirements.
+
+<details>
+<summary>Click to show Python code</summary>
+
+```python copy
+"""
+functions.py
+
+This is an example of how you can use the Python SDK's built-in Function connector to easily write Python code.
+When you add a Python Lambda connector to your Hasura project, this file is generated for you!
+
+In this file you'll find code examples that will help you get up to speed with the usage of the Hasura lambda connector.
+If you are an old pro and already know what is going on you can get rid of these example functions and start writing your own code.
+"""
+import os
+import weaviate
+from weaviate.classes.init import Auth
+import weaviate.classes.config as wc
+import weaviate.classes.query as wq
+
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from pydantic import BaseModel, Field # You only need this import if you plan to have complex inputs/outputs, which function similar to how frameworks like FastAPI do
+from hasura_ndc.errors import UnprocessableContent
+from typing import Annotated
+
+# Weaviate Environment Variables
+wcd_url = os.environ["WCD_URL"]
+wcd_api_key = os.environ["WCD_API_KEY"]
+cohere_api_key = os.environ["COHERE_API_KEY"]
+
+client = weaviate.connect_to_weaviate_cloud(
+    cluster_url=wcd_url,                                    # Replace with your Weaviate Cloud URL
+    auth_credentials=Auth.api_key(wcd_api_key),             # Replace with your Weaviate Cloud key
+    headers={"X-Cohere-Api-Key": cohere_api_key}
+)
+
+connector = FunctionConnector()
+
+class Movies(BaseModel):
+  title: str
+
+# Semantic search to find similar entities in weaviate
+@connector.register_query # This is how you register a query
+def semantic_search(query: str) -> list[Movies]:
+    # do near by search with weaviate python client
+    # Get the collection
+    movies = client.collections.get("Movie")
+
+    # Perform query
+    response = movies.query.near_text(
+        query=query, limit=5, return_metadata=wq.MetadataQuery(distance=True)
+    )
+
+    movies_list = []
+    # Inspect the response
+    for o in response.objects:
+        print("XXXXXXX")
+        print(o.properties)
+        print(o.properties["release_date"])
+        print(
+            o.properties["title"]
+        )  # Print the title and release year (note the release date is a datetime object)
+        movies_list.append(Movies(title=o.properties["title"]))
+        print(
+            f"Distance to query: {o.metadata.distance:.3f}\n"
+        )  # Print the distance of the object from the query
+
+    return movies_list
+
+# This is an example of a keyword search function which uses the BM25 algorithm to find the most relevant Movie entities in Weaviate
+@connector.register_query # This is how you register a query
+def keyword_search(query: str) -> list[Movies]:
+    # Get the collection
+    movies = client.collections.get("Movie")
+
+    # Perform query
+    response = movies.query.bm25(
+        query="history", limit=5, return_metadata=wq.MetadataQuery(score=True)
+    )
+
+    movies_list = []
+    # Inspect the response
+    for o in response.objects:
+        print(
+            o.properties["title"]
+        )  # Print the title and release year (note the release date is a datetime object)
+        movies_list.append(Movies(title=o.properties["title"]))
+        print(
+            f"BM25 score: {o.metadata.score:.3f}\n"
+        )  # Print the BM25 score of the object from the query
+    return movies_list
+
+if __name__ == "__main__":
+    start(connector)
+
+```
+
+</details>
+
+### Step 5. Build your supergraph
+
+```ddn title="Create your supergraph build locally:"
+ddn supergraph build local
+```
+
+```ddn title="Run the services:"
+ddn run docker-start
+```
+
+### Step 6. Head to your local DDN console
+
+```ddn title="Run the following from your project's directory:"
+ddn console --local
+```
+
+### Step 7. Talk to your data
+
+```text title="Now, you can ask semantic questions on your data:"
+Movies with dystopian future
+Historical movies
+```
+
+## Iterating on the Python Code and Logic
+
+If you need to iterate on your code or schema, check out the [iteration guide](/data-modeling/iterate.mdx).
