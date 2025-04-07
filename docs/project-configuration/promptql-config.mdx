@@ -1,0 +1,118 @@
+---
+sidebar_position: 3
+sidebar_label: PromptQL Configuration
+description: Learn how to configure your PromptQL application via metadata.
+keywords:
+  - hasura
+  - hasura ddn
+  - project
+  - promptql-config
+  - config
+toc_max_heading_level: 4
+---
+
+# PromptQL Configuration
+
+## Overview
+
+You can manage PromptQL's LLM settings and system instructions from a single configuration file: `promptql_config.yaml`.
+
+With this file, you can:
+
+- Set the LLM provider and model used across the application.
+- Define a separate LLM for AI Primitives such as **Classification**, **Summarization**, and **Extraction**.
+- Add system instructions that apply to every PromptQL interaction.
+
+## Configuration File: `promptql_config.yaml`
+
+This file is automatically created when you initialize a new project with the `--with-promptql` flag using the Hasura
+DDN CLI. It appears at the root of your DDN project directory.
+
+### Examples
+
+#### Example 1: Minimal Configuration
+
+```yaml
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: hasura
+  system_instructions: |
+    You are a helpful AI Assistant.
+```
+
+:::info Base Model
+
+When using the `hasura` provider, the default model is `claude-3-5-sonnet-latest`. This is the recommended model for
+PromptQL program generation.
+
+:::
+
+#### Example 2: Custom Providers for LLM and AI Primitives
+
+```yaml copy
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+  system_instructions: |
+    You are a helpful AI Assistant.
+```
+
+:::info Considerations
+
+- The `model` key is **not supported** when using the `hasura` provider.
+- If `ai_primitives_llm` is not defined, it defaults to the provider specified in the `llm` configuration.
+- `system_instructions` are optional.
+
+:::
+
+## Supported Providers and Models
+
+Here are the currently supported providers and their available models:
+
+| Provider    | Supported Models                |
+| ----------- | ------------------------------- |
+| `hasura`    | N/A _(uses default internally)_ |
+| `openai`    | `o1`, `o3-mini`, `gpt-4o`       |
+| `anthropic` | `claude-3-5-sonnet-latest`      |
+
+This setup gives you flexibility in tailoring the LLM experience to suit your application's needs — whether you're
+generating full programs or chatting via the playground.
+
+## System Prompts
+
+Custom system instructions provide flexibility to fine-tune your PromptQL experience. This optional configuration allows
+you to tailor the playground’s behavior to your specific needs. While powerful, use this feature judiciously to maintain
+optimal performance.
+
+### Example
+
+```yaml
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: hasura
+  system_instructions: |
+
+    You are an AI assistant that helps go-to-market teams make data-driven decisions.
+
+    You have access to data from Salesforce (opportunities, accounts, leads), Clari (forecast categories, pipeline movement), and Postgres (custom product and revenue data). 
+
+    Use this data to answer questions about sales performance, forecast accuracy, pipeline health, rep activity, and account trends. Prioritize clarity, brevity, and business relevance in your answers.
+
+    If a question is ambiguous, ask for clarification.
+```
+
+### Best Practices
+
+- Keep instructions clear and concise.
+- Focus on specific behaviors or knowledge you want to emphasize.
+- Test your custom instructions thoroughly before using them in production.
