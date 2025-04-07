@@ -1,7 +1,5 @@
 ---
-description:
-  "Learn how to set up your Hasura DDN project with Webhook mode to authenticate requests and apply access-control
-  rules."
+description: "Learn how to set up PromptQL with Webhook mode to authenticate requests and apply access-control rules."
 keywords:
   - hasura webhook mode
   - hasura engine authentication
@@ -21,10 +19,10 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-You can enable your Hasura DDN instance to use an auth webhook in just a few steps.
+You can enable PromptQL to use an auth webhook in just a few steps.
 
-You will need to provide a URL that Hasura will call with the original request headers, and it should return a body with
-the session variables after the request is authenticated.
+You will need to provide a URL that your application will call with the original request headers, and it should return a
+body with the session variables after the request is authenticated.
 
 <Thumbnail src="/img/auth/auth-webhook-overview-diagram.png" alt="Authentication using webhooks" width="1000px" />
 
@@ -45,7 +43,7 @@ Hasura utilizes an [AuthConfig](/reference/metadata-reference/auth-config.mdx) o
 configuration for your authentication service. In a standard setup the `auth-config.hml` file can be found in your
 `globals` directory.
 
-:::tip Hasura DDN VS Code extension
+:::tip Hasura VS Code extension
 
 You can use [Hasura's VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to
 scaffold out your `AuthConfig` object by typing `AuthConfig` and selecting this object from the list of available
@@ -82,11 +80,11 @@ AUTH_WEBHOOK_URL=http://auth_hook:3050/validate-request
 
 ### GET vs POST
 
-For a POST request, the headers received by the DDN engine on the query can be forwarded to the webhook in a JSON object
-in the body of the request under a `headers` key.
+For a POST request, the headers received by Hasura on the query can be forwarded to the webhook in a JSON object in the
+body of the request under a `headers` key.
 
-For a GET request, the headers received by the DDN engine on the query can be forwarded to the webhook as actual headers
-on the request and the body will be empty.
+For a GET request, the headers received by Hasura on the query can be forwarded to the webhook as actual headers on the
+request and the body will be empty.
 
 What we've provided above is a sample configuration as a POST request but it can be configured as a GET request. See the
 reference for `AuthHookConfig` [here](/reference/metadata-reference/auth-config.mdx#authconfig-authhookconfigv3). For
@@ -127,30 +125,18 @@ Below is an example of the header object your webhook might receive in the body 
 }
 ```
 
-Headers are forwarded to the auth webhook from the client on each request received by the Hasura engine either as
-headers for a GET request or as a JSON object in the body of a POST request under a `headers` key.
+Headers are forwarded to the auth webhook from the client on each request received by your application either as headers
+for a GET request or as a JSON object in the body of a POST request under a `headers` key.
 
 :::tip Custom Headers Configuration
 
 You can configure the headers that are sent to the webhook in the optional `customHeadersConfig` field. If the field is
-not provided, the default behavior is to forward all headers (after filtering out commonly used headers) received by the
-DDN engine on the query to the webhook.
+not provided, the default behavior is to forward all headers (after filtering out commonly used headers) received by
+Hasura on the query to the webhook.
 
 ```yaml title="Ignored headers list"
-Accept
-Accept-Datetime
-Accept-Encoding
-Accept-Language
-Cache-Control
-Connection
-Content-Length
-Content-MD5
-Content-Type
-DNT
-Host
-Origin
-Referer
-User-Agent
+Accept Accept-Datetime Accept-Encoding Accept-Language Cache-Control Connection Content-Length Content-MD5 Content-Type
+DNT Host Origin Referer User-Agent
 ```
 
 When using `customHeadersConfig`, you can explicitly forward any headers, including those that are ignored by default.
@@ -167,8 +153,8 @@ can pass any headers you wish.
 
 :::tip Forward all headers
 
-If you want to forward all headers received by the DDN engine on the query to the webhook, you can set `forward: "*"`.
-This will forward all headers received by the DDN engine on the query to the webhook, excluding the ignored headers.
+If you want to forward all headers received by Hasura on the query to the webhook, you can set `forward: "*"`. This will
+forward all headers received by Hasura on the query to the webhook, excluding the ignored headers.
 
 :::
 
@@ -198,7 +184,7 @@ this request. Unlike [JWT auth mode](auth/jwt/jwt-mode.mdx), you do not have to 
 `X-Hasura-Default-Role` session variables.
 
 In the example below the `X-Hasura-Is-Owner` and `X-Hasura-Custom` are examples of custom session variables which can be
-used to enforce permissions in your supergraph.
+used to enforce permissions in your application.
 
 ```json title="Example response from your webhook to Hasura DDN"
 HTTP/1.1 200 OK
@@ -250,7 +236,7 @@ definition:
 ```
 
 Let's also add some example `ModelPermissions` so that an admin role can access all rows in the Orders model, but a user
-role can only access rows where the userId field matches the user id session variable in the JWT.
+role can only access rows where the `userId` field matches the user id session variable in the JWT.
 
 ```bash title="Example ModelPermissions for Orders model"
 ---
@@ -275,7 +261,7 @@ definition:
 # highlight-end
 ```
 
-## Step 4. Rebuild your supergraph
+## Step 4. Rebuild your application
 
 ```ddn title="For example, from the root of your project, run:"
 ddn supergraph build local
@@ -283,10 +269,10 @@ ddn supergraph build local
 
 ## Step 5. Make an authenticated request
 
-Here we're making a request to our Hasura DDN instance which will be validated by our webhook which returns a payload of
-session variables.
+Here we're making a request to our instance which will be validated by our webhook which returns a payload of session
+variables.
 
-```json title="Example response from our webhook to Hasura DDN"
+```json title="Example response from our webhook to Hasura:"
 {
   "x-hasura-user-id": "7cf0a66c-65b7-11ed-b904-fb49f034fbbb",
   "x-hasura-role": "user"
@@ -294,14 +280,4 @@ session variables.
 ```
 
 If we run a query for Orders, we can see that we only get the orders which this user has made and are not able to access
-the deliveryDate field.
-
-<Thumbnail
-  src="/img/auth/console-auth-webhook-query-permissions-results.png"
-  alt="Hasura console authentication using JWT"
-/>
-
-### Step 6. Set your API to public
-
-Now that you have implemented webhook authentication, you can set your API to public. See here for more information on
-[setting your API to public](/auth/private-vs-public.mdx).
+the `deliveryDate` field.

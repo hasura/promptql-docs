@@ -18,8 +18,8 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-JWT mode requires that the client making the query sends a valid JSON Web Token to the Hasura Engine endpoint. This JWT
-is provided by an auth service such as Auth0, AWS Cognito, Firebase, Clerk, or your own custom solution.
+JWT mode requires that the client making the request sends a valid JSON Web Token to application. This JWT is provided
+by an auth service such as Auth0, AWS Cognito, Firebase, Clerk, or your own custom solution.
 
 Hasura then verifies and decodes the JWT to extract `x-hasura-*` session variable claim values from a defined namespace
 in the token.
@@ -43,13 +43,13 @@ used. If this is not provided, the engine will use the `x-hasura-default-role` v
 To clarify, the `x-hasura-role` header is optional and can be used to override the default role in the JWT allowing the
 same verified JWT to be used for different roles.
 
-Only keys prefixed with `x-hasura-` will be accessible by the engine.
+Only keys prefixed with `x-hasura-` will be accessible by the application.
 
 Session variable keys are case-insensitive. Values are case-sensitive.
 
 ## Enabling JWT authentication
 
-You can enable your Hasura DDN instance to use JWTs in just a few steps.
+You can enable your application to use JWTs in just a few steps.
 
 ### Step 1. Update your AuthConfig
 
@@ -57,7 +57,7 @@ Hasura utilizes an [AuthConfig](/reference/metadata-reference/auth-config.mdx) o
 configuration for your authentication service. In a standard setup the `auth-config.hml` file can be found in your
 `globals` directory.
 
-:::tip Hasura DDN VS Code extension
+:::tip Hasura VS Code extension
 
 You can use [Hasura's VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to
 scaffold out your `AuthConfig` object by typing `AuthConfig` and selecting this object from the list of available
@@ -67,8 +67,8 @@ different key-value pairs.
 :::
 
 Below, we're showing using the `BearerAuthorization` header location format using a fixed secret key from an environment
-variable. However, Hasura DDN supports other methods for
-[where the engine can locate the JWT](reference/metadata-reference/auth-config.mdx#authconfig-jwttokenlocation) and
+variable. However, we support other methods for
+[where the application can locate the JWT](reference/metadata-reference/auth-config.mdx#authconfig-jwttokenlocation) and
 [how it is verified](reference/metadata-reference/auth-config.mdx#authconfig-jwtalgorithm).
 
 ```yaml title="globals/metadata/auth-config.hml"
@@ -121,8 +121,8 @@ can be used with [permissions](/reference/metadata-reference/permissions.mdx) wh
 }
 ```
 
-Your auth service will encode this object using a secret and create a token which can then be passed to Hasura. You can
-see an example of the above token encoded
+Your auth service will encode this object using a secret and create a token which can then be passed to the application.
+You can see an example of the above token encoded
 [here](https://jwt.io/#debugger-io?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzU5MTY3MTgsImV4cCI6MTc5NjkxNjY3NywiY2xhaW1zLmp3dC5oYXN1cmEuaW8iOnsieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS1hbGxvd2VkLXJvbGVzIjpbInVzZXIiLCJhZG1pbiJdLCJ4LWhhc3VyYS11c2VyLWlkIjoxMjM0fX0.1Dv6B077loe9wGcUFwK_JAHRUtLOZHOEp9EE-OehUzY).
 The signature secret to verify this token with the HS256 algorithm is `ultra-secret-very-secret-super-secret-key`.
 
@@ -209,7 +209,7 @@ definition:
 
 For these examples we'll set the payload of the JWT to specify a `user` role and a UUID for the user id.
 
-```json title="Example JWT payload which we will send to the Hasura Engine"
+```json title="Example JWT payload which we will send to the application"
 {
   "iat": 1735916718,
   "exp": 1796916677,
@@ -223,10 +223,10 @@ For these examples we'll set the payload of the JWT to specify a `user` role and
 
 :::
 
-### Step 4. Rebuild your supergraph
+### Step 4. Rebuild your application
 
 Once you've updated your `AuthConfig` object in `auth-config.hml` and updated your claims, you can rebuild your
-supergraph and test it locally.
+application and test it locally.
 
 ```ddn title="For example, from the root of your project, run:"
 ddn supergraph build local
@@ -236,22 +236,7 @@ ddn supergraph build local
 
 In the example above, we're using the `BearerAuthorization` method. As such, as we can make a request to our Hasura DDN
 instance by including a header with the key-value of `Authorization: Bearer <our-encoded-token>`. For testing, you can
-pass this value in the Hasura DDN console's header section.
-
-<Thumbnail src="/img/auth/console-auth-tab-default-jwt.png" alt="Hasura console authentication using JWT" />
-
-If we run a query for Orders, we can see that we only get the orders which this user has made and are not able to access
-the deliveryDate field.
-
-<Thumbnail
-  src="/img/auth/console-auth-query-permissions-results.png"
-  alt="Hasura console query permissions results using JWT"
-/>
-
-### Step 6. Set your API to public
-
-Now that you have implemented JWT authentication, you can set your API to public. See here for more information on
-[setting your API to public](/auth/private-vs-public.mdx).
+pass this value in via a thread using a PromptQL thread.
 
 ## Next steps
 

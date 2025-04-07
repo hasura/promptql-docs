@@ -12,7 +12,7 @@ sidebar_label: Command Permissions
 
 # Command Permissions
 
-To limit what **commands** are available to a role in your supergraph, you define a `CommandPermissions` object.
+To limit what **commands** are available to a role, you define a `CommandPermissions` object.
 
 By default, whenever a new command is created in your supergraph, it is only executable by the `admin` role.
 
@@ -55,7 +55,7 @@ they want.
 The `user` role however, is able to pass a `user_id` argument, but the `pre_check` expression is passed to the data
 connector which will only let them delete the row if the row's `is_invincible` value is set to `false`.
 
-To make a execution of a command available to a role in your supergraph, after updating your metadata, you'll need to
+To make a execution of a command available to a role in your application, after updating your metadata, you'll need to
 [create a new build](/reference/cli/commands/ddn_supergraph_build_local.mdx) using the CLI.
 
 ### Examples
