@@ -1,7 +1,7 @@
 ---
 sidebar_position: 0
 title: Basics
-description: "Learn the basics of deploying Hasura DDN projects"
+description: "Learn the basics of deploying PromptQL projects."
 keywords:
   - hasura ddn
   - hasura enterprise
@@ -20,7 +20,7 @@ import Icon from "@site/static/icons/features/deployment.svg";
 
 ## Introduction
 
-There are a few ways to deploy your supergraph API.
+There are a few ways to deploy your PromptQL application.
 
 ## Hasura DDN
 
@@ -36,7 +36,7 @@ You can host your API on fully-managed Hasura DDN.
 
 ## Private DDN
 
-Hasura Private DDN is an enterprise-grade deployment offering to run your API on dedicated infrastructure.
+Hasura Private DDN is an enterprise-grade deployment offering to run your application on dedicated infrastructure.
 
 You can also host your [Data Plane](/help/glossary#data-plane) on your own infrastructure, and the
 [Control Plane](/help/glossary#control-plane) on Hasura DDN.
@@ -47,14 +47,3 @@ You can also host your [Data Plane](/help/glossary#data-plane) on your own infra
 - Compliance with specific regulatory requirements
 
 [Read more](/private-ddn/overview.mdx)
-
-## Self-Hosted
-
-You can also self-host the v3 engine and connectors on your own Docker-based infrastructure.
-
-- Includes a basic version of the console with GraphiQL and metadata explorer.
-- Includes all API related features, plugins and connectors.
-- Does not include a control plane: no built-in CI/CD (or build versioning), schema registry, API analytics.
-- Observability is not built-in but you can export traces to your own 3rd party service.
-
-[Read more](/deployment/self-hosted/index.mdx)
