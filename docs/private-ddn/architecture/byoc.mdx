@@ -41,10 +41,10 @@ requests. Even if the Control Plane becomes unavailable, the Data Plane continue
 
 ## Data Flow and security
 
-All critical data operations occur exclusively within the customer infrastructure. When an API user sends a GraphQL
-query, it's received by Hasura in the Data Plane. Hasura then directly accesses the necessary data sources within the
-customer infrastructure to fulfill the request. This direct access ensures that sensitive data never leaves the
-customer's controlled environment, maintaining data residency and security.
+All critical data operations occur exclusively within the customer infrastructure. When an API user sends a request,
+it's received by Hasura in the Data Plane. Hasura then directly accesses the necessary data sources within the customer
+infrastructure to fulfill the request. This direct access ensures that sensitive data never leaves the customer's
+controlled environment, maintaining data residency and security.
 
 While the Control Plane, situated in the Hasura infrastructure, does communicate with the Data Plane, this communication
 is strictly limited to configuration and management purposes. Importantly, this communication does not involve customer

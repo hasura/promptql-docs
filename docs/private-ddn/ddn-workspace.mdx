@@ -14,7 +14,7 @@ seoFrontMatterUpdated: false
 
 import Thumbnail from "@site/src/components/Thumbnail";
 
-# Developing with DDN workspace
+# Developing with DDN Workspace
 
 ## Introduction
 
@@ -118,8 +118,8 @@ ddn auth login --pat <personal-account-token>
 
 ## Step 4. Scaffold out a new local project
 
-```ddn title="Next, create a new local project:"
-ddn supergraph init my-project && cd my-project
+```ddn title="Next, create a new local project and pass your data plane's ID:"
+ddn supergraph init my-project --with-promptql --project-data-plane-id <data-plane-id> && cd my-project
 ```
 
 After navigating into the directory, you will see the project structure scaffolded for you. You can view the project
@@ -170,29 +170,19 @@ Metadata files will be generated for each entity in your data source. You can le
 :::info Note
 
 `ddn supergraph build local`, `ddn run docker-start` and `ddn console --local` are not supported in DDN workspace. Once
-the metadata is generated, create a cloud project and deploy your supergraph to your Private DDN to query the API.
+the metadata is generated, deploy your supergraph to your Private DDN to talk with your data.
 
 :::
 
-## Step 7. Initiate against a project on your Data Plane
-
-:::info
-
-In this step, use the `<project-name>` from Step 2. :::
-
-```ddn title="Initiate against an existing project on your data plane:"
-ddn project init --with-project <project-name>
-```
-
-## Step 8. Build and deploy your supergraph
+## Step 7. Build and deploy your supergraph
 
 ```ddn title="Build and deploy your supergraph:"
 ddn supergraph build create
 ```
 
-When this process is complete, the CLI will return a link to the hosted API where you can query your data.
+When this process is complete, the CLI will return a link to the hosted application where you can chat with your data.
 
-## Step 9. Exporting your metadata
+## Step 8. Exporting your metadata
 
 To export metadata, right-click the Explorer pane and select `Download`. This will download the entire workspace
 directory to your local machine. Since Git is pre-installed in the workspace, you can also configure it and push changes
