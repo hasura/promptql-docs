@@ -76,3 +76,34 @@ ddn update-cli
 :::
 
 Restarting the local services post this should fix the issue.
+
+## Local PromptQL threads disappear on service restarts
+
+A local file to store the PromptQL Playground state is required to persist threads data. We can create this file and
+mount it to the `promptql-playground` service to ensure the threads data stays persisted.
+
+**Step 1. Create an empty file to store the Playground state**
+
+In your project root directory, run:
+
+```bash copy
+touch .promptql_playground.db
+```
+
+**Step 2. Mount the file to the Playground service**
+
+Update the project `compose.yaml` file as follows:
+
+```yaml
+...
+promptql-playground:
+   ...
+   volumes:
+     ...
+     - ./.promptql_playground.db:/app/promptql_playground/promptql_playground.db
+   ...
+```
+
+**Step 3. Restart the local services**
+
+Restart the local services, e.g. `docker compose down && ddn run docker-start`.
