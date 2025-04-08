@@ -1,7 +1,7 @@
-# Hasura DDN Docs
+# Hasura PromptQL Docs
 
-Welcome to the Hasura DDN Docs repository! This is the official documentation for Hasura DDN. Below, you'll find
-instructions on how to install, run, and contribute to the project.
+Welcome to the Hasura PromptQL Docs repository! This is the official documentation for PromptQL, powered by Hasura DDN.
+Below, you'll find instructions on how to install, run, and contribute to the project.
 
 ## Installation
 
@@ -35,6 +35,6 @@ This generates static content into the `build` directory, which can be hosted us
 ## Contributing
 
 We love contributions! If you'd like to contribute, please review our
-[Contribution Guide](https://hasura.io/docs/3.0/wiki/contributing/) for all the details on how to get involved 🤙.
+[Contribution Guide](https://hasura.io/docs/promptql/wiki/contributing/) for all the details on how to get involved 🤙.
 
 We appreciate all contributions to make our docs better for everyone! 🙌
