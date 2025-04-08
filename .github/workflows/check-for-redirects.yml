@@ -38,9 +38,9 @@ jobs:
           fi
           read -r -d '' TEMPLATE << EOM
           \`\`\`
-          # TEST ME: https://stage.hasura.io/docs/3.0/$OLD
-          location = /docs/3.0/$OLD {
-              return 301 https://\$host/docs/3.0/$NEW;
+          # TEST ME: https://stage.hasura.io/docs/promptql/$OLD
+          location = /docs/promptql/$OLD {
+              return 301 https://\$host/docs/promptql/$NEW;
           }
           \`\`\`
           EOM
