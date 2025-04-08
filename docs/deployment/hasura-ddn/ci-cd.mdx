@@ -7,13 +7,13 @@ description: "Set up CI/CD for Hasura DDN projects using any CI/CD platform"
 # CI/CD
 
 Because the DDN CLI plays the central role in controlling and managing metadata builds and connector deployments, it
-allows developers to easily create effective CI/CD pipelines for managing projects, creating and applying builds or
-promoting them to another environment.
+allows developers to easily create effective CI/CD pipelines for managing PromptQL projects, creating and applying
+builds or promoting them to another environment.
 
 ## Generic CI/CD Setup
 
-The user should follow the following generic implementation steps which we will go through below when setting up CI/CD
-for their Hasura DDN projects.
+You should follow these generic implementation steps which we will go through below when setting up CI/CD for your
+Hasura DDN projects.
 
 1. Prepare a service account access token.
 2. Use a linux environment to run the DDN CLI.
@@ -22,19 +22,19 @@ for their Hasura DDN projects.
 5. Check context or use flags.
 6. Run DDN CLI commands.
 
-### Step 1: Prepare a service account access token
+### Step 1. Prepare a service account access token
 
-See the [service account access token section](/project-configuration/project-management/service-accounts.mdx) to learn how to create a service
-account access token.
+See the [service account access token section](/project-configuration/project-management/service-accounts.mdx) to learn
+how to create a service account access token.
 
-### Step 2: Use a Linux environment to run the DDN CLI
+### Step 2. Use a Linux environment to run the DDN CLI
 
-Any service which can provide a Linux-like environment will work, eg: GitHub Actions, GitLab CI, CircleCI, etc.
+Any service which can provide a Linux environment will work, e.g., GitHub Actions, GitLab CI, CircleCI, etc.
 
 Indeed, a Windows or macOS environment will work and run the DDN CLI but for CI/CD pipelines, we recommend using a Linux
 environment for speed, availability and convenience.
 
-### Step 3: Install and login to the DDN CLI
+### Step 3. Install and login to the DDN CLI
 
 ```sh
 curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/v4/get.sh | bash
@@ -42,9 +42,9 @@ curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/v4/get.sh | bash
 
 :::info curl
 
-Your environment should already have `curl` installed. If not, you can install it using your package manager. eg:
+Your environment should already have `curl` installed. If not, you can install it using your package manager.
 
-```sh
+```sh title="E.g."
 sudo apt update && sudo apt upgrade
 sudo apt install curl
 curl --version
@@ -52,12 +52,11 @@ curl --version
 
 :::
 
-### Step 4: Clone the repo with the DDN supergraph metadata
+### Step 4. Clone the repo with the metadata
 
-Clone (or checkout) the repository that contains all of your DDN supergraph metadata. For example, if you have a public
-GitHub repository, run:
+Clone (or checkout) the repository that contains all of your DDN supergraph metadata.
 
-```sh
+```sh title="For example, if you have a public GitHub repository, run:"
 git clone https://github.com/<your-org>/<your-repo>.git
 ```
 
@@ -69,7 +68,7 @@ or similar for your git provider to clone it.
 git clone https://username:<pat>@github.com/<your-account-or-org>/<repo>.git
 ```
 
-### Step 5: Check context or use flags
+### Step 5. Check context or use flags
 
 Make sure your context is set properly to reference the correct projects, subgraphs, etc., or use the correct flags in
 your DDN CLI commands.
@@ -80,7 +79,7 @@ You can set your context using the `ddn context set-current-context <context-nam
 You can also of course use specific flags in your DDN CLI commands eg: `--project`, `--supergraph`,
 `--base-supergraph-version`, `--log-level`, `--out` to make your commands more explicit.
 
-### Step 6: Run DDN CLI commands
+### Step 6. Run DDN CLI commands
 
 You can now run any DDN CLI commands required in the CI/CD workflow. You will likely be creating builds and applying
 them to projects.
@@ -94,9 +93,11 @@ ddn supergraph build apply <build-id>
 ```
 
 :::tip Optimize your CI/CD pipeline
+
 For a more efficient CI/CD workflow, you can create and apply the supergraph build in a single command using
-`ddn supergraph build create --apply`
-This reduces the number of CLI commands needed and simplifies your automation scripts.
+`ddn supergraph build create --apply` This reduces the number of CLI commands needed and simplifies your automation
+scripts.
+
 :::
 
 ## GitHub Actions Setup
