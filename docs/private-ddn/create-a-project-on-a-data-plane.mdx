@@ -43,8 +43,8 @@ The DDN CLI will scaffold out all the necessary files and directories for your p
 
 ## Step 2. Scaffold out a new local project
 
-```ddn title="Next, create a new local project:"
-ddn supergraph init my-project && cd my-project
+```ddn title="Next, create a new local project and pass your data plane's ID:"
+ddn supergraph init my-project --with-promptql --project-data-plane-id <data-plane-id> && cd my-project
 ```
 
 Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
@@ -99,39 +99,17 @@ ddn run docker-start
 ddn console --local
 ```
 
-The development console will open wherein you can run your first query.
+The development console will open wherein you can now chat with your data.
 
-## Step 6. Create a project on your Data Plane
+## Step 6. Build and deploy your supergraph
 
-You'll create a new project using the DDN CLI and by passing two flags: the `data-plane-id` and the `plan`.
+When you're ready, you can create a cloud build.
 
-:::info Get Data Plane ID
-
-You can find all the Data Planes you have access to on this page: https://console.hasura.io/data-plane
-
-:::
-
-:::info Available Plans
-
-- ddn_free
-- ddn_base
-- ddn_advanced
-
-:::
-
-```ddn title="Create a new project using your Data Plane ID and plan choice:"
-ddn project init --data-plane-id <data-plane-id> --plan <plan-name>
-```
-
-The CLI will return information about your newly created project.
-
-## Step 7. Build and deploy your supergraph
-
-```ddn title="build and deploy you supergraph:"
+```ddn title="Build and deploy you supergraph:"
 ddn supergraph build create
 ```
 
-When this process is complete, the CLI will return a link to the hosted API where you can run the same query as before.
+When this process is complete, the CLI will return a link to the hosted application where you can run talk to your data.
 
 ## Next steps
 
