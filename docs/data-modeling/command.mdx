@@ -13,11 +13,9 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import CommandCreateClickHouseNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/clickHouse/_command-create-native-operation-how-to.mdx";
 import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
 import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
 import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
-import CommandCreateMongoDBNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/mongoDB/_command-create-native-operation-how-to.mdx";
 import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
 
 # Commands Enable PromptQL to Modify Data
@@ -91,12 +89,6 @@ other side-effects) that PromptQL can use to execute specialized operations on y
 <Tabs groupId="source-preference" className="api-tabs">
   <TabItem value="PostgreSQL" label="PostgreSQL">
     <CommandCreatePostgreSQLNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="MongoDB" label="MongoDB">
-    <CommandCreateMongoDBNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="ClickHouse" label="ClickHouse">
-    <CommandCreateClickHouseNativeOperationHowTo />
   </TabItem>
   <TabItem value="TypeScript" label="Node.js TypeScript">
     <CommandCreateLambdaTypescriptNativeOperationHowTo />
