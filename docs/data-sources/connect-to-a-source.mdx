@@ -90,11 +90,12 @@ it requires:
 | `JDBC_URL` | `jdbc:mysql://user:password@host:3306/db_name` | This connector requires a JDBC URL. |
 
 </TabItem>
-<TabItem value="PostgreSQL" label="PostgreSQL">
+<TabItem value="PostgreSQL" label="PostgreSQL PromptQL">
 
-| ENV              | Example                                       | Description                                                            |
-| ---------------- | --------------------------------------------- | ---------------------------------------------------------------------- |
-| `CONNECTION_URI` | `postgresql://user:password@host:5432/dbname` | The full connection string used to connect to the PostgreSQL database. |
+| ENV            | Example                                                                          | Description                                                                                        |
+| -------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:postgresql://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the PostgreSQL database.                                                |
+| `JDBC_SCHEMAS` | `public, app`                                                                    | The schemas to use for the database. Optional. This can also be included in the connection string. |
 
 </TabItem>
 <TabItem value="Snowflake" label="Snowflake">

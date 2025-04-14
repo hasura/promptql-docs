@@ -35,6 +35,8 @@ Select `hasura/bigquery-jdbc` (you can type to filter the list). Then, enter the
 | ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
 | `JDBC_URL` | `jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=project-id;DefaultDataset=dataset;OAuthType=0;OAuthServiceAcctEmail=service-account-email;OAuthPvtKey=/etc/connector/key.json;` | The JDBC URL to connect to the BigQuery database. |
 
+Hasura will never modify your source schema.
+
 You should also create and download a JSON key file for the IAM service account.
 
 The JSON key file should look like this example:
