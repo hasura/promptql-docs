@@ -73,20 +73,20 @@ CLI to add it to the connector configuration. For example:
 
 3. Create a new entry in the ndc-postgres configuration:
 
-   ```sh
+   ```ddn
    ddn connector plugin --connector my_subgraph/connector/chinook_pg/connector.yaml -- \
      native-operation create --operation-path native_operations/mutations/insert_artist.sql --kind mutation
    ```
 
 4. Update your metadata to track the new native query:
 
-   ```sh
+   ```ddn
    ddn connector-link update chinook_pg --add-all-resources
    ```
 
 5. Then, generate the metadata for your new command before creating a new build:
 
-   ```sh
+   ```ddn
     ddn command add chinook_pg "InsertArtist"
    ```
 
