@@ -1,0 +1,38 @@
+---
+sidebar_position: 2.7
+sidebar_label: With BigQuery
+description: "Learn the basics of Hasura DDN and how to get started with a BigQuery database."
+keywords:
+  - hasura ddn
+  - promptql
+  - graphql api
+  - getting started
+  - guide
+  - bigquery
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and BigQuery
+
+<BoilerplateOverview dataSourceName="BigQuery" time="twenty" />
+
+This tutorial assumes you're starting from scratch; you should use an existing BigQuery database.
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/bigquery-jdbc` (you can type to filter the list).
+
+Provide your connection string. Hasura will never modify your source schema.
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="BigQuery" />
