@@ -29,9 +29,37 @@ This tutorial assumes you're starting from scratch; you should use an existing B
 
 <BoilerplateInit />
 
-Select `hasura/bigquery-jdbc` (you can type to filter the list).
+Select `hasura/bigquery-jdbc` (you can type to filter the list). Then, enter the following environment variables:
 
-Provide your connection string. Hasura will never modify your source schema.
+| ENV        | Example                                                                                                                                                                                               | Description                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `JDBC_URL` | `jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=project-id;DefaultDataset=dataset;OAuthType=0;OAuthServiceAcctEmail=service-account-email;OAuthPvtKey=/etc/connector/key.json;` | The JDBC URL to connect to the BigQuery database. |
+
+You should also create and download a JSON key file for the IAM service account.
+
+The JSON key file should look like this example:
+
+```json
+{
+  "type": "service_account",
+  "project_id": "project-id",
+  "private_key_id": "private-key-id",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nprivate-key\n-----END PRIVATE KEY-----\n",
+  "client_email": "service-account-email",
+  "client_id": "client-id",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/service-account-email"
+}
+```
+
+Move your downloaded service account key file to your connector folder which is already referenced in the `JDBC_URL`
+environment variable.
+
+```bash
+mv /path/to/your/key.json app/connector/my_bigquery/key.json
+```
 
 <BoilerplateDx />
 
