@@ -30,9 +30,14 @@ PostgreSQL docker image that ships with the data connector.
 
 <BoilerplateInit />
 
-Select `hasura/postgres` (you can type to filter the list).
+Select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following environment variables:
 
-Provide your connection string. Hasura will never modify your source schema.
+| ENV            | Example                                                                          | Description                                                                                        |
+| -------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:postgresql://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the PostgreSQL database.                                                |
+| `JDBC_SCHEMAS` | `public, app`                                                                    | The schemas to use for the database. Optional. This can also be included in the connection string. |
+
+Hasura will never modify your source schema.
 
 <BoilerplateDx />
 
