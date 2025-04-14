@@ -51,6 +51,9 @@
   --heatmap-success-green: var(--ifm-color-primary);
   --heatmap-warn-yellow: #f6b93b;
   --heatmap-error-red: #f77173;
+
+  --color-mcpScore: #6b8cae;
+  --color-promptQLScore: #b6fc34;
 }
 
 .heatmap {
