@@ -14,23 +14,23 @@ import { OverviewPlainCard } from "@site/src/components/OverviewPlainCard";
 import Icon from "@site/static/icons/speedometer-04.svg";
 import Link from "@docusaurus/Link";
 
-# Common Patterns
+# Common Data Source & Logic Patterns
 
 ## Introduction
 
 PromptQL, powered by Hasura DDN, makes it simple to build AI-ready APIs on your data — no matter where it lives.
 
-You’ll connect your data using **native connectors**, configure your API using **Hasura Metadata Language (HML)**, and
+You'll connect your data using **native connectors**, configure your API using **Hasura Metadata Language (HML)**, and
 create an immutable **build** that will serve your application.
 
 Then, you'll use **PiQL**, our built-in GUI, or the **PromptQL API** to talk to your data.
 
 ## Let's build something
 
-To get started, it’s helpful to look at common patterns for building PromptQL applications based on the datasource(s)
+To get started, it's helpful to look at common patterns for building PromptQL applications based on the datasource(s)
 you want to include:
 
-- [With a persistent datasource](with-a-datasource-and-custom-business-logic.mdx)
+- [With a persistent datasource and custom business logic](with-a-datasource-and-custom-business-logic.mdx)
 - [With API endpoints](with-api-endpoints.mdx)
 - [With bulk API data](with-apis-with-bulk-data.mdx)
 
@@ -41,11 +41,14 @@ project to create a unified supergraph which feeds data to PromptQL.
 
 :::
 
-Or, dive straight into a guide for your preferred source:
+## Guides by data source
 
+You can also dive straight into a guide for your preferred source:
+
+- [Amazon Athena](/how-to-build-with-promptql/with-amazon-athena.mdx)
+- [Amazon Redshift](/how-to-build-with-promptql/with-amazon-redshift.mdx)
+- [BigQuery](/how-to-build-with-promptql/with-bigquery.mdx)
 - [Databricks](/how-to-build-with-promptql/with-databricks.mdx)
 - [MySQL](/how-to-build-with-promptql/with-mysql.mdx)
 - [PostgreSQL](/how-to-build-with-promptql/with-postgresql.mdx)
 - [Snowflake](/how-to-build-with-promptql/with-snowflake.mdx)
-
-See the full list in the sidebar to the left!
