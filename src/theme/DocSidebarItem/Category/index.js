@@ -7,19 +7,16 @@ import {
   Collapsible,
   useCollapsible,
 } from '@docusaurus/theme-common';
+import {isSamePath} from '@docusaurus/theme-common/internal';
 import {
   isActiveSidebarItem,
   findFirstSidebarItemLink,
   useDocSidebarItemsExpandedState,
-  isSamePath,
-} from '@docusaurus/theme-common/internal';
+} from '@docusaurus/plugin-content-docs/client';
 import Link from '@docusaurus/Link';
 import {translate} from '@docusaurus/Translate';
 import useIsBrowser from '@docusaurus/useIsBrowser';
 import DocSidebarItems from '@theme/DocSidebarItems';
-import styles from './styles.module.css';
-import { addIconsToLabel } from '../utils';
-
 // If we navigate to a category and it becomes active, it should automatically
 // expand itself
 function useAutoExpandActiveCategory({isActive, collapsed, updateCollapsed}) {
@@ -75,6 +72,7 @@ function CollapseButton({collapsed, categoryLabel, onClick}) {
               {label: categoryLabel},
             )
       }
+      aria-expanded={!collapsed}
       type="button"
       className="clean-btn menu__caret"
       onClick={onClick}
@@ -125,9 +123,6 @@ export default function DocSidebarItemCategory({
       setCollapsed(true);
     }
   }, [collapsible, expandedItem, index, setCollapsed, autoCollapseCategories]);
-
-  const labelWithIcons = addIconsToLabel(label, className);
-
   return (
     <li
       className={clsx(
@@ -165,10 +160,11 @@ export default function DocSidebarItemCategory({
                 }
           }
           aria-current={isCurrentPage ? 'page' : undefined}
-          aria-expanded={collapsible ? !collapsed : undefined}
+          role={collapsible && !href ? 'button' : undefined}
+          aria-expanded={collapsible && !href ? !collapsed : undefined}
           href={collapsible ? hrefWithSSRFallback ?? '#' : hrefWithSSRFallback}
           {...props}>
-          {labelWithIcons}
+          {label}
         </Link>
         {href && collapsible && (
           <CollapseButton

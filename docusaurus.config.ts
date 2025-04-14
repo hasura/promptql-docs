@@ -182,11 +182,11 @@ const config: Config = {
         //   type: 'search',
         //   position: 'left',
         // },
-        {
-          to: 'https://hasura.io/',
-          label: 'Hasura.io',
-          position: 'right',
-        },
+        // {
+        //   to: 'https://hasura.io/',
+        //   label: 'Hasura.io',
+        //   position: 'right',
+        // },
         // {
         //   to: 'https://cloud.hasura.io/login',
         //   label: 'Log In',
