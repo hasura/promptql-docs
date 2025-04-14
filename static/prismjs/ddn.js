@@ -4,6 +4,13 @@ Prism.languages.ddn = {
     greedy: true,
     alias: 'comment',
   },
+  'shell-command': {
+    // Common bash/sh command patterns like echo, mkdir, cat, grep, etc.
+    pattern:
+      /\b(?:echo|cat|ls|cd|mkdir|rm|cp|mv|grep|find|sed|awk|curl|wget|ssh|tar|git|docker|npm|yarn|export|source|sudo|touch|chmod|chown)\b.*(?:\n|$)/,
+    greedy: true,
+    alias: 'keyword',
+  },
   cli: {
     pattern: /\bddn\b/,
     alias: 'keyword',
