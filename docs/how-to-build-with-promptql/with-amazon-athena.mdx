@@ -29,12 +29,12 @@ This tutorial assumes you're starting from scratch; you should use an existing A
 
 <BoilerplateInit />
 
-Select `hasura/athena` (you can type to filter the list). Then, enter the following environment variables:
+Select `hasura/athena` (you can type to filter the list). Then, enter the following required environment variables:
 
-| ENV            | Example                                                                      | Description                                                                                        |
-| -------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
-| `JDBC_URL`     | `jdbc:athena://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Athena database.                                             |
-| `JDBC_SCHEMAS` | `public, app`                                                                | The schemas to use for the database. Optional. This can also be included in the connection string. |
+| ENV            | Example                                                                      | Description                                            |
+| -------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| `JDBC_URL`     | `jdbc:athena://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Athena database. |
+| `JDBC_SCHEMAS` | `public, app`                                                                | The schemas to use for the database.                   |
 
 Hasura will never modify your source schema.
 
