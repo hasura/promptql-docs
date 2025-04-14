@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useState, useRef, useEffect, type ReactNode } from 'react';
 import clsx from 'clsx';
 import { translate } from '@docusaurus/Translate';
 import type { Props } from '@theme/CodeBlock/CopyButton';
@@ -8,12 +8,9 @@ import { copyToClipboard } from './utils';
 
 import styles from './styles.module.css';
 
-export default function CopyButton({ code, className }: Props): JSX.Element {
+export default function CopyButton({ code, className }: Props): ReactNode {
   const [isCopied, setIsCopied] = useState(false);
   const copyTimeout = useRef<number | undefined>(undefined);
-
-  // handleCopyCode is the only REAL addition to this swizzled component.
-  // We simply call it whenever the button is clicked.
   const handleCopyCode = useCallback(async () => {
     try {
       await copyToClipboard(code);
