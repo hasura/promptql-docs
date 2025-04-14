@@ -54,6 +54,13 @@
 
   --color-mcpScore: #6b8cae;
   --color-promptQLScore: #b6fc34;
+
+  .thumbnail-small {
+    display: block;
+    margin: 0 auto;
+    width: 300px;
+    height: auto;
+  }
 }
 
 .heatmap {
