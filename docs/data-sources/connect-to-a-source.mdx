@@ -49,6 +49,32 @@ it requires:
 
 <Tabs groupId="source-preference" className="api-tabs">
 
+<TabItem value="Amazon Athena" label="Amazon Athena">
+
+| ENV            | Example                                                                      | Description                                                                                        |
+| -------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:athena://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Athena database.                                             |
+| `JDBC_SCHEMAS` | `public, app`                                                                | The schemas to use for the database. Optional. This can also be included in the connection string. |
+
+</TabItem>
+
+<TabItem value="Amazon Redshift" label="Amazon Redshift">
+
+| ENV            | Example                                                                        | Description                                                                                        |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:redshift://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Redshift database.                                           |
+| `JDBC_SCHEMAS` | `public, app`                                                                  | The schemas to use for the database. Optional. This can also be included in the connection string. |
+
+</TabItem>
+
+<TabItem value="BigQuery" label="BigQuery">
+
+| ENV        | Example                                                                                                                                                                                               | Description                                       |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------- |
+| `JDBC_URL` | `jdbc:bigquery://https://www.googleapis.com/bigquery/v2:443;ProjectId=project-id;DefaultDataset=dataset;OAuthType=0;OAuthServiceAcctEmail=service-account-email;OAuthPvtKey=/etc/connector/key.json;` | The JDBC URL to connect to the BigQuery database. |
+
+</TabItem>
+
 <TabItem value="Databricks" label="Databricks">
 
 | ENV            | Example                                                                                                                                                                  | Description                                                                                                                        |
