@@ -24,11 +24,11 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 ddn connector init imdb -i
 ```
 
-From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI
-to an existing PostgreSQL database of IMDB data:
+From the dropdown, select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following
+connection URI to an existing PostgreSQL database of IMDB data:
 
 ```plaintext
-postgresql://read_only_user:readonlyuser@35.236.11.122:5432/imdb
+jdbc:postgresql://35.236.11.122:5432/v3-docs-sample-app?user=read_only_user&password=readonlyuser
 ```
 
 You can press `ENTER` to advance through the remaining prompts.
