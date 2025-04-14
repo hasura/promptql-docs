@@ -15,7 +15,7 @@ sidebar_position: 2
 
 # JWT Configuration
 
-This section describes the JSON Web Token (JWT) configuration options available for PromptQL.
+This section describes the JSON Web Token (JWT) configuration options available.
 
 ## Payload Definition
 
@@ -402,7 +402,7 @@ key:
 The JWTs must be signed by the JWK published at the given URL. They can be signed by any algorithm that is compatible
 with the key (eg. `RS256`, `RS384`, `RS512` algorithms require a JWK with an RSA key).
 
-PromptQL does not currently support rotating JWKs.
+Hasura DDN does not currently support rotating JWKs.
 
 ### audience
 
@@ -774,7 +774,7 @@ Auth0 with Hasura.
 
 ### Clerk
 
-Clerk integrates with PromptQL using JWTs.
+Clerk integrates with PromptQL and Hasura DDN using JWTs.
 
 Clerk publishes their JWK under: `https://<YOUR_CLERK_FRONTEND_API>/.well-known/jwks.json`
 
