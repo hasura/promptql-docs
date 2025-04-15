@@ -825,15 +825,9 @@ div:has(> .DocSearch.DocSearch-Button) {
   margin-bottom: 0 !important;
 }
 
-.theme-admonition .theme-admonition .theme-admonition,
-.alert .alert .alert {
-  border-radius: 6px;
-}
-
 .theme-admonition code,
 .alert code {
   padding: 3px 6px;
-  border-radius: 4px;
   color: #1f2a37;
 }
 
@@ -846,8 +840,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-admonition-note code,
 .alert--secondary code {
-  border: 1px solid #d2d6db;
-  background-color: #e5e7eb;
+  background-color: #c4d3fc;
 }
 
 .theme-admonition-tip,
@@ -858,7 +851,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-admonition-tip code,
 .alert--success code {
-  border: 1px solid #8abcad;
   background-color: #448470;
   color: #e5e7eb;
 }
@@ -871,9 +863,8 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-admonition-info code,
 .alert--info code {
-  border: 1px solid #80a3ff;
-  background-color: #6b6b6b;
-  border-radius: 12px;
+  color: var(--primary-neutral-0);
+  background-color: var(--primary-neutral-900);
 }
 
 .theme-admonition-caution,
@@ -884,7 +875,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-admonition-caution code,
 .alert--warning code {
-  border: 1px solid #ffe4b0;
   background-color: #ffce70;
 }
 
@@ -896,7 +886,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-admonition-danger code,
 .alert--danger code {
-  border: 1px solid #fecacb;
   background-color: #fba5a6;
 }
 
@@ -1137,6 +1126,7 @@ table td {
 /* Code Block Lines */
 [class^='codeBlockLines_'] {
   background-color: var(--primary-neutral-900) !important;
+  padding: 0.5rem 1rem !important;
 }
 
 /* Vendor Table */

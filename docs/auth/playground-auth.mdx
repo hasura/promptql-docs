@@ -1,8 +1,8 @@
 ---
 sidebar_position: 1
-description: "Learn how the PiQL PromptQL chat client interface sets the auth headers for your requests."
+description: "Learn how the PromptQL Playground interface sets the auth headers for your requests."
 keywords:
-  - PiQL
+  - PromptQL Playground
   - Auth
   - Headers
   - JWT
@@ -11,10 +11,10 @@ keywords:
 
 import Thumbnail from "@site/src/components/Thumbnail";
 
-# PiQL Client Auth
+# PromptQL Playground Auth
 
-You can check the auth which the PiQL client is using by clicking the Auth button on the left-hand side of the chat
-dialogue.
+You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
+of the chat dialogue.
 
 <Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
 
@@ -29,8 +29,8 @@ You can also add custom headers to the request by clicking the `+` button.
 
 :::info Reserved headers
 
-The `x-hasura-ddn-token` header is automatically added by the PiQL client and should not be modified. If passing a
-custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
+The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
+passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
 
 :::
 
