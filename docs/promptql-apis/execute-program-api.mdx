@@ -18,13 +18,11 @@ interacting within the PromptQL playground.
 
 However, you can also use an API to run these programs dynamically.
 
-## API Reference
-
-### Execute Program Endpoint
+## Execute Program Endpoint
 
 Execute a PromptQL program with your data.
 
-#### Request
+### Request
 
 `POST https://api.promptql.pro.hasura.io/execute_program`
 
@@ -122,7 +120,12 @@ The `artifacts` array can contain both text and table artifacts:
 }
 ```
 
-#### Response
+#### Request DDN Auth
+
+The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
+[auth for DDN](/auth/overview.mdx).
+
+### Response
 
 ```json
 {
@@ -153,7 +156,7 @@ The `artifacts` array can contain both text and table artifacts:
 }
 ```
 
-#### Response Fields
+### Response Fields
 
 | Field                   | Type         | Description                                                      |
 | ----------------------- | ------------ | ---------------------------------------------------------------- |
@@ -172,7 +175,7 @@ The `artifacts` array can contain both text and table artifacts:
 | `input_tokens`  | integer | Number of input tokens consumed                               |
 | `output_tokens` | integer | Number of output tokens generated                             |
 
-#### Error Response
+### Error Response
 
 When the API encounters an error, it will return a 422 status code with a validation error response:
 
