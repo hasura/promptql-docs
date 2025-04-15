@@ -6,7 +6,7 @@ hide_table_of_contents: true
 import { Grid } from "@site/src/components/Spec";
 import Architecture from "@site/src/components/Benchmark/Architectures";
 import Thumbnail from "@site/src/components/Thumbnail";
-import Charts from "@site/src/components/Charts";
+import ScoreCompareCharts from "@site/src/components/Charts/ScoreCompareCharts";
 import Results from "@site/src/components/Benchmark";
 import Gallery from "@site/src/components/Benchmark/Gallery";
 
@@ -157,20 +157,42 @@ on a subjective task.
 
 We factor these into a formula to calculate a usefulness score:
 
-TODO: Insert latex
+$$
+\text{Usefulness} = (\text{CompAcc}^{w} \times \text{CogAcc}^{1-w}) \times (\text{CompRep}^{w} \times \text{CogRep}^{1-w})
+$$
 
 Where:
 
-TODO: Insert pseudo latex definitions
+- $\text{CompAcc} (Computational Accuracy)$
+  - A user-assigned score between 0 and 1 indicating how accurately the system handles computational (algorithmic)
+    tasks.
+- $\text{CogAcc} (Cognitive Accuracy)$
+  - A user-assigned score between 0 and 1 indicating the system's accuracy on more interpretive, cognitive tasks.
+- $\text{CompRep} (Computational Repeatability)$
+
+$$
+\text{CompRep} = \exp\left(-\alpha_C (1 - C)\right)
+$$
 
 This transforms the raw computational repeatability measure (C, ranging from 0 to 1) into a value between 0 and 1. A
 higher αC means that any deviation from perfect computational repeatability (C=1) is penalized more severely. In plain
 English: This score heavily rewards systems that deliver the same computational results every time.
 
+- $\text{CogRep} (Cognitive Repeatability)$
+
+$$
+\text{CogRep} = \exp\left(-\alpha_K (1 - K)\right)
+$$
+
 Similar to CompRep, this takes a raw cognitive repeatability measure (K, 0 to 1) and maps it to a 0-to-1 scale. Here, αK
 controls how harshly deviations from perfect repeatability are penalized for cognitive tasks. In other words, this score
 measures how consistently the system provides similar cognitive outputs across multiple runs, typically allowing for a
 bit more variation than computational tasks if α<sub>K</sub> is smaller than α<sub>C</sub>.
+
+- $\text{w}$
+
+A weighting factor between 0 and 1 that determines the relative importance of computational versus cognitive factors in
+both accuracy and repeatability.
 
 ### 5.3 Evaluation parameters
 
@@ -189,7 +211,7 @@ basic awareness of the available AI primitives.
 
 ### 5.5 Evaluation results
 
-TODO: Insert chart
+<ScoreCompareCharts />
 
 ## 6. Coming Up
 

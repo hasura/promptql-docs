@@ -54,14 +54,25 @@
 
   --color-mcpScore: #6b8cae;
   --color-promptQLScore: #b6fc34;
+}
 
-  .thumbnail-small {
-    display: block;
-    margin: 0 auto;
-    width: 300px;
-    height: auto;
-    margin-bottom: 2rem;
-  }
+.thumbnail-small {
+  display: block;
+  margin: 0 auto;
+  width: 300px;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+.katex-display {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.katex-html {
+  display: none;
 }
 
 .heatmap {
