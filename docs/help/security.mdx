@@ -2,11 +2,14 @@
 title: Security
 sidebar_position: 2.8
 description:
-  "Overview of security measures and practices within Hasura DDN, including data encryption, access control, and
-  compliance with industry standards."
+  "Overview of security measures and practices within PromptQL and Hasura DDN, including data encryption, access
+  control, and compliance with industry standards."
 keywords:
-  - hasura ddn
+  - promptql
   - security
+  - data privacy
+  - fine grained authorization
+  - hasura ddn
   - data encryption
   - access control
   - compliance
@@ -19,7 +22,7 @@ keywords:
   - SSO
 ---
 
-# Security in Hasura DDN
+# Security in PromptQL and Hasura DDN
 
 ## Introduction
 
@@ -103,19 +106,18 @@ Hasura DDN offers the following authentication modes:
 
 ### Multi-Factor Authentication (MFA)
 
-Currently, Hasura DDN does not natively support MFA for console login. However, the recommended approach for enterprise
-clients is to integrate with a corporate Identity Provider (IDP) via SAML, allowing you to leverage your existing
-identity and multi-factor authentication infrastructure, and ensuring a consistent, and secure, access management
-process.
+Currently, the console does not natively support MFA for login. However, the recommended approach for enterprise clients
+is to integrate with a corporate Identity Provider (IDP) via SAML, allowing you to leverage your existing identity and
+multi-factor authentication infrastructure, and ensuring a consistent, and secure, access management process.
 
-If you use a corporate email address to sign up for Hasura DDN, the password you choose is tied only to our system and
-you can set it to whatever you'd like.
+If you use a corporate email address to sign up, the password you choose is tied only to our system and you can set it
+to whatever you'd like.
 
 ## Self-Hosted Data Plane
 
 For enhanced security and control, Hasura Private DDN allows the data plane to be hosted within your own infrastructure.
-This ensures that the data processing and API execution occur within your controlled environment, providing an added
-layer of security. [Learn more](/private-ddn/overview.mdx).
+This ensures that the data processing and execution occur within your controlled environment, providing an added layer
+of security. [Learn more](/private-ddn/overview.mdx).
 
 ## Access Tokens
 
@@ -148,11 +150,11 @@ tokens are tied to your user account and are ideal for development, testing, and
 
 ## Securely Managing Secrets
 
-Hasura DDN strongly recommends using environment variables to manage sensitive information, such as API keys, database
-connection strings, and other credentials. This practice enhances security by keeping secrets out of your codebase and
-metadata files.
+The PromptQL ecosystem strongly recommends using environment variables to manage sensitive information, such as API
+keys, database connection strings, and other credentials. This practice enhances security by keeping secrets out of your
+codebase and metadata files.
 
-Hasura DDN employs envelope encryption to secure all sensitive information, including secrets and metadata.
+The platform employs envelope encryption to secure all sensitive information, including secrets and metadata.
 
 ### Best Practices
 
@@ -162,7 +164,7 @@ Hasura DDN employs envelope encryption to secure all sensitive information, incl
 2.  **Local Development:** For local development, use `.env` files to manage environment variables. The DDN CLI
     automatically recognizes and loads these files.
 
-3.  **Cloud Deployment:** When deploying to Hasura DDN, use the project's `.env.cloud` file.
+3.  **Cloud Deployment:** When deploying to the cloud, use the project's `.env.cloud` file.
 
 4.  **Connector Configuration:** When configuring data connectors, use the `valueFromEnv` option to reference
     environment variables. This ensures that sensitive values are loaded from the environment rather than being stored
@@ -191,9 +193,8 @@ definition:
 
 ## Native Operations and Security
 
-Hasura DDN allows you to extend your application's capabilities using native queries and mutations, providing direct
-access to the underlying data source's capabilities. However, this comes with the responsibility of preventing
-vulnerabilities.
+You can extend your application's capabilities using native queries and mutations, providing direct access to the
+underlying data source's capabilities. However, this comes with the responsibility of preventing vulnerabilities.
 
 **Important Considerations:**
 
@@ -205,7 +206,8 @@ vulnerabilities.
 
 ## Disable APIs
 
-Instead of exposing all APIs in your supergraph, assess your requirements and disable any APIs that are not required.
+Instead of exposing all APIs in your supergraph, assess your requirements and disable any APIs that are not required for
+PromptQL's functionality.
 
 ## Need more information?
 

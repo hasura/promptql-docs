@@ -19,7 +19,7 @@ seoFrontMatterUpdated: false
 ## Introduction
 
 In this tutorial, you'll learn how to configure an existing [Auth0 application](https://auth0.com) and generate a JWT
-which you can pass in the header of your requests to PromptQL. After setting up your
+which you can pass in the header of your requests. After setting up your
 [AuthConfig](/reference/metadata-reference/auth-config.mdx) object to use JWT mode, this will allow you to validate
 users' identities and create [permission rules](/reference/metadata-reference/permissions.mdx) which can limit access to
 underlying data served by Hasura DDN to PromptQL.
@@ -107,7 +107,7 @@ definition:
       issuer: "<your Auth0 tenant's URL>"
       key:
         jwkFromUrl: "https://<your Auth0 tenant's URL>/.well-known/jwks.json"
-      audience: ["<your PromptQL endpoint>"]
+      audience: ["<your endpoint>"]
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -123,8 +123,8 @@ ddn supergraph build local
 
 The easiest way to verify your setup is to generate a new JWT by logging into your client application that uses Auth0.
 These values aren't typically displayed to users, so you'll need to log them while in development. You can then add that
-value as a header in the PromptQL Playground and test any permissions you have in your metadata. If you're unfamiliar
-with this, we have a sample repo [here](https://github.com/hasura/ddn-auth-examples/tree/main/auth0).
+value as a header in [PiQL](/auth/piql-auth.mdx) and test any permissions you have in your metadata. If you're
+unfamiliar with this, we have a sample repo [here](https://github.com/hasura/ddn-auth-examples/tree/main/auth0).
 
 :::info Auth0 API Debugger
 
@@ -198,8 +198,8 @@ oversights.
 
 ## Wrapping up
 
-In this guide, you learned how to integrate Auth0 with PromptQL to create a secure and scalable identity management
-solution using JWTs. By leveraging custom claims in conjunction with
+In this guide, you learned how to integrate Auth0 with Hasura DDN and PromptQL to create a secure and scalable identity
+management solution using JWTs. By leveraging custom claims in conjunction with
 [permissions](/reference/metadata-reference/permissions.mdx), you can define precise access-control rules, ensuring that
 your application remains secure and meets your users' needs.
 
