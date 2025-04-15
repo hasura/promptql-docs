@@ -1,0 +1,134 @@
+## Introduction
+
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. It never changes during the lifetime of the data connector service
+instance. When your database schema changes you will have to update the configuration accordingly.
+
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
