@@ -167,7 +167,7 @@ app.post("/login", async (req, res) => {
         email,
         password,
         returnSecureToken: true,
-      },
+      }
     );
 
     const { idToken } = response.data;
@@ -209,8 +209,8 @@ app.listen(4000, () => {
 
 ## Wrapping up
 
-In this guide, you learned how to integrate Firebase with PromptQL to create a secure and scalable identity management
-solution using JWTs. By leveraging custom claims in conjunction with
+In this guide, you learned how to integrate Firebase with Hasura DDN and PromptQL to create a secure and scalable
+identity management solution using JWTs. By leveraging custom claims in conjunction with
 [permissions](/reference/metadata-reference/permissions.mdx), you can define precise access-control rules, ensuring that
 your application remains secure and meets your users' needs.
 

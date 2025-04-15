@@ -1,0 +1,43 @@
+---
+sidebar_position: 2.6
+sidebar_label: With Amazon Redshift
+description: "Learn the basics of Hasura DDN and how to get started with an Amazon Redshift database."
+keywords:
+  - hasura ddn
+  - promptql
+  - graphql api
+  - getting started
+  - guide
+  - amazon redshift
+---
+
+import Prereqs from "@site/docs/_prereqs.mdx";
+import BoilerplateOverview from "@site/docs/how-to-build-with-promptql/_boilerplateOverview.mdx";
+import BoilerplateInit from "@site/docs/how-to-build-with-promptql/_boilerplateInit.mdx";
+import BoilerplateDx from "@site/docs/how-to-build-with-promptql/_boilerplateDx.mdx";
+import BoilerplateSummary from "@site/docs/how-to-build-with-promptql/_boilerplateSummary.mdx";
+
+# Get Started with PromptQL and Amazon Redshift
+
+<BoilerplateOverview dataSourceName="Amazon Redshift" time="twenty" />
+
+This tutorial assumes you're starting from scratch; you should use an existing Amazon Redshift database.
+
+<Prereqs />
+
+## Tutorial
+
+<BoilerplateInit />
+
+Select `hasura/redshift` (you can type to filter the list). Then, enter the following environment variables:
+
+| ENV            | Example                                                                        | Description                                                                                        |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:redshift://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Redshift database.                                           |
+| `JDBC_SCHEMAS` | `public, app`                                                                  | The schemas to use for the database. Optional. This can also be included in the connection string. |
+
+Hasura will never modify your source schema.
+
+<BoilerplateDx />
+
+<BoilerplateSummary dataSourceName="Amazon Redshift" />

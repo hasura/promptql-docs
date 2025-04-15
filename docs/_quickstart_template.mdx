@@ -24,14 +24,18 @@ running `ls` in your terminal, or by opening the directory in your preferred edi
 ddn connector init imdb -i
 ```
 
-From the dropdown, select `hasura/postgres` (you can type to filter the list). Then, enter the following connection URI
-to an existing PostgreSQL database of IMDB data:
+From the dropdown, select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following
+connection URI to an existing PostgreSQL database of IMDB data:
 
 ```plaintext
-postgresql://read_only_user:readonlyuser@35.236.11.122:5432/imdb
+jdbc:postgresql://35.236.11.122:5432/imdb?user=read_only_user&password=readonlyuser
 ```
 
-You can press `ENTER` to advance through the remaining prompts.
+For the `JDBC_SCHEMAS` environment variable, enter the following:
+
+```plaintext
+public
+```
 
 ### Step 4. Introspect the PostgreSQL database
 
@@ -51,7 +55,7 @@ ddn model add imdb "*"
 ```
 
 Open the `app/metadata` directory. You'll find Hasura Metadata Language (HML) files for each table in your database.  
-In this case, there's only one: `movies`.
+In this case, there's only one: `public_movies.hml`.
 
 The DDN CLI uses these HML files to represent PostgreSQL tables in your API as
 [models](/reference/metadata-reference/models.mdx).
