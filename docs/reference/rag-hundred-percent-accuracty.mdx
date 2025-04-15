@@ -1,0 +1,197 @@
+---
+title: 100% accuracy
+sidebar_position: 8
+description: "See how we achieved 100% accuracy with RAG with agentic planning and how you can do it too."
+sidebar_label: Achieving 100% accuracy
+keywords:
+  - reference
+  - accuracy
+  - one-hundred-percent
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+import Architecture from "@site/src/components/Benchmark/Architectures";
+import FRAMESAccuracyChart from "@site/src/components/FRAMES/FRAMESAccuracyChart";
+import FRAMESQuestionTable from "@site/src/components/FRAMES/FRAMESQuestionTable";
+
+# Achieving 100% Accuracy with RAG with Agentic Planning
+
+## RAG vs RAG + agentic planning
+
+We take 10 hard [questions](#questions) from the
+[FRAMES benchmark](https://huggingface.co/datasets/google/frames-benchmark). These questions test the AI system's
+ability to handle complex reasoning tasks, and to handle multi-hop retrieval. The knowledge base is Wikipedia articles.
+
+We see that a simple RAG pipeline with Claude 3.5 Sonnet achieves 40% accuracy. On the same retrieval stack, PromptQL
+achieves 100% accuracy.
+
+<FRAMESAccuracyChart />
+
+#### The setup
+
+- **Naive RAG**: A simple RAG pipeline with vector search that retrieves the top 5 articles that match the question and
+  then provides that to the LLM
+- **Agentic RAG**: A vector search tool is provided to the LLM. The tool retrieves the top 5 articles that match a given
+  query. The LLM uses the tool to create search queries on its own or as guided by the user.
+- **PromptQL**: Same retrieval function as used in the setups above, but instead of retrieving data and processing in
+  context, PromptQL uses the LLM to create a plan and then executes it programmatically.
+
+The LLM used in all the 3 setups above is Claude 3.5 Sonnet.
+
+**PromptQL achieves this accuracy by providing a _planning engine_ with a novel approach to processing data in
+context.**
+
+PromptQL uses the LLM to author a program representing the overall plan. This program contains data retrieval,
+computational and even LLM operations with dynamically created contexts. This decoupling of context-heavy plan
+generation from context-limited plan execution allows for indefinite iteration over arbitrarily large or numerous data
+items, and allows the task to be solved successfully.
+
+Read the discussions below for more details on the failure modes of RAG and how PromptQL addresses them.
+
+## Benchmark question results {#questions}
+
+<FRAMESQuestionTable />
+
+## Discussion: RAG failure modes
+
+#### Extraction errors in processing
+
+The following question failed with Agentic RAG because of errors in processing the data in context:
+
+> If my future wife has the same first name as the 15th first lady of the United States' mother and her surname is the
+> same as the second assassinated president's mother's maiden name, what is my future wife's name?
+
+Correct answer: Jane Ballou
+
+Agentic RAG final response:
+
+> Let me process all this information:
+>
+> 1. The 15th First Lady was Mary Todd Lincoln, and I need to find her mother's first name
+> 2. The second assassinated president was James Garfield, and I need to find his mother's maiden name
+>
+> From searching through the results:
+>
+> 1. Mary Todd Lincoln's mother's name Eliza Parker
+> 2. James Garfield's mother was Eliza Ballou
+>
+> Therefore, if your future wife has the first name "Eliza" (like Mary Todd Lincoln's mother) and the surname "Ballou"
+> (like James Garfield's mother's maiden name), her name would be Eliza Ballou.
+>
+> So your future wife's name would be Eliza Ballou.
+
+The problem here is the wrong extraction of the 15th First Lady from the Wikipedia article. Mary Todd Lincoln is
+actually the 16th First Lady, while Harriet Lane is the 15th First Lady. This is a common problem with errors in
+processing when dealing with large data in-context.
+
+#### Context size limitations
+
+The following question failed on Agentic RAG due to context size limits:
+
+> I have an element in mind and would like you to identify the person it was named after. Here's a clue: The element's
+> atomic number is 9 higher than that of an element discovered by the scientist who discovered Zirconium in the same
+> year.
+
+Correct answer: Mendelevium is named after Dmitri Mendeleev.
+
+Agentic RAG final response
+
+> Error code: 400 -
+> `{'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'prompt is too long: 208600 tokens > 200000 maximum'}}`
+
+Since we are retrieving top-5 chunks per tool call, and there can be multiple tool calls requested in the course of one
+question - it’s not uncommon to see context size limit issues.
+
+#### Inexhaustive computation
+
+The following question failed on Agentic RAG because it preemptively responded with a plausible answer instead of
+exhaustively verifying the answer.
+
+> A general motors vehicle is named after the largest ward in the country of Monaco. How many people had walked on the
+> moon as of the first model year of the vehicle? Note: the model year is not the same as the year the model was first
+> produced.
+
+Correct answer: 4
+
+Agentic RAG response:
+
+> By July 1969, when the first 1970 model year Monte Carlo would have been introduced, two people had walked on the
+> Moon - Neil Armstrong and Buzz Aldrin who landed on July 20, 1969 as part of the Apollo 11 mission. They were the
+> first and only people to have walked on the Moon when the first 1970 model year Monte Carlos went on sale. The Apollo
+> 12 mission also happened in 1969 but in-context processing simply skips processing it.
+
+#### Errors in computational reasoning
+
+The following question failed on Agentic RAG because it couldn’t reason and compute the user intent correctly:
+
+> As of July 1, 2024, if I wanted to give my daughter the middle name of the American woman who is the most decorated
+> female in the history of American gymnastics as her first name and the full first name of the American woman who holds
+> the world record in the 800-meter freestyle as her middle name, what would I name my daughter?
+
+Correct answer: Arianne Kathleen
+
+Agentic RAG answer:
+
+> Based on the search results, I can determine that as of July 1, 2024, the name would be:
+>
+> The first name would be "Simone", as Simone Biles is clearly the most decorated American female gymnast in history,
+> with 32 Olympic and World Championship gold medals among her many accomplishments.
+>
+> The middle name would be "Katie", as Katie Ledecky is the world record holder in the 800m freestyle with a time of
+> 8:04.79, which she set at the 2016 Rio Olympics and still stands as of 2024.
+>
+> Therefore, the name would be "Simone Katie".
+
+Although the athletes determined are correct, in-context processing fails to put the right computational plan for the
+final answer. We needed to get the middle name for Simone Biles and the full first name of Katie Ledecky.
+
+## Discussion: Adding planning to RAG
+
+PromptQL does not process data in-context. It uses the LLM to first create a query plan and then executes the plan in a
+programmatic environment. It stores relevant outputs in referenceable artifacts to create "structured memory" across
+multiple turns. See the details of PromptQL design here: https://promptql.hasura.io/spec
+
+With this approach, a user can ask PromptQL to create a plan according to some guidelines, or even provide a specific
+plan which allows for far more accuracy.
+
+### Planning prompt
+
+Here's an example of how a user can provide a planning prompt to help tackle FRAMES style questions with the given
+retrieval stack:
+
+> This problem requires the collection of many facts step by step and creating an algorithm to solve the problem.
+> Don{"'"}t rely on your own knowledge of facts, but instead try to collect facts step by step. To collect facts,
+> retrieve relevant articles by making search queries. From a retrieved article use the extract function to extract the
+> precise fact if its present in the article.
+>
+> [..question here...]
+
+Here's another example of how a user can even provide a more specific plan to steer the AI agent:
+
+> Find the article that contains the S&P 500 list.
+>
+> Extract the company name of the alphabetically first ticker from the article.
+>
+> Then, extract the company name of the alphabetically second to last ticker.
+>
+> Get articles about these two companies and try to extract the employee count of these companies from those articles if
+> present.
+>
+> Tell me the employee count difference.
+
+### Example
+
+Here's an example of how PromptQL's planner breaks down the retrieval and reasoning into a series of steps to determine
+the answer for one of the questions.
+
+<Thumbnail src="/img/get-started/promptql-rag-planner.png" alt="PromptQL planning a RAG sequence" />
+
+[View shared thread](https://promptql.console.hasura.io/share/a1e707cc-ece4-42f4-8c3d-925514d75d9b)
+
+- Read more about PromptQL's design [here](/reference/spec.mdx).
+- Add PromptQL to your existing RAG set up [here](/recipes/tutorials/add-vector-search-to-postgresql.mdx).
+
+## Code
+
+The code that was used to try out the different approaches is available
+[on github](https://github.com/hasura/rag-benchmark).

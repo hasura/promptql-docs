@@ -46,7 +46,52 @@
   /* Custom Colors */
   --docusaurus-highlighted-code-line-bg: var(--main-bg-color);
   --ifm-color-primary-fade: #b6fc3499;
+
+  /* Custom Colors for heatmaps */
+  --heatmap-success-green: var(--ifm-color-primary);
+  --heatmap-warn-yellow: #f6b93b;
+  --heatmap-error-red: #f77173;
+
+  --color-mcpScore: #6b8cae;
+  --color-promptQLScore: #b6fc34;
 }
+
+.thumbnail-small {
+  display: block;
+  margin: 0 auto;
+  width: 300px;
+  height: auto;
+  margin-bottom: 2rem;
+}
+
+.katex-display {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.katex-html {
+  display: none;
+}
+
+.heatmap {
+  height: 1rem;
+  width: 1rem;
+}
+
+.heatmap-success {
+  background-color: var(--heatmap-success-green);
+}
+
+.heatmap-warn {
+  background-color: var(--heatmap-warn-yellow);
+}
+
+.heatmap-error {
+  background-color: var(--heatmap-error-red);
+}
+
 /* -------------- TYPOGRAPHY SIZES -------------- */
 
 h1 {
@@ -306,9 +351,7 @@ iframe {
   align-items: center;
   background-color: var(--primary-neutral-700);
   padding: 4px 8px 4px 16px;
-  box-shadow:
-    0px 1px 2px 0px var(--primary-neutral-800),
-    0px 1px 3px 0px var(--primary-neutral-900);
+  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
   width: 120px;
   color: var(--primary-neutral-200);
 }
@@ -335,9 +378,7 @@ iframe {
   top: calc(100% - var(--ifm-navbar-item-padding-vertical) + 0.6rem);
   width: 120px;
   min-width: 120px;
-  box-shadow:
-    0px 1px 2px 0px var(--primary-neutral-800),
-    0px 1px 3px 0px var(--primary-neutral-900);
+  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
   margin-top: -6px;
   background-color: var(--primary-neutral-700);
 }
@@ -380,9 +421,7 @@ iframe {
   max-width: 370px;
   width: 100%;
   padding: 8px 20px 8px 16px;
-  box-shadow:
-    0px 1px 2px 0px var(--primary-neutral-800),
-    0px 1px 3px 0px var(--primary-neutral-900);
+  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
   background-color: var(--search-dark-bg-color);
   border: 1px solid var(--primary-neutral-600);
 }
@@ -399,9 +438,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 .DocSearch-Button:focus,
 .DocSearch-Button:hover {
   border: 1px solid var(--primary-neutral-0);
-  box-shadow:
-    0px 1px 2px 0px var(--primary-neutral-800),
-    0px 1px 3px 0px var(--primary-neutral-900) !important;
+  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900) !important;
 }
 
 .DocSearch-Button-Keys {
