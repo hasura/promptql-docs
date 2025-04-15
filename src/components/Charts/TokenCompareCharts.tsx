@@ -45,7 +45,7 @@ export default function ScoreCompareCharts() {
           textAnchor="middle"
           style={{
             fontSize: '16px',
-            fill: '#333333',
+            fill: '#ffffff',
             fontWeight: 500,
           }}
         >
