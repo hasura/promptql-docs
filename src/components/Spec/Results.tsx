@@ -2,7 +2,7 @@ import React from 'react';
 
 type Result = 'accurate' | 'partial' | 'inaccurate';
 
-const getColorForResult = (result: Result): string => {
+export const getColorForResult = (result: Result): string => {
   switch (result) {
     case 'accurate':
       return 'heatmap-success';

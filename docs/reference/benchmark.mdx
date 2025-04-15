@@ -1,10 +1,14 @@
 ---
 title: Benchmark
+hide_table_of_contents: true
 ---
 
 import { Grid } from "@site/src/components/Spec";
+import Architecture from "@site/src/components/Benchmark/Architectures";
 import Thumbnail from "@site/src/components/Thumbnail";
 import Charts from "@site/src/components/Charts";
+import Results from "@site/src/components/Benchmark";
+import Gallery from "@site/src/components/Benchmark/Gallery";
 
 # Case-study I - PromptQL vs MCP
 
@@ -32,7 +36,7 @@ The benchmark focuses on a customer success domain, integrating data from Zendes
 database. This setup simulates a real-world scenario where customer support interactions are linked with product usage
 and purchase history, providing a comprehensive view of customer interactions and behavior.
 
-TODO: Add screenshot
+<Architecture />
 
 ## 2. Evaluation set
 
@@ -55,57 +59,7 @@ data.
 We run each prompt five times, and record the accuracy of the result. Each result is a list of data points. In the heat
 maps that you see below, columns represent a particular "run" and the rows represent the data points in the output.
 
-Sample heatmap:
-
-TODO: Add heatmap
-
-### 3.1 Prioritization task prompt
-
-Give me a sorted list of top 5 support tickets which I should prioritize amongst last 30 most recent open tickets.
-
-For each ticket, attach the following information to each ticket:
-
-1. the project_id
-2. the plan of the project
-3. the criticality of the issue
-4. the monthly average revenue for the project
-5. list of recent ticket_ids for that project from the last 6 months
-
-Extract the project_id from the ticket description.
-
-Determine the criticality of the issue of a ticket, by looking at the ticket and its comments. These are categories of
-issue criticality in descending order of importance:
-
-1. Production downtime
-2. Instability in production
-3. Performance degradation in production
-4. Bug
-5. Feature request
-6. How-to
-
-Now, prioritize the tickets according to the following rules. Assign the highest priority to production issues. Within
-this group, prioritize advanced plan > base plan > free plan. Next, take non-production issues, and within this group,
-order by monthly average revenue.
-
-In case there are ties within the 2 groups above, break the tie using:
-
-1. Time since when the ticket was open
-2. Recent negative support or product experience in the last 6 months
-
-Plan names are "advanced", "base" and "free".
-
-TODO: Add heatmap table
-
-### 3.2 Analysis task prompt
-
-In the last 10 tickets, look at the comments and find the slowest response made by the support agent.
-
-Classify these as whether the reason for the delay was because of a delay by the customer or by the agent.
-
-Return the list of tickets sorted by ticket id, along with the comment id of the slowest comment and the classification
-result.
-
-TODO: Add heatmap table
+<Results />
 
 ## 4. Examining failure of in-context approaches
 
@@ -119,7 +73,7 @@ In-context approaches cannot separate the creation of a query plan from the exec
 This results in a lack of repeatability. Increasing amount of data and information in the context window deteriorates
 accuracy at each step of the query plan and hence further reduces repeatability.
 
-TODO: Insert gallery of images
+<Gallery />
 
 ### 4.2 Failure #2: Natural query plans don't work
 
@@ -127,9 +81,9 @@ In-context approaches require that data is exchanged between tools in context, o
 query plans often require data to flow between steps with 100% reliability, but this runs against the LLMs natural
 limitations, and in particular against output token limits.
 
-TODO: Add screenshot
+<Thumbnail src="/img/get-started/challenge-2.png" alt="A PromptQL agent chat instance" className="thumbnail-small" />
 
-TODO: Add full-bleed image
+<Thumbnail src="/img/get-started/failure2-computation-in-context.png" alt="A PromptQL agent chat instance" />
 
 ### 4.3 PromptQL approach: Decouple creation of the query plan from the execution of the query plan
 
@@ -139,7 +93,39 @@ plan. The execution of the query plan should be mechanical and 100% repeatable.
 PromptQL's query plans are composed of steps that are computational and cognitive. These ensures intelligence can be
 precisely used only in the isolated context of the step (eg: "extract project_id from the ticket description").
 
-TODO: Add ERD
+```mermaid
+flowchart TD
+  subgraph "Create query plan (LLM task)"
+    A[Fetch last 20 open tickets]
+    B[Extract project_id]
+    C[Enrich tickets with more project information]
+    D[Fetch ticket comments]
+    E[Classify ticket criticality]
+    F[Enrich ticket with all the required information]
+    G[Run ranking algorithm]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+  end
+
+  UI[User input] --> A
+
+  G --> H["Run query plan<br/><i>programmatically</i>"]
+
+  subgraph Inputs
+    I[Tools]
+    J[LLM]
+  end
+
+  I --> H
+  J --> H
+
+  H --> R[Result]
+```
 
 ## 5. Evaluation Methodology
 

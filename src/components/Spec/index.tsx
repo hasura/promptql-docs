@@ -200,6 +200,7 @@ export function Grid() {
         style={{
           overflowX: 'auto',
           maxWidth: '800px',
+          border: '1px solid #e5e5e5',
           borderRadius: '0.5rem',
         }}
       >
