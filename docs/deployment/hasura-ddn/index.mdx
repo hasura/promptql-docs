@@ -12,25 +12,27 @@ keywords:
 
 # Deployment Overview
 
-Deploying to Hasura DDN is the optimal way to run your supergraph API. For more details on dedicated infrastructure, see
-[Hasura Private DDN](/private-ddn/overview.mdx). For more details on pricing plans, see
+Deploying to Hasura DDN is the optimal way to enable PromptQL to accurately talk to all your data. Hasura DDN provides
+the data foundation that powers PromptQL's intelligent data interaction capabilities. For more details on dedicated
+infrastructure, see [Hasura Private DDN](/private-ddn/overview.mdx). For more details on pricing plans, see
 [our pricing page](https://hasura.io/pricing).
 
 ## Hasura DDN
 
-With Hasura DDN your API runs in a globally-distributed cloud where performance, availability, and security are handled
+With Hasura DDN, PromptQL runs in a globally-distributed cloud where performance, availability, and security are handled
 for you.
 
-To deploy your application and make it accessible to the world you will create builds of your connectors, subgraphs, and
-the supergraph. This can all be done in a single command. You will then apply the supergraph build to your project,
-making it the "official" build for the project.
+To deploy your PromptQL project, you will create builds of your connectors, subgraphs, and the supergraph. This can all
+be done in a single command. You will then apply the supergraph build to your project, making it the "official" build
+for the project.
 
-PromptQL will use this to answer queries by accessing data according to the structure of the build.
+PromptQL will use this supergraph to facilitate AI-powered conversations with your data, generating dynamic query plans
+that can access and analyze information across all your connected data sources.
 
 ## Next steps
 
-Use the How To guide for the most common steps to deploy your project to DDN. Try the tutorial for more detailed steps
-depending on your specific connector.
+Use the How To guide for the most common steps to deploy your PromptQL project to DDN. Try the tutorial for more
+detailed steps depending on your specific connector.
 
 - [How to deploy your project to DDN](/deployment/hasura-ddn/deploy-to-ddn.mdx)
 - [Deploy specific connectors and subgraphs to DDN](/deployment/hasura-ddn/incremental-builds.mdx)

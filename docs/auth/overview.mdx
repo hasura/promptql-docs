@@ -2,7 +2,7 @@
 title: Authentication and Authorization Overview
 sidebar_position: 1
 description:
-  "Learn about PromptQL's powerful authentication process. Understand its flexibility to use JWT, webhook, role
+  "Learn about Hasura DDN's powerful authentication process. Understand its flexibility to use JWT, webhook, role
   emulation and your existing solutions. Control user access to data."
 sidebar_label: Basics
 keywords:
@@ -22,22 +22,28 @@ keywords:
 
 ## Introduction
 
-PromptQL is agnostic about how you authenticate users. You can integrate many popular auth services or use your own
-custom solution.
+By default, PromptQL accesses your data through Hasura DDN in [NoAuth](/auth/noauth-mode.mdx) mode as an `admin` user.
+This means that by default on a new installation, it has full access to your data.
 
-After authentication, session variables are passed via either a valid JWT or webhook to the application to be checked
-against your access control rules or "permissions" to determine what data the user can access. This ensures any
-conversations are scoped to only return information users are permitted to access.
+However, you can integrate many popular auth services or use your own custom solution to authenticate users.
+
+After the authentication step, session variables, including a user role, are passed via either a valid JWT or webhook
+response, to the Hasura Engine to be checked against the access control rules or "permissions" to determine what data
+the user can access. This ensures any PromptQL conversations are scoped to only return information that a particular
+user is permitted to access.
+
+As you will most often be using PromptQL in the PiQL interface, you can check the auth which the PiQL client is using by
+clicing the "Auth" button on the left of the chat textbox.
 
 ## AuthConfig options
 
-Authentication in PromptQL can be set up in one of three modes. These modes and their configuration options are
-specified in the `AuthConfig` object within your metadata.
+Authentication can be set up in one of three modes. These modes and their configuration options are specified in the
+`AuthConfig` object within your metadata.
 
 ### JWT mode
 
-Your authentication service must issue JWTs which contain session variables that are passed to PromptQL by the client on
-each request.
+Your authentication service must issue JWTs which contain session variables that are passed to the Hasura Engine by the
+PromptQL client on each request.
 
 [Read more](/auth/jwt/index.mdx).
 
