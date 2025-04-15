@@ -49,21 +49,12 @@ it requires:
 
 <Tabs groupId="source-preference" className="api-tabs">
 
-<TabItem value="Athena" label="Amazon">
+<TabItem value="Athena" label="Athena">
 
 | ENV            | Example                                                                      | Description                                            |
 | -------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
 | `JDBC_URL`     | `jdbc:athena://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Athena database. |
 | `JDBC_SCHEMAS` | `public,app`                                                                 | The schemas to use for the database.                   |
-
-</TabItem>
-
-<TabItem value="Redshift" label="Redshift">
-
-| ENV            | Example                                                                        | Description                                              |
-| -------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------- |
-| `JDBC_URL`     | `jdbc:redshift://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Redshift database. |
-| `JDBC_SCHEMAS` | `public,app`                                                                   | The schemas to use for the database.                     |
 
 </TabItem>
 
@@ -90,7 +81,7 @@ it requires:
 | `JDBC_URL` | `jdbc:mysql://user:password@host:3306/db_name` | This connector requires a JDBC URL. |
 
 </TabItem>
-<TabItem value="PostgreSQL" label="PostgreSQL PromptQL">
+<TabItem value="PostgreSQL" label="PostgreSQL">
 
 | ENV            | Example                                                                          | Description                                                                                        |
 | -------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
@@ -98,6 +89,15 @@ it requires:
 | `JDBC_SCHEMAS` | `public, app`                                                                    | The schemas to use for the database. Optional. This can also be included in the connection string. |
 
 </TabItem>
+  <TabItem value="Redshift" label="Redshift">
+
+| ENV            | Example                                                                        | Description                                              |
+| -------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------- |
+| `JDBC_URL`     | `jdbc:redshift://<host>:<port>/<database>?user=<username>&password=<password>` | The JDBC URL to connect to the Amazon Redshift database. |
+| `JDBC_SCHEMAS` | `public,app`                                                                   | The schemas to use for the database.                     |
+
+</TabItem>
+
 <TabItem value="Snowflake" label="Snowflake">
 
 | ENV        | Example                                                                                                                                                                                       | Description                         |
