@@ -1371,3 +1371,49 @@ table td {
   padding-bottom: 0.5rem !important;
   margin-bottom: 0.5rem;
 }
+
+/* Sidebar icon styling */
+.sidebar-icon svg {
+  transition: stroke 0.2s;
+}
+
+.sidebar-icon svg path,
+.sidebar-icon svg line,
+.sidebar-icon svg circle,
+.sidebar-icon svg rect {
+  transition: stroke 0.2s;
+}
+
+/* Style for icons in menu items on hover */
+.menu__link:hover .sidebar-icon svg path,
+.menu__link:hover .sidebar-icon svg line,
+.menu__link:hover .sidebar-icon svg circle,
+.menu__link:hover .sidebar-icon svg rect {
+  stroke: var(--ifm-color-primary) !important;
+}
+
+/* Style for icons in active menu items */
+.menu__link--active .sidebar-icon svg path,
+.menu__link--active .sidebar-icon svg line,
+.menu__link--active .sidebar-icon svg circle,
+.menu__link--active .sidebar-icon svg rect {
+  stroke: var(--ifm-color-primary) !important;
+}
+
+/* For GraphQL logo which uses fill instead of stroke */
+.menu__link:hover .sidebar-icon .graphql-icon path,
+.menu__link--active .sidebar-icon .graphql-icon path {
+  fill: var(--ifm-color-primary) !important;
+}
+
+/* Make sure text color changes on hover and active states */
+.menu__link:hover .menu-label,
+.menu__link--active .menu-label {
+  color: var(--ifm-color-primary) !important;
+}
+
+/* Restore correct text weight */
+.menu-label {
+  font-weight: inherit;
+  color: inherit;
+}
