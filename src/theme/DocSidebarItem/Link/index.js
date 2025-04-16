@@ -4,8 +4,7 @@ import { ThemeClassNames } from '@docusaurus/theme-common';
 import { isActiveSidebarItem } from '@docusaurus/plugin-content-docs/client';
 import Link from '@docusaurus/Link';
 import isInternalUrl from '@docusaurus/isInternalUrl';
-import IconExternalLink from '@theme/Icon/ExternalLink';
-import styles from './styles.module.css';
+
 import { addIconsToLabel } from '../utils';
 export default function DocSidebarItemLink({ item, onItemClick, activePath, level, index, ...props }) {
   const { href, label, className, autoAddBaseUrl } = item;
@@ -25,7 +24,7 @@ export default function DocSidebarItemLink({ item, onItemClick, activePath, leve
       key={label}
     >
       <Link
-        className={clsx('menu__link', !isInternalLink && styles.menuExternalLink, {
+        className={clsx('menu__link', !isInternalLink && { 'align-items': 'center' }, {
           'menu__link--active': isActive,
         })}
         autoAddBaseUrl={autoAddBaseUrl}
