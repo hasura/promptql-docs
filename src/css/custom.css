@@ -301,12 +301,18 @@ iframe {
 
 .navbar__logo img {
   border-radius: 0;
+  width: auto;
 }
 
-.theme-doc-sidebar-container a img {
+.theme-doc-sidebar-container [class^='sidebarLogo_'] {
+  border-bottom: 1px solid var(--next-prev-border-color);
+  margin: 0;
+}
+
+.theme-doc-sidebar-container [class^='sidebarLogo_'] img {
   width: 92px;
   height: 32px;
-  margin-left: 1.1rem;
+  margin-left: 2rem;
 }
 
 .navbar__items {
@@ -520,6 +526,12 @@ div:has(> .DocSearch.DocSearch-Button) {
   margin-bottom: 2.5rem; /* md */
   margin-bottom: 3rem; /* lg */
   display: none;
+}
+
+/* -------------- FOOTER -------------- */
+
+[class^='custom-footer-wrapper_'] [class^='logo-wrapper'] {
+  width: 120px !important;
 }
 
 /* -------------- SIDEBAR -------------- */
