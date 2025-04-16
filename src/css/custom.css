@@ -303,10 +303,15 @@ iframe {
   border-radius: 0;
 }
 
-.theme-doc-sidebar-container a img {
+.theme-doc-sidebar-container [class^='sidebarLogo_'] {
+  border-bottom: 1px solid var(--next-prev-border-color);
+  margin: 0;
+}
+
+.theme-doc-sidebar-container [class^='sidebarLogo_'] img {
   width: 92px;
   height: 32px;
-  margin-left: 1.1rem;
+  margin-left: 2rem;
 }
 
 .navbar__items {
