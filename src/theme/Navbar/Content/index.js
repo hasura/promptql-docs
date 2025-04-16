@@ -3,10 +3,10 @@ import { useThemeConfig, ErrorCauseBoundary } from '@docusaurus/theme-common';
 import { splitNavbarItems, useNavbarMobileSidebar } from '@docusaurus/theme-common/internal';
 import NavbarItem from '@theme/NavbarItem';
 import NavbarColorModeToggle from '@theme/Navbar/ColorModeToggle';
-// import SearchBar from '@theme/SearchBar';
+import SearchBar from '@theme/SearchBar';
 import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarLogo from '@theme/Navbar/Logo';
-// import NavbarSearch from '@theme/Navbar/Search';
+import NavbarSearch from '@theme/Navbar/Search';
 import styles from './styles.module.css';
 // import { useColorMode } from '@docusaurus/theme-common';
 // import DocsLogoDark from '@site/static/img/docs-logo-dark.svg';
@@ -41,11 +41,11 @@ function NavbarContentLayout({ left, right, searchBarItem }) {
   return (
     <div className="navbar__inner">
       <div className="navbar__items">{left}</div>
-      {/* {!searchBarItem && (
+      {!searchBarItem && (
         <NavbarSearch>
           <SearchBar />
         </NavbarSearch>
-      )} */}
+      )}
       {/* <div className="navbar__items navbar__items--right">
         {right}
         <a
