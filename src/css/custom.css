@@ -303,6 +303,17 @@ iframe {
   border-radius: 0;
 }
 
+.docRoot_src-theme-DocRoot-Layout-styles-module a img {
+  width: 92px;
+  height: 32px;
+}
+
+.docRoot_src-theme-DocRoot-Layout-styles-module a[tabindex='-1'] {
+  display: flex;
+  justify-content: center;
+  box-sizing: content-box;
+}
+
 .navbar__items {
   margin-right: 0;
   flex: none;
