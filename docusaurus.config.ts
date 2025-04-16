@@ -186,17 +186,17 @@ const config: Config = {
           type: 'search',
           position: 'right',
         },
-        // {
-        //   to: 'https://hasura.io/',
-        //   label: 'Hasura.io',
-        //   position: 'right',
-        // },
-        // {
-        //   to: 'https://cloud.hasura.io/login',
-        //   label: 'Log In',
-        //   position: 'right',
-        // },
       ],
+    },
+    footer: {
+      logo: {
+        alt: 'Hasura Logo',
+        src: 'img/logo-light.svg',
+        href: 'https://hasura.io/',
+        width: 160,
+        height: 51,
+      },
+      copyright: `Copyright © ${new Date().getFullYear()} Hasura, Inc. Built with Docusaurus.`,
     },
     prism: {
       theme: prismThemes.github,
