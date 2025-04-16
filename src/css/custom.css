@@ -301,6 +301,7 @@ iframe {
 
 .navbar__logo img {
   border-radius: 0;
+  width: auto;
 }
 
 .theme-doc-sidebar-container [class^='sidebarLogo_'] {
@@ -525,6 +526,12 @@ div:has(> .DocSearch.DocSearch-Button) {
   margin-bottom: 2.5rem; /* md */
   margin-bottom: 3rem; /* lg */
   display: none;
+}
+
+/* -------------- FOOTER -------------- */
+
+[class^='custom-footer-wrapper_'] [class^='logo-wrapper'] {
+  width: 120px !important;
 }
 
 /* -------------- SIDEBAR -------------- */
