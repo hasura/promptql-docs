@@ -148,9 +148,9 @@ const config: Config = {
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
-      appId: '7M3BTIV34B',
+      appId: 'SRR7ESDJ9D',
       // Public API key: it is safe to commit it
-      apiKey: '10f3d9d2cd836eec903fcabbd6d50139',
+      apiKey: '3b1c345518f2e525056dac73aa24e17c',
       indexName: 'hasura',
     },
     navbar: {

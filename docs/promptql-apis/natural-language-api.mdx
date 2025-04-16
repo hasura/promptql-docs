@@ -15,13 +15,11 @@ The Natural Language Query API allows you to interact with PromptQL directly, se
 with support for streaming. This API is particularly useful for building interactive applications that need to
 communicate with PromptQL in real-time.
 
-## API Reference
-
-### Query Endpoint
+## Query Endpoint
 
 Send messages to PromptQL and receive responses, optionally in a streaming format.
 
-#### Request
+### Request
 
 `POST https://api.promptql.pro.hasura.io/query`
 
@@ -118,7 +116,12 @@ You get $10 worth of free credits with Hasura's built-in provider when you get s
 }
 ```
 
-#### Response
+#### Request DDN Auth
+
+The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
+[auth for DDN](/auth/overview.mdx).
+
+### Response
 
 The response format depends on the `stream` parameter:
 
@@ -172,7 +175,7 @@ data: {
 }
 ```
 
-#### Response Fields
+### Response Fields
 
 | Field                | Type  | Description                                                  |
 | -------------------- | ----- | ------------------------------------------------------------ |
@@ -189,7 +192,7 @@ data: {
 | `code_output` | string | Output from code execution             |
 | `code_error`  | string | Error message if code execution failed |
 
-#### Error Response
+### Error Response
 
 ```json
 {
