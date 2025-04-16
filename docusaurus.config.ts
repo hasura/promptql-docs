@@ -101,7 +101,6 @@ const config: Config = {
             },
           },
           sidebarCollapsible: true,
-          sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
         },
@@ -145,6 +144,10 @@ const config: Config = {
       defaultMode: 'dark',
       disableSwitch: true,
     },
+    sidebar: {
+      hideable: true,
+    },
+
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
@@ -188,16 +191,7 @@ const config: Config = {
         },
       ],
     },
-    footer: {
-      logo: {
-        alt: 'Hasura Logo',
-        src: 'img/logo-light.svg',
-        href: 'https://hasura.io/',
-        width: 160,
-        height: 51,
-      },
-      copyright: `Copyright © ${new Date().getFullYear()} Hasura, Inc. Built with Docusaurus.`,
-    },
+
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
