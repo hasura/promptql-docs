@@ -182,10 +182,10 @@ const config: Config = {
             },
           ],
         },
-        // {
-        //   type: 'search',
-        //   position: 'left',
-        // },
+        {
+          type: 'search',
+          position: 'right',
+        },
         // {
         //   to: 'https://hasura.io/',
         //   label: 'Hasura.io',
