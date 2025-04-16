@@ -44,6 +44,19 @@ You can get started by choosing one of the supported connectors:
 - Python Lambda
 - Go Lambda
 
+:::note Supported Connectors for PromptQL
+
+Most Hasura DDN connectors are compatible with PromptQL, with SQL-based database connectors offering the best
+integration since PromptQL communicates with the Hasura DDN engine using SQL.
+
+Some limitations exist:
+
+- Lambda and OpenAPI connectors that return nested data structures may have reduced reliability
+- Connectors returning arbitrary JSON with primitive scalar values are not supported
+- OpenAPI, command-based connectors may experience inconsistent results
+
+:::
+
 ## Building your own connector
 
 If you're working with a custom data source, you can create your own connector. The
