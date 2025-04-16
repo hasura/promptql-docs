@@ -306,12 +306,7 @@ iframe {
 .docRoot_src-theme-DocRoot-Layout-styles-module a img {
   width: 92px;
   height: 32px;
-}
-
-.docRoot_src-theme-DocRoot-Layout-styles-module a[tabindex='-1'] {
-  display: flex;
-  justify-content: center;
-  box-sizing: content-box;
+  margin-left: 1rem;
 }
 
 .navbar__items {
@@ -530,9 +525,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 /* -------------- SIDEBAR -------------- */
 
 .menu {
-  background-color: var(--sidebar-bg-color);
   padding: 0 !important;
-  border-right: 1px solid var(--border-color);
 }
 
 .menu__link {
