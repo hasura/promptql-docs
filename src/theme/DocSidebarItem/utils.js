@@ -73,7 +73,7 @@ export function addIconsToLabel(label, className) {
       icons = <DataModeling style={iconStyle} />;
       break;
     case 'graphQL-api-icon':
-      icons = <GraphQLAPI style={iconStyle} />;
+      icons = <GraphQLAPI className="graphql-icon" style={iconStyle} />;
       break;
     case 'json-api-icon':
       icons = <JsonAPI style={iconStyle} />;
@@ -143,9 +143,11 @@ export function addIconsToLabel(label, className) {
       break;
   }
 
+  // Return the icon and label wrapped in a div with special styling to handle hover states
   return (
-    <div>
-      {icons} {label}
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+      <div className="sidebar-icon">{icons}</div>
+      <span className="menu-label">{label}</span>
     </div>
   );
 }

@@ -101,7 +101,6 @@ const config: Config = {
             },
           },
           sidebarCollapsible: true,
-          sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
         },
@@ -145,6 +144,10 @@ const config: Config = {
       defaultMode: 'dark',
       disableSwitch: true,
     },
+    sidebar: {
+      hideable: true,
+    },
+
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
@@ -183,12 +186,12 @@ const config: Config = {
           ],
         },
         {
-          to: 'https://hasura.io/',
-          label: 'Hasura.io',
+          type: 'search',
           position: 'right',
         },
       ],
     },
+
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,

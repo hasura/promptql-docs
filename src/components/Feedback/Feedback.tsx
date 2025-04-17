@@ -2,7 +2,7 @@ import React, { ReactNode, useState, useEffect } from 'react';
 import styles from './styles.module.css';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
-export const Feedback = ({ metadata }: { metadata: any }) => {
+export const Feedback = () => {
   const [rating, setRating] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [notes, setNotes] = useState<string | null>(null);
   const [errorText, setErrorText] = useState<string | null>(null);
@@ -141,11 +141,6 @@ export const Feedback = ({ metadata }: { metadata: any }) => {
       setTextAreaPlaceholder('This section is optional ✌️');
     }
   };
-
-  // Do not show on Intro page
-  if (metadata.source === '@site/docs/index.mdx') {
-    return null;
-  }
 
   return (
     <div className={styles.feedback} id={'feedback'}>
