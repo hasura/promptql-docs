@@ -161,9 +161,9 @@ const config: Config = {
       hideOnScroll: true,
       logo: {
         alt: 'Hasura Logo',
-        src: 'img/logo-dark.svg',
+        src: 'img/prompt-ql-beta@2x.png',
         href: '/index',
-        srcDark: '/img/ql-logo-light.svg',
+        srcDark: '/img/prompt-ql-beta@2x.png',
       },
       items: [
         {
