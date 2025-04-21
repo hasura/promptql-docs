@@ -469,6 +469,12 @@ div:has(> .DocSearch.DocSearch-Button) {
   color: var(--primary-neutral-500) !important;
 }
 
+.DocSearch-Modal,
+.DocSearch-Modal .DocSearch-Hit-source,
+.DocSearch-Modal .DocSearch-Footer {
+  background-color: var(--primary-neutral-900) !important;
+}
+
 .DocSearch-Hit a:hover .DocSearch-Hit-Container .DocSearch-Hit-content-wrapper span,
 .DocSearch-Hit a:hover .DocSearch-Hit-Container .DocSearch-Hit-content-wrapper span mark,
 .DocSearch-Hit a:hover .DocSearch-Hit-Container .DocSearch-Hit-Tree,
