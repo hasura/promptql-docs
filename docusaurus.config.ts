@@ -185,10 +185,10 @@ const config: Config = {
             },
           ],
         },
-        {
-          type: 'search',
-          position: 'right',
-        },
+        // {
+        //   type: 'search',
+        //   position: 'left',
+        // },
       ],
     },
 
