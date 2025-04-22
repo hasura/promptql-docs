@@ -3,6 +3,11 @@ import clsx from 'clsx';
 import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 import styles from './styles.module.css';
 import Logo from '@site/static/img/logo-light.svg';
+import GithubIcon from '@site/static/icons/github.svg';
+import TwitterIcon from '@site/static/icons/twitter.svg';
+import DiscordIcon from '@site/static/icons/discord.svg';
+import YoutubeIcon from '@site/static/icons/youtube.svg';
+import LinkedinIcon from '@site/static/icons/linkedin.svg';
 
 export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) {
   const sidebar = useDocsSidebar();
@@ -21,24 +26,24 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
         <div id="hasura-footer" className={styles.footer}>
           <div className={styles.footerContent}>
             <div className={styles.footerLogo}>
-              <img src={Logo} alt="Hasura" />
+              <Logo />
             </div>
             <div className={styles.footerCopyright}>© {new Date().getFullYear()} Hasura Inc. All rights reserved</div>
             <div className={styles.footerSocial}>
               <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
-                <img src={'/icons/github.svg'} alt="GitHub" />
+                <GithubIcon />
               </a>
               <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/twitter.svg" alt="X (Twitter)" />
+                <TwitterIcon />
               </a>
               <a href="https://discord.com/invite/hasura" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/discord.svg" alt="Discord" />
+                <DiscordIcon />
               </a>
               <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/youtube.svg" alt="YouTube" />
+                <YoutubeIcon />
               </a>
               <a href="https://www.linkedin.com/company/hasura" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/linkedin.svg" alt="LinkedIn" />
+                <LinkedinIcon />
               </a>
             </div>
           </div>
