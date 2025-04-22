@@ -1,32 +1,16 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import clsx from 'clsx';
-import { useDocsSidebar } from '@docusaurus/theme-common/internal';
-import { useLocation } from '@docusaurus/router';
+import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 import styles from './styles.module.css';
+import Logo from '@site/static/img/logo-light.svg';
+import GithubIcon from '@site/static/icons/github.svg';
+import TwitterIcon from '@site/static/icons/twitter.svg';
+import DiscordIcon from '@site/static/icons/discord.svg';
+import YoutubeIcon from '@site/static/icons/youtube.svg';
+import LinkedinIcon from '@site/static/icons/linkedin.svg';
 
 export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) {
   const sidebar = useDocsSidebar();
-  const location = useLocation();
-
-  useEffect(() => {
-    // dynamically updating the pg prop for the getting started cta
-    function updateGettingStartedParam() {
-      const linkElement = document.querySelector('#login_button');
-
-      if (linkElement) {
-        let page = location.pathname;
-        page = page.slice(0, -1);
-        page = page.replace('/docs/', 'docs_ddn_').replace('3.0/', '').replace(/\//g, '_');
-
-        const href = linkElement.getAttribute('href');
-        const newHref = href.replace(/pg=([^&]+)/, `pg=${page}`);
-        linkElement.setAttribute('href', newHref);
-      }
-    }
-
-    updateGettingStartedParam();
-  }, [location]);
-
   return (
     <main
       className={clsx(styles.docMainContainer, (hiddenSidebarContainer || !sidebar) && styles.docMainContainerEnhanced)}
@@ -39,6 +23,31 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
         )}
       >
         {children}
+        <div id="hasura-footer" className={styles.footer}>
+          <div className={styles.footerContent}>
+            <div className={styles.footerLogo}>
+              <Logo />
+            </div>
+            <div className={styles.footerCopyright}>© {new Date().getFullYear()} Hasura Inc. All rights reserved</div>
+            <div className={styles.footerSocial}>
+              <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
+                <GithubIcon />
+              </a>
+              <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
+                <TwitterIcon />
+              </a>
+              <a href="https://discord.com/invite/hasura" target="_blank" rel="noopener noreferrer">
+                <DiscordIcon />
+              </a>
+              <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">
+                <YoutubeIcon />
+              </a>
+              <a href="https://www.linkedin.com/company/hasura" target="_blank" rel="noopener noreferrer">
+                <LinkedinIcon />
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
   );

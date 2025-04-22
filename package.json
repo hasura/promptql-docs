@@ -22,10 +22,10 @@
     "quicky:pg": "cd utilities/starter-scripts && ./pg.sh"
   },
   "dependencies": {
-    "@docusaurus/core": "3.4.0",
-    "@docusaurus/plugin-content-docs": "3.4.0",
-    "@docusaurus/preset-classic": "3.4.0",
-    "@docusaurus/theme-mermaid": "3.4.0",
+    "@docusaurus/core": "^3.7.0",
+    "@docusaurus/plugin-content-docs": "^3.7.0",
+    "@docusaurus/preset-classic": "^3.7.0",
+    "@docusaurus/theme-mermaid": "^3.7.0",
     "@mdx-js/react": "^3.0.0",
     "@openreplay/tracker": "^15.0.3",
     "autoprefixer": "^10.4.16",
@@ -52,9 +52,9 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "3.4.0",
-    "@docusaurus/tsconfig": "3.4.0",
-    "@docusaurus/types": "3.4.0",
+    "@docusaurus/module-type-aliases": "^3.7.0",
+    "@docusaurus/tsconfig": "^3.7.0",
+    "@docusaurus/types": "^3.7.0",
     "@types/dompurify": "^3",
     "@types/js-cookie": "^3",
     "@types/punycode": "^2",
@@ -77,5 +77,5 @@
   "engines": {
     "node": ">=18.0"
   },
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.9.1"
 }

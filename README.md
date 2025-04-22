@@ -31,10 +31,3 @@ $ yarn build
 ```
 
 This generates static content into the `build` directory, which can be hosted using any static hosting service.
-
-## Contributing
-
-We love contributions! If you'd like to contribute, please review our
-[Contribution Guide](https://hasura.io/docs/promptql/wiki/contributing/) for all the details on how to get involved 🤙.
-
-We appreciate all contributions to make our docs better for everyone! 🙌

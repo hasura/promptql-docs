@@ -316,8 +316,7 @@ iframe {
 }
 
 .navbar__items {
-  margin-right: 0;
-  flex: none;
+  flex: 0 0 auto;
 }
 
 .navbar__items .navbar__item {
@@ -428,6 +427,38 @@ iframe {
 }
 
 /* Search */
+
+[class^='navbarSearchContainer_'] {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 370px;
+  z-index: 1;
+}
+
+@media (max-width: 996px) {
+  [class^='navbarSearchContainer_'] {
+    position: absolute;
+    left: auto;
+    right: 1rem;
+    transform: none;
+    max-width: 200px;
+    margin: 0;
+  }
+
+  .DocSearch.DocSearch-Button {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  [class^='navbarSearchContainer_'] {
+    max-width: 100px;
+  }
+}
+
 .DocSearch.DocSearch-Button {
   max-width: 370px;
   width: 100%;
@@ -1402,4 +1433,50 @@ table td {
   border-bottom: 2px solid var(--ifm-color-primary-fade) !important;
   padding-bottom: 0.5rem !important;
   margin-bottom: 0.5rem;
+}
+
+/* Sidebar icon styling */
+.sidebar-icon svg {
+  transition: stroke 0.2s;
+}
+
+.sidebar-icon svg path,
+.sidebar-icon svg line,
+.sidebar-icon svg circle,
+.sidebar-icon svg rect {
+  transition: stroke 0.2s;
+}
+
+/* Style for icons in menu items on hover */
+.menu__link:hover .sidebar-icon svg path,
+.menu__link:hover .sidebar-icon svg line,
+.menu__link:hover .sidebar-icon svg circle,
+.menu__link:hover .sidebar-icon svg rect {
+  stroke: var(--ifm-color-primary) !important;
+}
+
+/* Style for icons in active menu items */
+.menu__link--active .sidebar-icon svg path,
+.menu__link--active .sidebar-icon svg line,
+.menu__link--active .sidebar-icon svg circle,
+.menu__link--active .sidebar-icon svg rect {
+  stroke: var(--ifm-color-primary) !important;
+}
+
+/* For GraphQL logo which uses fill instead of stroke */
+.menu__link:hover .sidebar-icon .graphql-icon path,
+.menu__link--active .sidebar-icon .graphql-icon path {
+  fill: var(--ifm-color-primary) !important;
+}
+
+/* Make sure text color changes on hover and active states */
+.menu__link:hover .menu-label,
+.menu__link--active .menu-label {
+  color: var(--ifm-color-primary) !important;
+}
+
+/* Restore correct text weight */
+.menu-label {
+  font-weight: inherit;
+  color: inherit;
 }

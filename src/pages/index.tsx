@@ -24,9 +24,6 @@ function HomepageHeader() {
           <Link className="button button--primary button--lg" id="hasura-promptql-docs-main-button" to="/index">
             Hasura PromptQL Docs
           </Link>
-          <Link className="button button--secondary button--lg" to="/wiki/">
-            Docs Wiki
-          </Link>
         </div>
       </div>
     </header>
