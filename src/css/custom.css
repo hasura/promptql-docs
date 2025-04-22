@@ -437,6 +437,28 @@ iframe {
   z-index: 1;
 }
 
+@media (max-width: 996px) {
+  [class^='navbarSearchContainer_'] {
+    position: absolute;
+    left: auto;
+    right: 1rem;
+    transform: none;
+    max-width: 200px;
+    margin: 0;
+  }
+
+  .DocSearch.DocSearch-Button {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  [class^='navbarSearchContainer_'] {
+    max-width: 100px;
+  }
+}
+
 .DocSearch.DocSearch-Button {
   max-width: 370px;
   width: 100%;
