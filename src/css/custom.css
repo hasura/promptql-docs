@@ -291,15 +291,6 @@ iframe {
   border-bottom: 1px solid var(--border-color);
 }
 
-.navbar__inner {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
-}
-
 .navbar__brand {
   margin-right: 0;
 }
@@ -326,18 +317,6 @@ iframe {
 
 .navbar__items {
   flex: 0 0 auto;
-}
-
-.navbar__items--right {
-  flex: 0 0 auto;
-}
-
-/* Center navbar items container */
-.navbar__items:not(.navbar__items--right) {
-  flex: 1 1 auto;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
 }
 
 .navbar__items .navbar__item {
@@ -447,8 +426,9 @@ iframe {
   justify-content: end;
 }
 
-/* Search container positioning */
-.navbarSearchContainer_Bca1 {
+/* Search */
+
+[class^='navbarSearchContainer_'] {
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
@@ -457,7 +437,6 @@ iframe {
   z-index: 1;
 }
 
-/* Search */
 .DocSearch.DocSearch-Button {
   max-width: 370px;
   width: 100%;
