@@ -2,6 +2,8 @@ import React from 'react';
 import clsx from 'clsx';
 import { useDocsSidebar } from '@docusaurus/plugin-content-docs/client';
 import styles from './styles.module.css';
+import Logo from '@site/static/img/logo-light.svg';
+
 export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) {
   const sidebar = useDocsSidebar();
   return (
@@ -19,12 +21,12 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
         <div id="hasura-footer" className={styles.footer}>
           <div className={styles.footerContent}>
             <div className={styles.footerLogo}>
-              <img src="/img/logo-light.svg" alt="Hasura" />
+              <img src={Logo} alt="Hasura" />
             </div>
             <div className={styles.footerCopyright}>© {new Date().getFullYear()} Hasura Inc. All rights reserved</div>
             <div className={styles.footerSocial}>
               <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
-                <img src="/icons/github.svg" alt="GitHub" />
+                <img src={'/icons/github.svg'} alt="GitHub" />
               </a>
               <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
                 <img src="/icons/twitter.svg" alt="X (Twitter)" />
