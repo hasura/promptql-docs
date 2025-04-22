@@ -101,7 +101,6 @@ const config: Config = {
             },
           },
           sidebarCollapsible: true,
-          sidebarPath: './sidebars.ts',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
         },
@@ -117,17 +116,6 @@ const config: Config = {
   ],
 
   plugins: [
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'wiki',
-        path: 'wiki',
-        routeBasePath: 'wiki',
-        exclude: ['**/*.wip'],
-        // sidebarPath: './sidebarsCommunity.js',
-        // ... other options
-      },
-    ],
     async function tailwind(context, options) {
       return {
         name: 'docusaurus-tailwindcss',
@@ -145,6 +133,10 @@ const config: Config = {
       defaultMode: 'dark',
       disableSwitch: true,
     },
+    sidebar: {
+      hideable: true,
+    },
+
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
@@ -182,13 +174,9 @@ const config: Config = {
             },
           ],
         },
-        {
-          to: 'https://hasura.io/',
-          label: 'Hasura.io',
-          position: 'right',
-        },
       ],
     },
+
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
