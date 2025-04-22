@@ -116,17 +116,6 @@ const config: Config = {
   ],
 
   plugins: [
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'wiki',
-        path: 'wiki',
-        routeBasePath: 'wiki',
-        exclude: ['**/*.wip'],
-        // sidebarPath: './sidebarsCommunity.js',
-        // ... other options
-      },
-    ],
     async function tailwind(context, options) {
       return {
         name: 'docusaurus-tailwindcss',
