@@ -14,8 +14,63 @@
   }
 
   .docItemWrapperEnhanced {
-    max-width: calc(
-      var(--ifm-container-width) + var(--doc-sidebar-width)
-    ) !important;
+    max-width: calc(var(--ifm-container-width) + var(--doc-sidebar-width)) !important;
+  }
+}
+
+.footer {
+  margin-top: 4rem;
+  padding: 2rem 0;
+  border-top: 1px solid var(--ifm-color-emphasis-200);
+}
+
+.footerContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footerLogo img {
+  height: 32px;
+  width: auto;
+}
+
+.footerCopyright {
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.875rem;
+}
+
+.footerSocial {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.footerSocial a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: var(--ifm-color-emphasis-100);
+  transition: background-color 0.2s ease;
+}
+
+.footerSocial a:hover {
+  background-color: var(--ifm-color-emphasis-200);
+}
+
+.footerSocial img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.8;
+}
+
+@media (min-width: 768px) {
+  .footerContent {
+    flex-direction: row;
+    justify-content: space-between;
   }
 }
