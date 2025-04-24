@@ -1,0 +1,64 @@
+---
+sidebar_position: 4
+sidebar_label: Authentication in APIs
+description: ""
+keywords:
+  - hasura ddn
+  - apis
+  - auth
+---
+
+# Authentication in APIs
+
+## Introduction
+
+PromptQL endpoints accept a `ddn` object which contains details like your project's URL and what headers to pass along.
+These endpoints accept all DDN-compatible authentication strategies; learn more about these in our
+[auth docs](/auth/overview.mdx).
+
+## Modes
+
+### Default
+
+```json {10} title="By default, you can use the short-lived x-hasura-ddn-token to make requests against the Execute Program API:"
+{
+  "code": "# Get Saving Private Ryan's details\nsql = \"\"\"\nSELECT series_title, overview, genre, director, imdb_rating, released_year\nFROM app.movies\nWHERE LOWER(series_title) = 'saving private ryan'\n\"\"\"\nmovie = executor.run_sql(sql)\n\nif len(movie) == 0:\n    executor.print(\"Movie not found\")\nelse:\n    movie = movie[0]\n    # Prepare text for classification\n    classification_text = f\"\"\"\nMovie: {movie['series_title']}\nOverview: {movie['overview']}\n\"\"\"",
+  "promptql_api_key": "<YOUR_API_KEY>",
+  "ai_primitives_llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_TOKEN_FROM_THE_PLAYGROUND>"
+    }
+  },
+  "artifacts": []
+}
+```
+
+### JWT & Webhook Mode
+
+```json {10} title="If you're using JWT or Webhook Mode, you'll pass your authentication header:"
+{
+  "code": "# Get Saving Private Ryan's details\nsql = \"\"\"\nSELECT series_title, overview, genre, director, imdb_rating, released_year\nFROM app.movies\nWHERE LOWER(series_title) = 'saving private ryan'\n\"\"\"\nmovie = executor.run_sql(sql)\n\nif len(movie) == 0:\n    executor.print(\"Movie not found\")\nelse:\n    movie = movie[0]\n    # Prepare text for classification\n    classification_text = f\"\"\"\nMovie: {movie['series_title']}\nOverview: {movie['overview']}\n\"\"\"",
+  "promptql_api_key": "<YOUR_API_KEY>",
+  "ai_primitives_llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "authorization": "Bearer <YOUR_TOKEN>"
+    }
+  },
+  "artifacts": []
+}
+```
+
+:::info Authorization Strategies
+
+The example above uses the Bearer strategy for the `tokenLocation`. Your setup may be different; consult our
+[auth docs](/auth/overview.mdx) for more information about setting up an authentication mode.
+
+:::

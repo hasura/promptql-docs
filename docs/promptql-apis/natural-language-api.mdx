@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 sidebar_label: Natural Language API
-description: ""
+description: "Learn how the Natural Language API accepts a request and allows you to chat with your data in realtime."
 keywords:
   - hasura ddn
   - natural language
@@ -11,9 +11,59 @@ toc_max_heading_level: 4
 
 # Natural Language API
 
+## Introduction
+
 The Natural Language Query API allows you to interact with PromptQL directly, sending messages and receiving responses
 with support for streaming. This API is particularly useful for building interactive applications that need to
 communicate with PromptQL in real-time.
+
+```json title="Example request using our quickstart:"
+{
+  "version": "v1",
+  "promptql_api_key": "<YOUR_API_KEY_HERE>",
+  "llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {}
+  },
+  "artifacts": [],
+  "system_instructions": "Responde solo en espanol, por favor",
+  "timezone": "America/Los_Angeles",
+  "interactions": [
+    {
+      "user_message": {
+        "text": "What can you do?"
+      },
+      "assistant_actions": []
+    }
+  ],
+  "stream": false
+}
+```
+
+<details>
+  <summary>
+    Click here to see a sample response ☝️
+  </summary>
+
+```json title="Example response using our quickstart:"
+{
+  "assistant_actions": [
+    {
+      "message": "¡Hola! Soy un asistente que puede ayudarte con varias tareas relacionadas con películas. Específicamente, puedo:\n\n1. Buscar y analizar películas de la base de datos basado en diferentes criterios como:\n   - Título\n   - Director\n   - Año de lanzamiento\n   - Género\n   - Calificación IMDB\n   - Actores\n   - Y más\n\n2. Ayudarte a rentar películas a través del servicio Promptflix\n\n3. Crear análisis y resúmenes personalizados de películas\n\n4. Responder preguntas sobre películas específicas o tendencias generales\n\n¿Hay algo específico sobre películas que te gustaría explorar?",
+      "plan": null,
+      "code": null,
+      "code_output": null,
+      "code_error": null
+    }
+  ],
+  "modified_artifacts": []
+}
+```
+
+</details>
 
 ## Query Endpoint
 
@@ -34,12 +84,12 @@ Content-Type: application/json
 ```json
 {
   "version": "v1",
-  "promptql_api_key": "<promptql api key created from project settings>",
+  "promptql_api_key": "<YOUR_API_KEY_HERE>",
   "llm": {
     "provider": "hasura"
   },
   "ddn": {
-    "url": "<project sql endpoint url>",
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
     "headers": {}
   },
   "artifacts": [],
@@ -120,7 +170,7 @@ You get $20 worth of free credits with Hasura's built-in provider during the tri
 #### Request DDN Auth
 
 The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
-[auth for DDN](/auth/overview.mdx).
+[auth with these APIs](/promptql-apis/auth.mdx).
 
 ### Response
 
@@ -218,7 +268,8 @@ data: {
 3. **Timezone Handling**
 
    - Always provide a timezone to ensure consistent handling of time-based queries
-   - Use standard IANA timezone formats (e.g., "America/Los_Angeles", "Europe/London")
+   - Use standard [IANA timezone formats](https://www.iana.org/time-zones) (e.g., "America/Los_Angeles",
+     "Europe/London")
 
 4. **Error Handling**
    - Always check for error responses, especially in streaming mode
