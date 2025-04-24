@@ -13,10 +13,89 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 # Execute Program API
 
-The PromptQL agent creates PromptQL programs that work on your data. Usually, these programs are created and invoked by
-interacting within the PromptQL playground.
+## Introduction
 
-However, you can also use an API to run these programs dynamically.
+Under the hood, PromptQL utilizes a set of built-in primitives, in conjunction with any
+[custom business logic](/business-logic/overview.mdx) you've provided, to create small programs on top of your data.
+
+These primitives pair relevant data or artifacts—represented as `inputs` or `data`—from your application with on-the-fly
+and context-aware `instructions` based on the thread between the user and PromptQL.
+
+### Summarize
+
+```python title="Example:"
+summaries = executor.summarize(
+    instructions="""
+    Create a concise summary of each reservation focusing on:
+    - The restaurant name
+    - Any special notes or important details
+    Keep each summary to 1-2 sentences.
+    """,
+    inputs=reservation_texts
+)
+```
+
+### Extract
+
+```python title="Example:"
+extracted_info = executor.extract(
+        json_schema=json_schema,
+        instructions="""
+        Extract any mentioned dietary requirements, special occasions, or seating preferences from the reservation notes.
+        For dietary requirements, include any allergies, restrictions, or preferences mentioned.
+        For special occasions, look for mentions of birthdays, anniversaries, celebrations etc.
+        For seating preferences, identify if they specifically requested indoor, outdoor, bar seating etc.
+        If any field is not mentioned, omit it from the output.
+        """,
+        inputs=notes_to_extract
+    )
+```
+
+### Classify
+
+```python title="Example:"
+classifications = executor.classify(
+    instructions="""
+    Categorize each restaurant based on its name and any available description.
+    A restaurant can belong to multiple categories.
+    Consider both the dining style (Fine Dining, Casual) and cuisine type.
+    Examples:
+    - A high-end Italian restaurant would be both "Fine Dining" and "Italian"
+    - A casual American pub would be both "Casual Dining" and "American"
+    """,
+    categories=categories,
+    allow_multiple=True,
+    inputs=unique_restaurants
+)
+```
+
+### Visualize
+
+```python title="Example:"
+viz_result = executor.visualize(
+    instructions="""
+    Create an interactive bar chart showing the distribution of restaurant categories.
+    Requirements:
+    - Use a horizontal bar chart for better readability of category names
+    - Sort bars by count in descending order
+    - Use a pleasant color scheme (preferably blues or teals)
+    - Include hover tooltips showing exact count
+    - Add a clear title 'Restaurant Categories Distribution'
+    - Make the chart responsive to container width
+    - Include total number of restaurants in each category
+    """,
+    data=viz_data
+)
+```
+
+:::info Think of this as a toolbox
+
+Each primitive is a specialized tool designed to perform a specific task on your data. They're flexible, composable, and
+context-aware, letting you build intelligent workflows by combining natural language instructions with structured input.
+
+As you add your own custom business logic, you're providing more specific tools to PromptQL.
+
+:::
 
 ## Execute Program Endpoint
 
