@@ -1,0 +1,15 @@
+.llm-button {
+  background: var(--ifm-color-primary);
+  border: solid 1px var(--ifm-color-primary);
+  padding: 8px 12px;
+  border-radius: 4px;
+  color: var(--primary-dark);
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+
+  white-space: nowrap;
+  transition: all 0.3s ease;
+  width: auto;
+  text-align: center;
+}
