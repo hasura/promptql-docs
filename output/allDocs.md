@@ -1607,132 +1607,6 @@ You can learn more about models in the metadata reference [docs](/reference/meta
 
 
 
-# command.mdx
-
-
-
-# Commands Enable PromptQL to Modify Data
-
-## Introduction
-
-Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
-query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
-updates, deletes), executing complex operations, or implementing custom business logic across your connected data
-sources.
-
-When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
-incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
-action taken.
-
-## Lifecycle
-
-When setting up commands for use with PromptQL, follow this lifecycle:
-
-1. Have some operation in your data source that you want to make executable via PromptQL.
-2. Introspect your data source using the DDN CLI with the relevant data connector to fetch the operation resources.
-3. Add the command to your metadata with the DDN CLI.
-4. Create a build of your supergraph API with the DDN CLI.
-5. Serve your build as your API with the Hasura engine either locally or in the cloud.
-6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
-
-<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
-
-## Create a command
-
-To add a command you will need to have a data connector already set up and connected to the data source. Follow the
-[Quickstart](/quickstart.mdx) or the tutorial in [How to Build with DDN](/how-to-build-with-promptql/overview.mdx) to
-get to that point.
-
-### From a source operation
-
-Some data connectors support the ability to introspect your data source to discover the commands that can be added to
-your supergraph automatically.
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Show the resources discovered from your data source:"
-ddn connector show-resources <connector_name>
-```
-
-```ddn title="Add the command from the discovered resources to your metadata:"
-ddn command add <connector_link_name> <operation_name>
-```
-
-Or you can optionally add all the commands by specifying `"*"`.
-
-```ddn title="Add all commands from your data source:"
-ddn command add <connector_link_name> "*"
-```
-
-This will add commands with their accompanying metadata definitions to your metadata.
-
-### Via native operations {#via-native-operations-how-to}
-
-Some data connectors support the ability to add commands via native operations so that you can add any operation that is
-not supported by the automatic introspection process.
-
-For classic database connectors, this will be native query code for that source. This can be, for example, a more
-complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
-
-For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
-other side-effects) that PromptQL can use to execute specialized operations on your data.
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandCreateLambdaTypescriptNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandCreateLambdaPythonNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandCreateLambdaGoNativeOperationHowTo />
-  </TabItem>
-</Tabs>
-
-Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
-enabling accurate data modifications and complex operations through natural language interactions.
-
-## Update a command
-
-When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
-accuracy in its operations:
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Then, update your existing command:"
-ddn command update <connector_link_name> <command_name>
-```
-
-You will see an output which explains how new resources were added or updated in the command.
-
-After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
-interactions with their data remain accurate and up-to-date.
-
-You can also update the command by editing the command's metadata manually.
-
-## Delete a command
-
-```ddn title="If you no longer need a command, you can delete it:"
-ddn command remove <command_name>
-```
-
-Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
-in its query planning.
-
-## Reference
-
-You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
-
-
-
-==============================
-
-
-
 # relationship.mdx
 
 
@@ -1893,6 +1767,132 @@ self-contained.
 
 You can learn more about relationships in the metadata reference
 [docs](/reference/metadata-reference/relationships.mdx).
+
+
+
+==============================
+
+
+
+# command.mdx
+
+
+
+# Commands Enable PromptQL to Modify Data
+
+## Introduction
+
+Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
+query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
+updates, deletes), executing complex operations, or implementing custom business logic across your connected data
+sources.
+
+When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
+incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
+action taken.
+
+## Lifecycle
+
+When setting up commands for use with PromptQL, follow this lifecycle:
+
+1. Have some operation in your data source that you want to make executable via PromptQL.
+2. Introspect your data source using the DDN CLI with the relevant data connector to fetch the operation resources.
+3. Add the command to your metadata with the DDN CLI.
+4. Create a build of your supergraph API with the DDN CLI.
+5. Serve your build as your API with the Hasura engine either locally or in the cloud.
+6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
+
+<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
+
+## Create a command
+
+To add a command you will need to have a data connector already set up and connected to the data source. Follow the
+[Quickstart](/quickstart.mdx) or the tutorial in [How to Build with DDN](/how-to-build-with-promptql/overview.mdx) to
+get to that point.
+
+### From a source operation
+
+Some data connectors support the ability to introspect your data source to discover the commands that can be added to
+your supergraph automatically.
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Show the resources discovered from your data source:"
+ddn connector show-resources <connector_name>
+```
+
+```ddn title="Add the command from the discovered resources to your metadata:"
+ddn command add <connector_link_name> <operation_name>
+```
+
+Or you can optionally add all the commands by specifying `"*"`.
+
+```ddn title="Add all commands from your data source:"
+ddn command add <connector_link_name> "*"
+```
+
+This will add commands with their accompanying metadata definitions to your metadata.
+
+### Via native operations {#via-native-operations-how-to}
+
+Some data connectors support the ability to add commands via native operations so that you can add any operation that is
+not supported by the automatic introspection process.
+
+For classic database connectors, this will be native query code for that source. This can be, for example, a more
+complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
+
+For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
+other side-effects) that PromptQL can use to execute specialized operations on your data.
+
+<Tabs groupId="source-preference" className="api-tabs">
+  <TabItem value="TypeScript" label="Node.js TypeScript">
+    <CommandCreateLambdaTypescriptNativeOperationHowTo />
+  </TabItem>
+  <TabItem value="Python" label="Python">
+    <CommandCreateLambdaPythonNativeOperationHowTo />
+  </TabItem>
+  <TabItem value="Go" label="Go">
+    <CommandCreateLambdaGoNativeOperationHowTo />
+  </TabItem>
+</Tabs>
+
+Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
+enabling accurate data modifications and complex operations through natural language interactions.
+
+## Update a command
+
+When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
+accuracy in its operations:
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Then, update your existing command:"
+ddn command update <connector_link_name> <command_name>
+```
+
+You will see an output which explains how new resources were added or updated in the command.
+
+After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
+interactions with their data remain accurate and up-to-date.
+
+You can also update the command by editing the command's metadata manually.
+
+## Delete a command
+
+```ddn title="If you no longer need a command, you can delete it:"
+ddn command remove <command_name>
+```
+
+Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
+in its query planning.
+
+## Reference
+
+You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
 
 
 
@@ -3564,6 +3564,45 @@ improvements can be made to enhance accuracy.
 
 
 
+# playground-auth.mdx
+
+
+# PromptQL Playground Auth
+
+You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
+of the chat dialogue.
+
+<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
+
+## Configure headers
+
+<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
+
+In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
+engine for each request.
+
+You can also add custom headers to the request by clicking the `+` button.
+
+:::info Reserved headers
+
+The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
+passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
+
+:::
+
+## Authorization
+
+The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
+variables if there are any set.
+
+<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
+
+
+
+==============================
+
+
+
 # Authentication and Authorization Overview
 
 # Auth
@@ -3611,45 +3650,6 @@ webhook must return a valid `http` response with session variables in the body.
 No authentication is required for a specific role to access the data.
 
 [Read more](/auth/noauth-mode.mdx).
-
-
-
-==============================
-
-
-
-# playground-auth.mdx
-
-
-# PromptQL Playground Auth
-
-You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
-of the chat dialogue.
-
-<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
-
-## Configure headers
-
-<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
-
-In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
-engine for each request.
-
-You can also add custom headers to the request by clicking the `+` button.
-
-:::info Reserved headers
-
-The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
-passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
-
-:::
-
-## Authorization
-
-The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
-variables if there are any set.
-
-<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
 
 
 
@@ -8436,6 +8436,107 @@ subgraph can be added to an existing or private team repository. Learn more
 
 
 
+# remove-subgraph.mdx
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
+
+
+
+==============================
+
+
+
 # work-with-multiple-repositories.mdx
 
 # Work with Multiple Repositories
@@ -8846,107 +8947,6 @@ By organizing your project into multiple repositories, you can create a flexible
 development in Hasura. Starting with a parent project, you learned how to provision subgraphs, invite collaborators, and
 manage builds to integrate subgraph changes into a unified supergraph. This structure ensures teams can work
 independently while maintaining seamless integration and coordination across the entire application.
-
-
-
-==============================
-
-
-
-# remove-subgraph.mdx
-
-# Remove a subgraph
-
-## Introduction
-
-In this recipe, you'll learn how to remove a subgraph from your local project directory.
-
-:::info Prerequisites
-
-Before continuing, ensure you have:
-
-- A [local Hasura project](/quickstart.mdx).
-- Stopped any running docker services related to the project.
-
-:::
-
-## Recipe
-
-### Step 1. Delete subgraph directory
-
-Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
-directory is typically located at `<subgraph-name>`.
-
-### Step 2. Update supergraph config files
-
-Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
-
-```yaml title="supergraph.yaml"
-kind: Supergraph
-version: v2
-definition:
-  subgraphs:
-    - globals/subgraph.yaml
-    #highlight-start
-    - <subgraph-name>/subgraph.yaml
-    #highlight-end
-    ...
-```
-
-### Step 3. Update engine compose file
-
-Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
-compose file is typically located at `<project-root>/compose.yaml`.
-
-```yaml title="<project-root>/compose.yaml"
-include:
-  #highlight-start
-  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
-  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
-  #highlight-end
-  ...
-services:
-  engine: ...
-```
-
-### Step 4. Remove subgraph config file from context
-
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
-the `subgraph` key if set as the deleted subgraph config file.
-
-```yaml title=".hasura/context.yaml"
-kind: Context
-version: v3
-definition:
-  current: default
-  contexts:
-    default:
-      supergraph: ../supergraph.yaml
-      #highlight-start
-      subgraph: ../<subgraph-name>/subgraph.yaml
-      #highlight-end
-      ...
-```
-
-### Step 5. (Optional) Remove subgraph relevant environment variables
-
-You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
-CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
-
-```.env title="For example, .env"
-...
-#highlight-start
-<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
-#highlight-end
-...
-```
-
-## Learn more
-
-- [Project configuration](/project-configuration/overview.mdx)
 
 
 
@@ -10738,6 +10738,73 @@ detailed steps depending on your specific connector.
 
 
 
+# deploy-to-ddn.mdx
+
+# Deploying your project to Hasura DDN
+
+Deploying your project to Hasura DDN is a simple process and can be done in two steps.
+
+## Deployment flow
+
+1. Create a supergraph build on Hasura DDN.
+2. Apply the supergraph build to your project on Hasura DDN.
+
+To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
+information on how to get started.
+
+:::info Hasura DDN Cloud projects
+
+When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
+that's paired with your local project.
+
+:::
+
+### Step 1. Create a supergraph build on Hasura DDN
+
+```ddn title="The following will use the project name in your .hasura/context.yaml file:"
+ddn supergraph build create
+```
+
+This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
+independently but this command will create them all.
+
+The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
+the build on the console.
+
+You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
+command.
+
+The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
+applied at a time as the "official" API.
+
+### Step 2. Apply the build
+
+```ddn
+# E.g., ddn supergraph build apply 85b0961544
+ddn supergraph build apply <build-version>
+```
+
+This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
+command, via the console, or any client accessing via the API URL.
+
+:::tip Simplify your deployment
+
+For a more efficient deployment process, you can create and apply the supergraph build in a single command using
+`ddn supergraph build create --apply`
+
+:::
+
+## Summary
+
+There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
+the simplest and most common flow here.
+
+
+
+==============================
+
+
+
 # incremental-builds.mdx
 
 # Deploying Incrementally
@@ -10870,73 +10937,6 @@ ddn subgraph build apply <build-version>
 
 You have full control over the composition of your supergraph and can build and deploy subgraphs and connectors
 incrementally and independently to compose your supergraph.
-
-
-
-==============================
-
-
-
-# deploy-to-ddn.mdx
-
-# Deploying your project to Hasura DDN
-
-Deploying your project to Hasura DDN is a simple process and can be done in two steps.
-
-## Deployment flow
-
-1. Create a supergraph build on Hasura DDN.
-2. Apply the supergraph build to your project on Hasura DDN.
-
-To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
-information on how to get started.
-
-:::info Hasura DDN Cloud projects
-
-When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
-that's paired with your local project.
-
-:::
-
-### Step 1. Create a supergraph build on Hasura DDN
-
-```ddn title="The following will use the project name in your .hasura/context.yaml file:"
-ddn supergraph build create
-```
-
-This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
-independently but this command will create them all.
-
-The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
-the build on the console.
-
-You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
-command.
-
-The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
-applied at a time as the "official" API.
-
-### Step 2. Apply the build
-
-```ddn
-# E.g., ddn supergraph build apply 85b0961544
-ddn supergraph build apply <build-version>
-```
-
-This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
-command, via the console, or any client accessing via the API URL.
-
-:::tip Simplify your deployment
-
-For a more efficient deployment process, you can create and apply the supergraph build in a single command using
-`ddn supergraph build create --apply`
-
-:::
-
-## Summary
-
-There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
-the simplest and most common flow here.
 
 
 
@@ -19564,6 +19564,69 @@ Try using the DDN CLI with auto-completion by typing part of a command and press
 
 
 
+# ddn.mdx
+
+# DDN CLI: ddn
+
+DDN Command Line Interface.
+
+## Synopsis
+
+```
+
+       
+
+DDDDDDD\   DDDDDDD\   NN\   NN\ 
+DD  __DD\  DD  __DD\  NNN\  NN |
+DD |  DD | DD |  DD | NNNN\ NN |
+DD |  DD | DD |  DD | NN NN\NN |
+DD |  DD | DD |  DD | NN \NNNN |
+DD |  DD | DD |  DD | NN |\NNN |
+DDDDDDD  | DDDDDDD  | NN | \NN |
+\_______/  \_______/  \__|  \__|
+
+
+
+```
+
+```bash
+ddn [flags]
+```
+
+## Available operations
+
+- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
+- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
+- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
+- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
+- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
+- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
+- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
+- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
+- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
+- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
+- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
+- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
+- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
+- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
+- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
+
+## Options
+
+```sass
+-h, --help               help for ddn
+    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+    --no-prompt          Do not prompt for required but missing flags
+    --out string         Output format. Can be table, json or yaml. (default "table")
+    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+
+
+==============================
+
+
+
 # index.mdx
 
 # DDN CLI: Commands
@@ -19649,69 +19712,6 @@ Flags:
 
 Use "ddn [command] --help" for more information about a command.
 
-```
-
-
-
-==============================
-
-
-
-# ddn.mdx
-
-# DDN CLI: ddn
-
-DDN Command Line Interface.
-
-## Synopsis
-
-```
-
-       
-
-DDDDDDD\   DDDDDDD\   NN\   NN\ 
-DD  __DD\  DD  __DD\  NNN\  NN |
-DD |  DD | DD |  DD | NNNN\ NN |
-DD |  DD | DD |  DD | NN NN\NN |
-DD |  DD | DD |  DD | NN \NNNN |
-DD |  DD | DD |  DD | NN |\NNN |
-DDDDDDD  | DDDDDDD  | NN | \NN |
-\_______/  \_______/  \__|  \__|
-
-
-
-```
-
-```bash
-ddn [flags]
-```
-
-## Available operations
-
-- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
-- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
-- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
-- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
-- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
-- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
-- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
-- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
-- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
-- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
-- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
-- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
-- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
-- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
-- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
-
-## Options
-
-```sass
--h, --help               help for ddn
-    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
-    --no-prompt          Do not prompt for required but missing flags
-    --out string         Output format. Can be table, json or yaml. (default "table")
-    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
 ```
 
 
@@ -24281,6 +24281,60 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 
 
+# ddn_update-cli.mdx
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+
+
+
+==============================
+
+
+
 # ddn_subgraph_delete.mdx
 
 # DDN CLI: ddn subgraph delete
@@ -24329,60 +24383,6 @@ ddn subgraph delete <subgraph-name> [flags]
 ## Parent operation
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
-
-
-
-==============================
-
-
-
-# ddn_update-cli.mdx
-
-# DDN CLI: ddn update-cli
-
-Update this CLI to the latest version or to a specific version.
-
-## Synopsis
-
-You can use this command to update the CLI to the latest version or a specific version.
-
-```bash
-ddn update-cli [flags]
-```
-
-## Examples
-
-```bash
-# Update CLI to latest version:
- ddn update-cli
-
-# Update CLI to a specific version (say v1.0.0):
- ddn update-cli --version v1.0.0
-
-# To disable the auto-update check on the CLI, set
-# "show_update_notification": false
-# in ~/.ddn/config.yaml
-```
-
-## Options
-
-```sass
--h, --help             help for update-cli
-    --version string   A specific version to install
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
 
 
@@ -24579,6 +24579,63 @@ ddn completion [command] [flags]
 
 
 
+# ddn_completion_bash.mdx
+
+# DDN CLI: ddn completion
+
+Generate autocompletion scripts for the DDN CLI for the bash shell.
+
+## Synopsis
+
+Generate the autocompletion script for DDN for the bash shell.
+
+To load completions in your current shell session:
+
+```sass
+        source <(ddn completion bash)
+```
+
+To load completions for every new session, execute once:
+
+#### Linux:
+
+```sass
+        ddn completion bash > /etc/bash_completion.d/ddn
+```
+
+#### macOS:
+
+```sass
+        ddn completion bash > $(brew --prefix)/etc/bash_completion.d/ddn
+```
+
+You will need to start a new shell for this setup to take effect.
+
+## Options
+
+```sass
+-h, --help   help for bash completion
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
+
+
+
+==============================
+
+
+
 # ddn_supergraph_build_apply.mdx
 
 # DDN CLI: ddn supergraph build apply
@@ -24630,34 +24687,26 @@ ddn supergraph build apply <supergraph-build-version> [flags]
 
 
 
-# ddn_completion_bash.mdx
+# ddn_completion_fish.mdx
 
 # DDN CLI: ddn completion
 
-Generate autocompletion scripts for the DDN CLI for the bash shell.
+Generate autocompletion scripts for the DDN CLI for the fish shell.
 
 ## Synopsis
 
-Generate the autocompletion script for DDN for the bash shell.
+Generate the autocompletion script for DDN for the fish shell.
 
 To load completions in your current shell session:
 
 ```sass
-        source <(ddn completion bash)
+        ddn completion fish | source
 ```
 
 To load completions for every new session, execute once:
 
-#### Linux:
-
 ```sass
-        ddn completion bash > /etc/bash_completion.d/ddn
-```
-
-#### macOS:
-
-```sass
-        ddn completion bash > $(brew --prefix)/etc/bash_completion.d/ddn
+        ddn completion fish > ~/.config/fish/completions/ddn.fish
 ```
 
 You will need to start a new shell for this setup to take effect.
@@ -24665,7 +24714,7 @@ You will need to start a new shell for this setup to take effect.
 ## Options
 
 ```sass
--h, --help   help for bash completion
+-h, --help   help for fish completion
 ```
 
 ## Options inherited from parent operations
@@ -24758,55 +24807,6 @@ ddn supergraph build create [flags]
 ## Parent operation
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
-
-
-
-==============================
-
-
-
-# ddn_completion_fish.mdx
-
-# DDN CLI: ddn completion
-
-Generate autocompletion scripts for the DDN CLI for the fish shell.
-
-## Synopsis
-
-Generate the autocompletion script for DDN for the fish shell.
-
-To load completions in your current shell session:
-
-```sass
-        ddn completion fish | source
-```
-
-To load completions for every new session, execute once:
-
-```sass
-        ddn completion fish > ~/.config/fish/completions/ddn.fish
-```
-
-You will need to start a new shell for this setup to take effect.
-
-## Options
-
-```sass
--h, --help   help for fish completion
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
 
 
