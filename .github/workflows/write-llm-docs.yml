@@ -1,12 +1,13 @@
 name: Update LLM Docs
 
 on:
-  pull_request_target:
-    types: [closed]
+  push:
+    branches:
+      - robdominguez/doc-2696-evaluate-the-idea-of-a-one-click-copy-to-llm-button
 
 jobs:
   update-and-commit:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    # if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
 
     permissions:
