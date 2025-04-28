@@ -1,0 +1,66 @@
+---
+sidebar_position: 3
+sidebar_label: System Instructions
+description: Learn how to configure your PromptQL application via metadata.
+keywords:
+  - hasura
+  - hasura ddn
+  - project
+  - promptql-config
+  - config
+toc_max_heading_level: 4
+---
+
+# System Instructions
+
+## Introduction
+
+Custom system instructions provide flexibility to fine-tune your PromptQL experience. This optional configuration allows
+you to tailor the application's behavior to your specific needs. They act as a guide for the model, shaping how it
+interprets questions and crafts responses.
+
+**While powerful, use this feature judiciously to maintain optimal performance.**
+
+```yaml title="Consider this example where we set the system instructions using the PromptQlConfig file:"
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: hasura
+  system_instructions: |
+
+    You are an AI assistant that helps go-to-market teams make data-driven decisions.
+
+    You have access to data from Salesforce (opportunities, accounts, leads), Clari (forecast categories, pipeline movement), and Postgres (custom product and revenue data). 
+
+    Use this data to answer questions about sales performance, forecast accuracy, pipeline health, rep activity, and account trends. Prioritize clarity, brevity, and business relevance in your answers.
+
+    If a question is ambiguous, ask for clarification.
+```
+
+:::info Configuring system instructions on cloud builds
+
+The steps above will set the system instructions for projects during local development. To set the system instructions
+for cloud deployments, navigate to your `Settings » PromptQL` and update the `System Instructions` field.
+
+:::
+
+## Best practices
+
+When writing system instructions, your goal is to **narrow the model's focus** and **reduce ambiguity**. Here are some
+guidelines.
+
+- **Be clear and concise:** The model performs better when instructions are direct and avoid unnecessary complexity.
+- **Define the role and audience:** Tell the model who it is (e.g., a sales analyst, a support bot) and who it is
+  helping.
+- **Specify sources of knowledge:** Mention any data sources, systems, or domains the model should rely on when
+  answering.
+- **Encourage appropriate behavior:** Highlight priorities like brevity, clarity, formality, creativity, or
+  error-handling.
+- **Provide code patterns or examples:** You can include sample Python functions, formulas, or logic patterns to guide
+  how the model generates its own code. These are not backend functions to call, but templates for the LLM to adapt and
+  build from.
+- **Anticipate ambiguity:** If the model might face unclear inputs, instruct it on when and how to ask for
+  clarification.
+- **Set limits if needed:** If certain topics, behaviors, or types of output should be avoided, explicitly mention them.
+- **Test and iterate:** Start simple, evaluate outputs, and refine your instructions based on observed model behavior.

@@ -1,0 +1,73 @@
+---
+sidebar_position: 2
+sidebar_label: Providers & Models
+description: Learn how to configure your LLM provider and model of choice.
+keywords:
+  - hasura
+  - hasura ddn
+  - project
+  - promptql-config
+  - llm
+  - provider
+  - model
+toc_max_heading_level: 4
+---
+
+# Providers & Models
+
+## Introduction
+
+PromptQL supports configuring different LLM providers and models to tailor the experience to your application's needs.
+
+This gives you the flexibility to choose the most performance-efficient and cost-effective solution for your use case,
+and the freedom to switch between providers and models as needed depending the task.
+
+For example, you can use one model for conversational tasks and another for advanced AI primitives:
+
+```yaml {5-6,8-9}
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+```
+
+### `llm`
+
+The `llm` configuration is used to define the LLM provider and model for **conversational tasks** in your application.
+In the example above, we're using `openai` as the provider with the `o3-mini` model.
+
+### `ai_primitives_llm`
+
+The `ai_primitives_llm` configuration is used to define the LLM provider and model for
+[**AI primitives** in your application](/promptql-apis/execute-program-api.mdx). This is used for tasks such as
+**program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
+model.
+
+## Available providers and models
+
+Here are the currently supported providers and their available models:
+
+| Provider    | Supported Models                |
+| ----------- | ------------------------------- |
+| `hasura`    | N/A _(uses default internally)_ |
+| `openai`    | `o1`, `o3-mini`, `gpt-4o`       |
+| `anthropic` | `claude-3-5-sonnet-latest`      |
+
+:::info Base Model
+
+When using the `hasura` provider, the default model is `claude-3-5-sonnet-latest`. This is the recommended model for
+PromptQL program generation.
+
+:::
+
+## Considerations
+
+- The `model` key is **not supported** when using the `hasura` provider.
+- If `ai_primitives_llm` is not defined, it defaults to the provider specified in the `llm` configuration.
+- [`system_instructions` are optional](/project-configuration/promptql-config/system-instructions.mdx) but recommended
+  to customize the behavior of your LLM.
