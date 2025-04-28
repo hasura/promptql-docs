@@ -1,0 +1,83 @@
+name: Weekly Changelog to Slack
+
+on:
+  workflow_dispatch:
+
+jobs:
+  changelog-to-slack:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Generate Git Log
+        id: get_gitlog
+        run: |
+          git fetch --prune
+          git log --pretty=format:'%h %s%n  %an, %ar%n%n%b' --graph --since='1 week ago' --stat > gitlog.txt
+
+      - name: Summarize Git Log with OpenAI
+        id: summarize
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          PROMPT="(insert the updated prompt text here exactly)"
+
+          GIT_LOG=$(cat gitlog.txt)
+
+          RESPONSE=$(curl https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d '{
+              "model": "gpt-4o",
+              "messages": [
+                {
+                  "role": "system",
+                  "content": "You are a professional changelog summarizer for an engineering team."
+                },
+                {
+                  "role": "user",
+                  "content": "'"$PROMPT"'\n\nGit log:\n\n'"$GIT_LOG"'"
+                }
+              ],
+              "temperature": 0.3
+            }' | jq '.choices[0].message.content' | jq -r)
+
+          # Save it to GITHUB_OUTPUT
+          echo "response<<EOF" >> $GITHUB_OUTPUT
+          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Send Changelog to Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "📢 Docs Changelog",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
