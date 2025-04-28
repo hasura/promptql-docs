@@ -1,6 +1,8 @@
 name: Weekly Changelog to Slack
 
 on:
+  schedule:
+    - cron: '0 15 * * 1'
   workflow_dispatch:
 
 jobs:
@@ -22,62 +24,95 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          PROMPT="(insert the updated prompt text here exactly)"
-
           GIT_LOG=$(cat gitlog.txt)
 
-          RESPONSE=$(curl https://api.openai.com/v1/chat/completions \
+          PROMPT="You are a professional changelog summarizer for a documentation engineering team.
+          You are writing a weekly changelog for the field team based on a list of git commits to the docs repo.
+
+          Instructions:
+
+          - Start with a one-paragraph TL;DR summarizing overall changes.
+          - Then list the most important changes clearly as bullet points.
+          - Group minor changes together where appropriate.
+          - If a commit references a PR number it's imperative to include it (e.g., (#123)) and format the link as <https://github.com/hasura/promptql-docs/pull/123|#123>.
+          - If there is no PR number, use the commit hash instead (e.g., (<https://github.com/hasura/promptql-docs/commit/abc123|abc123>)).
+
+          **Output format: Strict JSON**
+
+          {
+            \"tldr\": \"One paragraph summarizing the week's changes starting with a friendly greeting for the field teams.\",
+            \"highlights\": [
+              \"First important change (<https://github.com/hasura/promptql-docs/pull/123|#123>)\",
+              \"Second important change (<https://github.com/hasura/promptql-docs/pull/456|#456>)\"
+            ]
+          }
+
+          **Tone:**  
+          Clear, professional, and friendly. Ignore internal-only build/dependency updates if possible. Bullet points should be tight and action-focused.
+
+          **Important:**  
+          Only return valid JSON. No extra commentary.
+
+          Input: (git log will be provided)"
+
+          # Create a properly escaped JSON payload for curl
+          JSON_PAYLOAD=$(cat <<EOF
+          {
+            "model": "gpt-4o",
+            "messages": [
+              {
+                "role": "system",
+                "content": "You are a professional changelog summarizer for an engineering team."
+              },
+              {
+                "role": "user",
+                "content": "$PROMPT\n\nGit log:\n\n$GIT_LOG"
+              }
+            ],
+            "response_format": { "type": "json_object" }
+          }
+          EOF
+          )
+
+          # Fix any escaped quotes and newlines in the JSON payload 
+          JSON_PAYLOAD=$(echo "$JSON_PAYLOAD" | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+
+          # Make the API call
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
-            -d '{
-              "model": "gpt-4o",
-              "messages": [
-                {
-                  "role": "system",
-                  "content": "You are a professional changelog summarizer for an engineering team."
-                },
-                {
-                  "role": "user",
-                  "content": "'"$PROMPT"'\n\nGit log:\n\n'"$GIT_LOG"'"
-                }
-              ],
-              "temperature": 0.3
-            }' | jq '.choices[0].message.content' | jq -r)
+            -d "{\"model\":\"gpt-4o\",\"messages\":[{\"role\":\"system\",\"content\":\"You are a professional changelog summarizer for an engineering team.\"},{\"role\":\"user\",\"content\":\"$JSON_PAYLOAD\"}],\"response_format\":{\"type\":\"json_object\"}}")
 
-          # Save it to GITHUB_OUTPUT
+          # Extract the content from the response
+          CONTENT=$(echo $RESPONSE | jq -r '.choices[0].message.content')
+
+          # Debug output
+          echo "API Response: $RESPONSE"
+          echo "Extracted content: $CONTENT"
+
+          # Set the output
           echo "response<<EOF" >> $GITHUB_OUTPUT
-          echo "$RESPONSE" >> $GITHUB_OUTPUT
+          echo "$CONTENT" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
       - name: Send Changelog to Slack
-        uses: slackapi/slack-github-action@v1.24.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
-            {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "📢 Docs Changelog",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            text: "📢 Docs Changelog"
+            blocks:
+              - type: "header"
+                text:
+                  type: "plain_text"
+                  text: "📢 Docs Changelog"
+                  emoji: true
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "<!subteam^S08LLNF1S3F>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
+              - type: "section"
+                text:
+                  type: "mrkdwn"
+                  text: "• ${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
