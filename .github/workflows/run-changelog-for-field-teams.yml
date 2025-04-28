@@ -22,7 +22,32 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          PROMPT="(insert the updated prompt text here exactly)"
+          PROMPT="You are a professional changelog summarizer for an engineering team.
+          You are writing a weekly changelog for the field team based on a list of git commits.
+
+          Instructions:
+
+          - Start with a one-paragraph TL;DR summarizing overall changes.
+          - Then list the most important changes clearly as bullet points.
+          - Group minor changes together where appropriate.
+          - If a commit references a PR number (e.g., (#123)), format the link as <https://github.com/hasura/promptql-docs/pull/123|#123>.
+
+          **Output format: Strict JSON**
+
+          {
+            "tldr": "One paragraph summarizing the week's changes.",
+            "highlights": [
+              "First important change",
+              "Second important change",
+              ...
+            ]
+          }
+
+          **Tone:**  
+          Clear, professional, and friendly. Ignore internal-only build/dependency updates if possible. Bullet points should be tight and action-focused.
+
+          **Important:**  
+          Only return valid JSON. No extra commentary."
 
           GIT_LOG=$(cat gitlog.txt)
 
@@ -41,43 +66,44 @@ jobs:
                   "content": "'"$PROMPT"'\n\nGit log:\n\n'"$GIT_LOG"'"
                 }
               ],
-              "temperature": 0.3
-            }' | jq '.choices[0].message.content' | jq -r)
+              "response_format": "json"
+            }'
 
           # Save it to GITHUB_OUTPUT
+          echo response
           echo "response<<EOF" >> $GITHUB_OUTPUT
           echo "$RESPONSE" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
-      - name: Send Changelog to Slack
-        uses: slackapi/slack-github-action@v1.24.0
-        with:
-          payload: |
-            {
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "📢 Docs Changelog",
-                    "emoji": true
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
-                  }
-                }
-              ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      # - name: Send Changelog to Slack
+      #   uses: slackapi/slack-github-action@v1.24.0
+      #   with:
+      #     payload: |
+      #       {
+      #         "blocks": [
+      #           {
+      #             "type": "header",
+      #             "text": {
+      #               "type": "plain_text",
+      #               "text": "📢 Docs Changelog",
+      #               "emoji": true
+      #             }
+      #           },
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
+      #             }
+      #           },
+      #           {
+      #             "type": "section",
+      #             "text": {
+      #               "type": "mrkdwn",
+      #               "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
+      #             }
+      #           }
+      #         ]
+      #       }
+      #   env:
+      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
