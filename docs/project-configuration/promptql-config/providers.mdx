@@ -48,15 +48,52 @@ The `ai_primitives_llm` configuration is used to define the LLM provider and mod
 **program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
 model.
 
-## Available providers and models
+## Available providers & models
 
-Here are the currently supported providers and their available models:
+### Anthropic
 
-| Provider    | Supported Models                |
-| ----------- | ------------------------------- |
-| `hasura`    | N/A _(uses default internally)_ |
-| `openai`    | `o1`, `o3-mini`, `gpt-4o`       |
-| `anthropic` | `claude-3-5-sonnet-latest`      |
+You can use any [Anthropic model](https://docs.anthropic.com/en/docs/about-claude/models/all-models); the following have
+been tested with PromptQL:
+
+- `claude-3-5-sonnet-latest`
+- `claude-3-7-sonnet-latest`
+
+### AWS Bedrock
+
+You can use any [Bedrock-wrapped model](https://aws.amazon.com/bedrock/); the following have been tested with PromptQL:
+
+- Claude 3.5 Sonnet
+- Claude 3.7 Sonnet
+
+**NB: For Bedrock models, you'll need to provide a `model_id` that resembles this string:**
+
+```
+arn:aws:bedrock:<AWS region>:<AWS account ID>:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0
+```
+
+### Google Gemini
+
+You can use any [Google Gemini model](https://ai.google.dev/gemini-api/docs/models); the following have been tested with
+PromptQL:
+
+- `gemini-1.5-flash`
+- `gemini-2.0-flash`
+
+### Hasura
+
+With Hasura—used as the default provider—there is **no specific model necessary** in your configuration.
+
+### Microsoft Azure
+
+You can use any [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models).
+
+### OpenAI
+
+You can use any [OpenAI model](https://platform.openai.com/docs/models); the following have been tested with PromptQL:
+
+- `o1`
+- `o3-mini`
+- `gpt-4o`
 
 :::info Base Model
 
