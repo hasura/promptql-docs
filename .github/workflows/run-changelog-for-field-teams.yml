@@ -71,7 +71,7 @@ jobs:
                     }
                   ],
                   "response_format": "json"
-                }' | jq -r '.choices[0].message.content')
+                }' | jq -c '.choices[0].message.content')
 
               echo $RESPONSE
               echo "response<<EOF" >> $GITHUB_OUTPUT
