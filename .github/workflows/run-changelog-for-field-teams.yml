@@ -73,39 +73,40 @@ jobs:
                   "response_format": "json"
                 }' | jq -r '.choices[0].message.content')
 
+              echo $RESPONSE
               echo "response<<EOF" >> $GITHUB_OUTPUT
               echo "$RESPONSE" >> $GITHUB_OUTPUT
               echo "EOF" >> $GITHUB_OUTPUT
 
-      # - name: Send Changelog to Slack
-      #   uses: slackapi/slack-github-action@v1.24.0
-      #   with:
-      #     payload: |
-      #       {
-      #         "blocks": [
-      #           {
-      #             "type": "header",
-      #             "text": {
-      #               "type": "plain_text",
-      #               "text": "📢 Docs Changelog",
-      #               "emoji": true
-      #             }
-      #           },
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
-      #             }
-      #           },
-      #           {
-      #             "type": "section",
-      #             "text": {
-      #               "type": "mrkdwn",
-      #               "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
-      #             }
-      #           }
-      #         ]
-      #       }
-      #   env:
-      #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      - name: Send Changelog to Slack
+        uses: slackapi/slack-github-action@v1.24.0
+        with:
+          payload: |
+            {
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "📢 Docs Changelog",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<@Rob>\n\n${{ fromJson(steps.summarize.outputs.response).tldr }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "${{ join(fromJson(steps.summarize.outputs.response).highlights, '\n• ') }}"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
