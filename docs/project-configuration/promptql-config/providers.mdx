@@ -105,6 +105,7 @@ PromptQL program generation.
 ## Considerations
 
 - The `model` key is **not supported** when using the `hasura` provider.
+- The value for a `model` key is always in the dialect of the provider's API.
 - If `ai_primitives_llm` is not defined, it defaults to the provider specified in the `llm` configuration.
 - [`system_instructions` are optional](/project-configuration/promptql-config/system-instructions.mdx) but recommended
   to customize the behavior of your LLM.
