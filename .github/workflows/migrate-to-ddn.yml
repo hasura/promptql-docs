@@ -1,0 +1,189 @@
+# Migration Workflow: promptql-docs to ddn-docs
+# =============================================
+#
+# PURPOSE:
+# This workflow automatically migrates changes from the promptql-docs repository
+# to the ddn-docs repository when a PR is merged with the 'migrate-to-ddn' label.
+#
+# HOW IT WORKS:
+# 1. Triggers when a PR with the 'migrate-to-ddn' label is merged to main branch
+# 2. Creates a patch file containing all changes from the merged PR (focusing on docs/ and static/ directories)
+# 3. Checks out the target ddn-docs repository and creates a new branch
+# 4. Attempts to apply the patch to the target repository:
+#    - First tries clean application
+#    - Falls back to partial application with rejection files if needed
+# 5. Creates a PR in the ddn-docs repository containing:
+#    - List of changed files
+#    - Reference to the original PR
+#    - Details about any conflicts that occurred
+# 6. If the patch couldn't be applied at all, creates an issue for manual intervention
+#
+# REQUIREMENTS:
+# - DDN_REPO_TOKEN secret: GitHub token with permission to create PRs in the ddn-docs repository
+# - 'migrate-to-ddn' label must exist in the repository
+#
+# USAGE:
+# To migrate changes from a PR to ddn-docs, simply add the 'migrate-to-ddn' label
+# to the PR before or after merging it.
+
+name: Migrate Changes to DDN Docs
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  migrate-to-ddn:
+    runs-on: ubuntu-latest
+    # Only run when PR is merged and has the migrate-to-ddn label
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'migrate-to-ddn')
+
+    steps:
+      - name: Checkout promptql-docs repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Get PR diff
+        id: get-diff
+        run: |
+          # Get the merge commit SHA
+          MERGE_COMMIT_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+          # Get the parent commit of the merge commit (the commit before the merge)
+          PARENT_COMMIT_SHA=$(git rev-parse "${MERGE_COMMIT_SHA}^1")
+
+          # Generate a patch file from the diff, focusing on docs/ and static/ content
+          # You can adjust the paths to include or exclude as needed
+          git diff ${PARENT_COMMIT_SHA} ${MERGE_COMMIT_SHA} -- docs/ static/ > pr-changes.patch
+
+          # Check if the patch file is not empty
+          if [ -s pr-changes.patch ]; then
+            echo "patch_created=true" >> $GITHUB_OUTPUT
+            
+            # Get a list of changed files for the PR description
+            git diff --name-only ${PARENT_COMMIT_SHA} ${MERGE_COMMIT_SHA} -- docs/ static/ > changed_files.txt
+            echo "FILES_CHANGED<<EOF" >> $GITHUB_ENV
+            cat changed_files.txt >> $GITHUB_ENV
+            echo "EOF" >> $GITHUB_ENV
+            
+            # Count number of files changed
+            FILES_COUNT=$(wc -l < changed_files.txt)
+            echo "files_count=$FILES_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "patch_created=false" >> $GITHUB_OUTPUT
+            echo "No relevant changes detected in the PR that need to be migrated."
+          fi
+
+      - name: Checkout ddn-docs repository
+        if: steps.get-diff.outputs.patch_created == 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: seanparkross/ddn-docs
+          path: ddn-docs
+          token: ${{ secrets.DDN_REPO_TOKEN }}
+
+      - name: Setup Git in ddn-docs
+        if: steps.get-diff.outputs.patch_created == 'true'
+        working-directory: ddn-docs
+        run: |
+          git config user.name "seanparkross"
+          git config user.email "sean@parkross.com"
+
+          # Create a new branch for the changes
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BRANCH_NAME="promptql-sync-${PR_NUMBER}"
+          git checkout -b ${BRANCH_NAME}
+
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        id: setup-git
+
+      - name: Apply patch to ddn-docs
+        if: steps.get-diff.outputs.patch_created == 'true'
+        working-directory: ddn-docs
+        id: apply-patch
+        continue-on-error: true
+        run: |
+          # Try to apply the patch
+          if git apply --check ../pr-changes.patch; then
+            git apply ../pr-changes.patch
+            echo "patch_applied=true" >> $GITHUB_OUTPUT
+          else
+            echo "Failed to apply patch cleanly. Attempting with --reject option..."
+            # Try to apply as much as possible and create reject files for conflicts
+            git apply --reject --whitespace=fix ../pr-changes.patch || true
+            
+            # Check if any changes were applied (even partial ones)
+            if git status --porcelain | grep -q '^[AM]'; then
+              echo "patch_applied=partial" >> $GITHUB_OUTPUT
+              
+              # Create a report of conflicts
+              echo "CONFLICTS<<EOF" >> $GITHUB_ENV
+              find . -name "*.rej" -exec echo "Conflict in {}" \; >> $GITHUB_ENV
+              echo "EOF" >> $GITHUB_ENV
+            else
+              echo "patch_applied=false" >> $GITHUB_OUTPUT
+              echo "No changes could be applied."
+            fi
+          fi
+
+      - name: Commit changes to ddn-docs
+        if: steps.apply-patch.outputs.patch_applied == 'true' || steps.apply-patch.outputs.patch_applied == 'partial'
+        working-directory: ddn-docs
+        run: |
+          # Stage all changes, including new files
+          git add -A
+
+          # Create commit with details about the source PR
+          git commit -m "Sync changes from promptql-docs PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
+
+          # Push the branch to the repository
+          git push origin ${{ steps.setup-git.outputs.branch_name }}
+
+      - name: Create PR in ddn-docs
+        if: steps.apply-patch.outputs.patch_applied == 'true' || steps.apply-patch.outputs.patch_applied == 'partial'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          path: ddn-docs
+          token: ${{ secrets.DDN_REPO_TOKEN }}
+          commit-message: 'Sync changes from promptql-docs PR #${{ github.event.pull_request.number }}'
+          branch: ${{ steps.setup-git.outputs.branch_name }}
+          base: main
+          title: '[Sync] ${{ github.event.pull_request.title }}'
+          body: |
+            ## Synced Changes from promptql-docs
+
+            This PR contains synced changes from promptql-docs PR #${{ github.event.pull_request.number }}.
+
+            **Original PR:** ${{ github.event.pull_request.html_url }}
+            **Original Author:** @${{ github.event.pull_request.user.login }}
+
+            ### Files Changed (${steps.get-diff.outputs.files_count})
+
+            ```
+            ${{ env.FILES_CHANGED }}
+            ```
+
+            ### Status
+
+            ${{ steps.apply-patch.outputs.patch_applied == 'partial' && '⚠️ Some conflicts were detected and may need manual resolution:' || '✅ All changes applied cleanly.' }}
+
+            ${{ steps.apply-patch.outputs.patch_applied == 'partial' && env.CONFLICTS || '' }}
+
+            Please review the changes carefully before merging.
+
+          labels: 'sync-from-promptql'
+          reviewers: ${{ github.event.pull_request.user.login }}
+
+      - name: Create issue if patch failed
+        if:
+          steps.get-diff.outputs.patch_created == 'true' && steps.apply-patch.outputs.patch_applied != 'true' &&
+          steps.apply-patch.outputs.patch_applied != 'partial'
+        uses: JasonEtco/create-an-issue@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        with:
+          filename: .github/ISSUE_TEMPLATE/sync-failed.md
