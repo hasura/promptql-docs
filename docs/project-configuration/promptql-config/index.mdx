@@ -1,0 +1,55 @@
+---
+sidebar_position: 1
+sidebar_label: PromptQL Configuration
+description: Learn how to configure your PromptQL application via metadata.
+keywords:
+  - hasura
+  - hasura ddn
+  - project
+  - promptql-config
+  - config
+toc_max_heading_level: 4
+---
+
+# PromptQL Configuration
+
+## Overview
+
+You can manage PromptQL's LLM settings and system instructions from a single `promptql_config.yaml` file, automatically
+created at the root of your DDN project when you initialize a project with the `--with-promptql` flag using the Hasura
+DDN CLI.
+
+## Examples
+
+```yaml title="Minimal configuration:"
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: hasura
+```
+
+```yaml title="Custom providers for LLM & AI primitives and custom system instructions:"
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+  system_instructions: |
+    You are a helpful AI Assistant.
+```
+
+With this file, you can:
+
+- Set the LLM provider and model used across the application.
+- Define a separate LLM for AI Primitives such as **Classification**, **Summarization**, and **Extraction**.
+- Add system instructions that apply to every PromptQL interaction.
+
+## Next steps
+
+- [Check out how to configure your LLM of choice](/project-configuration/promptql-config/providers.mdx).
+- [Learn how to improve performance by using system instructions](/project-configuration/promptql-config/system-instructions.mdx).
