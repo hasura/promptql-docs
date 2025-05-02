@@ -1,0 +1,66 @@
+name: Update LLM Docs
+
+on:
+  pull_request_target:
+    types: [closed]
+
+jobs:
+  update-and-commit:
+    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Check for changes in /docs
+        id: check_docs_changes
+        run: |
+          git fetch origin ${{ github.event.pull_request.base.ref }}
+          if git diff --quiet origin/${{ github.event.pull_request.base.ref }} -- docs/; then
+            echo "No changes in /docs. Skipping job."
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in /docs."
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Bun
+        if: steps.check_docs_changes.outputs.skip == 'false'
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        if: steps.check_docs_changes.outputs.skip == 'false'
+        working-directory: utilities/one-click-llm
+        run: bun install
+
+      - name: Run Bun script
+        if: steps.check_docs_changes.outputs.skip == 'false'
+        working-directory: utilities/one-click-llm
+        run: bun run start
+
+      - name: Commit and push changes
+        if: steps.check_docs_changes.outputs.skip == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add -u
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "Chore: update markdown before merge"
+          git push origin HEAD
+        env:
+          GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
