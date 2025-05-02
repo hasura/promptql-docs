@@ -1,11 +1,25 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import styles from './styles.module.css';
 
 export default function CopyLLM() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const fileUrl =
-    'https://raw.githubusercontent.com/hasura/promptql-docs/refs/heads/robdominguez/doc-2696-evaluate-the-idea-of-a-one-click-copy-to-llm-button/output/allDocs.md';
+  const fileUrl = 'https://raw.githubusercontent.com/hasura/promptql-docs/refs/heads/release-prod/output/allDocs.md';
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   async function handleCopy() {
     let showLoadingTimer: NodeJS.Timeout | undefined;
@@ -39,24 +53,53 @@ export default function CopyLLM() {
     }
   }
 
-  function getButtonText() {
-    switch (status) {
-      case 'loading':
-        return 'Copying...';
-      case 'success':
-        return '✅ Copied!';
-      case 'error':
-        return 'Failed to copy';
-      default:
-        return '📋 Copy the docs for your LLM!';
+  async function handleDownload() {
+    try {
+      const response = await fetch(fileUrl);
+      if (!response.ok) {
+        throw new Error('Failed to fetch file.');
+      }
+      const text = await response.text();
+      const blob = new Blob([text], { type: 'text/markdown' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'promptql-docs.md';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error(err);
     }
   }
 
   return (
-    <div>
-      <button className={styles['llm-button']} onClick={handleCopy} disabled={status === 'loading'}>
-        {getButtonText()}
+    <div className={styles.container} ref={containerRef}>
+      <button className={styles.ellipsisButton} onClick={() => setIsOpen(!isOpen)} aria-label="Document actions">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <circle cx="5" cy="12" r="1" />
+          <circle cx="12" cy="12" r="1" />
+          <circle cx="19" cy="12" r="1" />
+        </svg>
       </button>
+
+      {isOpen && (
+        <div className={styles.dropdown}>
+          <button className={styles.dropdownItem} onClick={handleCopy} disabled={status === 'loading'}>
+            {status === 'loading'
+              ? 'Copying...'
+              : status === 'success'
+                ? '✅ Copied!'
+                : status === 'error'
+                  ? 'Failed to copy'
+                  : 'Copy all docs content to clipboard for use in LLM prompts'}
+          </button>
+          <button className={styles.dropdownItem} onClick={handleDownload}>
+            Download docs content
+          </button>
+        </div>
+      )}
     </div>
   );
 }
