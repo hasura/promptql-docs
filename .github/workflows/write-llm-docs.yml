@@ -60,7 +60,7 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Chore: update markdown before merge"
-          git push origin HEAD
+          git commit -m "Chore: update LLM markdown"
+          git push origin HEAD:refs/heads/main
         env:
           GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
