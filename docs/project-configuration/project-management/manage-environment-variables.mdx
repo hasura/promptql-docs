@@ -25,7 +25,7 @@ project and connector levels, and how to collaborate effectively with your team.
 
 ## Project-level variables
 
-Your project uses two main environment files:
+By default, your project uses two main environment files:
 
 1. `.env` - Used for local development
 2. `.env.cloud` - Used for cloud deployments
@@ -42,6 +42,14 @@ development environment. Key variables include:
 
 The `.env.cloud` file follows the same structure but contains values specific to your cloud deployment. This separation
 ensures that your local development environment remains isolated from production settings.
+
+:::info You can specify environment variable files using contexts
+
+While these filenames follow our default conventions, you can configure and specify filenames using your project's
+`./hasura/context.yaml` file. Learn more about managing contexts
+[here](/project-configuration/project-management/manage-contexts.mdx).
+
+:::
 
 ## Connector-level variables
 
