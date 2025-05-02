@@ -1,5 +1,6 @@
 # Hasura PromptQL Documentation
 
+URL: https://hasura.io/docs/promptql/
 
 # Hasura PromptQL Documentation
 
@@ -77,14 +78,11 @@ connected data sources and will suggest some ways of interacting with the applic
 
 </div>
 
-
-
 ==============================
-
-
 
 # quickstart.mdx
 
+URL: https://hasura.io/docs/promptql/quickstart
 
 # Quickstart with PromptQL
 
@@ -93,20 +91,289 @@ You'll use a hosted PostgreSQL database pre-loaded with IMDb movie data. You’l
 information about different movies. Then, you'll add custom business logic that lets PromptQL take action — like renting
 a movie on a user's behalf.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Build your First PromptQL app
 
-<Quickstart />
+### Step 1. Authenticate your CLI
 
+```ddn title="Before you can create a new Hasura DDN project, you need to authenticate your CLI:"
+ddn auth login
+```
 
+This will launch a browser window prompting you to log in or sign up for Hasura Cloud. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init imdb-promptflix --with-promptql && cd imdb-promptflix
+```
+
+Now that you're in this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your PostgreSQL connector
+
+```ddn title="In your project directory, run:"
+ddn connector init imdb -i
+```
+
+From the dropdown, select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following
+connection URI to an existing PostgreSQL database of IMDB data:
+
+```plaintext
+jdbc:postgresql://35.236.11.122:5432/imdb?user=read_only_user&password=readonlyuser
+```
+
+For the `JDBC_SCHEMAS` environment variable, enter the following:
+
+```plaintext
+public
+```
+
+### Step 4. Introspect the PostgreSQL database
+
+```ddn title="Next, use the CLI to introspect your PostgreSQL database:"
+ddn connector introspect imdb
+```
+
+After running this, you should see a representation of your database's schema in the
+`app/connector/imdb/configuration.json` file; you can view this using `cat` or open the file in your editor.
+
+### Step 5. Track your tables
+
+Based on our sample database, a SQL schema will be generated. Let's track all the models to get started quickly.
+
+```ddn title="Run the following command:"
+ddn model add imdb "*"
+```
+
+Open the `app/metadata` directory. You'll find Hasura Metadata Language (HML) files for each table in your database.  
+In this case, there's only one: `public_movies.hml`.
+
+The DDN CLI uses these HML files to represent PostgreSQL tables in your API as
+[models](/reference/metadata-reference/models.mdx).
+
+### Step 6. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 7. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+## Talk to your data
+
+### Step 1. Open the PromptQL Playground
+
+```ddn title="In another terminal, run:"
+ddn console --local
+```
+
+### Step 2. Ask questions about your dataset
+
+The console is a web app hosted at [`promptql.console.hasura.io`](https://promptql.console.hasura.io) that connects to
+your local PromptQL API and data sources. Your data is processed in the DDN PromptQL runtime but isn't persisted
+externally.
+
+Head over to the console and ask a few questions about your data.
+
+```plaintext title="For example:"
+Hi, what are some questions you can answer?
+```
+
+PromptQL will respond with information about the dataset and make suggestions for your first query on the data!
+
+:::info Try it out
+
+Go ahead and ask a question! In the next steps, we'll take a deeper look at interacting with the data.
+
+:::
+
+## Act on your data
+
+### Step 1. Create a command
+
+While it's great that we can ask questions about the data set, what if the application could take action on our behalf?
+Such as rent a movie for us? We can easily do this by adding custom business logic using one of our
+[lambda connectors](/business-logic/overview.mdx). In the example below, we'll use TypeScript.
+
+```ddn title="Like before, let's initialize this connector:"
+ddn connector init promptflix -i
+```
+
+From the list of choices, select `hasura/nodejs`. Like with the PostgreSQL connector, the CLI will scaffold out a set of
+configuration files, including a file called `app/connector/promptflix/functions.ts` — this is where we'll add our logic
+so the application can take action on our behalf.
+
+```typescript title="Replace the content of your functions.ts file with the following:"
+/*
+ * This interface defines the structure of the response object returned by the
+ * function that rents a movie. It includes a success status and a message.
+ * The success status is a boolean indicating whether the operation was
+ * successful or not.
+ */
+interface RentMovieResponse {
+  success: boolean;
+  message: string;
+}
+
+/*
+ * PromptFlix - A movie rental service
+ *
+ * @param {string} seriesTitle - The title of the movie series to rent
+ * @returns {RentMovieResponse} - The response object containing success status and message
+ */
+export function rentSingleMovieBySeriesTitle(seriesTitle: string): RentMovieResponse {
+  console.log(`Renting movie series: ${seriesTitle}`);
+  return {
+    success: true,
+    message: `Successfully rented the movie series: ${seriesTitle}`,
+  };
+}
+```
+
+This function simulates the action of renting a movie on behalf of a user. The JSDoc comments aid in providing context
+to the underlying LLM so that the application knows how to use the function.
+
+```ddn title="Introspect your connector:"
+ddn connector introspect promptflix
+```
+
+```ddn title="Add your function as a command:"
+ddn command add promptflix "*"
+```
+
+Before we create a new build, let's add a description to the metadata for our command located in
+`app/metadata/rent_single_movie_by_series_title.hml`
+
+```yaml title="Open the newly-generated rent_single_movie_by_series_title.hml file and add the following description:" {6-7}
+---
+kind: Command
+version: v1
+definition:
+  name: rent_single_movie_by_series_title
+  description:
+    This function allows users to rent movies from PromptFlix and should be used for any request to rent a movie.
+  outputType: rent_movie_response!
+  arguments:
+    - name: series_title
+      type: String!
+  source:
+    dataConnectorName: promptflix
+    dataConnectorCommand:
+      procedure: rentSingleMovieBySeriesTitle
+    argumentMapping:
+      series_title: seriesTitle
+  graphql:
+    rootFieldName: rent_single_movie_by_series_title
+    rootFieldKind: Mutation
+```
+
+```ddn title="Create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Bring your services down with CTRL+C and start them back up:"
+ddn run docker-start
+```
+
+### Step 2. Approve an action
+
+```plaintext title="From the PromptQL playground, ask the following question:"
+I really like Apollo 13; can you recommend a single movie with the same actors that is a historical story?
+```
+
+PromptQL will analyze the dataset by classifying movies and will suggest Saving Private Ryan. Likely, it will also ask
+if you'd like to rent it. Answer `yes` and you'll then be prompted to either `Deny` or `Approve` the action.
+
+If you click `Approve`, PromptQL will confirm that the rental was successful! 🍿
+
+## Deploy and share your project
+
+### Step 1. Create a new cloud build
+
+Until this point, we've been developing locally. However, we can easily create a cloud build of our project and then
+share it with others.
+
+```ddn title="Run the following from your project's directory:"
+ddn supergraph build create
+```
+
+The CLI will respond with information about your new build.
+
+### Step 2. Share your project
+
+You can visit the cloud project's console and share your new PromptQL app!
+
+<Thumbnail src="/img/get-started/share-project.png" alt="Share your app" width="1000px" />
+
+Users with any access level, including “Read only” can access your PromptQL app. Read only users cannot modify your
+project or invite additional users.
+
+You can also choose “Request Access” so that anyone who arrives at the project URL can request access.
 
 ==============================
 
-
-
 # overview.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/overview
 
 # Common Data Source & Logic Patterns
 
@@ -147,14 +414,11 @@ You can also dive straight into a guide for your preferred source:
 - [PostgreSQL](/how-to-build-with-promptql/with-postgresql.mdx)
 - [Snowflake](/how-to-build-with-promptql/with-snowflake.mdx)
 
-
-
 ==============================
-
-
 
 # with-a-datasource-and-custom-business-logic.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-a-datasource-and-custom-business-logic
 
 # With Persistent Datasources
 
@@ -166,20 +430,289 @@ You'll use a hosted PostgreSQL database pre-loaded with IMDB movie data. You'll 
 information about different movies. Then, you'll add custom business logic that lets PromptQL take action — like renting
 a movie on a user's behalf.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<Quickstart />
+### Step 1. Authenticate your CLI
 
+```ddn title="Before you can create a new Hasura DDN project, you need to authenticate your CLI:"
+ddn auth login
+```
 
+This will launch a browser window prompting you to log in or sign up for Hasura Cloud. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init imdb-promptflix --with-promptql && cd imdb-promptflix
+```
+
+Now that you're in this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your PostgreSQL connector
+
+```ddn title="In your project directory, run:"
+ddn connector init imdb -i
+```
+
+From the dropdown, select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following
+connection URI to an existing PostgreSQL database of IMDB data:
+
+```plaintext
+jdbc:postgresql://35.236.11.122:5432/imdb?user=read_only_user&password=readonlyuser
+```
+
+For the `JDBC_SCHEMAS` environment variable, enter the following:
+
+```plaintext
+public
+```
+
+### Step 4. Introspect the PostgreSQL database
+
+```ddn title="Next, use the CLI to introspect your PostgreSQL database:"
+ddn connector introspect imdb
+```
+
+After running this, you should see a representation of your database's schema in the
+`app/connector/imdb/configuration.json` file; you can view this using `cat` or open the file in your editor.
+
+### Step 5. Track your tables
+
+Based on our sample database, a SQL schema will be generated. Let's track all the models to get started quickly.
+
+```ddn title="Run the following command:"
+ddn model add imdb "*"
+```
+
+Open the `app/metadata` directory. You'll find Hasura Metadata Language (HML) files for each table in your database.  
+In this case, there's only one: `public_movies.hml`.
+
+The DDN CLI uses these HML files to represent PostgreSQL tables in your API as
+[models](/reference/metadata-reference/models.mdx).
+
+### Step 6. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 7. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and PostgreSQL connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+## Talk to your data
+
+### Step 1. Open the PromptQL Playground
+
+```ddn title="In another terminal, run:"
+ddn console --local
+```
+
+### Step 2. Ask questions about your dataset
+
+The console is a web app hosted at [`promptql.console.hasura.io`](https://promptql.console.hasura.io) that connects to
+your local PromptQL API and data sources. Your data is processed in the DDN PromptQL runtime but isn't persisted
+externally.
+
+Head over to the console and ask a few questions about your data.
+
+```plaintext title="For example:"
+Hi, what are some questions you can answer?
+```
+
+PromptQL will respond with information about the dataset and make suggestions for your first query on the data!
+
+:::info Try it out
+
+Go ahead and ask a question! In the next steps, we'll take a deeper look at interacting with the data.
+
+:::
+
+## Act on your data
+
+### Step 1. Create a command
+
+While it's great that we can ask questions about the data set, what if the application could take action on our behalf?
+Such as rent a movie for us? We can easily do this by adding custom business logic using one of our
+[lambda connectors](/business-logic/overview.mdx). In the example below, we'll use TypeScript.
+
+```ddn title="Like before, let's initialize this connector:"
+ddn connector init promptflix -i
+```
+
+From the list of choices, select `hasura/nodejs`. Like with the PostgreSQL connector, the CLI will scaffold out a set of
+configuration files, including a file called `app/connector/promptflix/functions.ts` — this is where we'll add our logic
+so the application can take action on our behalf.
+
+```typescript title="Replace the content of your functions.ts file with the following:"
+/*
+ * This interface defines the structure of the response object returned by the
+ * function that rents a movie. It includes a success status and a message.
+ * The success status is a boolean indicating whether the operation was
+ * successful or not.
+ */
+interface RentMovieResponse {
+  success: boolean;
+  message: string;
+}
+
+/*
+ * PromptFlix - A movie rental service
+ *
+ * @param {string} seriesTitle - The title of the movie series to rent
+ * @returns {RentMovieResponse} - The response object containing success status and message
+ */
+export function rentSingleMovieBySeriesTitle(seriesTitle: string): RentMovieResponse {
+  console.log(`Renting movie series: ${seriesTitle}`);
+  return {
+    success: true,
+    message: `Successfully rented the movie series: ${seriesTitle}`,
+  };
+}
+```
+
+This function simulates the action of renting a movie on behalf of a user. The JSDoc comments aid in providing context
+to the underlying LLM so that the application knows how to use the function.
+
+```ddn title="Introspect your connector:"
+ddn connector introspect promptflix
+```
+
+```ddn title="Add your function as a command:"
+ddn command add promptflix "*"
+```
+
+Before we create a new build, let's add a description to the metadata for our command located in
+`app/metadata/rent_single_movie_by_series_title.hml`
+
+```yaml title="Open the newly-generated rent_single_movie_by_series_title.hml file and add the following description:" {6-7}
+---
+kind: Command
+version: v1
+definition:
+  name: rent_single_movie_by_series_title
+  description:
+    This function allows users to rent movies from PromptFlix and should be used for any request to rent a movie.
+  outputType: rent_movie_response!
+  arguments:
+    - name: series_title
+      type: String!
+  source:
+    dataConnectorName: promptflix
+    dataConnectorCommand:
+      procedure: rentSingleMovieBySeriesTitle
+    argumentMapping:
+      series_title: seriesTitle
+  graphql:
+    rootFieldName: rent_single_movie_by_series_title
+    rootFieldKind: Mutation
+```
+
+```ddn title="Create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Bring your services down with CTRL+C and start them back up:"
+ddn run docker-start
+```
+
+### Step 2. Approve an action
+
+```plaintext title="From the PromptQL playground, ask the following question:"
+I really like Apollo 13; can you recommend a single movie with the same actors that is a historical story?
+```
+
+PromptQL will analyze the dataset by classifying movies and will suggest Saving Private Ryan. Likely, it will also ask
+if you'd like to rent it. Answer `yes` and you'll then be prompted to either `Deny` or `Approve` the action.
+
+If you click `Approve`, PromptQL will confirm that the rental was successful! 🍿
+
+## Deploy and share your project
+
+### Step 1. Create a new cloud build
+
+Until this point, we've been developing locally. However, we can easily create a cloud build of our project and then
+share it with others.
+
+```ddn title="Run the following from your project's directory:"
+ddn supergraph build create
+```
+
+The CLI will respond with information about your new build.
+
+### Step 2. Share your project
+
+You can visit the cloud project's console and share your new PromptQL app!
+
+<Thumbnail src="/img/get-started/share-project.png" alt="Share your app" width="1000px" />
+
+Users with any access level, including “Read only” can access your PromptQL app. Read only users cannot modify your
+project or invite additional users.
+
+You can also choose “Request Access” so that anyone who arrives at the project URL can request access.
 
 ==============================
 
-
-
 # with-api-endpoints.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-api-endpoints
 
 # With API Endpoints
 
@@ -192,7 +725,54 @@ However, if you expect to run into API rate limits, or need more flexible access
 data in ways that the API doesn't natively allow for, consider
 [bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
@@ -242,10 +822,10 @@ Open the `app/connector/typescript/functions.ts` file.
 export async function helloFromHttpBin(name?: string): Promise<{ greeting?: string }> {
   const greeting = { greeting: name };
 
-  const response = await fetch("https://httpbin.org/post", {
-    method: "POST",
+  const response = await fetch('https://httpbin.org/post', {
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
     body: JSON.stringify({ greeting: `Hello ${name}!` }),
   });
@@ -283,14 +863,11 @@ Head over to the PromptQL Playground and see if the AI assistant is able to call
 say hello from httpBin for everyone
 ```
 
-
-
 ==============================
-
-
 
 # with-apis-with-bulk-data.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-apis-with-bulk-data
 
 # With Bulk API Data
 
@@ -305,7 +882,54 @@ We're loading data into DuckDB for this example, but you could load data into an
 connector (e.g., PostgreSQL, MongoDB, ClickHouse). We're going to use TypeScript to write a loading script to load data
 — but how you choose to load data is completely up to you.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
@@ -460,14 +1084,11 @@ through the code at
 [app/connector/github/index.ts](https://github.com/hasura/example-promptql-github/blob/main/app/connector/github/index.ts)
 to see how to put together a real-world bulk data from an API connector!
 
-
-
 ==============================
-
-
 
 # with-amazon-athena.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-amazon-athena
 
 # Get Started with PromptQL and Amazon Athena
 
@@ -475,11 +1096,80 @@ to see how to put together a real-world bulk data from an API connector!
 
 This tutorial assumes you're starting from scratch; you should use an existing Amazon Athena database.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/athena` (you can type to filter the list). Then, enter the following required environment variables:
 
@@ -496,18 +1186,118 @@ When entering schemas, ensure there's no whitespace as in the example above.
 
 Hasura will never modify your source schema.
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="Amazon Athena" />
 
-
-
 ==============================
-
-
 
 # with-amazon-redshift.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-amazon-redshift
 
 # Get Started with PromptQL and Amazon Redshift
 
@@ -515,11 +1305,80 @@ Hasura will never modify your source schema.
 
 This tutorial assumes you're starting from scratch; you should use an existing Amazon Redshift database.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/redshift` (you can type to filter the list). Then, enter the following environment variables:
 
@@ -536,18 +1395,118 @@ When entering schemas, ensure there's no whitespace as in the example above.
 
 Hasura will never modify your source schema.
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="Amazon Redshift" />
 
-
-
 ==============================
-
-
 
 # with-bigquery.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-bigquery
 
 # Get Started with PromptQL and BigQuery
 
@@ -555,11 +1514,80 @@ Hasura will never modify your source schema.
 
 This tutorial assumes you're starting from scratch; you should use an existing BigQuery database.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/bigquery-jdbc` (you can type to filter the list). Then, enter the following required environment
 variable:
@@ -596,28 +1624,197 @@ environment variable.
 mv /path/to/your/key.json app/connector/my_bigquery/key.json
 ```
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="BigQuery" />
 
-
-
 ==============================
-
-
 
 # with-databricks.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-databricks
 
 # Get Started with PromptQL and Databricks
 
 <BoilerplateOverview dataSourceName="Databricks" time="twenty" />
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/databricks` (you can type to filter the list). Then, enter the following environment variables:
 
@@ -626,28 +1823,197 @@ Select `hasura/databricks` (you can type to filter the list). Then, enter the fo
 | `JDBC_URL`     | `jdbc:databricks://<host>:<port>/default;transportMode=http;ssl=1;AuthMech=3;httpPath=/sql/1.0/warehouses/<warehouse-id>;UID=token;PWD=<access-token>;ConnCatalog=main;` | You can construct the base of this using your Databricks UI under `SQL Warehouses` » `<name-of-warehouse>` » `Connection details`. |
 | `JDBC_SCHEMAS` | `default,public`                                                                                                                                                         | A comma-separated list of schemas within the referenced catalog.                                                                   |
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="Databricks" />
 
-
-
 ==============================
-
-
 
 # with-mysql.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-mysql
 
 # Get Started with PromptQL and MySQL
 
 <BoilerplateOverview dataSourceName="MySQL" time="twenty" />
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/mysql` (you can type to filter the list). Then, enter the following environment variables:
 
@@ -655,18 +2021,118 @@ Select `hasura/mysql` (you can type to filter the list). Then, enter the followi
 | ---------- | ---------------------------------------------- | ----------------------------------- |
 | `JDBC_URL` | `jdbc:mysql://user:password@host:3306/db_name` | This connector requires a JDBC URL. |
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="MySQL" />
 
-
-
 ==============================
-
-
 
 # with-postgresql.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-postgresql
 
 # Get Started with PromptQL and PostgreSQL
 
@@ -675,11 +2141,80 @@ Select `hasura/mysql` (you can type to filter the list). Then, enter the followi
 This tutorial assumes you're starting from scratch; you can use an existing PostgreSQL database that you have or the
 PostgreSQL docker image that ships with the data connector.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/postgres-promptql` (you can type to filter the list). Then, enter the following environment variables:
 
@@ -696,28 +2231,197 @@ When entering schemas, ensure there's no whitespace as in the example above.
 
 Hasura will never modify your source schema.
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="PostgreSQL" />
 
-
-
 ==============================
-
-
 
 # with-snowflake.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-snowflake
 
 # Get Started with PromptQL and Snowflake
 
 <BoilerplateOverview dataSourceName="Snowflake" time="twenty" />
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Tutorial
 
-<BoilerplateInit />
+### Step 1. Authenticate your CLI
+
+```ddn title="Before you can create a new Hasura DDN project for PromptQL, you need to authenticate your CLI:"
+ddn auth login
+```
+
+This will launch a browser window prompting you to log in or sign up for Hasura DDN. After you log in, the CLI will
+acknowledge your login, giving you access to Hasura Cloud resources.
+
+### Step 2. Scaffold out a new local project
+
+```ddn title="Next, create a new local project:"
+ddn supergraph init my-project --with-promptql && cd my-project
+```
+
+Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
+running `ls` in your terminal, or by opening the directory in your preferred editor.
+
+### Step 3. Initialize your connector
+
+```ddn title="In your project directory, run:"
+ddn connector init my_connector -i
+```
 
 Select `hasura/snowflake` (you can type to filter the list). Then, enter the following environment variables:
 
@@ -732,18 +2436,118 @@ username, and password) or more granular depending on your settings within Snowf
 
 :::
 
-<BoilerplateDx />
+### Step 4. Introspect your source
+
+```ddn title="Next, use the CLI to introspect your source:"
+ddn connector introspect my_connector
+```
+
+After running this, you should see a representation of your source's schema in the
+`app/connector/my_connector/configuration||config.json` file; you can view this using `cat` or open the file in your
+editor.
+
+```ddn title="Additionally, you can check which resources are available — and their status — at any point using the CLI:"
+ddn connector show-resources my_connector
+```
+
+### Step 5. Add your resources
+
+```ddn title="Add your resources to create metadata:"
+ddn model add my_connector "*"
+ddn command add my_connector "*"
+ddn relationship add my_connector "*"
+```
+
+Open the `app/metadata` directory and you'll find newly-generated file(s) ending in `.hml`. The DDN CLI will use these
+Hasura Metadata Language files to represent your data source to PromptQL as
+[models](/reference/metadata-reference/models.mdx), [commands](/reference/metadata-reference/commands.mdx), and
+[relationships](/reference/metadata-reference/relationships.mdx).
+
+### Step 6. Add semantic information to your metadata (optional)
+
+It is highly recommended to provide extra natural language descriptions of the resources in your project so that the LLM
+can better understand your data and create appropriate query plans.
+
+The description field can be added to `Model`, `Command` and `Relationship` metadata objects to provide semantic
+context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
+
+### Step 7. Create a new build
+
+```ddn title="To create a local build, run:"
+ddn supergraph build local
+```
+
+The build is stored as a set of JSON files in `engine/build`.
+
+### Step 8. Start your local services
+
+```ddn title="Start your local Hasura DDN Engine and connector:"
+ddn run docker-start
+```
+
+Your terminal will be taken over by logs for the different services.
+
+### Step 9. Chat with your data
+
+```ddn title="In a new terminal tab, open your local console:"
+ddn console --local
+```
+
+Once the PromptQL interface is open, ask a question about your data. For example:
+
+<PqlChat>
+  <User>Hi, what are some questions you can answer?</User>
+  <Pql>
+    I can help you analyze data from what appears to be an e-commerce system. Here are some types of questions I can answer:
+
+    <ol>
+        <li>Product-related:</li>
+        <ul>
+            <li>Find popular products based on orders or reviews</li>
+            <li>Analyze product pricing across categories</li>
+            <li>Look up product details and descriptions</li>
+            <li>Find products from specific manufacturers or countries</li>
+        </ul>
+        <li>Order and Purchase Analysis:</li>
+        <ul>
+            <li>Track order statuses</li>
+            <li>Analyze delivery times</li>
+            <li>Look at purchase patterns</li>
+            <li>Find abandoned carts</li>
+        </ul>
+        <li>Customer Behavior:</li>
+        <ul>
+            <li>Analyze customer reviews and ratings</li>
+            <li>Look at shopping patterns</li>
+            <li>Track cart abandonment</li>
+            <li>Study product category preferences</li>
+        </ul>
+        <li>Business Metrics:</li>
+        <ul>
+            <li>Calculate sales metrics</li>
+            <li>Analyze review scores</li>
+            <li>Track coupon usage</li>
+            <li>Monitor cart completion rates</li>
+        </ul>
+    </ol>
+
+    Would you like me to explore any of these areas in particular?
+
+  </Pql>
+</PqlChat>
+
+### Step 10. Iterate on your source's schema
+
+If something changes in your data source's schema, you can iterate on your data model by following the steps in the
+[iteration guide](/data-modeling/iterate.mdx).
 
 <BoilerplateSummary dataSourceName="Snowflake" />
 
-
-
 ==============================
-
-
 
 # with-others.mdx
 
+URL: https://hasura.io/docs/promptql/how-to-build-with-promptql/with-others
 
 # Get Started with PromptQL and other Sources
 
@@ -754,13 +2558,11 @@ or even a third-party API — to Hasura DDN and build an API on top of it.
 We recommend using the [Quickstart](/quickstart.mdx) and referencing the individual connector's docs from ☝️ to get
 started with a connector-specific setup.
 
-
-
 ==============================
 
-
-
 # overview.mdx
+
+URL: https://hasura.io/docs/promptql/data-sources/overview
 
 # Basics
 
@@ -813,14 +2615,11 @@ you.
 
 - [Connect your data](/data-sources/connect-to-a-source.mdx)
 
-
-
 ==============================
-
-
 
 # connect-to-a-source.mdx
 
+URL: https://hasura.io/docs/promptql/data-sources/connect-to-a-source
 
 # Connect to a source
 
@@ -935,13 +2734,11 @@ Now that you've initialized a connector and connected it to your data, you're re
 populate the configuration files with source-specific information that Hasura will need to build your application. Check
 out the [introspection page](/data-sources/introspect-a-source.mdx) to learn more.
 
-
-
 ==============================
 
-
-
 # introspect-a-source.mdx
+
+URL: https://hasura.io/docs/promptql/data-sources/introspect-a-source
 
 # Introspect a source
 
@@ -994,13 +2791,11 @@ With your source introspected and the configuration files populated, you can now
 will represent your source's schema in your application. Check out the [Data Modeling](/data-modeling/overview.mdx)
 section to begin creating models, commands, and relationships for your data.
 
-
-
 ==============================
 
-
-
 # troubleshooting.mdx
+
+URL: https://hasura.io/docs/promptql/data-sources/troubleshooting
 
 # Troubleshooting
 
@@ -1152,13 +2947,11 @@ the connectors.
 
 You can search the list of public repositories [here](https://github.com/orgs/hasura/repositories).
 
-
-
 ==============================
 
-
-
 # publish-your-own-connector.mdx
+
+URL: https://hasura.io/docs/promptql/data-sources/publish-your-own-connector
 
 # Publish a Data Connector
 
@@ -1435,14 +3228,11 @@ Ensure the PR targets the main branch and modifies files under the `registry/` d
 
 Ping `@scriptnull` or `@codingkarthik` in the PR.
 
-
-
 ==============================
-
-
 
 # overview.mdx
 
+URL: https://hasura.io/docs/promptql/data-modeling/overview
 
 # Data Modeling
 
@@ -1478,16 +3268,11 @@ There are [many types of metadata objects](/reference/metadata-reference/index.m
 
 We will cover each of these in more detail in the following sections.
 
-
-
 ==============================
-
-
 
 # model.mdx
 
-
-
+URL: https://hasura.io/docs/promptql/data-modeling/model
 
 # Models Empower PromptQL to Understand Your Data
 
@@ -1601,14 +3386,292 @@ In addition to removing the `Model` object itself, the DDN CLI will also remove 
 
 You can learn more about models in the metadata reference [docs](/reference/metadata-reference/models.mdx).
 
+==============================
 
+# command.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/command
+
+# Commands Enable PromptQL to Modify Data
+
+## Introduction
+
+Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
+query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
+updates, deletes), executing complex operations, or implementing custom business logic across your connected data
+sources.
+
+When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
+incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
+action taken.
+
+## Lifecycle
+
+When setting up commands for use with PromptQL, follow this lifecycle:
+
+1. Have some operation in your data source that you want to make executable via PromptQL.
+2. Introspect your data source using the DDN CLI with the relevant data connector to fetch the operation resources.
+3. Add the command to your metadata with the DDN CLI.
+4. Create a build of your supergraph API with the DDN CLI.
+5. Serve your build as your API with the Hasura engine either locally or in the cloud.
+6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
+
+<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
+
+## Create a command
+
+To add a command you will need to have a data connector already set up and connected to the data source. Follow the
+[Quickstart](/quickstart.mdx) or the tutorial in [How to Build with DDN](/how-to-build-with-promptql/overview.mdx) to
+get to that point.
+
+### From a source operation
+
+Some data connectors support the ability to introspect your data source to discover the commands that can be added to
+your supergraph automatically.
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Show the resources discovered from your data source:"
+ddn connector show-resources <connector_name>
+```
+
+```ddn title="Add the command from the discovered resources to your metadata:"
+ddn command add <connector_link_name> <operation_name>
+```
+
+Or you can optionally add all the commands by specifying `"*"`.
+
+```ddn title="Add all commands from your data source:"
+ddn command add <connector_link_name> "*"
+```
+
+This will add commands with their accompanying metadata definitions to your metadata.
+
+### Via native operations {#via-native-operations-how-to}
+
+Some data connectors support the ability to add commands via native operations so that you can add any operation that is
+not supported by the automatic introspection process.
+
+For classic database connectors, this will be native query code for that source. This can be, for example, a more
+complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
+
+For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
+other side-effects) that PromptQL can use to execute specialized operations on your data.
+
+<Tabs groupId="source-preference" className="api-tabs">
+  <TabItem value="TypeScript" label="Node.js TypeScript">
+    You can create custom TypeScript functions in your connector to expand PromptQL's capabilities, enabling it to interact
+with your data in more sophisticated ways through natural language conversations.
+
+```ddn title="Initalize a new connector and select hasura/nodejs from the list:"
+ddn connector init my_ts -i
+```
+
+```ts title="Replace the functions.ts contents with your own custom code:"
+/**
+ * @readonly
+ */
+export function myCustomCode(myInput: string): string {
+  // Do something with the input
+  return 'My output';
+}
+```
+
+The `@readonly` tag indicates this function is a read-only operation. PromptQL will recognize this as a data retrieval
+function when building query plans. Without this tag, PromptQL will treat it as an action that can modify data.
+
+```ddn title="Introspect the connector:"
+ddn connector introspect my_ts
+```
+
+```ddn title="Track the function:"
+ddn command add my_ts myCustomCode
+```
+
+```ddn title="Create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Start your services:"
+ddn run docker-start
+```
+
+```ddn title="Open your development console:"
+ddn console --local
+```
+
+Once set up, you can interact with your custom function through PromptQL conversations.
+
+By adding custom functions to your supergraph, you extend PromptQL's capabilities to talk to your data in ways specific
+to your business needs.
+
+  </TabItem>
+  <TabItem value="Python" label="Python">
+    You can create Python connectors with custom code to enhance PromptQL's ability to talk to all your data. These
+connectors become available in your supergraph, allowing PromptQL to include them in its dynamic query plans.
+
+```ddn title="Initialize a new connector and select hasura/python from the list:"
+ddn connector init my_py -i
+```
+
+```py title="Replace the functions.py contents with your own custom code:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+
+connector = FunctionConnector()
+
+@connector.register_query
+def my_custom_code(my_input: str) -> str:
+  # Do something with the input
+  return "My output"
+
+if __name__ == "__main__":
+  start(connector)
+```
+
+When you add the `@connector.register_query` decorator, you're creating a function that PromptQL can access as part of
+its query planning. If you use `@connector.register_mutation` instead, the function will be available for data
+modification operations in PromptQL's query plans.
+
+```ddn title="Introspect the connector:"
+ddn connector introspect my_py
+```
+
+```ddn title="Track the function:"
+ddn command add my_py my_custom_code
+```
+
+```ddn title="Create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Start your services:"
+ddn run docker-start
+```
+
+```ddn title="Open your development console:"
+ddn console --local
+```
+
+```graphql title="You can now query your native operation:"
+query MyCustomCode {
+  myCustomCode(myInput: "My input")
+}
+```
+
+By extending your supergraph with custom Python connectors, you give PromptQL the ability to perform specialized
+operations that go beyond standard data access, enabling more powerful and flexible interactions with your data.
+
+  </TabItem>
+  <TabItem value="Go" label="Go">
+    You can run whatever arbitrary code you want in your Go connector and expose it for PromptQL to access, enabling your AI
+agents to accurately interact with your custom business logic.
+
+```ddn title="Initialize a new connector and select hasura/go from the list:"
+ddn connector init my_go -i
+```
+
+```go title="Replace the functions.go contents with your own custom code:"
+package functions
+
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// InputArguments represents the input of the native operation.
+type InputArguments struct {
+	MyInput string `json:"myInput"`
+}
+
+// OutputResult represents the output of the native operation.
+type OutputResult struct {
+	MyOutput string `json:"myOutput"`
+}
+
+// ProcedureCustomCode is a native operation that can be called via PromptQL.
+func ProcedureCustomCode(ctx context.Context, state *types.State, arguments *InputArguments) (*OutputResult, error) {
+	// Do something with the input
+	return &OutputResult{
+		MyOutput: "My output",
+	}, nil
+}
+```
+
+Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutation in your supergraph. Prefixing with
+`Function` identifies it as a function to be exposed as a query. Both will be accessible through PromptQL.
+
+Both have typed input arguments and return strings, which the connector will use to generate the corresponding schema
+for your supergraph.
+
+```ddn title="Introspect the connector:"
+ddn connector introspect my_go
+```
+
+```ddn title="Track the function:"
+ddn command add my_go customCode
+```
+
+```ddn title="Create a new build:"
+ddn supergraph build local
+```
+
+```ddn title="Start your services:"
+ddn run docker-start
+```
+
+```ddn title="Open your development console:"
+ddn console --local
+```
+
+Once your connector and custom function are set up, you can use PromptQL to talk to your data using natural language.
+
+  </TabItem>
+</Tabs>
+
+Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
+enabling accurate data modifications and complex operations through natural language interactions.
+
+## Update a command
+
+When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
+accuracy in its operations:
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Then, update your existing command:"
+ddn command update <connector_link_name> <command_name>
+```
+
+You will see an output which explains how new resources were added or updated in the command.
+
+After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
+interactions with their data remain accurate and up-to-date.
+
+You can also update the command by editing the command's metadata manually.
+
+## Delete a command
+
+```ddn title="If you no longer need a command, you can delete it:"
+ddn command remove <command_name>
+```
+
+Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
+in its query planning.
+
+## Reference
+
+You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
 
 ==============================
 
-
-
 # relationship.mdx
 
+URL: https://hasura.io/docs/promptql/data-modeling/relationship
 
 # Relationships Connect Data
 
@@ -1686,7 +3749,7 @@ ddn relationship add <connector_link_name> "*"
 
 Note that the above CLI commands work without also adding the relevant subgraph to the command with the `--subgraph`
 flag because this has been set in the CLI context. You can learn more about creating and switching contexts in the
-[CLI context](/) section. {/* TODO: Add link */}
+[CLI context](/) section. {/_ TODO: Add link _/}
 
 :::
 
@@ -1768,139 +3831,11 @@ self-contained.
 You can learn more about relationships in the metadata reference
 [docs](/reference/metadata-reference/relationships.mdx).
 
-
-
 ==============================
-
-
-
-# command.mdx
-
-
-
-# Commands Enable PromptQL to Modify Data
-
-## Introduction
-
-Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
-query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
-updates, deletes), executing complex operations, or implementing custom business logic across your connected data
-sources.
-
-When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
-incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
-action taken.
-
-## Lifecycle
-
-When setting up commands for use with PromptQL, follow this lifecycle:
-
-1. Have some operation in your data source that you want to make executable via PromptQL.
-2. Introspect your data source using the DDN CLI with the relevant data connector to fetch the operation resources.
-3. Add the command to your metadata with the DDN CLI.
-4. Create a build of your supergraph API with the DDN CLI.
-5. Serve your build as your API with the Hasura engine either locally or in the cloud.
-6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
-
-<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
-
-## Create a command
-
-To add a command you will need to have a data connector already set up and connected to the data source. Follow the
-[Quickstart](/quickstart.mdx) or the tutorial in [How to Build with DDN](/how-to-build-with-promptql/overview.mdx) to
-get to that point.
-
-### From a source operation
-
-Some data connectors support the ability to introspect your data source to discover the commands that can be added to
-your supergraph automatically.
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Show the resources discovered from your data source:"
-ddn connector show-resources <connector_name>
-```
-
-```ddn title="Add the command from the discovered resources to your metadata:"
-ddn command add <connector_link_name> <operation_name>
-```
-
-Or you can optionally add all the commands by specifying `"*"`.
-
-```ddn title="Add all commands from your data source:"
-ddn command add <connector_link_name> "*"
-```
-
-This will add commands with their accompanying metadata definitions to your metadata.
-
-### Via native operations {#via-native-operations-how-to}
-
-Some data connectors support the ability to add commands via native operations so that you can add any operation that is
-not supported by the automatic introspection process.
-
-For classic database connectors, this will be native query code for that source. This can be, for example, a more
-complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
-
-For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
-other side-effects) that PromptQL can use to execute specialized operations on your data.
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandCreateLambdaTypescriptNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandCreateLambdaPythonNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandCreateLambdaGoNativeOperationHowTo />
-  </TabItem>
-</Tabs>
-
-Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
-enabling accurate data modifications and complex operations through natural language interactions.
-
-## Update a command
-
-When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
-accuracy in its operations:
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Then, update your existing command:"
-ddn command update <connector_link_name> <command_name>
-```
-
-You will see an output which explains how new resources were added or updated in the command.
-
-After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
-interactions with their data remain accurate and up-to-date.
-
-You can also update the command by editing the command's metadata manually.
-
-## Delete a command
-
-```ddn title="If you no longer need a command, you can delete it:"
-ddn command remove <command_name>
-```
-
-Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
-in its query planning.
-
-## Reference
-
-You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
-
-
-
-==============================
-
-
 
 # permissions.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/permissions
 
 # Permissions Protect Data
 
@@ -2010,7 +3945,7 @@ definition:
       argumentPresets: # Specify the arguments and their values which need to be passed to the command
         - argument: keyId
           value:
-            sessionVariable: "x-hasura-user-id" # The value of the argument must equal the session variable
+            sessionVariable: 'x-hasura-user-id' # The value of the argument must equal the session variable
       #highlight-end
 ```
 
@@ -2035,13 +3970,11 @@ or `CommandPermissions` object.
 
 You can learn more about permissions in the metadata reference [docs](/reference/metadata-reference/permissions.mdx).
 
-
-
 ==============================
 
-
-
 # data-modeling-workflows.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/data-modeling-workflows
 
 # Data Modeling Workflows
 
@@ -2060,13 +3993,11 @@ query plans.
 
 [Learn more about semantic information](/data-modeling/semantic-information.mdx)
 
-
-
 ==============================
 
-
-
 # iterate.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/iterate
 
 # Iterate on your Data Model
 
@@ -2148,14 +4079,11 @@ If you are iterating locally, you then need to restart the Docker services by ru
 ddn run docker-start
 ```
 
-
-
 ==============================
-
-
 
 # overview.mdx
 
+URL: https://hasura.io/docs/promptql/promptql-playground/overview
 
 # PromptQL Playground
 
@@ -2218,14 +4146,11 @@ publicly.
 - [Learn how to use saved prompts](/promptql-playground/saved-prompts.mdx).
 - [Learn how to deal with the most common issues](/promptql-playground/troubleshooting.mdx).
 
-
-
 ==============================
-
-
 
 # public-projects.mdx
 
+URL: https://hasura.io/docs/promptql/promptql-playground/public-projects
 
 # Public Projects
 
@@ -2299,13 +4224,11 @@ plans and options.
 
 :::
 
-
-
 ==============================
 
-
-
 # saved-prompts.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/saved-prompts
 
 # Saved Prompts
 
@@ -2340,14 +4263,11 @@ link is opened.
 Special characters in the prompt are automatically escaped to ensure proper functionality. This ensures that even
 complex prompts with spaces or special symbols can be shared without issues.
 
-
-
 ==============================
-
-
 
 # shared-threads.mdx
 
+URL: https://hasura.io/docs/promptql/promptql-playground/shared-threads
 
 # Shared Threads
 
@@ -2371,13 +4291,11 @@ Sharing a thread doesn't reveal any publicly identifiable information about your
 itself is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
 conversation intact.
 
-
-
 ==============================
 
-
-
 # troubleshooting.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/troubleshooting
 
 # Troubleshooting
 
@@ -2479,14 +4397,11 @@ promptql-playground:
 
 Restart the local services, e.g. `docker compose down && ddn run docker-start`.
 
-
-
 ==============================
-
-
 
 # overview.mdx
 
+URL: https://hasura.io/docs/promptql/promptql-apis/overview
 
 # PromptQL APIs
 
@@ -2509,13 +4424,11 @@ flexible endpoints make it easy to create interactive, dynamic, and intelligent 
 Each API is backed by Hasura DDN, meaning you can connect your own project, pass context via artifacts, and control
 behavior using system instructions and customizations.
 
-
-
 ==============================
 
-
-
 # natural-language-api.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/natural-language-api
 
 # Natural Language API
 
@@ -2732,14 +4645,11 @@ data: {
    - Always check for error responses, especially in streaming mode
    - Implement appropriate retry logic for transient failures
 
-
-
 ==============================
-
-
 
 # execute-program-api.mdx
 
+URL: https://hasura.io/docs/promptql/promptql-apis/execute-program-api
 
 # Execute Program API
 
@@ -2946,13 +4856,11 @@ the Query Plan in the playground.
 
 <Thumbnail src="/img/get-started/export-as-api.png" alt="Export as API" />
 
-
-
 ==============================
 
-
-
 # overview.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/overview
 
 # Basics of Business Logic
 
@@ -2997,13 +4905,11 @@ native capabilities of your data source.
 
 :::
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/tutorials/
 
 # Business Logic Tutorials
 
@@ -3013,14 +4919,11 @@ step-by-step. Initially, we recommend checking out common use cases:
 - [Take action for a user](/business-logic/tutorials/1-take-action-for-a-user.mdx)
 - [Return complex information](/business-logic/tutorials/2-query-complex-information.mdx)
 
-
-
 ==============================
-
-
 
 # 1-take-action-for-a-user.mdx
 
+URL: https://hasura.io/docs/promptql/business-logic/tutorials/1-take-action-for-a-user
 
 # Take Action on Behalf of a User
 
@@ -3283,14 +5186,11 @@ from other datasources. Typically, PromptQL can pick up on the context of how to
 with your data, but you can always improve its understanding by creating a
 [relationship object](/data-modeling/relationship.mdx).
 
-
-
 ==============================
-
-
 
 # 2-query-complex-information.mdx
 
+URL: https://hasura.io/docs/promptql/business-logic/tutorials/2-query-complex-information
 
 # Return Complex Information
 
@@ -3315,14 +5215,11 @@ need to do custom transformations of the data before its returned to your applic
 
 You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
 
-
-
 ==============================
-
-
 
 # add-a-lambda-connector.mdx
 
+URL: https://hasura.io/docs/promptql/business-logic/add-a-lambda-connector
 
 # Add a Lambda Connector
 
@@ -3382,13 +5279,11 @@ After adding a connector, learn
 [how to add custom business logic](/business-logic/tutorials/1-take-action-for-a-user.mdx) written in your language of
 choice and expose it via your API.
 
-
-
 ==============================
 
-
-
 # add-env-vars-to-a-lambda.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/add-env-vars-to-a-lambda
 
 # Add Custom Environment Variables
 
@@ -3421,14 +5316,11 @@ conventions your language of choice prefers. For detailed instructions, refer to
 - **Python**: Using [python-dotenv](https://pypi.org/project/python-dotenv/)
 - **Go**: Using [godotenv](https://github.com/joho/godotenv)
 
-
-
 ==============================
-
-
 
 # errors.mdx
 
+URL: https://hasura.io/docs/promptql/business-logic/errors
 
 # Handle Errors with Lambda Connectors
 
@@ -3464,27 +5356,26 @@ supported classes and their usage details.
 <TabItem value="TypeScript" label="TypeScript">
 
 ```typescript title="TypeScript examples:" {1,6,14,22}
-
 /** @readonly */
 export function updateResource(userRole: string): void {
-  if (userRole !== "admin") {
-    throw new sdk.Forbidden("User does not have permission to update this resource", { role: userRole });
+  if (userRole !== 'admin') {
+    throw new sdk.Forbidden('User does not have permission to update this resource', { role: userRole });
   }
-  console.log("Resource updated successfully.");
+  console.log('Resource updated successfully.');
 }
 
 /** @readonly */
 export function createResource(id: string, existingIds: string[]): void {
   if (existingIds.includes(id)) {
-    throw new sdk.Conflict("Resource with this ID already exists", { existingId: id });
+    throw new sdk.Conflict('Resource with this ID already exists', { existingId: id });
   }
-  console.log("Resource created successfully.");
+  console.log('Resource created successfully.');
 }
 
 /** @readonly */
 export function divide(x: number, y: number): number {
   if (y === 0) {
-    throw new sdk.UnprocessableContent("Cannot divide by zero", { myErrorMetadata: "stuff", x, y });
+    throw new sdk.UnprocessableContent('Cannot divide by zero', { myErrorMetadata: 'stuff', x, y });
   }
   return x / y;
 }
@@ -3558,52 +5449,11 @@ Traces — complete with your custom error messages — are available for each r
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
 improvements can be made to enhance accuracy.
 
-
-
 ==============================
-
-
-
-# playground-auth.mdx
-
-
-# PromptQL Playground Auth
-
-You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
-of the chat dialogue.
-
-<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
-
-## Configure headers
-
-<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
-
-In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
-engine for each request.
-
-You can also add custom headers to the request by clicking the `+` button.
-
-:::info Reserved headers
-
-The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
-passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
-
-:::
-
-## Authorization
-
-The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
-variables if there are any set.
-
-<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
-
-
-
-==============================
-
-
 
 # Authentication and Authorization Overview
+
+URL: https://hasura.io/docs/promptql/auth/overview
 
 # Auth
 
@@ -3651,14 +5501,47 @@ No authentication is required for a specific role to access the data.
 
 [Read more](/auth/noauth-mode.mdx).
 
+==============================
 
+# playground-auth.mdx
+
+URL: https://hasura.io/docs/promptql/auth/playground-auth
+
+# PromptQL Playground Auth
+
+You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
+of the chat dialogue.
+
+<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
+
+## Configure headers
+
+<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
+
+In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
+engine for each request.
+
+You can also add custom headers to the request by clicking the `+` button.
+
+:::info Reserved headers
+
+The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
+passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
+
+:::
+
+## Authorization
+
+The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
+variables if there are any set.
+
+<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
 
 ==============================
 
-
-
 # Recipes
 
+URL: https://hasura.io/docs/promptql/recipes/overview
 
 # Recipes
 
@@ -3672,13 +5555,11 @@ rate-limiting and throttling, you can do it with PromptQL.
 
 For now, check out our [tutorials section](/recipes/tutorials/index.mdx) with cloneable repos to get you started!
 
-
-
 ==============================
 
-
-
 # Tutorials
+
+URL: https://hasura.io/docs/promptql/recipes/tutorials/
 
 # Tutorials
 
@@ -3694,14 +5575,11 @@ immediately.
 - [DuckDuckGo Web Search](/recipes/tutorials/duckduckgo-web-search.mdx)
 - [Add Vector Search to PostgreSQL](/recipes/tutorials/add-vector-search-to-postgresql.mdx)
 
-
-
 ==============================
-
-
 
 # GitHub Assistant
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/github-assistant
 
 # GitHub Assistant
 
@@ -3717,7 +5595,54 @@ You will learn how to:
 - Run your PromptQL project in a local environment.
 - Ask your questions with PromptQL playground.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Build your PromptQL app
 
@@ -3841,14 +5766,11 @@ Head over to the console and ask a few questions about your GitHub repo.
 > What kind of questions can I ask?
 ```
 
-
-
 ==============================
-
-
 
 # Apple Health Assistant
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/apple-health-assistant
 
 # Apple Health Assistant
 
@@ -3862,7 +5784,54 @@ Here’s a sample conversation:
 
 Check out the [GitHub repo](https://github.com/praveenweb/apple-health-ai-assistant).
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Export your Apple Health Data
 
@@ -4000,14 +5969,11 @@ PromptQL! You can click the `Replay` button at any point to restart the demo.
   />
 </div>
 
-
-
 ==============================
-
-
 
 # Huggingface Datasets
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/huggingface-csv-parquet-sqlite
 
 # Huggingface Datasets
 
@@ -4016,7 +5982,54 @@ connect it to PromptQL to be able to query using natural language.
 
 Check out the [GitHub repo](https://github.com/hasura/huggingface-dataset-promptql).
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Import your Huggingface Dataset
 
@@ -4157,14 +6170,11 @@ directory of the repo:
 docker compose down -v && ddn run docker-start
 ```
 
-
-
 ==============================
-
-
 
 # Realtime Chat with the BART API
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/bart-api
 
 # AI Assistant for BART (Bay Area Rapid Transit)
 
@@ -4182,7 +6192,54 @@ Here's a sample of what you can ask:
 
 <Thumbnail src="/img/get-started/bart-assistant.jpeg" alt="Bart AI Assistant" />
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Setup the Bart API
 
@@ -4249,20 +6306,64 @@ This should open up your browser (or print a browser URL) for displaying the Has
 something like:
 [https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
-
-
 ==============================
-
-
 
 # CSV Files
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/csv-files
 
 # AI Assistant on CSV Files
 
 Supports importing multiple CSV files, each with their own schema.
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Import your CSV Files
 
@@ -4355,14 +6456,11 @@ directory of the repo:
 docker compose down -v && ddn run docker-start
 ```
 
-
-
 ==============================
-
-
 
 # Kaggle Datasets
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/kaggle-csv-sqlite
 
 # Import Kaggle Datasets | CSV, SQLite
 
@@ -4371,7 +6469,54 @@ PromptQL to be able to query using natural language.
 
 Check out the [GitHub repo](https://github.com/hasura/kaggle-dataset-promptql).
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Import your Kaggle Dataset
 
@@ -4495,14 +6640,11 @@ directory of the repo:
 docker compose down -v && ddn run docker-start
 ```
 
-
-
 ==============================
-
-
 
 # DuckDuckGo Web Search
 
+URL: https://hasura.io/docs/promptql/recipes/tutorials/duckduckgo-web-search
 
 # AI Assistant for DuckDuckGo Web Search with Agentic Query Planning
 
@@ -4519,7 +6661,54 @@ query using natural language and perform programmatic analysis or computation on
 
 Check out the [GitHub repo](https://github.com/hasura/duckduckgo-search).
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Setup DuckDuckGo Search Connector
 
@@ -4588,13 +6777,11 @@ Here's a sample of what you can ask to get started.
 - summarize the top 3 results for "promptql"
 - for "promptql", classify the results as informational or product intent.
 
-
-
 ==============================
 
-
-
 # Add Vector Search to PostgreSQL
+
+URL: https://hasura.io/docs/promptql/recipes/tutorials/add-vector-search-to-postgresql
 
 # Add Vector Search to PostgreSQL
 
@@ -4882,13 +7069,11 @@ Which customer feedback best highlights our product’s unique value?
 Which client comment would be most persuasive for a case study?
 ```
 
-
-
 ==============================
 
-
-
 # Add JSONB Support for Snowflake
+
+URL: https://hasura.io/docs/promptql/recipes/tutorials/add-jsonb-support-snowflake
 
 # Add JSONB Support for Snowflake
 
@@ -5099,13 +7284,11 @@ ddn console --local
 Ask any questions you wish about your Snowflake data...including those that utilize your structured JSON directly from
 Snowflake!
 
-
-
 ==============================
 
-
-
 # Add Support for Weaviate
+
+URL: https://hasura.io/docs/promptql/recipes/tutorials/weaviate
 
 # Add Support for Weaviate
 
@@ -5297,13 +7480,11 @@ Historical movies
 
 If you need to iterate on your code or schema, check out the [iteration guide](/data-modeling/iterate.mdx).
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/
 
 # JWT Mode
 
@@ -5321,14 +7502,11 @@ In JWT mode, session variables are passed to the Hasura Engine on each request i
 - [Firebase JWT integration](/auth/jwt/tutorials/integrations/3-firebase.mdx)
 - [Clerk JWT integration](/auth/jwt/tutorials/integrations/4-clerk.mdx)
 
-
-
 ==============================
-
-
 
 # jwt-mode.mdx
 
+URL: https://hasura.io/docs/promptql/auth/jwt/jwt-mode
 
 # JWT Mode
 
@@ -5559,13 +7737,11 @@ pass this value in via the [PromptQL Playground client](/auth/playground-auth.md
 If you're looking for step-by-step help to get started with common authentication providers, check
 [this section](/auth/jwt/tutorials/index.mdx) of tutorials.
 
-
-
 ==============================
 
-
-
 # jwt-configuration.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/jwt-configuration
 
 # JWT Configuration
 
@@ -5592,7 +7768,7 @@ definition:
           algorithm: HS256
           key:
             value: ultra-secret-very-secret-super-secret-key
-      audience: ["myapp-1234", "myapp-6789"]
+      audience: ['myapp-1234', 'myapp-6789']
       allowedSkew: 60
       issuer: https://my-auth-server.com
 ```
@@ -5846,7 +8022,7 @@ claimsConfig:
     x-hasura-default-role:
       literal: user
     x-hasura-allowed-roles:
-      literal: ["user", "editor"]
+      literal: ['user', 'editor']
     x-hasura-user-id:
       path:
         path: /user/id
@@ -5988,7 +8164,7 @@ definition:
   mode:
     jwt:
       # ...
-      audience: ["myapp-1234", "myapp-6789"]
+      audience: ['myapp-1234', 'myapp-6789']
 ```
 
 :::danger Audience Security Vulnerability
@@ -6340,13 +8516,11 @@ Hasura with Clerk.
 By default, Keycloak uses the `RSA-OAEP` algorithm, which Hasura doesn't support. Remove the algorithm in the
 `Realm Settings -> Keys -> Add Providers` tab.
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/
 
 # Authentication
 
@@ -6362,13 +8536,11 @@ authentication provider to Hasura DDN.
 - [Firebase](/auth/jwt/tutorials/integrations/3-firebase.mdx)
 - [Clerk](/auth/jwt/tutorials/integrations/4-clerk.mdx)
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/integrations/
 
 # Authentication
 
@@ -6384,13 +8556,11 @@ authentication provider to Hasura DDN.
 - [Firebase](/auth/jwt/tutorials/integrations/3-firebase.mdx)
 - [Clerk](/auth/jwt/tutorials/integrations/4-clerk.mdx)
 
-
-
 ==============================
-
-
 
 # 1-auth0.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/integrations/1-auth0
 
 # Auth0
 
@@ -6434,23 +8604,23 @@ Enter a name for your Action such as `Hasura JWT Claims` and paste the following
 
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
-  const namespace = "claims.jwt.hasura.io";
+  const namespace = 'claims.jwt.hasura.io';
   // Here, you'll need to fetch the user's role from Hasura DDN using an admin-level authenticated request
   // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
   // Below, we're hard-coding the value for now
-  const user_role = "user"; // the role returned from your request ☝️
+  const user_role = 'user'; // the role returned from your request ☝️
   api.idToken.setCustomClaim(namespace, {
-    "x-hasura-default-role": user_role,
-    "x-hasura-allowed-roles": [user_role],
-    "x-hasura-user-id": event.user.user_id,
+    'x-hasura-default-role': user_role,
+    'x-hasura-allowed-roles': [user_role],
+    'x-hasura-user-id': event.user.user_id,
     // Add any other custom claims you wish to include
   });
 
   // Set the necessary access token claims for Hasura to authenticate the user
   api.accessToken.setCustomClaim(namespace, {
-    "x-hasura-default-role": user_role,
-    "x-hasura-allowed-roles": [user_role],
-    "x-hasura-user-id": event.user.user_id,
+    'x-hasura-default-role': user_role,
+    'x-hasura-allowed-roles': [user_role],
+    'x-hasura-user-id': event.user.user_id,
   });
 };
 ```
@@ -6481,11 +8651,11 @@ definition:
       claimsConfig:
         namespace:
           claimsFormat: Json
-          location: "/claims.jwt.hasura.io"
+          location: '/claims.jwt.hasura.io'
       issuer: "<your Auth0 tenant's URL>"
       key:
         jwkFromUrl: "https://<your Auth0 tenant's URL>/.well-known/jwks.json"
-      audience: ["<your endpoint>"]
+      audience: ['<your endpoint>']
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -6524,13 +8694,13 @@ After creating the application, go to `Triggers`, located underneath `Actions` i
 
 ```javascript
 exports.onExecuteCredentialsExchange = async (event, api) => {
-  const namespace = "claims.jwt.hasura.io";
+  const namespace = 'claims.jwt.hasura.io';
 
-  const service_role = "service_account";
+  const service_role = 'service_account';
 
   api.accessToken.setCustomClaim(namespace, {
-    "x-hasura-default-role": service_role,
-    "x-hasura-allowed-roles": [service_role],
+    'x-hasura-default-role': service_role,
+    'x-hasura-allowed-roles': [service_role],
   });
 };
 ```
@@ -6588,13 +8758,11 @@ different roles and environments.
 If you encounter issues or need further customization, consider reviewing our related documentation or exploring
 additional Auth0 features that can enhance your authentication flows.
 
-
-
 ==============================
 
-
-
 # 2-aws-cognito.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/integrations/2-aws-cognito
 
 # AWS Cognito
 
@@ -6631,18 +8799,18 @@ After your Lambda is created, you'll be redirected to an editor where you can mo
 following code to modify the Cognito JWT and inject the custom Hasura namespace claims:
 
 ```javascript
-export const handler = async (event) => {
+export const handler = async event => {
   // Here, you'll need to fetch the user's role from Hasura DDN using an admin-level authenticated request
   // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
   // Below, we're hard-coding the value for now
-  const user_role = "user"; // the role returned from your request ☝️
+  const user_role = 'user'; // the role returned from your request ☝️
   event.response = {
     claimsOverrideDetails: {
       claimsToAddOrOverride: {
-        "claims.jwt.hasura.io": JSON.stringify({
-          "x-hasura-user-id": event.request.userAttributes.sub,
-          "x-hasura-default-role": user_role,
-          "x-hasura-allowed-roles": ["user"],
+        'claims.jwt.hasura.io': JSON.stringify({
+          'x-hasura-user-id': event.request.userAttributes.sub,
+          'x-hasura-default-role': user_role,
+          'x-hasura-allowed-roles': ['user'],
         }),
       },
     },
@@ -6686,9 +8854,9 @@ definition:
       claimsConfig:
         namespace:
           claimsFormat: StringifiedJson
-          location: "/claims.jwt.hasura.io"
+          location: '/claims.jwt.hasura.io'
       key:
-        jwkFromUrl: "https://cognito-idp.<your_region>.amazonaws.com/<your_region>_<your_user_pool_id>.well-known/jwks.json"
+        jwkFromUrl: 'https://cognito-idp.<your_region>.amazonaws.com/<your_region>_<your_user_pool_id>.well-known/jwks.json'
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -6720,13 +8888,11 @@ roles and environments.
 If you encounter issues or need further customization, consider reviewing our related documentation or exploring
 additional AWS Cognito features that can enhance your authentication flows.
 
-
-
 ==============================
 
-
-
 # 3-firebase.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/integrations/3-firebase
 
 # Firebase
 
@@ -6769,10 +8935,10 @@ npm i firebase-admin
 Then, initialize the module in your application:
 
 ```javascript
-const admin = require("firebase-admin");
+const admin = require('firebase-admin');
 
 // service_account.json points to the private key from the prerequisites
-admin.initializeApp({ credential: admin.credential.cert(require("./service_account.json")) });
+admin.initializeApp({ credential: admin.credential.cert(require('./service_account.json')) });
 ```
 
 #### Step 1.3 Add the custom claims
@@ -6781,12 +8947,12 @@ admin.initializeApp({ credential: admin.credential.cert(require("./service_accou
 // Here, you'll need to fetch the user's role from Hasura using an admin-level authenticated request
 // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
 // Below, we're hard-coding the value for now
-const user_role = "user"; // the role returned from your request ☝️
+const user_role = 'user'; // the role returned from your request ☝️
 const customClaims = {
-  "claims.jwt.hasura.io": {
-    "x-hasura-default-role": user_role,
-    "x-hasura-allowed-roles": ["user"],
-    "x-hasura-user-id": decodedToken.uid,
+  'claims.jwt.hasura.io': {
+    'x-hasura-default-role': user_role,
+    'x-hasura-allowed-roles': ['user'],
+    'x-hasura-user-id': decodedToken.uid,
   },
 };
 
@@ -6813,13 +8979,13 @@ version: v3
 definition:
   mode:
     jwt:
-      audience: ["your-firebase-project-name"]
+      audience: ['your-firebase-project-name']
       claimsConfig:
         namespace:
           claimsFormat: Json
-          location: "/claims.jwt.hasura.io"
+          location: '/claims.jwt.hasura.io'
       key:
-        jwkFromUrl: "https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com"
+        jwkFromUrl: 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com'
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -6849,14 +9015,14 @@ have in your metadata.
   <summary>Here's the complete sample Node.js server.</summary>
 
 ```javascript
-const express = require("express");
-const admin = require("firebase-admin");
-const bodyParser = require("body-parser");
-const axios = require("axios");
+const express = require('express');
+const admin = require('firebase-admin');
+const bodyParser = require('body-parser');
+const axios = require('axios');
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
-  credential: admin.credential.cert(require("./service_account.json")),
+  credential: admin.credential.cert(require('./service_account.json')),
 });
 
 const app = express();
@@ -6866,11 +9032,11 @@ app.use(bodyParser.json());
 const FIREBASE_API_KEY = "your API key found on the Firebase project's console";
 
 // Route to handle user login with email and password
-app.post("/login", async (req, res) => {
+app.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res.status(400).json({ message: "Email and password are required" });
+    return res.status(400).json({ message: 'Email and password are required' });
   }
 
   try {
@@ -6892,12 +9058,12 @@ app.post("/login", async (req, res) => {
     // Here, you'll need to fetch the user's role from Hasura DDN using an admin-level authenticated request
     // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
     // Below, we're hard-coding the value for now
-    const user_role = "user"; // the role returned from your request ☝️
+    const user_role = 'user'; // the role returned from your request ☝️
     const customClaims = {
-      "claims.jwt.hasura.io": {
-        "x-hasura-default-role": user_role,
-        "x-hasura-allowed-roles": ["user"],
-        "x-hasura-user-id": decodedToken.uid,
+      'claims.jwt.hasura.io': {
+        'x-hasura-default-role': user_role,
+        'x-hasura-allowed-roles': ['user'],
+        'x-hasura-user-id': decodedToken.uid,
       },
     };
 
@@ -6909,13 +9075,13 @@ app.post("/login", async (req, res) => {
       idToken,
     });
   } catch (error) {
-    console.error("Error logging in:", error.response?.data || error.message);
-    res.status(401).json({ message: "Invalid credentials", error: error.response?.data || error.message });
+    console.error('Error logging in:', error.response?.data || error.message);
+    res.status(401).json({ message: 'Invalid credentials', error: error.response?.data || error.message });
   }
 });
 
 app.listen(4000, () => {
-  console.log("Server running on port 4000");
+  console.log('Server running on port 4000');
 });
 ```
 
@@ -6935,13 +9101,11 @@ roles and environments.
 If you encounter issues or need further customization, consider reviewing our related documentation or exploring
 additional Firebase features that can enhance your authentication flows.
 
-
-
 ==============================
 
-
-
 # 4-clerk.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/integrations/4-clerk
 
 # Clerk
 
@@ -7011,9 +9175,9 @@ definition:
       claimsConfig:
         namespace:
           claimsFormat: Json
-          location: "/claims.jwt.hasura.io"
+          location: '/claims.jwt.hasura.io'
       key:
-        jwkFromUrl: "https://<your-clerk-domain>/.well-known/jwks.json"
+        jwkFromUrl: 'https://<your-clerk-domain>/.well-known/jwks.json'
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -7035,7 +9199,7 @@ Clerk's [various SDKs](https://clerk.com/docs/references/overview) make this eas
 template and get back the encoded token.
 
 ```javascript title="As an example, using the JavaScript SDK:"
-const jwt = await session.getToken({ template: "hasura" });
+const jwt = await session.getToken({ template: 'hasura' });
 ```
 
 ## Wrapping up
@@ -7052,13 +9216,11 @@ roles and environments.
 If you encounter issues or need further customization, consider reviewing our related documentation or exploring
 additional Clerk features that can enhance your authentication flows.
 
-
-
 ==============================
 
-
-
 # setup-test-jwt.mdx
+
+URL: https://hasura.io/docs/promptql/auth/jwt/tutorials/setup-test-jwt
 
 # Set up a JWT for Testing
 
@@ -7105,12 +9267,12 @@ definition:
       claimsConfig:
         namespace:
           claimsFormat: Json
-          location: "/claims.jwt.hasura.io"
+          location: '/claims.jwt.hasura.io'
       key:
         fixed:
           algorithm: HS256
           key:
-            value: "<insert-the-key-generated-in-previous-step>"
+            value: '<insert-the-key-generated-in-previous-step>'
       tokenLocation:
         type: Header
         name: Auth-Token
@@ -7154,14 +9316,11 @@ If you're storing your secret key's value as an environment variable, ensure you
 
 :::
 
-
-
 ==============================
-
-
 
 # webhook-mode.mdx
 
+URL: https://hasura.io/docs/promptql/auth/webhook/webhook-mode
 
 # Webhook Mode
 
@@ -7219,7 +9378,7 @@ definition:
               - content-type
         headers:
           additional:
-            user-agent: "Hasura DDN"
+            user-agent: 'Hasura DDN'
 ```
 
 ```yaml title="Example .env file"
@@ -7430,13 +9589,11 @@ variables.
 If we run a query for Orders, we can see that we only get the orders which this user has made and are not able to access
 the `deliveryDate` field.
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/auth/webhook/
 
 # Authentication Using a Webhook
 
@@ -7451,14 +9608,11 @@ containing the session variables after authenticating the request.
 
 - [How to set up webhook mode](/auth/webhook/webhook-mode.mdx)
 
-
-
 ==============================
-
-
 
 # noauth-mode.mdx
 
+URL: https://hasura.io/docs/promptql/auth/noauth-mode
 
 # NoAuth
 
@@ -7555,13 +9709,11 @@ ddn console --local
 
 You can query your data without any authentication.
 
-
-
 ==============================
 
-
-
 # model-permissions.mdx
+
+URL: https://hasura.io/docs/promptql/auth/permissions/model-permissions
 
 # Model Permissions
 
@@ -7626,13 +9778,11 @@ definition:
 
 See the [ModelPermissions](/reference/metadata-reference/permissions.mdx) reference for more information.
 
-
-
 ==============================
 
-
-
 # type-permissions.mdx
+
+URL: https://hasura.io/docs/promptql/auth/permissions/type-permissions
 
 # Type Permissions
 
@@ -7682,13 +9832,11 @@ definition:
 
 See the [TypePermissions](/reference/metadata-reference/permissions.mdx) reference for more information.
 
-
-
 ==============================
 
-
-
 # command-permissions.mdx
+
+URL: https://hasura.io/docs/promptql/auth/permissions/command-permissions
 
 # Command Permissions
 
@@ -7763,13 +9911,11 @@ definition:
 
 See the [CommandPermissions](/reference/metadata-reference/permissions.mdx) reference for more information.
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/auth/permissions/tutorials/
 
 # Permissions Tutorials
 
@@ -7785,13 +9931,11 @@ deeper into one of these tutorials.
 
 - [Limit data to users](/auth/permissions/tutorials/1-simple-user-permissions.mdx)
 
-
-
 ==============================
 
-
-
 # 1-simple-user-permissions.mdx
+
+URL: https://hasura.io/docs/promptql/auth/permissions/tutorials/1-simple-user-permissions
 
 # Limit Data to Users
 
@@ -7925,13 +10069,11 @@ different roles and environments.
 
 - [Authorization tutorials](/auth/permissions/tutorials/index.mdx)
 
-
-
 ==============================
 
-
-
 # overview.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/overview
 
 # Projects
 
@@ -7993,13 +10135,11 @@ collaborate through a unified API. For more information, check out
 - [Learn more about provisioning subgraphs](/project-configuration/subgraphs/index.mdx)
 - [Learn how to manage a project across environments](/project-configuration/project-management/index.mdx)
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/
 
 # Tutorials
 
@@ -8015,13 +10155,11 @@ to enable independent ownership and development.
 - [Work with multiple subgraphs](/project-configuration/tutorials/work-with-multiple-subgraphs.mdx)
 - [Work with multiple subgraphs across separate repositories](/project-configuration/tutorials/work-with-multiple-repositories.mdx)
 
-
-
 ==============================
 
-
-
 # manage-multiple-environments.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/manage-multiple-environments
 
 # Manage Multiple Environments
 
@@ -8177,13 +10315,11 @@ build, which should be identical to your `staging` build.
 Now that you know how contexts can help you manage environments, see how easy it is to
 [set up CI/CD](/deployment/hasura-ddn/ci-cd.mdx) using the CLI and contexts.
 
-
-
 ==============================
 
-
-
 # work-with-multiple-subgraphs.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-subgraphs
 
 # Work with Multiple Subgraphs
 
@@ -8430,114 +10566,11 @@ between teams. To take this a step further, many teams prefer to implement multi
 subgraph can be added to an existing or private team repository. Learn more
 [here](/project-configuration/tutorials/work-with-multiple-repositories.mdx).
 
-
-
 ==============================
-
-
-
-# remove-subgraph.mdx
-
-# Remove a subgraph
-
-## Introduction
-
-In this recipe, you'll learn how to remove a subgraph from your local project directory.
-
-:::info Prerequisites
-
-Before continuing, ensure you have:
-
-- A [local Hasura project](/quickstart.mdx).
-- Stopped any running docker services related to the project.
-
-:::
-
-## Recipe
-
-### Step 1. Delete subgraph directory
-
-Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
-directory is typically located at `<subgraph-name>`.
-
-### Step 2. Update supergraph config files
-
-Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
-
-```yaml title="supergraph.yaml"
-kind: Supergraph
-version: v2
-definition:
-  subgraphs:
-    - globals/subgraph.yaml
-    #highlight-start
-    - <subgraph-name>/subgraph.yaml
-    #highlight-end
-    ...
-```
-
-### Step 3. Update engine compose file
-
-Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
-compose file is typically located at `<project-root>/compose.yaml`.
-
-```yaml title="<project-root>/compose.yaml"
-include:
-  #highlight-start
-  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
-  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
-  #highlight-end
-  ...
-services:
-  engine: ...
-```
-
-### Step 4. Remove subgraph config file from context
-
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
-the `subgraph` key if set as the deleted subgraph config file.
-
-```yaml title=".hasura/context.yaml"
-kind: Context
-version: v3
-definition:
-  current: default
-  contexts:
-    default:
-      supergraph: ../supergraph.yaml
-      #highlight-start
-      subgraph: ../<subgraph-name>/subgraph.yaml
-      #highlight-end
-      ...
-```
-
-### Step 5. (Optional) Remove subgraph relevant environment variables
-
-You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
-CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
-
-```.env title="For example, .env"
-...
-#highlight-start
-<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
-#highlight-end
-...
-```
-
-## Learn more
-
-- [Project configuration](/project-configuration/overview.mdx)
-
-
-
-==============================
-
-
 
 # work-with-multiple-repositories.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-repositories
 
 # Work with Multiple Repositories
 
@@ -8751,7 +10784,7 @@ ddn supergraph build apply <supergraph-build-version>
 
 :::tip Streamline team collaboration For more efficient development across multiple repositories, you can create and
 apply the supergraph build in a single command using
-`ddn supergraph build create  --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id> --apply`
+`ddn supergraph build create --subgraph-version customers:<build-version> --base-supergraph-version <supergraph-build-id> --apply`
 :::
 
 :::warning Make sure to stop all running services
@@ -8948,13 +10981,110 @@ development in Hasura. Starting with a parent project, you learned how to provis
 manage builds to integrate subgraph changes into a unified supergraph. This structure ensures teams can work
 independently while maintaining seamless integration and coordination across the entire application.
 
+==============================
 
+# remove-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
 
 ==============================
 
-
-
 # rename-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/rename-subgraph
 
 # Rename a subgraph
 
@@ -9095,13 +11225,11 @@ definition:
 
 - [Project configuration](/project/configuration/overview.mdx
 
-
-
 ==============================
 
-
-
 # independent-connector-deployment.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/independent-connector-deployment
 
 # Deploy connectors and supergraph independently
 
@@ -9258,13 +11386,11 @@ The `--project`, `--supergraph` and `--env-file` flags can be skipped if the key
 
 - [Project configuration](/project/configuration/overview.mdx
 
-
-
 ==============================
 
-
-
 # promptql-config.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/promptql-config
 
 # PromptQL Configuration
 
@@ -9372,13 +11498,11 @@ definition:
 - Focus on specific behaviors or knowledge you want to emphasize.
 - Test your custom instructions thoroughly before using them in production.
 
-
-
 ==============================
 
-
-
 # supergraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/supergraph
 
 # Supergraph
 
@@ -9414,13 +11538,11 @@ visualizations from your data through natural conversations, enabling you to tak
 
 - [Learn more about subgraphs](/project-configuration/subgraphs/index.mdx)
 
-
-
 ==============================
 
-
-
 # create-a-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/create-a-subgraph
 
 # How to Create a Subgraph
 
@@ -9479,13 +11601,11 @@ on the cloud project.
 - [Check out an end-to-end tutorial for working with multiple subgraphs](/project-configuration/tutorials/work-with-multiple-subgraphs.mdx)
 - [Learn how to work with multiple subgraphs in a project](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/
 
 # Subgraphs
 
@@ -9518,13 +11638,11 @@ foundation for PromptQL's data interactions.
 - [Learn how to establish relationships across subgraphs to unify your data for PromptQL access](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
 - [Learn how to split subgraphs across repositories to enable decentralized development](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
 
-
-
 ==============================
 
-
-
 # working-with-multiple-subgraphs.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/working-with-multiple-subgraphs
 
 # How to Work with Multiple Subgraphs
 
@@ -9688,14 +11806,11 @@ This advanced feature requires the DDN Advanced plan. Learn more in our guide ab
 
 :::
 
-
-
 ==============================
-
-
 
 # working-with-multiple-repositories.mdx
 
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/working-with-multiple-repositories
 
 # How to Split Subgraphs across Repositories
 
@@ -9822,11 +11937,34 @@ This initial build serves as the foundation for future subgraph builds.
 
 Navigate to your project's console and invite collaborators based on their roles:
 
-<Roles />
+| Role                      | Abilities                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Owner**                 | All Project abilities including deletion. At this time, project ownership is not transferable.       |
+| **Admin**                 | Same as a Project Owner, excluding deletion of the project.                                          |
+| **Read Only**             | Only explore and visualize the supergraph.                                                           |
+| **Subgraph Admin** \*     | All subgraph development-related abilities: create subgraph build, apply subgraph build to endpoint. |
+| **Subgraph Developer** \* | Same as a subgraph admin, excluding the ability to apply subgraph build to endpoint.                 |
+
+\* Subgraph roles are only available on [DDN Advanced projects](https://hasura.io/pricing/ddn).
 
 The following are the detailed permissions for the above roles:
 
-<Permissions />
+| Permissions                                                         | Owner | Admin | Read Only | Subgraph<br/> Admin \* | Subgraph<br/> Developer \* |
+| ------------------------------------------------------------------- | ----- | ----- | --------- | ---------------------- | -------------------------- |
+| View Supergraph Explorer                                            | ✅    | ✅    | ✅        | ✅                     | ✅                         |
+| View project insights                                               | ✅    | ✅    | ✅        | ✅                     | ✅                         |
+| Create supergraph builds<br/> - using all subgraphs' metadata       | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create supergraph builds<br/> - using single subgraph's metadata \* | ✅    | ✅    | ❌        | ✅                     | ✅                         |
+| Apply supergraph builds to project endpoint                         | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create subgraph builds \*                                           | ✅    | ✅    | ❌        | ✅                     | ✅                         |
+| Apply subgraph builds to project endpoint \*                        | ✅    | ✅    | ❌        | ✅                     | ❌                         |
+| Admin permissions on all subgraphs                                  | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create / Delete subgraphs                                           | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Add / Remove collaborators                                          | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Manage project plans and billing                                    | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Delete project                                                      | ✅    | ❌    | ❌        | ❌                     | ❌                         |
+
+\* Only available on [DDN Advanced projects](https://hasura.io/pricing/ddn).
 
 Each collaborator will receive an invitation to join the project and can proceed to add their subgraphs.
 
@@ -9990,13 +12128,11 @@ ddn subgraph build apply <subgraph-build-version>
 
 - [Follow an end-to-end tutorial](/project-configuration/tutorials/work-with-multiple-repositories.mdx)
 
-
-
 ==============================
 
-
-
 # subgraph-prefixing.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/subgraph-prefixing
 
 # Subgraph Prefixing
 
@@ -10045,13 +12181,11 @@ ddn codemod rename-graphql-prefixes --graphql-root-field 'app_' --graphql-type-n
 ddn codemod rename-graphql-prefixes --subgraph app/subgraph.yaml --from-graphql-root-field 'app_' --graphql-root-field 'new_'
 ```
 
-
-
 ==============================
 
-
-
 # manage-contexts.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/manage-contexts
 
 # How to Manage Project Contexts
 
@@ -10205,13 +12339,11 @@ Now that you have a better idea of configuring your project for various contexts
 [learn how to collaborate with others](/project-configuration/project-management/manage-collaborators.mdx) by adding
 collaborators and defining their roles.
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/
 
 # Project Management
 
@@ -10231,14 +12363,11 @@ enabling them to only contribute to certain [subgraphs](/project-configuration/s
 - [Learn how to manage context](/project-configuration/project-management/manage-contexts.mdx)
 - [Learn how to invite collaborators](/project-configuration/project-management/manage-collaborators.mdx)
 
-
-
 ==============================
-
-
 
 # manage-collaborators.mdx
 
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/manage-collaborators
 
 # How to Manage Project Collaborators
 
@@ -10258,11 +12387,34 @@ In order to add collaborators, your project must either be a
 
 ## Available roles {#roles}
 
-<Roles />
+| Role                      | Abilities                                                                                            |
+| ------------------------- | ---------------------------------------------------------------------------------------------------- |
+| **Owner**                 | All Project abilities including deletion. At this time, project ownership is not transferable.       |
+| **Admin**                 | Same as a Project Owner, excluding deletion of the project.                                          |
+| **Read Only**             | Only explore and visualize the supergraph.                                                           |
+| **Subgraph Admin** \*     | All subgraph development-related abilities: create subgraph build, apply subgraph build to endpoint. |
+| **Subgraph Developer** \* | Same as a subgraph admin, excluding the ability to apply subgraph build to endpoint.                 |
+
+\* Subgraph roles are only available on [DDN Advanced projects](https://hasura.io/pricing/ddn).
 
 The following are the detailed permissions for the above roles:
 
-<Permissions />
+| Permissions                                                         | Owner | Admin | Read Only | Subgraph<br/> Admin \* | Subgraph<br/> Developer \* |
+| ------------------------------------------------------------------- | ----- | ----- | --------- | ---------------------- | -------------------------- |
+| View Supergraph Explorer                                            | ✅    | ✅    | ✅        | ✅                     | ✅                         |
+| View project insights                                               | ✅    | ✅    | ✅        | ✅                     | ✅                         |
+| Create supergraph builds<br/> - using all subgraphs' metadata       | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create supergraph builds<br/> - using single subgraph's metadata \* | ✅    | ✅    | ❌        | ✅                     | ✅                         |
+| Apply supergraph builds to project endpoint                         | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create subgraph builds \*                                           | ✅    | ✅    | ❌        | ✅                     | ✅                         |
+| Apply subgraph builds to project endpoint \*                        | ✅    | ✅    | ❌        | ✅                     | ❌                         |
+| Admin permissions on all subgraphs                                  | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Create / Delete subgraphs                                           | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Add / Remove collaborators                                          | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Manage project plans and billing                                    | ✅    | ✅    | ❌        | ❌                     | ❌                         |
+| Delete project                                                      | ✅    | ❌    | ❌        | ❌                     | ❌                         |
+
+\* Only available on [DDN Advanced projects](https://hasura.io/pricing/ddn).
 
 ## How to invite collaborators {#invite-collaborators}
 
@@ -10324,13 +12476,11 @@ this, click the `Share` button in the top navigation of your project and select 
 
 Each time a user requests access, you'll be able to approve or deny the request from this modal.
 
-
-
 ==============================
 
-
-
 # manage-environments.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/manage-environments
 
 # Alternative Configuration Files per Environment
 
@@ -10386,14 +12536,11 @@ definition:
 Then similarly, we would have the supergraph file for the other environments to use which specifies JWT mode in the
 `auth-config.yaml` file. You can read more about [auth here](/auth/overview.mdx).
 
-
-
 ==============================
-
-
 
 # service-accounts.mdx
 
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/service-accounts
 
 # Service Accounts
 
@@ -10530,14 +12677,11 @@ Click the `Delete` button next to the service account you want to delete:
   width="1000"
 />
 
-
-
 ==============================
-
-
 
 # console-collaborator-comments.mdx
 
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/console-collaborator-comments
 
 # Commenting on Metadata
 
@@ -10628,7 +12772,7 @@ The notification hub can be found in the top right corner of the console. On cli
 all the comments where you are tagged in one place. You can click on a particular comment (deep linking) and go to the
 original thread on the console. You can also delete notifications from that menu.
 
-{/* <Thumbnail src="/img/get-started/comments_notification.png" alt="Notifications" width="100" height="100" /> */}
+{/_ <Thumbnail src="/img/get-started/comments_notification.png" alt="Notifications" width="100" height="100" /> _/}
 ![Alt text](/img/get-started/comments_notification.png)
 
 <br />
@@ -10651,14 +12795,11 @@ prioritize any specific functionality.
 4. Ability to auto notify subgraph admin and developers.
 5. History Tab for comments.
 
-
-
 ==============================
-
-
 
 # Basics
 
+URL: https://hasura.io/docs/promptql/deployment/overview
 
 # Deployment
 
@@ -10692,13 +12833,11 @@ You can also host your [Data Plane](/help/glossary#data-plane) on your own infra
 
 [Read more](/private-ddn/overview.mdx)
 
-
-
 ==============================
 
-
-
 # Overview
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/
 
 # Deployment Overview
 
@@ -10732,80 +12871,11 @@ detailed steps depending on your specific connector.
 
 - [Deploy from multiple repositories.](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
 
-
-
 ==============================
-
-
-
-# deploy-to-ddn.mdx
-
-# Deploying your project to Hasura DDN
-
-Deploying your project to Hasura DDN is a simple process and can be done in two steps.
-
-## Deployment flow
-
-1. Create a supergraph build on Hasura DDN.
-2. Apply the supergraph build to your project on Hasura DDN.
-
-To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
-information on how to get started.
-
-:::info Hasura DDN Cloud projects
-
-When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
-that's paired with your local project.
-
-:::
-
-### Step 1. Create a supergraph build on Hasura DDN
-
-```ddn title="The following will use the project name in your .hasura/context.yaml file:"
-ddn supergraph build create
-```
-
-This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
-independently but this command will create them all.
-
-The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
-the build on the console.
-
-You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
-command.
-
-The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
-applied at a time as the "official" API.
-
-### Step 2. Apply the build
-
-```ddn
-# E.g., ddn supergraph build apply 85b0961544
-ddn supergraph build apply <build-version>
-```
-
-This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
-command, via the console, or any client accessing via the API URL.
-
-:::tip Simplify your deployment
-
-For a more efficient deployment process, you can create and apply the supergraph build in a single command using
-`ddn supergraph build create --apply`
-
-:::
-
-## Summary
-
-There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
-the simplest and most common flow here.
-
-
-
-==============================
-
-
 
 # incremental-builds.mdx
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/incremental-builds
 
 # Deploying Incrementally
 
@@ -10938,13 +13008,76 @@ ddn subgraph build apply <build-version>
 You have full control over the composition of your supergraph and can build and deploy subgraphs and connectors
 incrementally and independently to compose your supergraph.
 
+==============================
 
+# deploy-to-ddn.mdx
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/deploy-to-ddn
+
+# Deploying your project to Hasura DDN
+
+Deploying your project to Hasura DDN is a simple process and can be done in two steps.
+
+## Deployment flow
+
+1. Create a supergraph build on Hasura DDN.
+2. Apply the supergraph build to your project on Hasura DDN.
+
+To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
+information on how to get started.
+
+:::info Hasura DDN Cloud projects
+
+When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
+that's paired with your local project.
+
+:::
+
+### Step 1. Create a supergraph build on Hasura DDN
+
+```ddn title="The following will use the project name in your .hasura/context.yaml file:"
+ddn supergraph build create
+```
+
+This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
+independently but this command will create them all.
+
+The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
+the build on the console.
+
+You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
+command.
+
+The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
+applied at a time as the "official" API.
+
+### Step 2. Apply the build
+
+```ddn
+# E.g., ddn supergraph build apply 85b0961544
+ddn supergraph build apply <build-version>
+```
+
+This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
+command, via the console, or any client accessing via the API URL.
+
+:::tip Simplify your deployment
+
+For a more efficient deployment process, you can create and apply the supergraph build in a single command using
+`ddn supergraph build create --apply`
+
+:::
+
+## Summary
+
+There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
+the simplest and most common flow here.
 
 ==============================
 
-
-
 # CI/CD
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/ci-cd
 
 # CI/CD
 
@@ -11047,13 +13180,11 @@ scripts.
 We have a GitHub Action that you can use to deploy your Hasura DDN projects.
 [See here](https://github.com/hasura/ddn-deployment).
 
-
-
 ==============================
 
-
-
 # Region Routing
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/region-routing
 
 # Region Routing
 
@@ -11153,13 +13284,11 @@ Currently, Hasura DDN supports the following regions in GCP for multi-region rou
 - `gcp-us-east4`
 - `gcp-us-west2`
 
-
-
 ==============================
 
-
-
 # Private DDN
+
+URL: https://hasura.io/docs/promptql/private-ddn/overview
 
 # Hasura Private DDN
 
@@ -11201,13 +13330,11 @@ Ready to get started with Hasura Private DDN? Here's what you can do next:
 - [Create a project on a private Data Plane](/private-ddn/create-a-project-on-a-data-plane.mdx)
 - [DDN workspace](/private-ddn/ddn-workspace.mdx)
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/
 
 # Private DDN
 
@@ -11222,14 +13349,11 @@ connectors. Hasura communicates with your sources over a dedicated private netwo
 - [BYOC](/private-ddn/architecture/byoc) private deployments
 - [Fully Self-Hosted](/private-ddn/architecture/self-hosted) private deployments
 
-
-
 ==============================
-
-
 
 # dedicated.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/dedicated
 
 # Private DDN: Dedicated
 
@@ -11255,14 +13379,11 @@ Please reach out to us if you need support for another cloud or configuration th
 
 To get started with Hasura DDN in Hasura Hosted VPC deployment mode, [contact sales](https://hasura.io/contact-us).
 
-
-
 ==============================
-
-
 
 # byoc.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/byoc
 
 # Private DDN: Bring Your Own Cloud (BYOC)
 
@@ -11350,14 +13471,11 @@ Any region on AWS, GCP, Azure are supported, provided there is enough quota avai
 
 To get started with Hasura DDN in your own cloud, [contact sales](https://hasura.io/contact-us).
 
-
-
 ==============================
-
-
 
 # self-hosted.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/self-hosted
 
 # Self-Hosted
 
@@ -11385,13 +13503,11 @@ A Kubernetes cluster is required for installing DDN.
 
 To get started with Hasura DDN in your own infrastructure, [contact sales](https://hasura.io/contact-us).
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/
 
 # Introduction
 
@@ -11401,14 +13517,11 @@ through the process of creating a new Data Plane.
 - [Dedicated](/private-ddn/creating-a-data-plane/dedicated.mdx) private deployment
 - [BYOC](/private-ddn/creating-a-data-plane/byoc.mdx) private deployment
 
-
-
 ==============================
-
-
 
 # dedicated.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/dedicated
 
 # Dedicated: Create a Data Plane
 
@@ -11660,14 +13773,11 @@ detailed view page of the selected Data Plane, as illustrated below.
 Now that you've created a Data Plane on dedicated Private DDN,
 [learn how to add collaborators](/private-ddn/data-plane-collaboration.mdx) so they can create projects.
 
-
-
 ==============================
-
-
 
 # byoc.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/byoc
 
 # Bring Your Own Cloud (BYOC): Create a Data Plane
 
@@ -11692,7 +13802,8 @@ To get started with BYOC, customers are required to have one of the following:
 
 ### AWS
 
-The setup involves creating an IAM role in your AWS account that establishes a trust relationship with Hasura's AWS automation role (PulumiDDNCli). This role will be used to deploy and manage workloads necessary for Hasura DDN.
+The setup involves creating an IAM role in your AWS account that establishes a trust relationship with Hasura's AWS
+automation role (PulumiDDNCli). This role will be used to deploy and manage workloads necessary for Hasura DDN.
 
 ##### Pre-requisites
 
@@ -11893,11 +14004,9 @@ Resources:
               StringEquals:
                 ec2:ResourceTag/Created-By: HasuraCloud
 
-Outputs:
-  RoleArn:
-    Description: "ARN of the HasuraCloudBYOC IAM Role"
-    Value: !GetAtt BootstrapRole.Arn
-```
+Outputs: RoleArn: Description: "ARN of the HasuraCloudBYOC IAM Role" Value: !GetAtt BootstrapRole.Arn
+
+````
 </details>
 
 2. Deploy the CloudFormation stack:
@@ -11905,36 +14014,40 @@ Outputs:
    First, check if the stack already exists:
    ```bash
    aws cloudformation describe-stacks --stack-name hasura-cloud-byoc
-   ```
+````
 
-   Then, based on the result:
-   - If you see an error "Stack with id hasura-cloud-byoc does not exist":
-     ```bash
-     # Create new stack
-     aws cloudformation create-stack \
-       --stack-name hasura-cloud-byoc \
-       --template-body file://cloudformation.yaml \
-       --capabilities CAPABILITY_NAMED_IAM
+Then, based on the result:
 
-     # Wait for creation to complete
-     aws cloudformation wait stack-create-complete \
-       --stack-name hasura-cloud-byoc
-     ```
+- If you see an error "Stack with id hasura-cloud-byoc does not exist":
 
-   - If the stack exists:
-     ```bash
-     # Update existing stack
-     aws cloudformation update-stack \
-       --stack-name hasura-cloud-byoc \
-       --template-body file://cloudformation.yaml \
-       --capabilities CAPABILITY_NAMED_IAM
+  ```bash
+  # Create new stack
+  aws cloudformation create-stack \
+    --stack-name hasura-cloud-byoc \
+    --template-body file://cloudformation.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
 
-     # Wait for update to complete
-     aws cloudformation wait stack-update-complete \
-       --stack-name hasura-cloud-byoc
-     ```
+  # Wait for creation to complete
+  aws cloudformation wait stack-create-complete \
+    --stack-name hasura-cloud-byoc
+  ```
+
+- If the stack exists:
+
+  ```bash
+  # Update existing stack
+  aws cloudformation update-stack \
+    --stack-name hasura-cloud-byoc \
+    --template-body file://cloudformation.yaml \
+    --capabilities CAPABILITY_NAMED_IAM
+
+  # Wait for update to complete
+  aws cloudformation wait stack-update-complete \
+    --stack-name hasura-cloud-byoc
+  ```
 
 3. Monitor stack status:
+
    ```bash
    aws cloudformation describe-stacks \
      --stack-name hasura-cloud-byoc \
@@ -11966,13 +14079,15 @@ Share the following with the Hasura team:
     ```
   - If you have specific zones which you'd like to use, please pass it along. Otherwise, Hasura will assign accordingly.
 - (Optional) VPC CIDR (/16 CIDR)
-  - If you have a specific CIDR in mind for the VPC setup, please pass it along. If not specified, Hasura will assign 10.0.0.0/16.
+  - If you have a specific CIDR in mind for the VPC setup, please pass it along. If not specified, Hasura will assign
+    10.0.0.0/16.
   - Note: If you are planning to use VPC Peering, this CIDR should not conflict with any networks on your side.
 - (Optional) Kubernetes Service CIDR (/16-20 CIDR)
-  - A /16-/20 CIDR block used for Kubernetes service cluster IP addresses in your Data Plane. If not specified, Hasura will assign 172.20.0.0/16.
+  - A /16-/20 CIDR block used for Kubernetes service cluster IP addresses in your Data Plane. If not specified, Hasura
+    will assign 172.20.0.0/16.
   - Note: If you are planning to use VPC Peering, this CIDR should not conflict with any networks on your side.
 
-***
+---
 
 ### GCP
 
@@ -12010,46 +14125,51 @@ gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
   --role roles/compute.networkAdmin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/dns.admin
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/dns.admin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/gkehub.editor
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/gkehub.editor
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/logging.configWriter
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/logging.configWriter
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/container.clusterAdmin
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/container.clusterAdmin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/monitoring.metricsScopesAdmin
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/monitoring.metricsScopesAdmin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/certificatemanager.editor
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/certificatemanager.editor
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member='serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com' \
-  --role='roles/resourcemanager.projectIamAdmin' \
-  --condition='^:^title=Restrict IAM Granting for ddn-automation:description=Restrict ddn-automation to granting specific roles to specific members:expression=api.getAttribute("iam.googleapis.com/modifiedGrantsByRole", []).hasOnly(["roles/container.defaultNodeServiceAccount"]) || api.getAttribute("iam.googleapis.com/modifiedGrantsByRole", []).hasOnly(["roles/container.admin"]) || api.getAttribute("iam.googleapis.com/modifiedGrantsByRole", []).hasOnly(["roles/compute.networkViewer"])'
+ --member='serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com' \
+ --role='roles/resourcemanager.projectIamAdmin' \
+ --condition='^:^title=Restrict IAM Granting for ddn-automation:description=Restrict ddn-automation to granting specific
+roles to specific members:expression=api.getAttribute("iam.googleapis.com/modifiedGrantsByRole",
+[]).hasOnly(["roles/container.defaultNodeServiceAccount"]) ||
+api.getAttribute("iam.googleapis.com/modifiedGrantsByRole", []).hasOnly(["roles/container.admin"]) ||
+api.getAttribute("iam.googleapis.com/modifiedGrantsByRole", []).hasOnly(["roles/compute.networkViewer"])'
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/container.admin
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/container.admin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/iam.serviceAccountAdmin
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/iam.serviceAccountAdmin
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
-  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
-  --role roles/iam.workloadIdentityPoolAdmin
-```
+ --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+ --role roles/iam.workloadIdentityPoolAdmin
+
+````
 </details>
 
 ##### Provide Required Information
@@ -12135,6 +14255,8 @@ to the Hasura team.
 
 # data-plane-collaboration.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/data-plane-collaboration
+
 
 # How to Add Collaborators to a Data Plane
 
@@ -12190,6 +14312,8 @@ Learn how to [create a project on a Private Data Plane](/private-ddn/create-a-pr
 
 
 # Connector Deployment Resources
+
+URL: https://hasura.io/docs/promptql/private-ddn/connector-deployment-resources
 
 # Connector Deployment Resources
 
@@ -12265,7 +14389,7 @@ definition:
       resources:
         memory: 128M
         cpu: 2
-```
+````
 
 ### Resource Limit Overrides
 
@@ -12299,14 +14423,11 @@ This allows for fine-grained control over resource allocation based on deploymen
 By optimizing resource configurations, connectors can achieve optimal performance while maintaining cost efficiency in
 Hasura DDN.
 
-
-
 ==============================
-
-
 
 # create-a-project-on-a-data-plane.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/create-a-project-on-a-data-plane
 
 # Create a Project on a Data Plane
 
@@ -12323,7 +14444,54 @@ run DDN CLI commands, consider using a [DDN Workspace](/private-ddn/ddn-workspac
 
 :::
 
-<Prereqs />
+## Prerequisites
+
+**Install the DDN CLI**
+
+:::info Minimum version requirements
+
+To use this guide, ensure you've installed/updated your CLI to at least `v2.28.0`.
+
+:::
+
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
+
+**Install [Docker](https://docs.docker.com/engine/install/)**
+
+The Docker-based workflow helps you iterate and develop locally without deploying any changes to Hasura DDN, making the
+development experience faster and your feedback loops shorter. **You'll need Docker Compose `v2.20` or later.**
+
+**Validate the installation**
+
+You can verify that the DDN CLI is installed correctly by running:
+
+```ddn
+ddn doctor
+```
 
 ## Step 1. Authenticate your CLI
 
@@ -12411,14 +14579,11 @@ When this process is complete, the CLI will return a link to the hosted applicat
 With your first project created, learn more about how Hasura handles [data modeling](/data-modeling/overview.mdx) before
 diving into advanced features.
 
-
-
 ==============================
-
-
 
 # ddn-workspace.mdx
 
+URL: https://hasura.io/docs/promptql/private-ddn/ddn-workspace
 
 # Developing with DDN Workspace
 
@@ -12604,13 +14769,11 @@ preserved and you can login again to continue working on it.
 
 <Thumbnail src="/img/data-plane/workspace-logout.png" alt="Logout from workspace" width="1000px" />
 
-
-
 ==============================
 
-
-
 # Reference
+
+URL: https://hasura.io/docs/promptql/reference/overview
 
 # Reference
 
@@ -12627,13 +14790,11 @@ This section of documentation is designed to be an exhaustive **reference** of H
 PromptQL. To see implementation docs for these concepts, check out the tutorials and guides in sections like
 [How to Build With PromptQL](/how-to-build-with-promptql/overview.mdx).
 
-
-
 ==============================
 
-
-
 # Best Practices
+
+URL: https://hasura.io/docs/promptql/reference/best-practices
 
 # Best Practices
 
@@ -12695,13 +14856,11 @@ If your underlying Hasura DDN project utilizes JWTs or a webhook for authenticat
 by clicking the `HTTP` button on the left-hand side of the chat dialogue when starting a new thread. To learn more about
 authentication and Hasura DDN, check out [the docs](/auth/overview.mdx).
 
-
-
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/
 
 # Supergraph Modeling
 
@@ -12732,13 +14891,11 @@ highly efficient and easy to maintain.
 - [Compatibility Config](/reference/metadata-reference/compatibility-config.mdx)
 - [Engine Plugins](/reference/metadata-reference/engine-plugins.mdx)
 
-
-
 ==============================
 
-
-
 # introduction.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/introduction
 
 # Working with Metadata
 
@@ -12779,13 +14936,11 @@ author and modify in your metadata. Each page will provide you with an overview 
 examples of how to use them. Below all of this, you'll find detailed reference information about the metadata structure
 and the fields that you can use to define each component.
 
-
-
 ==============================
 
-
-
 # build-configs.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/build-configs
 
 # Build configs
 
@@ -12929,174 +15084,149 @@ definition:
 
 ## Metadata structure
 
-
 ### Supergraph {#supergraph-supergraph}
 
 Defines the configuration used to build the Supergraph.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Supergraph` | true |  |
-| `version` | `v2` | true |  |
-| `definition` | [SupergraphDefinitionV2](#supergraph-supergraphdefinitionv2) | true |  |
-
-
+| Key          | Value                                                        | Required | Description |
+| ------------ | ------------------------------------------------------------ | -------- | ----------- |
+| `kind`       | `Supergraph`                                                 | true     |             |
+| `version`    | `v2`                                                         | true     |             |
+| `definition` | [SupergraphDefinitionV2](#supergraph-supergraphdefinitionv2) | true     |             |
 
 #### SupergraphDefinitionV2 {#supergraph-supergraphdefinitionv2}
 
 Supergraph Definition V2.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `subgraphs` | [string] | true | Paths to subgraph configuration. |
+| Key         | Value    | Required | Description                      |
+| ----------- | -------- | -------- | -------------------------------- |
+| `subgraphs` | [string] | true     | Paths to subgraph configuration. |
 
 ### Subgraph {#subgraph-subgraph}
 
 Defines the configuration used to build the Subgraph.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Subgraph` | true |  |
-| `version` | `v2` | true |  |
-| `definition` | [SubgraphDefinitionV2](#subgraph-subgraphdefinitionv2) | true |  |
-
-
+| Key          | Value                                                  | Required | Description |
+| ------------ | ------------------------------------------------------ | -------- | ----------- |
+| `kind`       | `Subgraph`                                             | true     |             |
+| `version`    | `v2`                                                   | true     |             |
+| `definition` | [SubgraphDefinitionV2](#subgraph-subgraphdefinitionv2) | true     |             |
 
 #### SubgraphDefinitionV2 {#subgraph-subgraphdefinitionv2}
 
 Subgraph Definition V2.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | string | true | Subgraph Name. |
-| `generator` | [SubgraphGeneratorConfig](#subgraph-subgraphgeneratorconfig) | true | Subgraph generator Configuration. |
-| `envFile` | string | false | Path to the Subgraph .env file. |
-| `includePaths` | [string] | true | Paths to be included to construct Subgraph metadata. |
-| `envMapping` | [EnvMapping](#subgraph-envmapping) | false | Environment Variable mapping config. |
-| `connectors` | [[SubgraphConnector](#subgraph-subgraphconnector)] | false | Connectors used in subgraph. |
-
-
+| Key            | Value                                                        | Required | Description                                          |
+| -------------- | ------------------------------------------------------------ | -------- | ---------------------------------------------------- |
+| `name`         | string                                                       | true     | Subgraph Name.                                       |
+| `generator`    | [SubgraphGeneratorConfig](#subgraph-subgraphgeneratorconfig) | true     | Subgraph generator Configuration.                    |
+| `envFile`      | string                                                       | false    | Path to the Subgraph .env file.                      |
+| `includePaths` | [string]                                                     | true     | Paths to be included to construct Subgraph metadata. |
+| `envMapping`   | [EnvMapping](#subgraph-envmapping)                           | false    | Environment Variable mapping config.                 |
+| `connectors`   | [[SubgraphConnector](#subgraph-subgraphconnector)]           | false    | Connectors used in subgraph.                         |
 
 #### SubgraphConnector {#subgraph-subgraphconnector}
 
 Subgraph Connector config.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `path` | string | true | Path to connector config file. |
-| `connectorLinkName` | string | false | Name of connector link associated with the connector. |
-
-
+| Key                 | Value  | Required | Description                                           |
+| ------------------- | ------ | -------- | ----------------------------------------------------- |
+| `path`              | string | true     | Path to connector config file.                        |
+| `connectorLinkName` | string | false    | Name of connector link associated with the connector. |
 
 #### EnvMapping {#subgraph-envmapping}
 
 Environment Variables mapping config.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [EnvSource](#subgraph-envsource) | false | Target Environment variable. |
-
-
+| Key           | Value                            | Required | Description                  |
+| ------------- | -------------------------------- | -------- | ---------------------------- |
+| `<customKey>` | [EnvSource](#subgraph-envsource) | false    | Target Environment variable. |
 
 #### EnvSource {#subgraph-envsource}
 
 Environment Variable Source.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fromEnv` | string | true | Source Environment variable. |
-
-
+| Key       | Value  | Required | Description                  |
+| --------- | ------ | -------- | ---------------------------- |
+| `fromEnv` | string | true     | Source Environment variable. |
 
 #### SubgraphGeneratorConfig {#subgraph-subgraphgeneratorconfig}
 
 Subgraph generator Configuration.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootPath` | string | true | Path to the directory which holds all the Subgraph metadata. |
-| `graphqlRootFieldPrefix` | string | false | Prefix to use while generating GraphQL root fields. |
-| `graphqlTypeNamePrefix` | string | false | Prefix to use while generating GraphQL type names. |
-| `namingConvention` | `none` / `graphql` / `snake_case` | false | Naming convention to use while generating GraphQL fields and types. |
+| Key                      | Value                             | Required | Description                                                         |
+| ------------------------ | --------------------------------- | -------- | ------------------------------------------------------------------- |
+| `rootPath`               | string                            | true     | Path to the directory which holds all the Subgraph metadata.        |
+| `graphqlRootFieldPrefix` | string                            | false    | Prefix to use while generating GraphQL root fields.                 |
+| `graphqlTypeNamePrefix`  | string                            | false    | Prefix to use while generating GraphQL type names.                  |
+| `namingConvention`       | `none` / `graphql` / `snake_case` | false    | Naming convention to use while generating GraphQL fields and types. |
 
 ### Connector {#connector-connector}
 
 Defines the configuration used to build the connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Connector` | true |  |
-| `version` | `v2` | true |  |
-| `definition` | [ConnectorDefinitionV2](#connector-connectordefinitionv2) | true |  |
-
-
+| Key          | Value                                                     | Required | Description |
+| ------------ | --------------------------------------------------------- | -------- | ----------- |
+| `kind`       | `Connector`                                               | true     |             |
+| `version`    | `v2`                                                      | true     |             |
+| `definition` | [ConnectorDefinitionV2](#connector-connectordefinitionv2) | true     |             |
 
 #### ConnectorDefinitionV2 {#connector-connectordefinitionv2}
 
 Connector deployment definition V2.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | string | true | Connector name. |
-| `subgraph` | string | false | DDN project subgraph name. |
-| `source` | string | true | Connector Hub ID. |
-| `context` | string | true | Path to the context directory. |
-| `envFile` | string | false | Path to the shared .env file. |
-| `envMapping` | [EnvMapping](#connector-envmapping) | false | Environment Variable mapping config. |
-| `regionConfiguration` | [[RegionConfigurationV2](#connector-regionconfigurationv2)] | false | Connector deployment Region configuration |
-| `resources` | [Resources](#connector-resources) | false | Connector deployment Resources. |
-
-
+| Key                   | Value                                                       | Required | Description                               |
+| --------------------- | ----------------------------------------------------------- | -------- | ----------------------------------------- |
+| `name`                | string                                                      | true     | Connector name.                           |
+| `subgraph`            | string                                                      | false    | DDN project subgraph name.                |
+| `source`              | string                                                      | true     | Connector Hub ID.                         |
+| `context`             | string                                                      | true     | Path to the context directory.            |
+| `envFile`             | string                                                      | false    | Path to the shared .env file.             |
+| `envMapping`          | [EnvMapping](#connector-envmapping)                         | false    | Environment Variable mapping config.      |
+| `regionConfiguration` | [[RegionConfigurationV2](#connector-regionconfigurationv2)] | false    | Connector deployment Region configuration |
+| `resources`           | [Resources](#connector-resources)                           | false    | Connector deployment Resources.           |
 
 #### RegionConfigurationV2 {#connector-regionconfigurationv2}
 
 Connector deployment Region Configuration V2.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `region` | string | true | Region to deploy the connector to. |
-| `mode` | `ReadOnly` / `ReadWrite` | true | Connector deployment mode. |
-| `envMapping` | [EnvMapping](#connector-envmapping) | false | Environment Variable mapping config. |
-| `resources` | [Resources](#connector-resources) | false | Connector deployment Resources. |
-
-
+| Key          | Value                               | Required | Description                          |
+| ------------ | ----------------------------------- | -------- | ------------------------------------ |
+| `region`     | string                              | true     | Region to deploy the connector to.   |
+| `mode`       | `ReadOnly` / `ReadWrite`            | true     | Connector deployment mode.           |
+| `envMapping` | [EnvMapping](#connector-envmapping) | false    | Environment Variable mapping config. |
+| `resources`  | [Resources](#connector-resources)   | false    | Connector deployment Resources.      |
 
 #### Resources {#connector-resources}
 
 Connector deployment Resources.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `memory` | string | false | Connector deployment memory resource in bytes. Accepted units: k, M, G. Example: 128M, 1G |
-| `cpu` | string | false | Connector deployment cpu resource in cores. Example: 1, 1.5 |
-
-
+| Key      | Value  | Required | Description                                                                               |
+| -------- | ------ | -------- | ----------------------------------------------------------------------------------------- |
+| `memory` | string | false    | Connector deployment memory resource in bytes. Accepted units: k, M, G. Example: 128M, 1G |
+| `cpu`    | string | false    | Connector deployment cpu resource in cores. Example: 1, 1.5                               |
 
 #### EnvMapping {#connector-envmapping}
 
 Environment Variables mapping config.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [EnvSource](#connector-envsource) | false | Target Environment variable. |
-
-
+| Key           | Value                             | Required | Description                  |
+| ------------- | --------------------------------- | -------- | ---------------------------- |
+| `<customKey>` | [EnvSource](#connector-envsource) | false    | Target Environment variable. |
 
 #### EnvSource {#connector-envsource}
 
 Environment Variable Source.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fromEnv` | string | true | Source Environment variable. |
-
-
+| Key       | Value  | Required | Description                  |
+| --------- | ------ | -------- | ---------------------------- |
+| `fromEnv` | string | true     | Source Environment variable. |
 
 ==============================
 
-
-
 # data-connector-links.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/data-connector-links
 
 # Data Connector Links
 
@@ -13185,18 +15315,17 @@ definition:
 
 ## Metadata structure
 
-
 ### DataConnectorLink {#dataconnectorlink-dataconnectorlink}
 
 Definition of a data connector, used to bring in sources of data and connect them to OpenDD models and commands.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `DataConnectorLink` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [DataConnectorLinkV1](#dataconnectorlink-dataconnectorlinkv1) | true | Definition of a data connector - version 1. |
+| Key          | Value                                                         | Required | Description                                 |
+| ------------ | ------------------------------------------------------------- | -------- | ------------------------------------------- |
+| `kind`       | `DataConnectorLink`                                           | true     |                                             |
+| `version`    | `v1`                                                          | true     |                                             |
+| `definition` | [DataConnectorLinkV1](#dataconnectorlink-dataconnectorlinkv1) | true     | Definition of a data connector - version 1. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: DataConnectorLink
@@ -13224,232 +15353,193 @@ definition:
         mutation: {}
 ```
 
-
 #### DataConnectorLinkV1 {#dataconnectorlink-dataconnectorlinkv1}
 
 Definition of a data connector - version 1.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [DataConnectorName](#dataconnectorlink-dataconnectorname) | true | The name of the data connector. |
-| `url` | [DataConnectorUrlV1](#dataconnectorlink-dataconnectorurlv1) | true | The url(s) to access the data connector. |
-| `headers` | [HttpHeaders](#dataconnectorlink-httpheaders) | false | Key value map of HTTP headers to be sent with each request to the data connector. This is meant for protocol level use between engine and the data connector. |
-| `schema` | [VersionedSchemaAndCapabilities](#dataconnectorlink-versionedschemaandcapabilities) | true | The schema of the data connector. This schema is used as the source of truth when serving requests and the live schema of the data connector is not looked up. |
-| `argumentPresets` | [[DataConnectorArgumentPreset](#dataconnectorlink-dataconnectorargumentpreset)] | false | Argument presets that applies to all functions and procedures of this data connector. Defaults to no argument presets. |
-| `responseHeaders` | [ResponseHeaders](#dataconnectorlink-responseheaders) / null | false | HTTP response headers configuration that is forwarded from a data connector to the client. |
-
-
+| Key               | Value                                                                               | Required | Description                                                                                                                                                    |
+| ----------------- | ----------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`            | [DataConnectorName](#dataconnectorlink-dataconnectorname)                           | true     | The name of the data connector.                                                                                                                                |
+| `url`             | [DataConnectorUrlV1](#dataconnectorlink-dataconnectorurlv1)                         | true     | The url(s) to access the data connector.                                                                                                                       |
+| `headers`         | [HttpHeaders](#dataconnectorlink-httpheaders)                                       | false    | Key value map of HTTP headers to be sent with each request to the data connector. This is meant for protocol level use between engine and the data connector.  |
+| `schema`          | [VersionedSchemaAndCapabilities](#dataconnectorlink-versionedschemaandcapabilities) | true     | The schema of the data connector. This schema is used as the source of truth when serving requests and the live schema of the data connector is not looked up. |
+| `argumentPresets` | [[DataConnectorArgumentPreset](#dataconnectorlink-dataconnectorargumentpreset)]     | false    | Argument presets that applies to all functions and procedures of this data connector. Defaults to no argument presets.                                         |
+| `responseHeaders` | [ResponseHeaders](#dataconnectorlink-responseheaders) / null                        | false    | HTTP response headers configuration that is forwarded from a data connector to the client.                                                                     |
 
 #### ResponseHeaders {#dataconnectorlink-responseheaders}
 
 Configuration of what HTTP response headers should be forwarded from a data connector to the client in HTTP response.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headersField` | [DataConnectorColumnName](#dataconnectorlink-dataconnectorcolumnname) | true | Name of the field in the NDC function/procedure's result which contains the response headers |
-| `resultField` | [DataConnectorColumnName](#dataconnectorlink-dataconnectorcolumnname) | true | Name of the field in the NDC function/procedure's result which contains the result |
-| `forwardHeaders` | [string] | true | List of actual HTTP response headers from the data connector to be set as response headers |
-
-
+| Key              | Value                                                                 | Required | Description                                                                                  |
+| ---------------- | --------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------- |
+| `headersField`   | [DataConnectorColumnName](#dataconnectorlink-dataconnectorcolumnname) | true     | Name of the field in the NDC function/procedure's result which contains the response headers |
+| `resultField`    | [DataConnectorColumnName](#dataconnectorlink-dataconnectorcolumnname) | true     | Name of the field in the NDC function/procedure's result which contains the result           |
+| `forwardHeaders` | [string]                                                              | true     | List of actual HTTP response headers from the data connector to be set as response headers   |
 
 #### DataConnectorColumnName {#dataconnectorlink-dataconnectorcolumnname}
 
 The name of a column in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorArgumentPreset {#dataconnectorlink-dataconnectorargumentpreset}
 
 An argument preset that can be applied to all functions/procedures of a connector
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `argument` | [DataConnectorArgumentName](#dataconnectorlink-dataconnectorargumentname) | true | The name of an argument as defined by a data connector. |
-| `value` | [DataConnectorArgumentPresetValue](#dataconnectorlink-dataconnectorargumentpresetvalue) | true | The value of a data connector argument preset. |
-
-
+| Key        | Value                                                                                   | Required | Description                                             |
+| ---------- | --------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `argument` | [DataConnectorArgumentName](#dataconnectorlink-dataconnectorargumentname)               | true     | The name of an argument as defined by a data connector. |
+| `value`    | [DataConnectorArgumentPresetValue](#dataconnectorlink-dataconnectorargumentpresetvalue) | true     | The value of a data connector argument preset.          |
 
 #### DataConnectorArgumentPresetValue {#dataconnectorlink-dataconnectorargumentpresetvalue}
 
 The value of a data connector argument preset.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `httpHeaders` | [HttpHeadersPreset](#dataconnectorlink-httpheaderspreset) | true | HTTP headers that can be preset from request |
-
-
+| Key           | Value                                                     | Required | Description                                  |
+| ------------- | --------------------------------------------------------- | -------- | -------------------------------------------- |
+| `httpHeaders` | [HttpHeadersPreset](#dataconnectorlink-httpheaderspreset) | true     | HTTP headers that can be preset from request |
 
 #### HttpHeadersPreset {#dataconnectorlink-httpheaderspreset}
 
 Configuration of what HTTP request headers should be forwarded to a data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `forward` | [string] | true | List of HTTP headers that should be forwarded from HTTP requests |
-| `additional` | [AdditionalHttpHeaders](#dataconnectorlink-additionalhttpheaders) | true | Additional headers that should be forwarded, from other contexts |
-
-
+| Key          | Value                                                             | Required | Description                                                      |
+| ------------ | ----------------------------------------------------------------- | -------- | ---------------------------------------------------------------- |
+| `forward`    | [string]                                                          | true     | List of HTTP headers that should be forwarded from HTTP requests |
+| `additional` | [AdditionalHttpHeaders](#dataconnectorlink-additionalhttpheaders) | true     | Additional headers that should be forwarded, from other contexts |
 
 #### AdditionalHttpHeaders {#dataconnectorlink-additionalhttpheaders}
 
 Key value map of HTTP headers to be forwarded in the headers argument of a data connector request.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [ValueExpression](#dataconnectorlink-valueexpression) | false |  |
-
-
+| Key           | Value                                                 | Required | Description |
+| ------------- | ----------------------------------------------------- | -------- | ----------- |
+| `<customKey>` | [ValueExpression](#dataconnectorlink-valueexpression) | false    |             |
 
 #### ValueExpression {#dataconnectorlink-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#dataconnectorlink-openddsessionvariable) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key               | Value                                                             | Required | Description |
+| ----------------- | ----------------------------------------------------------------- | -------- | ----------- |
+| `literal`         |                                                                   | false    |             |
+| `sessionVariable` | [OpenDdSessionVariable](#dataconnectorlink-openddsessionvariable) | false    |             |
+| `valueFromEnv`    | string                                                            | false    |             |
 
 #### OpenDdSessionVariable {#dataconnectorlink-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
-
 **Value:** string
-
 
 #### DataConnectorArgumentName {#dataconnectorlink-dataconnectorargumentname}
 
 The name of an argument as defined by a data connector.
 
-
 **Value:** string
-
 
 #### VersionedSchemaAndCapabilities {#dataconnectorlink-versionedschemaandcapabilities}
 
 Versioned schema and capabilities for a data connector.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
+| Value                                                                   | Description                                                  |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------ |
 | [SchemaAndCapabilitiesV01](#dataconnectorlink-schemaandcapabilitiesv01) | Version 0.1 of schema and capabilities for a data connector. |
 | [SchemaAndCapabilitiesV02](#dataconnectorlink-schemaandcapabilitiesv02) | Version 0.2 of schema and capabilities for a data connector. |
-
-
 
 #### SchemaAndCapabilitiesV02 {#dataconnectorlink-schemaandcapabilitiesv02}
 
 Version 0.2 of schema and capabilities for a data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `version` | `v0.2` | true |  |
-| `schema` | [Schema Response](https://hasura.github.io/ndc-spec/specification/schema/index.html) | true |  |
-| `capabilities` | [Capabilities Response](https://hasura.github.io/ndc-spec/specification/capabilities.html) | true |  |
-
-
+| Key            | Value                                                                                      | Required | Description |
+| -------------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `version`      | `v0.2`                                                                                     | true     |             |
+| `schema`       | [Schema Response](https://hasura.github.io/ndc-spec/specification/schema/index.html)       | true     |             |
+| `capabilities` | [Capabilities Response](https://hasura.github.io/ndc-spec/specification/capabilities.html) | true     |             |
 
 #### SchemaAndCapabilitiesV01 {#dataconnectorlink-schemaandcapabilitiesv01}
 
 Version 0.1 of schema and capabilities for a data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `version` | `v0.1` | true |  |
-| `schema` | [Schema Response](https://hasura.github.io/ndc-spec/specification/schema/index.html) | true |  |
-| `capabilities` | [Capabilities Response](https://hasura.github.io/ndc-spec/specification/capabilities.html) | true |  |
-
-
+| Key            | Value                                                                                      | Required | Description |
+| -------------- | ------------------------------------------------------------------------------------------ | -------- | ----------- |
+| `version`      | `v0.1`                                                                                     | true     |             |
+| `schema`       | [Schema Response](https://hasura.github.io/ndc-spec/specification/schema/index.html)       | true     |             |
+| `capabilities` | [Capabilities Response](https://hasura.github.io/ndc-spec/specification/capabilities.html) | true     |             |
 
 #### HttpHeaders {#dataconnectorlink-httpheaders}
 
-Key value map of HTTP headers to be sent with an HTTP request. The key is the header name and the value is a potential reference to an environment variable.
+Key value map of HTTP headers to be sent with an HTTP request. The key is the header name and the value is a potential
+reference to an environment variable.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | false |  |
-
-
+| Key           | Value                                                   | Required | Description |
+| ------------- | ------------------------------------------------------- | -------- | ----------- |
+| `<customKey>` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | false    |             |
 
 #### DataConnectorUrlV1 {#dataconnectorlink-dataconnectorurlv1}
 
 A URL to access a data connector. This can be a single URL or a pair of read and write URLs.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `singleUrl` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | false |  |
-| `readWriteUrls` | [ReadWriteUrls](#dataconnectorlink-readwriteurls) | false | A pair of URLs to access a data connector, one for reading and one for writing. |
-
-
+| Key             | Value                                                   | Required | Description                                                                     |
+| --------------- | ------------------------------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `singleUrl`     | [EnvironmentValue](#dataconnectorlink-environmentvalue) | false    |                                                                                 |
+| `readWriteUrls` | [ReadWriteUrls](#dataconnectorlink-readwriteurls)       | false    | A pair of URLs to access a data connector, one for reading and one for writing. |
 
 #### ReadWriteUrls {#dataconnectorlink-readwriteurls}
 
 A pair of URLs to access a data connector, one for reading and one for writing.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `read` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | true |  |
-| `write` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | true |  |
-
-
+| Key     | Value                                                   | Required | Description |
+| ------- | ------------------------------------------------------- | -------- | ----------- |
+| `read`  | [EnvironmentValue](#dataconnectorlink-environmentvalue) | true     |             |
+| `write` | [EnvironmentValue](#dataconnectorlink-environmentvalue) | true     |             |
 
 #### EnvironmentValue {#dataconnectorlink-environmentvalue}
 
 Either a literal string or a reference to a Hasura secret
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `value` | string | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key            | Value  | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `value`        | string | false    |             |
+| `valueFromEnv` | string | false    |             |
 
 #### DataConnectorName {#dataconnectorlink-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
+
 ### DataConnectorScalarRepresentation {#dataconnectorscalarrepresentation-dataconnectorscalarrepresentation}
 
 The representation of a data connector scalar in terms of Open DD types
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `DataConnectorScalarRepresentation` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [DataConnectorScalarRepresentationV1](#dataconnectorscalarrepresentation-dataconnectorscalarrepresentationv1) | true | The representation of a data connector scalar in terms of Open DD types. Deprecated in favour of `BooleanExpressionType`. |
-
-
+| Key          | Value                                                                                                         | Required | Description                                                                                                               |
+| ------------ | ------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `kind`       | `DataConnectorScalarRepresentation`                                                                           | true     |                                                                                                                           |
+| `version`    | `v1`                                                                                                          | true     |                                                                                                                           |
+| `definition` | [DataConnectorScalarRepresentationV1](#dataconnectorscalarrepresentation-dataconnectorscalarrepresentationv1) | true     | The representation of a data connector scalar in terms of Open DD types. Deprecated in favour of `BooleanExpressionType`. |
 
 #### DataConnectorScalarRepresentationV1 {#dataconnectorscalarrepresentation-dataconnectorscalarrepresentationv1}
 
-The representation of a data connector scalar in terms of Open DD types. Deprecated in favour of `BooleanExpressionType`.
+The representation of a data connector scalar in terms of Open DD types. Deprecated in favour of
+`BooleanExpressionType`.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#dataconnectorscalarrepresentation-dataconnectorname) | true | The name of the data connector that this scalar type comes from. |
-| `dataConnectorScalarType` | [DataConnectorScalarType](#dataconnectorscalarrepresentation-dataconnectorscalartype) | true | The name of the scalar type coming from the data connector. |
-| `representation` | [TypeName](#dataconnectorscalarrepresentation-typename) | true | The name of the Open DD type that this data connector scalar type should be represented as. |
-| `graphql` | [DataConnectorScalarGraphQLConfiguration](#dataconnectorscalarrepresentation-dataconnectorscalargraphqlconfiguration) / null | false | Configuration for how this scalar's operators should appear in the GraphQL schema. |
+| Key                       | Value                                                                                                                        | Required | Description                                                                                 |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `dataConnectorName`       | [DataConnectorName](#dataconnectorscalarrepresentation-dataconnectorname)                                                    | true     | The name of the data connector that this scalar type comes from.                            |
+| `dataConnectorScalarType` | [DataConnectorScalarType](#dataconnectorscalarrepresentation-dataconnectorscalartype)                                        | true     | The name of the scalar type coming from the data connector.                                 |
+| `representation`          | [TypeName](#dataconnectorscalarrepresentation-typename)                                                                      | true     | The name of the Open DD type that this data connector scalar type should be represented as. |
+| `graphql`                 | [DataConnectorScalarGraphQLConfiguration](#dataconnectorscalarrepresentation-dataconnectorscalargraphqlconfiguration) / null | false    | Configuration for how this scalar's operators should appear in the GraphQL schema.          |
 
- **Example:**
+**Example:**
 
 ```yaml
 dataConnectorName: data_connector
@@ -13459,77 +15549,60 @@ graphql:
   comparisonExpressionTypeName: String_Comparison_Exp
 ```
 
-
 #### DataConnectorScalarGraphQLConfiguration {#dataconnectorscalarrepresentation-dataconnectorscalargraphqlconfiguration}
 
 GraphQL configuration of a data connector scalar
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `comparisonExpressionTypeName` | [GraphQlTypeName](#dataconnectorscalarrepresentation-graphqltypename) / null | false |  |
-
-
+| Key                            | Value                                                                        | Required | Description |
+| ------------------------------ | ---------------------------------------------------------------------------- | -------- | ----------- |
+| `comparisonExpressionTypeName` | [GraphQlTypeName](#dataconnectorscalarrepresentation-graphqltypename) / null | false    |             |
 
 #### GraphQlTypeName {#dataconnectorscalarrepresentation-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### TypeName {#dataconnectorscalarrepresentation-typename}
 
 The name of the Open DD type that this data connector scalar type should be represented as.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [InbuiltType](#dataconnectorscalarrepresentation-inbuilttype) | An inbuilt primitive OpenDD type. |
-| [CustomTypeName](#dataconnectorscalarrepresentation-customtypename) |  |
-
-
+| Value                                                               | Description                       |
+| ------------------------------------------------------------------- | --------------------------------- |
+| [InbuiltType](#dataconnectorscalarrepresentation-inbuilttype)       | An inbuilt primitive OpenDD type. |
+| [CustomTypeName](#dataconnectorscalarrepresentation-customtypename) |                                   |
 
 #### CustomTypeName {#dataconnectorscalarrepresentation-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
 
 #### InbuiltType {#dataconnectorscalarrepresentation-inbuilttype}
 
 An inbuilt primitive OpenDD type.
 
-
 **Value:** `ID` / `Int` / `Float` / `Boolean` / `String`
-
 
 #### DataConnectorScalarType {#dataconnectorscalarrepresentation-dataconnectorscalartype}
 
 The name of a scalar type in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#dataconnectorscalarrepresentation-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # types.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/types
 
 # Types
 
@@ -13667,18 +15740,17 @@ definition:
 
 ## Metadata structure
 
-
 ### ScalarType {#scalartype-scalartype}
 
 Definition of a user-defined scalar type that that has opaque semantics.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `ScalarType` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [ScalarTypeV1](#scalartype-scalartypev1) | true | Definition of a user-defined scalar type that that has opaque semantics. |
+| Key          | Value                                    | Required | Description                                                              |
+| ------------ | ---------------------------------------- | -------- | ------------------------------------------------------------------------ |
+| `kind`       | `ScalarType`                             | true     |                                                                          |
+| `version`    | `v1`                                     | true     |                                                                          |
+| `definition` | [ScalarTypeV1](#scalartype-scalartypev1) | true     | Definition of a user-defined scalar type that that has opaque semantics. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: ScalarType
@@ -13689,54 +15761,47 @@ graphql:
 description: A custom string type
 ```
 
-
 #### ScalarTypeV1 {#scalartype-scalartypev1}
 
 Definition of a user-defined scalar type that that has opaque semantics.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CustomTypeName](#scalartype-customtypename) | true | The name to give this scalar type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
-| `graphql` | [ScalarTypeGraphQLConfiguration](#scalartype-scalartypegraphqlconfiguration) / null | false | Configuration for how this scalar type should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of this scalar. Gets added to the description of the scalar's definition in the graphql schema. |
-
-
+| Key           | Value                                                                               | Required | Description                                                                                                                                 |
+| ------------- | ----------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | [CustomTypeName](#scalartype-customtypename)                                        | true     | The name to give this scalar type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
+| `graphql`     | [ScalarTypeGraphQLConfiguration](#scalartype-scalartypegraphqlconfiguration) / null | false    | Configuration for how this scalar type should appear in the GraphQL schema.                                                                 |
+| `description` | string / null                                                                       | false    | The description of this scalar. Gets added to the description of the scalar's definition in the graphql schema.                             |
 
 #### ScalarTypeGraphQLConfiguration {#scalartype-scalartypegraphqlconfiguration}
 
 GraphQL configuration of an Open DD scalar type
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `typeName` | [GraphQlTypeName](#scalartype-graphqltypename) | true | The name of the GraphQl type to use for this scalar. |
-
-
+| Key        | Value                                          | Required | Description                                          |
+| ---------- | ---------------------------------------------- | -------- | ---------------------------------------------------- |
+| `typeName` | [GraphQlTypeName](#scalartype-graphqltypename) | true     | The name of the GraphQl type to use for this scalar. |
 
 #### GraphQlTypeName {#scalartype-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#scalartype-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
+
 ### ObjectType {#objecttype-objecttype}
 
 Definition of a user-defined Open DD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `ObjectType` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [ObjectTypeV1](#objecttype-objecttypev1) | true | Definition of a user-defined Open DD object type. |
+| Key          | Value                                    | Required | Description                                       |
+| ------------ | ---------------------------------------- | -------- | ------------------------------------------------- |
+| `kind`       | `ObjectType`                             | true     |                                                   |
+| `version`    | `v1`                                     | true     |                                                   |
+| `definition` | [ObjectTypeV1](#objecttype-objecttypev1) | true     | Definition of a user-defined Open DD object type. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: ObjectType
@@ -13782,223 +15847,182 @@ definition:
               ai_model: model
 ```
 
-
 #### ObjectTypeV1 {#objecttype-objecttypev1}
 
 Definition of a user-defined Open DD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CustomTypeName](#objecttype-customtypename) | true | The name to give this object type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
-| `fields` | [[ObjectFieldDefinition](#objecttype-objectfielddefinition)] | true | The list of fields defined for this object type. |
-| `globalIdFields` | [[FieldName](#objecttype-fieldname)] / null | false | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
-| `graphql` | [ObjectTypeGraphQLConfiguration](#objecttype-objecttypegraphqlconfiguration) / null | false | Configuration for how this object type should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of the object. Gets added to the description of the object's definition in the graphql schema. |
-| `dataConnectorTypeMapping` | [[DataConnectorTypeMapping](#objecttype-dataconnectortypemapping)] | false | Mapping of this object type to corresponding object types in various data connectors. |
-
-
+| Key                        | Value                                                                               | Required | Description                                                                                                                                                                                                                                                                                      |
+| -------------------------- | ----------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                     | [CustomTypeName](#objecttype-customtypename)                                        | true     | The name to give this object type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph.                                                                                                                                                      |
+| `fields`                   | [[ObjectFieldDefinition](#objecttype-objectfielddefinition)]                        | true     | The list of fields defined for this object type.                                                                                                                                                                                                                                                 |
+| `globalIdFields`           | [[FieldName](#objecttype-fieldname)] / null                                         | false    | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
+| `graphql`                  | [ObjectTypeGraphQLConfiguration](#objecttype-objecttypegraphqlconfiguration) / null | false    | Configuration for how this object type should appear in the GraphQL schema.                                                                                                                                                                                                                      |
+| `description`              | string / null                                                                       | false    | The description of the object. Gets added to the description of the object's definition in the graphql schema.                                                                                                                                                                                   |
+| `dataConnectorTypeMapping` | [[DataConnectorTypeMapping](#objecttype-dataconnectortypemapping)]                  | false    | Mapping of this object type to corresponding object types in various data connectors.                                                                                                                                                                                                            |
 
 #### DataConnectorTypeMapping {#objecttype-dataconnectortypemapping}
 
-This defines the mapping of the fields of an object type to the corresponding columns of an object type in a data connector.
+This defines the mapping of the fields of an object type to the corresponding columns of an object type in a data
+connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#objecttype-dataconnectorname) | true |  |
-| `dataConnectorObjectType` | [DataConnectorObjectType](#objecttype-dataconnectorobjecttype) | true |  |
-| `fieldMapping` | [FieldMappings](#objecttype-fieldmappings) | false |  |
-
-
+| Key                       | Value                                                          | Required | Description |
+| ------------------------- | -------------------------------------------------------------- | -------- | ----------- |
+| `dataConnectorName`       | [DataConnectorName](#objecttype-dataconnectorname)             | true     |             |
+| `dataConnectorObjectType` | [DataConnectorObjectType](#objecttype-dataconnectorobjecttype) | true     |             |
+| `fieldMapping`            | [FieldMappings](#objecttype-fieldmappings)                     | false    |             |
 
 #### FieldMappings {#objecttype-fieldmappings}
 
 Mapping of object fields to their source columns in the data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [FieldMapping](#objecttype-fieldmapping) | false |  |
-
-
+| Key           | Value                                    | Required | Description |
+| ------------- | ---------------------------------------- | -------- | ----------- |
+| `<customKey>` | [FieldMapping](#objecttype-fieldmapping) | false    |             |
 
 #### FieldMapping {#objecttype-fieldmapping}
 
 Source field directly maps to some column in the data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `column` | [ColumnFieldMapping](#objecttype-columnfieldmapping) | true | The target column in a data connector object that a source field maps to. |
-
-
+| Key      | Value                                                | Required | Description                                                               |
+| -------- | ---------------------------------------------------- | -------- | ------------------------------------------------------------------------- |
+| `column` | [ColumnFieldMapping](#objecttype-columnfieldmapping) | true     | The target column in a data connector object that a source field maps to. |
 
 #### ColumnFieldMapping {#objecttype-columnfieldmapping}
 
 The target column in a data connector object that a source field maps to.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [DataConnectorColumnName](#objecttype-dataconnectorcolumnname) | true | The name of the target column |
-| `argumentMapping` | [ArgumentMapping](#objecttype-argumentmapping) / null | false | Arguments to the column field |
-
-
+| Key               | Value                                                          | Required | Description                   |
+| ----------------- | -------------------------------------------------------------- | -------- | ----------------------------- |
+| `name`            | [DataConnectorColumnName](#objecttype-dataconnectorcolumnname) | true     | The name of the target column |
+| `argumentMapping` | [ArgumentMapping](#objecttype-argumentmapping) / null          | false    | Arguments to the column field |
 
 #### ArgumentMapping {#objecttype-argumentmapping}
 
-Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of this object is the argument name used in the command or model and the value is the argument name used in the data connector.
+Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of
+this object is the argument name used in the command or model and the value is the argument name used in the data
+connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [DataConnectorArgumentName](#objecttype-dataconnectorargumentname) | false |  |
-
-
+| Key           | Value                                                              | Required | Description |
+| ------------- | ------------------------------------------------------------------ | -------- | ----------- |
+| `<customKey>` | [DataConnectorArgumentName](#objecttype-dataconnectorargumentname) | false    |             |
 
 #### DataConnectorArgumentName {#objecttype-dataconnectorargumentname}
 
 The name of an argument as defined by a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorColumnName {#objecttype-dataconnectorcolumnname}
 
 The name of a column in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorObjectType {#objecttype-dataconnectorobjecttype}
 
 The name of an object type in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#objecttype-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### ObjectTypeGraphQLConfiguration {#objecttype-objecttypegraphqlconfiguration}
 
 GraphQL configuration of an Open DD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `typeName` | [GraphQlTypeName](#objecttype-graphqltypename) / null | false | The name to use for the GraphQL type representation of this object type when used in an output context. |
-| `inputTypeName` | [GraphQlTypeName](#objecttype-graphqltypename) / null | false | The name to use for the GraphQL type representation of this object type when used in an input context. |
-| `apolloFederation` | [ObjectApolloFederationConfig](#objecttype-objectapollofederationconfig) / null | false | Configuration for exposing apollo federation related types and directives. |
-
-
+| Key                | Value                                                                           | Required | Description                                                                                             |
+| ------------------ | ------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `typeName`         | [GraphQlTypeName](#objecttype-graphqltypename) / null                           | false    | The name to use for the GraphQL type representation of this object type when used in an output context. |
+| `inputTypeName`    | [GraphQlTypeName](#objecttype-graphqltypename) / null                           | false    | The name to use for the GraphQL type representation of this object type when used in an input context.  |
+| `apolloFederation` | [ObjectApolloFederationConfig](#objecttype-objectapollofederationconfig) / null | false    | Configuration for exposing apollo federation related types and directives.                              |
 
 #### ObjectApolloFederationConfig {#objecttype-objectapollofederationconfig}
 
 Configuration for apollo federation related types and directives.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `keys` | [[ApolloFederationObjectKey](#objecttype-apollofederationobjectkey)] | true |  |
-
-
+| Key    | Value                                                                | Required | Description |
+| ------ | -------------------------------------------------------------------- | -------- | ----------- |
+| `keys` | [[ApolloFederationObjectKey](#objecttype-apollofederationobjectkey)] | true     |             |
 
 #### ApolloFederationObjectKey {#objecttype-apollofederationobjectkey}
 
 The definition of a key for an apollo federation object.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fields` | [[FieldName](#objecttype-fieldname)] | true |  |
-
-
+| Key      | Value                                | Required | Description |
+| -------- | ------------------------------------ | -------- | ----------- |
+| `fields` | [[FieldName](#objecttype-fieldname)] | true     |             |
 
 #### GraphQlTypeName {#objecttype-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### ObjectFieldDefinition {#objecttype-objectfielddefinition}
 
 The definition of a field in a user-defined object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [FieldName](#objecttype-fieldname) | true | The name of the field. This name is used both when referring to the field elsewhere in the metadata and when creating the corresponding GraphQl type. |
-| `type` | [TypeReference](#objecttype-typereference) | true | The type of this field. This uses the GraphQL syntax to represent field types and must refer to one of the inbuilt OpenDd types or another user-defined type. |
-| `description` | string / null | false | The description of this field. Gets added to the description of the field's definition in the graphql schema. |
-| `deprecated` | [Deprecated](#objecttype-deprecated) / null | false | Whether this field is deprecated. If set, the deprecation status is added to the field's graphql schema. |
-| `arguments` | [[FieldArgumentDefinition](#objecttype-fieldargumentdefinition)] | false | The arguments for the field |
-
-
+| Key           | Value                                                            | Required | Description                                                                                                                                                   |
+| ------------- | ---------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | [FieldName](#objecttype-fieldname)                               | true     | The name of the field. This name is used both when referring to the field elsewhere in the metadata and when creating the corresponding GraphQl type.         |
+| `type`        | [TypeReference](#objecttype-typereference)                       | true     | The type of this field. This uses the GraphQL syntax to represent field types and must refer to one of the inbuilt OpenDd types or another user-defined type. |
+| `description` | string / null                                                    | false    | The description of this field. Gets added to the description of the field's definition in the graphql schema.                                                 |
+| `deprecated`  | [Deprecated](#objecttype-deprecated) / null                      | false    | Whether this field is deprecated. If set, the deprecation status is added to the field's graphql schema.                                                      |
+| `arguments`   | [[FieldArgumentDefinition](#objecttype-fieldargumentdefinition)] | false    | The arguments for the field                                                                                                                                   |
 
 #### FieldArgumentDefinition {#objecttype-fieldargumentdefinition}
 
 The definition of an argument for a field in a user-defined object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [ArgumentName](#objecttype-argumentname) | true |  |
-| `argumentType` | [TypeReference](#objecttype-typereference) | true |  |
-| `description` | string / null | false |  |
-
-
+| Key            | Value                                      | Required | Description |
+| -------------- | ------------------------------------------ | -------- | ----------- |
+| `name`         | [ArgumentName](#objecttype-argumentname)   | true     |             |
+| `argumentType` | [TypeReference](#objecttype-typereference) | true     |             |
+| `description`  | string / null                              | false    |             |
 
 #### ArgumentName {#objecttype-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### Deprecated {#objecttype-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
+deprecated.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `reason` | string / null | false | The reason for deprecation. |
-
-
+| Key      | Value         | Required | Description                 |
+| -------- | ------------- | -------- | --------------------------- |
+| `reason` | string / null | false    | The reason for deprecation. |
 
 #### TypeReference {#objecttype-typereference}
 
-A reference to an Open DD type including nullable values and arrays.
-Suffix '!' to indicate a non-nullable reference, and wrap in '[]' to indicate an array.
-Eg: '[String!]!' is a non-nullable array of non-nullable strings.
-
+A reference to an Open DD type including nullable values and arrays. Suffix '!' to indicate a non-nullable reference,
+and wrap in '[]' to indicate an array. Eg: '[String!]!' is a non-nullable array of non-nullable strings.
 
 **Value:** string
-
 
 #### FieldName {#objecttype-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#objecttype-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # models.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/models
 
 # Models
 
@@ -14103,7 +16127,7 @@ A Global ID is a unique identifier for an object across the entire application, 
 type. Think of it as an ID which you can use to fetch any object directly, regardless of what kind of object it is. This
 is different from typical database IDs, which are often guaranteed unique only within a particular table.
 
-[//]: # "TODO: As long as it has already been fetched?"
+[//]: # 'TODO: As long as it has already been fetched?'
 
 Hasura's Global ID implementation can be used to provide options for GraphQL clients to elegantly handle caching and
 data re-fetching in a predictable and standardized way.
@@ -14534,13 +16558,11 @@ The name of data model.
 
 **Value:** string
 
-
-
 ==============================
 
-
-
 # commands.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/commands
 
 # Commands
 
@@ -14618,18 +16640,18 @@ query {
 
 ## Metadata structure
 
-
 ### Command {#command-command}
 
-The definition of a command. A command is a user-defined operation which can take arguments and returns an output. The semantics of a command are opaque to the Open DD specification.
+The definition of a command. A command is a user-defined operation which can take arguments and returns an output. The
+semantics of a command are opaque to the Open DD specification.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Command` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [CommandV1](#command-commandv1) | true | Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD. |
+| Key          | Value                           | Required | Description                                                                                                                                                  |
+| ------------ | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `kind`       | `Command`                       | true     |                                                                                                                                                              |
+| `version`    | `v1`                            | true     |                                                                                                                                                              |
+| `definition` | [CommandV1](#command-commandv1) | true     | Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: Command
@@ -14649,77 +16671,69 @@ definition:
   description: Get the latest article
 ```
 
-
 #### CommandV1 {#command-commandv1}
 
-Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD.
+Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The
+semantics of a command are opaque to OpenDD.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CommandName](#command-commandname) | true | The name of the command. |
-| `outputType` | [TypeReference](#command-typereference) | true | The return type of the command. |
-| `arguments` | [[ArgumentDefinition](#command-argumentdefinition)] | false | The list of arguments accepted by this command. Defaults to no arguments. |
-| `source` | [CommandSource](#command-commandsource) / null | false | The source configuration for this command. |
-| `graphql` | [CommandGraphQlDefinition](#command-commandgraphqldefinition) / null | false | Configuration for how this command should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of the command. Gets added to the description of the command's root field in the GraphQL schema. |
-
-
+| Key           | Value                                                                | Required | Description                                                                                                      |
+| ------------- | -------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `name`        | [CommandName](#command-commandname)                                  | true     | The name of the command.                                                                                         |
+| `outputType`  | [TypeReference](#command-typereference)                              | true     | The return type of the command.                                                                                  |
+| `arguments`   | [[ArgumentDefinition](#command-argumentdefinition)]                  | false    | The list of arguments accepted by this command. Defaults to no arguments.                                        |
+| `source`      | [CommandSource](#command-commandsource) / null                       | false    | The source configuration for this command.                                                                       |
+| `graphql`     | [CommandGraphQlDefinition](#command-commandgraphqldefinition) / null | false    | Configuration for how this command should appear in the GraphQL schema.                                          |
+| `description` | string / null                                                        | false    | The description of the command. Gets added to the description of the command's root field in the GraphQL schema. |
 
 #### CommandGraphQlDefinition {#command-commandgraphqldefinition}
 
 The definition of how a command should appear in the GraphQL API.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootFieldName` | [GraphQlFieldName](#command-graphqlfieldname) | true | The name of the graphql root field to use for this command. |
-| `rootFieldKind` | [GraphQlRootFieldKind](#command-graphqlrootfieldkind) | true | Whether to put this command in the Query or Mutation root of the GraphQL API. |
-| `deprecated` | [Deprecated](#command-deprecated) / null | false | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
+| Key             | Value                                                 | Required | Description                                                                                                            |
+| --------------- | ----------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `rootFieldName` | [GraphQlFieldName](#command-graphqlfieldname)         | true     | The name of the graphql root field to use for this command.                                                            |
+| `rootFieldKind` | [GraphQlRootFieldKind](#command-graphqlrootfieldkind) | true     | Whether to put this command in the Query or Mutation root of the GraphQL API.                                          |
+| `deprecated`    | [Deprecated](#command-deprecated) / null              | false    | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
 
- **Example:**
+**Example:**
 
 ```yaml
 rootFieldName: getLatestArticle
 rootFieldKind: Query
 ```
 
-
 #### Deprecated {#command-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
+deprecated.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `reason` | string / null | false | The reason for deprecation. |
-
-
+| Key      | Value         | Required | Description                 |
+| -------- | ------------- | -------- | --------------------------- |
+| `reason` | string / null | false    | The reason for deprecation. |
 
 #### GraphQlRootFieldKind {#command-graphqlrootfieldkind}
 
 Whether to put this command in the Query or Mutation root of the GraphQL API.
 
-
 **Value:** `Query` / `Mutation`
-
 
 #### GraphQlFieldName {#command-graphqlfieldname}
 
 The name of a GraphQL object field.
 
-
 **Value:** string
-
 
 #### CommandSource {#command-commandsource}
 
 Description of how a command maps to a particular data connector
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#command-dataconnectorname) | true | The name of the data connector backing this command. |
-| `dataConnectorCommand` | [DataConnectorCommand](#command-dataconnectorcommand) | true | The function/procedure in the data connector that backs this command. |
-| `argumentMapping` | [ArgumentMapping](#command-argumentmapping) | false | Mapping from command argument names to data connector function or procedure argument names. |
+| Key                    | Value                                                 | Required | Description                                                                                 |
+| ---------------------- | ----------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `dataConnectorName`    | [DataConnectorName](#command-dataconnectorname)       | true     | The name of the data connector backing this command.                                        |
+| `dataConnectorCommand` | [DataConnectorCommand](#command-dataconnectorcommand) | true     | The function/procedure in the data connector that backs this command.                       |
+| `argumentMapping`      | [ArgumentMapping](#command-argumentmapping)           | false    | Mapping from command argument names to data connector function or procedure argument names. |
 
- **Example:**
+**Example:**
 
 ```yaml
 dataConnectorName: data_connector
@@ -14728,107 +16742,85 @@ dataConnectorCommand:
 argumentMapping: {}
 ```
 
-
 #### ArgumentMapping {#command-argumentmapping}
 
-Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of this object is the argument name used in the command or model and the value is the argument name used in the data connector.
+Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of
+this object is the argument name used in the command or model and the value is the argument name used in the data
+connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [DataConnectorArgumentName](#command-dataconnectorargumentname) | false |  |
-
-
+| Key           | Value                                                           | Required | Description |
+| ------------- | --------------------------------------------------------------- | -------- | ----------- |
+| `<customKey>` | [DataConnectorArgumentName](#command-dataconnectorargumentname) | false    |             |
 
 #### DataConnectorArgumentName {#command-dataconnectorargumentname}
 
 The name of an argument as defined by a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorCommand {#command-dataconnectorcommand}
 
 The function/procedure in the data connector that backs this command.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `function` | [FunctionName](#command-functionname) | false | The name of a function backing the command. |
-| `procedure` | [ProcedureName](#command-procedurename) | false | The name of a procedure backing the command. |
-
-
+| Key         | Value                                   | Required | Description                                  |
+| ----------- | --------------------------------------- | -------- | -------------------------------------------- |
+| `function`  | [FunctionName](#command-functionname)   | false    | The name of a function backing the command.  |
+| `procedure` | [ProcedureName](#command-procedurename) | false    | The name of a procedure backing the command. |
 
 #### ProcedureName {#command-procedurename}
 
 The name of a procedure backing the command.
 
-
 **Value:** string
-
 
 #### FunctionName {#command-functionname}
 
 The name of a function backing the command.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#command-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### ArgumentDefinition {#command-argumentdefinition}
 
 The definition of an argument for a field, command, or model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [ArgumentName](#command-argumentname) | true | The name of an argument. |
-| `type` | [TypeReference](#command-typereference) | true |  |
-| `description` | string / null | false |  |
-
-
+| Key           | Value                                   | Required | Description              |
+| ------------- | --------------------------------------- | -------- | ------------------------ |
+| `name`        | [ArgumentName](#command-argumentname)   | true     | The name of an argument. |
+| `type`        | [TypeReference](#command-typereference) | true     |                          |
+| `description` | string / null                           | false    |                          |
 
 #### ArgumentName {#command-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### TypeReference {#command-typereference}
 
-A reference to an Open DD type including nullable values and arrays.
-Suffix '!' to indicate a non-nullable reference, and wrap in '[]' to indicate an array.
-Eg: '[String!]!' is a non-nullable array of non-nullable strings.
-
+A reference to an Open DD type including nullable values and arrays. Suffix '!' to indicate a non-nullable reference,
+and wrap in '[]' to indicate an array. Eg: '[String!]!' is a non-nullable array of non-nullable strings.
 
 **Value:** string
-
 
 #### CommandName {#command-commandname}
 
 The name of a command.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # boolean-expressions.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/boolean-expressions
 
 # Boolean Expressions
 
@@ -14951,18 +16943,17 @@ The above would let us write filters on `Album` types like:
 
 ## Metadata structure
 
-
 ### BooleanExpressionType {#booleanexpressiontype-booleanexpressiontype}
 
 Definition of a type representing a boolean expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `BooleanExpressionType` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [BooleanExpressionTypeV1](#booleanexpressiontype-booleanexpressiontypev1) | true | Definition of a type representing a boolean expression on an OpenDD object type. |
+| Key          | Value                                                                     | Required | Description                                                                      |
+| ------------ | ------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `kind`       | `BooleanExpressionType`                                                   | true     |                                                                                  |
+| `version`    | `v1`                                                                      | true     |                                                                                  |
+| `definition` | [BooleanExpressionTypeV1](#booleanexpressiontype-booleanexpressiontypev1) | true     | Definition of a type representing a boolean expression on an OpenDD object type. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: BooleanExpressionType
@@ -14990,249 +16981,202 @@ definition:
     typeName: App_Album_bool_exp
 ```
 
-
 #### BooleanExpressionTypeV1 {#booleanexpressiontype-booleanexpressiontypev1}
 
 Definition of a type representing a boolean expression on an OpenDD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CustomTypeName](#booleanexpressiontype-customtypename) | true | The name to give this boolean expression type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
-| `operand` | [BooleanExpressionOperand](#booleanexpressiontype-booleanexpressionoperand) | true | The type that this boolean expression applies to. |
-| `logicalOperators` | [BooleanExpressionLogicalOperators](#booleanexpressiontype-booleanexpressionlogicaloperators) | true | Whether to enable _and / _or / _not |
-| `isNull` | [BooleanExpressionIsNull](#booleanexpressiontype-booleanexpressionisnull) | true | Whether to enable _is_null |
-| `graphql` | [BooleanExpressionTypeGraphQlConfiguration](#booleanexpressiontype-booleanexpressiontypegraphqlconfiguration) / null | false | Configuration for how this object type should appear in the GraphQL schema. |
-
-
+| Key                | Value                                                                                                                | Required | Description                                                                                                                                             |
+| ------------------ | -------------------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`             | [CustomTypeName](#booleanexpressiontype-customtypename)                                                              | true     | The name to give this boolean expression type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
+| `operand`          | [BooleanExpressionOperand](#booleanexpressiontype-booleanexpressionoperand)                                          | true     | The type that this boolean expression applies to.                                                                                                       |
+| `logicalOperators` | [BooleanExpressionLogicalOperators](#booleanexpressiontype-booleanexpressionlogicaloperators)                        | true     | Whether to enable \_and / \_or / \_not                                                                                                                  |
+| `isNull`           | [BooleanExpressionIsNull](#booleanexpressiontype-booleanexpressionisnull)                                            | true     | Whether to enable \_is_null                                                                                                                             |
+| `graphql`          | [BooleanExpressionTypeGraphQlConfiguration](#booleanexpressiontype-booleanexpressiontypegraphqlconfiguration) / null | false    | Configuration for how this object type should appear in the GraphQL schema.                                                                             |
 
 #### BooleanExpressionTypeGraphQlConfiguration {#booleanexpressiontype-booleanexpressiontypegraphqlconfiguration}
 
 GraphQL configuration of an OpenDD boolean expression type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `typeName` | [GraphQlTypeName](#booleanexpressiontype-graphqltypename) | true | The name to use for the GraphQL type representation of this boolean expression type. |
-
-
+| Key        | Value                                                     | Required | Description                                                                          |
+| ---------- | --------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `typeName` | [GraphQlTypeName](#booleanexpressiontype-graphqltypename) | true     | The name to use for the GraphQL type representation of this boolean expression type. |
 
 #### GraphQlTypeName {#booleanexpressiontype-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### BooleanExpressionIsNull {#booleanexpressiontype-booleanexpressionisnull}
 
 Configuration for is_null in boolean expressions
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enable` | boolean | true |  |
-
-
+| Key      | Value   | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `enable` | boolean | true     |             |
 
 #### BooleanExpressionLogicalOperators {#booleanexpressiontype-booleanexpressionlogicaloperators}
 
 Configuration for logical operators in boolean expressions
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enable` | boolean | true |  |
-
-
+| Key      | Value   | Required | Description |
+| -------- | ------- | -------- | ----------- |
+| `enable` | boolean | true     |             |
 
 #### BooleanExpressionOperand {#booleanexpressiontype-booleanexpressionoperand}
 
 Configuration for object or scalar boolean expression
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `object` | [BooleanExpressionObjectOperand](#booleanexpressiontype-booleanexpressionobjectoperand) | false | Definition of an object type representing a boolean expression on an OpenDD object type. |
-| `scalar` | [BooleanExpressionScalarOperand](#booleanexpressiontype-booleanexpressionscalaroperand) | false | Definition of a scalar type representing a boolean expression on an OpenDD scalar type. |
-
-
+| Key      | Value                                                                                   | Required | Description                                                                              |
+| -------- | --------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------- |
+| `object` | [BooleanExpressionObjectOperand](#booleanexpressiontype-booleanexpressionobjectoperand) | false    | Definition of an object type representing a boolean expression on an OpenDD object type. |
+| `scalar` | [BooleanExpressionScalarOperand](#booleanexpressiontype-booleanexpressionscalaroperand) | false    | Definition of a scalar type representing a boolean expression on an OpenDD scalar type.  |
 
 #### BooleanExpressionScalarOperand {#booleanexpressiontype-booleanexpressionscalaroperand}
 
 Definition of a scalar type representing a boolean expression on an OpenDD scalar type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `type` | [TypeName](#booleanexpressiontype-typename) | true | The OpenDD type name of the scalar type that this boolean expression applies to. |
-| `comparisonOperators` | [[ComparisonOperator](#booleanexpressiontype-comparisonoperator)] | true | The list of comparison operators that can used on this scalar type |
-| `dataConnectorOperatorMapping` | [[DataConnectorOperatorMapping](#booleanexpressiontype-dataconnectoroperatormapping)] | true | The list of mappings between OpenDD operator names and the names used in the data connector schema |
-
-
+| Key                            | Value                                                                                 | Required | Description                                                                                        |
+| ------------------------------ | ------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `type`                         | [TypeName](#booleanexpressiontype-typename)                                           | true     | The OpenDD type name of the scalar type that this boolean expression applies to.                   |
+| `comparisonOperators`          | [[ComparisonOperator](#booleanexpressiontype-comparisonoperator)]                     | true     | The list of comparison operators that can used on this scalar type                                 |
+| `dataConnectorOperatorMapping` | [[DataConnectorOperatorMapping](#booleanexpressiontype-dataconnectoroperatormapping)] | true     | The list of mappings between OpenDD operator names and the names used in the data connector schema |
 
 #### DataConnectorOperatorMapping {#booleanexpressiontype-dataconnectoroperatormapping}
 
 Mapping between OpenDD operator names and the names used in the data connector schema
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#booleanexpressiontype-dataconnectorname) | true | Name of the data connector this mapping applies to |
-| `dataConnectorScalarType` | [DataConnectorScalarType](#booleanexpressiontype-dataconnectorscalartype) | true | Name of the scalar type according to the data connector's schema |
-| `operatorMapping` | [operator_mapping](#booleanexpressiontype-operator_mapping) | true | Mapping between OpenDD operator names and the data connector's operator names Defaults to the same operator name (e.g. "_eq: _eq") if no explicit mapping is present. |
-
-
+| Key                       | Value                                                                     | Required | Description                                                                                                                                                             |
+| ------------------------- | ------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dataConnectorName`       | [DataConnectorName](#booleanexpressiontype-dataconnectorname)             | true     | Name of the data connector this mapping applies to                                                                                                                      |
+| `dataConnectorScalarType` | [DataConnectorScalarType](#booleanexpressiontype-dataconnectorscalartype) | true     | Name of the scalar type according to the data connector's schema                                                                                                        |
+| `operatorMapping`         | [operator_mapping](#booleanexpressiontype-operator_mapping)               | true     | Mapping between OpenDD operator names and the data connector's operator names Defaults to the same operator name (e.g. "\_eq: \_eq") if no explicit mapping is present. |
 
 #### operator_mapping {#booleanexpressiontype-operator_mapping}
 
-Mapping between OpenDD operator names and the data connector's operator names Defaults to the same operator name (e.g. "_eq: _eq") if no explicit mapping is present.
+Mapping between OpenDD operator names and the data connector's operator names Defaults to the same operator name (e.g.
+"\_eq: \_eq") if no explicit mapping is present.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [DataConnectorOperatorName](#booleanexpressiontype-dataconnectoroperatorname) | false | The name of an operator in a data connector. |
-
-
+| Key           | Value                                                                         | Required | Description                                  |
+| ------------- | ----------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| `<customKey>` | [DataConnectorOperatorName](#booleanexpressiontype-dataconnectoroperatorname) | false    | The name of an operator in a data connector. |
 
 #### DataConnectorOperatorName {#booleanexpressiontype-dataconnectoroperatorname}
 
 The name of an operator in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorScalarType {#booleanexpressiontype-dataconnectorscalartype}
 
 The name of a scalar type in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#booleanexpressiontype-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### ComparisonOperator {#booleanexpressiontype-comparisonoperator}
 
 Definition of a comparison operator for a scalar type
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [OperatorName](#booleanexpressiontype-operatorname) | true | Name you want to give the operator in OpenDD / GraphQL |
-| `argumentType` | [TypeReference](#booleanexpressiontype-typereference) | true | An OpenDD type |
-
-
+| Key            | Value                                                 | Required | Description                                            |
+| -------------- | ----------------------------------------------------- | -------- | ------------------------------------------------------ |
+| `name`         | [OperatorName](#booleanexpressiontype-operatorname)   | true     | Name you want to give the operator in OpenDD / GraphQL |
+| `argumentType` | [TypeReference](#booleanexpressiontype-typereference) | true     | An OpenDD type                                         |
 
 #### TypeReference {#booleanexpressiontype-typereference}
 
-A reference to an Open DD type including nullable values and arrays.
-Suffix '!' to indicate a non-nullable reference, and wrap in '[]' to indicate an array.
-Eg: '[String!]!' is a non-nullable array of non-nullable strings.
-
+A reference to an Open DD type including nullable values and arrays. Suffix '!' to indicate a non-nullable reference,
+and wrap in '[]' to indicate an array. Eg: '[String!]!' is a non-nullable array of non-nullable strings.
 
 **Value:** string
-
 
 #### OperatorName {#booleanexpressiontype-operatorname}
 
 The name of an operator
 
-
 **Value:** string
-
 
 #### TypeName {#booleanexpressiontype-typename}
 
 The OpenDD type name of the scalar type that this boolean expression applies to.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [InbuiltType](#booleanexpressiontype-inbuilttype) | An inbuilt primitive OpenDD type. |
-| [CustomTypeName](#booleanexpressiontype-customtypename) |  |
-
-
+| Value                                                   | Description                       |
+| ------------------------------------------------------- | --------------------------------- |
+| [InbuiltType](#booleanexpressiontype-inbuilttype)       | An inbuilt primitive OpenDD type. |
+| [CustomTypeName](#booleanexpressiontype-customtypename) |                                   |
 
 #### InbuiltType {#booleanexpressiontype-inbuilttype}
 
 An inbuilt primitive OpenDD type.
 
-
 **Value:** `ID` / `Int` / `Float` / `Boolean` / `String`
-
 
 #### BooleanExpressionObjectOperand {#booleanexpressiontype-booleanexpressionobjectoperand}
 
 Definition of an object type representing a boolean expression on an OpenDD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `type` | [CustomTypeName](#booleanexpressiontype-customtypename) | true | The name of the object type that this boolean expression applies to. |
-| `comparableFields` | [[BooleanExpressionComparableField](#booleanexpressiontype-booleanexpressioncomparablefield)] | true | The list of fields of the object type that can be used for comparison when evaluating this boolean expression. |
-| `comparableRelationships` | [[BooleanExpressionComparableRelationship](#booleanexpressiontype-booleanexpressioncomparablerelationship)] | true | The list of relationships of the object type that can be used for comparison when evaluating this boolean expression. |
-
-
+| Key                       | Value                                                                                                       | Required | Description                                                                                                           |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| `type`                    | [CustomTypeName](#booleanexpressiontype-customtypename)                                                     | true     | The name of the object type that this boolean expression applies to.                                                  |
+| `comparableFields`        | [[BooleanExpressionComparableField](#booleanexpressiontype-booleanexpressioncomparablefield)]               | true     | The list of fields of the object type that can be used for comparison when evaluating this boolean expression.        |
+| `comparableRelationships` | [[BooleanExpressionComparableRelationship](#booleanexpressiontype-booleanexpressioncomparablerelationship)] | true     | The list of relationships of the object type that can be used for comparison when evaluating this boolean expression. |
 
 #### BooleanExpressionComparableRelationship {#booleanexpressiontype-booleanexpressioncomparablerelationship}
 
 Definition of a relationship that can be used for a comparison
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `relationshipName` | [RelationshipName](#booleanexpressiontype-relationshipname) | true | The name of the relationship to use for comparison |
-| `booleanExpressionType` | [CustomTypeName](#booleanexpressiontype-customtypename) / null | false | The boolean expression type to use for comparison. This is optional for relationships to models, and defaults to the filterExpressionType of the model |
-
-
+| Key                     | Value                                                          | Required | Description                                                                                                                                            |
+| ----------------------- | -------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `relationshipName`      | [RelationshipName](#booleanexpressiontype-relationshipname)    | true     | The name of the relationship to use for comparison                                                                                                     |
+| `booleanExpressionType` | [CustomTypeName](#booleanexpressiontype-customtypename) / null | false    | The boolean expression type to use for comparison. This is optional for relationships to models, and defaults to the filterExpressionType of the model |
 
 #### RelationshipName {#booleanexpressiontype-relationshipname}
 
 The name of the GraphQL relationship field.
 
-
 **Value:** string
-
 
 #### BooleanExpressionComparableField {#booleanexpressiontype-booleanexpressioncomparablefield}
 
 Comparison configuration definition for a field that can be used for a comparison
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [FieldName](#booleanexpressiontype-fieldname) | true | The name of the field that can be compared. |
-| `booleanExpressionType` | [CustomTypeName](#booleanexpressiontype-customtypename) | true | The boolean expression type that can be used for comparison against the type of the field. |
-
-
+| Key                     | Value                                                   | Required | Description                                                                                |
+| ----------------------- | ------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------ |
+| `fieldName`             | [FieldName](#booleanexpressiontype-fieldname)           | true     | The name of the field that can be compared.                                                |
+| `booleanExpressionType` | [CustomTypeName](#booleanexpressiontype-customtypename) | true     | The boolean expression type that can be used for comparison against the type of the field. |
 
 #### FieldName {#booleanexpressiontype-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#booleanexpressiontype-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
+
 ### ObjectBooleanExpressionType {#objectbooleanexpressiontype-objectbooleanexpressiontype}
 
 Definition of a type representing a boolean expression on an Open DD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `ObjectBooleanExpressionType` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [ObjectBooleanExpressionTypeV1](#objectbooleanexpressiontype-objectbooleanexpressiontypev1) | true | Definition of a type representing a boolean expression on an Open DD object type. Deprecated in favour of `BooleanExpressionType`. |
+| Key          | Value                                                                                       | Required | Description                                                                                                                        |
+| ------------ | ------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `kind`       | `ObjectBooleanExpressionType`                                                               | true     |                                                                                                                                    |
+| `version`    | `v1`                                                                                        | true     |                                                                                                                                    |
+| `definition` | [ObjectBooleanExpressionTypeV1](#objectbooleanexpressiontype-objectbooleanexpressiontypev1) | true     | Definition of a type representing a boolean expression on an Open DD object type. Deprecated in favour of `BooleanExpressionType`. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: ObjectBooleanExpressionType
@@ -15256,111 +17200,89 @@ definition:
     typeName: Author_bool_exp
 ```
 
-
 #### ObjectBooleanExpressionTypeV1 {#objectbooleanexpressiontype-objectbooleanexpressiontypev1}
 
-Definition of a type representing a boolean expression on an Open DD object type. Deprecated in favour of `BooleanExpressionType`.
+Definition of a type representing a boolean expression on an Open DD object type. Deprecated in favour of
+`BooleanExpressionType`.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CustomTypeName](#objectbooleanexpressiontype-customtypename) | true | The name to give this object boolean expression type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
-| `objectType` | [CustomTypeName](#objectbooleanexpressiontype-customtypename) | true | The name of the object type that this boolean expression applies to. |
-| `dataConnectorName` | [DataConnectorName](#objectbooleanexpressiontype-dataconnectorname) | true | The data connector this boolean expression type is based on. |
-| `dataConnectorObjectType` | [DataConnectorObjectType](#objectbooleanexpressiontype-dataconnectorobjecttype) | true | The object type in the data connector's schema this boolean expression type is based on. |
-| `comparableFields` | [[ComparableField](#objectbooleanexpressiontype-comparablefield)] | true | The list of fields of the object type that can be used for comparison when evaluating this boolean expression. |
-| `graphql` | [ObjectBooleanExpressionTypeGraphQlConfiguration](#objectbooleanexpressiontype-objectbooleanexpressiontypegraphqlconfiguration) / null | false | Configuration for how this object type should appear in the GraphQL schema. |
-
-
+| Key                       | Value                                                                                                                                  | Required | Description                                                                                                                                                    |
+| ------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`                    | [CustomTypeName](#objectbooleanexpressiontype-customtypename)                                                                          | true     | The name to give this object boolean expression type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
+| `objectType`              | [CustomTypeName](#objectbooleanexpressiontype-customtypename)                                                                          | true     | The name of the object type that this boolean expression applies to.                                                                                           |
+| `dataConnectorName`       | [DataConnectorName](#objectbooleanexpressiontype-dataconnectorname)                                                                    | true     | The data connector this boolean expression type is based on.                                                                                                   |
+| `dataConnectorObjectType` | [DataConnectorObjectType](#objectbooleanexpressiontype-dataconnectorobjecttype)                                                        | true     | The object type in the data connector's schema this boolean expression type is based on.                                                                       |
+| `comparableFields`        | [[ComparableField](#objectbooleanexpressiontype-comparablefield)]                                                                      | true     | The list of fields of the object type that can be used for comparison when evaluating this boolean expression.                                                 |
+| `graphql`                 | [ObjectBooleanExpressionTypeGraphQlConfiguration](#objectbooleanexpressiontype-objectbooleanexpressiontypegraphqlconfiguration) / null | false    | Configuration for how this object type should appear in the GraphQL schema.                                                                                    |
 
 #### ObjectBooleanExpressionTypeGraphQlConfiguration {#objectbooleanexpressiontype-objectbooleanexpressiontypegraphqlconfiguration}
 
 GraphQL configuration of an Open DD boolean expression type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `typeName` | [GraphQlTypeName](#objectbooleanexpressiontype-graphqltypename) | true | The name to use for the GraphQL type representation of this boolean expression type. |
-
-
+| Key        | Value                                                           | Required | Description                                                                          |
+| ---------- | --------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------ |
+| `typeName` | [GraphQlTypeName](#objectbooleanexpressiontype-graphqltypename) | true     | The name to use for the GraphQL type representation of this boolean expression type. |
 
 #### GraphQlTypeName {#objectbooleanexpressiontype-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### ComparableField {#objectbooleanexpressiontype-comparablefield}
 
 A field of an object type that can be used for comparison when evaluating a boolean expression.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [FieldName](#objectbooleanexpressiontype-fieldname) | true |  |
-| `operators` | [EnableAllOrSpecific](#objectbooleanexpressiontype-enableallorspecific) | true | Enable all or specific values. |
-
-
+| Key         | Value                                                                   | Required | Description                    |
+| ----------- | ----------------------------------------------------------------------- | -------- | ------------------------------ |
+| `fieldName` | [FieldName](#objectbooleanexpressiontype-fieldname)                     | true     |                                |
+| `operators` | [EnableAllOrSpecific](#objectbooleanexpressiontype-enableallorspecific) | true     | Enable all or specific values. |
 
 #### EnableAllOrSpecific {#objectbooleanexpressiontype-enableallorspecific}
 
 Enable all or specific values.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enableAll` | boolean | false |  |
-| `enableSpecific` | [[OperatorName](#objectbooleanexpressiontype-operatorname)] | false |  |
-
-
+| Key              | Value                                                       | Required | Description |
+| ---------------- | ----------------------------------------------------------- | -------- | ----------- |
+| `enableAll`      | boolean                                                     | false    |             |
+| `enableSpecific` | [[OperatorName](#objectbooleanexpressiontype-operatorname)] | false    |             |
 
 #### OperatorName {#objectbooleanexpressiontype-operatorname}
 
 The name of an operator
 
-
 **Value:** string
-
 
 #### FieldName {#objectbooleanexpressiontype-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### DataConnectorObjectType {#objectbooleanexpressiontype-dataconnectorobjecttype}
 
 The name of an object type in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#objectbooleanexpressiontype-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#objectbooleanexpressiontype-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # aggregate-expressions.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/aggregate-expressions
 
 # Aggregate Expressions
 
@@ -15503,18 +17425,17 @@ definition:
 
 ## Metadata structure
 
-
 ### AggregateExpression {#aggregateexpression-aggregateexpression}
 
 Definition of an aggregate expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `AggregateExpression` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [AggregateExpressionV1](#aggregateexpression-aggregateexpressionv1) | true | Definition of how to aggregate over a particular operand type |
+| Key          | Value                                                               | Required | Description                                                   |
+| ------------ | ------------------------------------------------------------------- | -------- | ------------------------------------------------------------- |
+| `kind`       | `AggregateExpression`                                               | true     |                                                               |
+| `version`    | `v1`                                                                | true     |                                                               |
+| `definition` | [AggregateExpressionV1](#aggregateexpression-aggregateexpressionv1) | true     | Definition of how to aggregate over a particular operand type |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: AggregateExpression
@@ -15532,255 +17453,206 @@ definition:
   description: Aggregate over Invoices
 ```
 
-
 #### AggregateExpressionV1 {#aggregateexpression-aggregateexpressionv1}
 
 Definition of how to aggregate over a particular operand type
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [AggregateExpressionName](#aggregateexpression-aggregateexpressionname) | true | The name of the aggregate expression. |
-| `operand` | [AggregateOperand](#aggregateexpression-aggregateoperand) | true | The type this aggregation expression aggregates over, and its associated configuration |
-| `count` | [AggregateCountDefinition](#aggregateexpression-aggregatecountdefinition) / null | false | Configuration for the count aggregate function used over the operand |
-| `countDistinct` | [AggregateCountDefinition](#aggregateexpression-aggregatecountdefinition) / null | false | Configuration for the count distinct aggregate function used over the operand |
-| `graphql` | [AggregateExpressionGraphQlDefinition](#aggregateexpression-aggregateexpressiongraphqldefinition) / null | false | Configuration for how this command should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of the aggregate expression. Gets added to the description of the command's root field in the GraphQL schema. |
-
-
+| Key             | Value                                                                                                    | Required | Description                                                                                                                   |
+| --------------- | -------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `name`          | [AggregateExpressionName](#aggregateexpression-aggregateexpressionname)                                  | true     | The name of the aggregate expression.                                                                                         |
+| `operand`       | [AggregateOperand](#aggregateexpression-aggregateoperand)                                                | true     | The type this aggregation expression aggregates over, and its associated configuration                                        |
+| `count`         | [AggregateCountDefinition](#aggregateexpression-aggregatecountdefinition) / null                         | false    | Configuration for the count aggregate function used over the operand                                                          |
+| `countDistinct` | [AggregateCountDefinition](#aggregateexpression-aggregatecountdefinition) / null                         | false    | Configuration for the count distinct aggregate function used over the operand                                                 |
+| `graphql`       | [AggregateExpressionGraphQlDefinition](#aggregateexpression-aggregateexpressiongraphqldefinition) / null | false    | Configuration for how this command should appear in the GraphQL schema.                                                       |
+| `description`   | string / null                                                                                            | false    | The description of the aggregate expression. Gets added to the description of the command's root field in the GraphQL schema. |
 
 #### AggregateExpressionGraphQlDefinition {#aggregateexpression-aggregateexpressiongraphqldefinition}
 
 The definition of how an aggregate expression should appear in the GraphQL API.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `selectTypeName` | [GraphQlTypeName](#aggregateexpression-graphqltypename) | true | The type name to use for the aggregate selection type |
-| `deprecated` | [Deprecated](#aggregateexpression-deprecated) / null | false | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
+| Key              | Value                                                   | Required | Description                                                                                                            |
+| ---------------- | ------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `selectTypeName` | [GraphQlTypeName](#aggregateexpression-graphqltypename) | true     | The type name to use for the aggregate selection type                                                                  |
+| `deprecated`     | [Deprecated](#aggregateexpression-deprecated) / null    | false    | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
 
- **Example:**
+**Example:**
 
 ```yaml
 selectTypeName: Invoice_aggregate_fields
 ```
 
-
 #### Deprecated {#aggregateexpression-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
+deprecated.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `reason` | string / null | false | The reason for deprecation. |
-
-
+| Key      | Value         | Required | Description                 |
+| -------- | ------------- | -------- | --------------------------- |
+| `reason` | string / null | false    | The reason for deprecation. |
 
 #### GraphQlTypeName {#aggregateexpression-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### AggregateCountDefinition {#aggregateexpression-aggregatecountdefinition}
 
 Definition of a count aggregation function
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enable` | boolean | true | Whether or not the aggregate function is available for use or not |
-| `description` | string / null | false | A description of the aggregation function. Gets added to the description of the field in the GraphQL schema. |
-| `returnType` | [TypeName](#aggregateexpression-typename) / null | false | The scalar type that the count aggregation function returns. Must be an integer type. If omitted, Int is used as the default. |
-
-
+| Key           | Value                                            | Required | Description                                                                                                                   |
+| ------------- | ------------------------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `enable`      | boolean                                          | true     | Whether or not the aggregate function is available for use or not                                                             |
+| `description` | string / null                                    | false    | A description of the aggregation function. Gets added to the description of the field in the GraphQL schema.                  |
+| `returnType`  | [TypeName](#aggregateexpression-typename) / null | false    | The scalar type that the count aggregation function returns. Must be an integer type. If omitted, Int is used as the default. |
 
 #### AggregateOperand {#aggregateexpression-aggregateoperand}
 
 Definition of an aggregate expression's operand
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `object` | [ObjectAggregateOperand](#aggregateexpression-objectaggregateoperand) | false | Definition of an aggregate over an object-typed operand |
-| `scalar` | [ScalarAggregateOperand](#aggregateexpression-scalaraggregateoperand) | false | Definition of an aggregate over a scalar-typed operand |
-
-
+| Key      | Value                                                                 | Required | Description                                             |
+| -------- | --------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `object` | [ObjectAggregateOperand](#aggregateexpression-objectaggregateoperand) | false    | Definition of an aggregate over an object-typed operand |
+| `scalar` | [ScalarAggregateOperand](#aggregateexpression-scalaraggregateoperand) | false    | Definition of an aggregate over a scalar-typed operand  |
 
 #### ScalarAggregateOperand {#aggregateexpression-scalaraggregateoperand}
 
 Definition of an aggregate over a scalar-typed operand
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `aggregatedType` | [TypeName](#aggregateexpression-typename) | true | The name of the scalar type the aggregate expression is aggregating |
-| `aggregationFunctions` | [[AggregationFunctionDefinition](#aggregateexpression-aggregationfunctiondefinition)] | true | The aggregation functions that operate over the scalar type |
-| `dataConnectorAggregationFunctionMapping` | [[DataConnectorAggregationFunctionMapping](#aggregateexpression-dataconnectoraggregationfunctionmapping)] | true | Mapping of aggregation functions to corresponding aggregation functions in various data connectors |
-
-
+| Key                                       | Value                                                                                                     | Required | Description                                                                                        |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `aggregatedType`                          | [TypeName](#aggregateexpression-typename)                                                                 | true     | The name of the scalar type the aggregate expression is aggregating                                |
+| `aggregationFunctions`                    | [[AggregationFunctionDefinition](#aggregateexpression-aggregationfunctiondefinition)]                     | true     | The aggregation functions that operate over the scalar type                                        |
+| `dataConnectorAggregationFunctionMapping` | [[DataConnectorAggregationFunctionMapping](#aggregateexpression-dataconnectoraggregationfunctionmapping)] | true     | Mapping of aggregation functions to corresponding aggregation functions in various data connectors |
 
 #### DataConnectorAggregationFunctionMapping {#aggregateexpression-dataconnectoraggregationfunctionmapping}
 
 Definition of how to map an aggregate expression's aggregation functions to data connector aggregation functions.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#aggregateexpression-dataconnectorname) | true | The data connector being mapped to |
-| `dataConnectorScalarType` | [DataConnectorScalarType](#aggregateexpression-dataconnectorscalartype) | true | The matching scalar type in the data connector for the operand scalar type |
-| `functionMapping` | [AggregationFunctionMappings](#aggregateexpression-aggregationfunctionmappings) | true | Mapping from Open DD aggregation function to data connector aggregation function |
-
-
+| Key                       | Value                                                                           | Required | Description                                                                      |
+| ------------------------- | ------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| `dataConnectorName`       | [DataConnectorName](#aggregateexpression-dataconnectorname)                     | true     | The data connector being mapped to                                               |
+| `dataConnectorScalarType` | [DataConnectorScalarType](#aggregateexpression-dataconnectorscalartype)         | true     | The matching scalar type in the data connector for the operand scalar type       |
+| `functionMapping`         | [AggregationFunctionMappings](#aggregateexpression-aggregationfunctionmappings) | true     | Mapping from Open DD aggregation function to data connector aggregation function |
 
 #### AggregationFunctionMappings {#aggregateexpression-aggregationfunctionmappings}
 
 Mapping of aggregation functions to their matching aggregation functions in the data connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [AggregateFunctionMapping](#aggregateexpression-aggregatefunctionmapping) | false | Definition of how to map the aggregation function to a function in the data connector |
-
-
+| Key           | Value                                                                     | Required | Description                                                                           |
+| ------------- | ------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `<customKey>` | [AggregateFunctionMapping](#aggregateexpression-aggregatefunctionmapping) | false    | Definition of how to map the aggregation function to a function in the data connector |
 
 #### AggregateFunctionMapping {#aggregateexpression-aggregatefunctionmapping}
 
 Definition of how to map the aggregation function to a function in the data connector
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [DataConnectorAggregationFunctionName](#aggregateexpression-dataconnectoraggregationfunctionname) | true | The name of the aggregation function in the data connector |
-
-
+| Key    | Value                                                                                             | Required | Description                                                |
+| ------ | ------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------- |
+| `name` | [DataConnectorAggregationFunctionName](#aggregateexpression-dataconnectoraggregationfunctionname) | true     | The name of the aggregation function in the data connector |
 
 #### DataConnectorAggregationFunctionName {#aggregateexpression-dataconnectoraggregationfunctionname}
 
 The name of an aggregation function in a data connector
 
-
 **Value:** string
-
 
 #### DataConnectorScalarType {#aggregateexpression-dataconnectorscalartype}
 
 The name of a scalar type in a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#aggregateexpression-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### AggregationFunctionDefinition {#aggregateexpression-aggregationfunctiondefinition}
 
 Definition of an aggregation function
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [AggregationFunctionName](#aggregateexpression-aggregationfunctionname) | true | The name of the aggregation function |
-| `description` | string / null | false | A description of the aggregation function. Gets added to the description of the field in the GraphQL schema. |
-| `returnType` | [TypeReference](#aggregateexpression-typereference) | true |  |
-
-
+| Key           | Value                                                                   | Required | Description                                                                                                  |
+| ------------- | ----------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------ |
+| `name`        | [AggregationFunctionName](#aggregateexpression-aggregationfunctionname) | true     | The name of the aggregation function                                                                         |
+| `description` | string / null                                                           | false    | A description of the aggregation function. Gets added to the description of the field in the GraphQL schema. |
+| `returnType`  | [TypeReference](#aggregateexpression-typereference)                     | true     |                                                                                                              |
 
 #### TypeReference {#aggregateexpression-typereference}
 
-A reference to an Open DD type including nullable values and arrays.
-Suffix '!' to indicate a non-nullable reference, and wrap in '[]' to indicate an array.
-Eg: '[String!]!' is a non-nullable array of non-nullable strings.
-
+A reference to an Open DD type including nullable values and arrays. Suffix '!' to indicate a non-nullable reference,
+and wrap in '[]' to indicate an array. Eg: '[String!]!' is a non-nullable array of non-nullable strings.
 
 **Value:** string
-
 
 #### AggregationFunctionName {#aggregateexpression-aggregationfunctionname}
 
 The name of an aggregation function.
 
-
 **Value:** string
-
 
 #### TypeName {#aggregateexpression-typename}
 
 The name of the scalar type the aggregate expression is aggregating
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [InbuiltType](#aggregateexpression-inbuilttype) | An inbuilt primitive OpenDD type. |
-| [CustomTypeName](#aggregateexpression-customtypename) |  |
-
-
+| Value                                                 | Description                       |
+| ----------------------------------------------------- | --------------------------------- |
+| [InbuiltType](#aggregateexpression-inbuilttype)       | An inbuilt primitive OpenDD type. |
+| [CustomTypeName](#aggregateexpression-customtypename) |                                   |
 
 #### InbuiltType {#aggregateexpression-inbuilttype}
 
 An inbuilt primitive OpenDD type.
 
-
 **Value:** `ID` / `Int` / `Float` / `Boolean` / `String`
-
 
 #### ObjectAggregateOperand {#aggregateexpression-objectaggregateoperand}
 
 Definition of an aggregate over an object-typed operand
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `aggregatedType` | [CustomTypeName](#aggregateexpression-customtypename) | true | The name of the object type the aggregate expression is aggregating |
-| `aggregatableFields` | [[AggregatableFieldDefinition](#aggregateexpression-aggregatablefielddefinition)] | true | The fields on the object that are aggregatable |
-
-
+| Key                  | Value                                                                             | Required | Description                                                         |
+| -------------------- | --------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| `aggregatedType`     | [CustomTypeName](#aggregateexpression-customtypename)                             | true     | The name of the object type the aggregate expression is aggregating |
+| `aggregatableFields` | [[AggregatableFieldDefinition](#aggregateexpression-aggregatablefielddefinition)] | true     | The fields on the object that are aggregatable                      |
 
 #### AggregatableFieldDefinition {#aggregateexpression-aggregatablefielddefinition}
 
 Definition of an aggregatable field on an object type
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [FieldName](#aggregateexpression-fieldname) | true | The name of the field on the operand aggregated type that is aggregatable |
-| `description` | string / null | false | A description of the aggregatable field. Gets added to the description of the field in the GraphQL schema. |
-| `aggregateExpression` | [AggregateExpressionName](#aggregateexpression-aggregateexpressionname) | true | The aggregate expression used to aggregate the type of the field |
-
-
+| Key                   | Value                                                                   | Required | Description                                                                                                |
+| --------------------- | ----------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `fieldName`           | [FieldName](#aggregateexpression-fieldname)                             | true     | The name of the field on the operand aggregated type that is aggregatable                                  |
+| `description`         | string / null                                                           | false    | A description of the aggregatable field. Gets added to the description of the field in the GraphQL schema. |
+| `aggregateExpression` | [AggregateExpressionName](#aggregateexpression-aggregateexpressionname) | true     | The aggregate expression used to aggregate the type of the field                                           |
 
 #### FieldName {#aggregateexpression-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#aggregateexpression-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
 
 #### AggregateExpressionName {#aggregateexpression-aggregateexpressionname}
 
 The name of an aggregate expression.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # orderby-expressions.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/orderby-expressions
 
 # OrderBy Expressions
 
@@ -15857,18 +17729,17 @@ Note here that we can specify different orderBy operators for `AlbumId` and `Art
 
 ## Metadata structure
 
-
 ### OrderByExpression {#orderbyexpression-orderbyexpression}
 
 Definition of an order by expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `OrderByExpression` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [OrderByExpressionV1](#orderbyexpression-orderbyexpressionv1) | true | Definition of a type representing an order by expression on an OpenDD type. |
+| Key          | Value                                                         | Required | Description                                                                 |
+| ------------ | ------------------------------------------------------------- | -------- | --------------------------------------------------------------------------- |
+| `kind`       | `OrderByExpression`                                           | true     |                                                                             |
+| `version`    | `v1`                                                          | true     |                                                                             |
+| `definition` | [OrderByExpressionV1](#orderbyexpression-orderbyexpressionv1) | true     | Definition of a type representing an order by expression on an OpenDD type. |
 
- **Examples:**
+**Examples:**
 
 ```yaml
 kind: OrderByExpression
@@ -15893,8 +17764,6 @@ definition:
   description: Order by expression for Albums
 ```
 
-
-
 ```yaml
 kind: OrderByExpression
 version: v1
@@ -15910,178 +17779,140 @@ definition:
   description: Order by expression for Int
 ```
 
-
 #### OrderByExpressionV1 {#orderbyexpression-orderbyexpressionv1}
 
 Definition of a type representing an order by expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname) | true | The name used to refer to this expression. This name is unique only in the context of the `orderedType` |
-| `operand` | [OrderByExpressionOperand](#orderbyexpression-orderbyexpressionoperand) | true | The type that this expression applies to. |
-| `graphql` | [OrderByExpressionGraphQlConfiguration](#orderbyexpression-orderbyexpressiongraphqlconfiguration) / null | false | Configuration for how this order by expression should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of the order by expression. |
-
-
+| Key           | Value                                                                                                    | Required | Description                                                                                             |
+| ------------- | -------------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `name`        | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname)                                        | true     | The name used to refer to this expression. This name is unique only in the context of the `orderedType` |
+| `operand`     | [OrderByExpressionOperand](#orderbyexpression-orderbyexpressionoperand)                                  | true     | The type that this expression applies to.                                                               |
+| `graphql`     | [OrderByExpressionGraphQlConfiguration](#orderbyexpression-orderbyexpressiongraphqlconfiguration) / null | false    | Configuration for how this order by expression should appear in the GraphQL schema.                     |
+| `description` | string / null                                                                                            | false    | The description of the order by expression.                                                             |
 
 #### OrderByExpressionGraphQlConfiguration {#orderbyexpression-orderbyexpressiongraphqlconfiguration}
 
 GraphQL configuration settings for a type representing an order by expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `expressionTypeName` | [GraphQlTypeName](#orderbyexpression-graphqltypename) | true | The name of a GraphQL type. |
-
-
+| Key                  | Value                                                 | Required | Description                 |
+| -------------------- | ----------------------------------------------------- | -------- | --------------------------- |
+| `expressionTypeName` | [GraphQlTypeName](#orderbyexpression-graphqltypename) | true     | The name of a GraphQL type. |
 
 #### GraphQlTypeName {#orderbyexpression-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
 
 #### OrderByExpressionOperand {#orderbyexpression-orderbyexpressionoperand}
 
 Configuration for object or scalar order by expression
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `object` | [OrderByExpressionObjectOperand](#orderbyexpression-orderbyexpressionobjectoperand) | false | Definition of an type representing an order by expression on an OpenDD object type. |
-| `scalar` | [OrderByExpressionScalarOperand](#orderbyexpression-orderbyexpressionscalaroperand) | false | Definition of a type representing an order by expression on an OpenDD scalar type. |
-
-
+| Key      | Value                                                                               | Required | Description                                                                         |
+| -------- | ----------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `object` | [OrderByExpressionObjectOperand](#orderbyexpression-orderbyexpressionobjectoperand) | false    | Definition of an type representing an order by expression on an OpenDD object type. |
+| `scalar` | [OrderByExpressionScalarOperand](#orderbyexpression-orderbyexpressionscalaroperand) | false    | Definition of a type representing an order by expression on an OpenDD scalar type.  |
 
 #### OrderByExpressionScalarOperand {#orderbyexpression-orderbyexpressionscalaroperand}
 
 Definition of a type representing an order by expression on an OpenDD scalar type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `orderedType` | [TypeName](#orderbyexpression-typename) | true | The type that this expression applies to. |
-| `enableOrderByDirections` | [EnableAllOrSpecific](#orderbyexpression-enableallorspecific) | true | Order by directions supported by this scalar type. |
-
-
+| Key                       | Value                                                         | Required | Description                                        |
+| ------------------------- | ------------------------------------------------------------- | -------- | -------------------------------------------------- |
+| `orderedType`             | [TypeName](#orderbyexpression-typename)                       | true     | The type that this expression applies to.          |
+| `enableOrderByDirections` | [EnableAllOrSpecific](#orderbyexpression-enableallorspecific) | true     | Order by directions supported by this scalar type. |
 
 #### EnableAllOrSpecific {#orderbyexpression-enableallorspecific}
 
 Enable all or specific values.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enableAll` | boolean | false |  |
-| `enableSpecific` | [[OrderByDirection](#orderbyexpression-orderbydirection)] | false |  |
-
-
+| Key              | Value                                                     | Required | Description |
+| ---------------- | --------------------------------------------------------- | -------- | ----------- |
+| `enableAll`      | boolean                                                   | false    |             |
+| `enableSpecific` | [[OrderByDirection](#orderbyexpression-orderbydirection)] | false    |             |
 
 #### OrderByDirection {#orderbyexpression-orderbydirection}
 
-
 **Value:** `Asc` / `Desc`
-
 
 #### TypeName {#orderbyexpression-typename}
 
 The type that this expression applies to.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [InbuiltType](#orderbyexpression-inbuilttype) | An inbuilt primitive OpenDD type. |
-| [CustomTypeName](#orderbyexpression-customtypename) |  |
-
-
+| Value                                               | Description                       |
+| --------------------------------------------------- | --------------------------------- |
+| [InbuiltType](#orderbyexpression-inbuilttype)       | An inbuilt primitive OpenDD type. |
+| [CustomTypeName](#orderbyexpression-customtypename) |                                   |
 
 #### InbuiltType {#orderbyexpression-inbuilttype}
 
 An inbuilt primitive OpenDD type.
 
-
 **Value:** `ID` / `Int` / `Float` / `Boolean` / `String`
-
 
 #### OrderByExpressionObjectOperand {#orderbyexpression-orderbyexpressionobjectoperand}
 
 Definition of an type representing an order by expression on an OpenDD object type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `orderedType` | [CustomTypeName](#orderbyexpression-customtypename) | true | The type that this expression applies to. |
-| `orderableFields` | [[OrderByExpressionOrderableField](#orderbyexpression-orderbyexpressionorderablefield)] | true | Orderable fields of the `orderedType` |
-| `orderableRelationships` | [[OrderByExpressionOrderableRelationship](#orderbyexpression-orderbyexpressionorderablerelationship)] | true | Orderable relationships |
-
-
+| Key                      | Value                                                                                                 | Required | Description                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------- |
+| `orderedType`            | [CustomTypeName](#orderbyexpression-customtypename)                                                   | true     | The type that this expression applies to. |
+| `orderableFields`        | [[OrderByExpressionOrderableField](#orderbyexpression-orderbyexpressionorderablefield)]               | true     | Orderable fields of the `orderedType`     |
+| `orderableRelationships` | [[OrderByExpressionOrderableRelationship](#orderbyexpression-orderbyexpressionorderablerelationship)] | true     | Orderable relationships                   |
 
 #### OrderByExpressionOrderableRelationship {#orderbyexpression-orderbyexpressionorderablerelationship}
 
 Definition of a relationship in a type representing an order by expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `relationshipName` | [RelationshipName](#orderbyexpression-relationshipname) | true | The name of the relationship. |
-| `orderByExpression` | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname) / null | false | The OrderByExpression to use for this relationship. This is optional for model relationships. If not specified we use the model's OrderByExpression configuration. For local command relationships this is required. |
-
-
+| Key                 | Value                                                                    | Required | Description                                                                                                                                                                                                          |
+| ------------------- | ------------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `relationshipName`  | [RelationshipName](#orderbyexpression-relationshipname)                  | true     | The name of the relationship.                                                                                                                                                                                        |
+| `orderByExpression` | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname) / null | false    | The OrderByExpression to use for this relationship. This is optional for model relationships. If not specified we use the model's OrderByExpression configuration. For local command relationships this is required. |
 
 #### RelationshipName {#orderbyexpression-relationshipname}
 
 The name of the GraphQL relationship field.
 
-
 **Value:** string
-
 
 #### OrderByExpressionOrderableField {#orderbyexpression-orderbyexpressionorderablefield}
 
 Definition of a field in a type representing an order by expression on an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [FieldName](#orderbyexpression-fieldname) | true |  |
-| `orderByExpression` | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname) | true | OrderByExpression to use for this field. |
-
-
+| Key                 | Value                                                             | Required | Description                              |
+| ------------------- | ----------------------------------------------------------------- | -------- | ---------------------------------------- |
+| `fieldName`         | [FieldName](#orderbyexpression-fieldname)                         | true     |                                          |
+| `orderByExpression` | [OrderByExpressionName](#orderbyexpression-orderbyexpressionname) | true     | OrderByExpression to use for this field. |
 
 #### FieldName {#orderbyexpression-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#orderbyexpression-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
 
 #### OrderByExpressionName {#orderbyexpression-orderbyexpressionname}
 
 The name of an order by expression.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # relationships.mdx
 
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/relationships
 
 # Relationships
 
@@ -16166,42 +17997,8 @@ type** and you want to relate that to a `customers` **model** and whatever objec
 
 **Example:** Fetch a list of orders along with the customer details for each order:
 
-<GraphiQLIDE
-  query={`query OrdersAndCustomers {
-  orders {
-    orderId
-    orderDate
-    customer {
-      customerId
-      name
-      email
-    }
-  }
-}`}
-  response={`{
-  "data": {
-    "orders": [
-      {
-        "orderId": "ORD001",
-        "orderDate": "2024-05-10",
-        "customer": {
-          "customerId": "CUST001",
-          "name": "John Doe",
-          "email": "john.doe@example.com"
-        }
-      },
-      {
-        "orderId": "ORD002",
-        "orderDate": "2024-05-11",
-        "customer": {
-          "customerId": "CUST002",
-          "name": "Jane Smith",
-          "email": "jane.smith@example.com"
-        }
-      }
-    ]
-  }
-}`}
+<GraphiQLIDE query={`query OrdersAndCustomers { orders { orderId orderDate customer { customerId name email } } }`}
+response={`{ "data": { "orders": [ { "orderId": "ORD001", "orderDate": "2024-05-10", "customer": { "customerId": "CUST001", "name": "John Doe", "email": "john.doe@example.com" } }, { "orderId": "ORD002", "orderDate": "2024-05-11", "customer": { "customerId": "CUST002", "name": "Jane Smith", "email": "jane.smith@example.com" } } ] } }`}
 />
 
 Here is the corresponding relationship configuration which enables this query:
@@ -16243,43 +18040,8 @@ data and their current session information.
 
 **Example:** fetch a list of users and the current session information of each user:
 
-<GraphiQLIDE
-  query={`query UsersAndCurrentSession {
-  users {
-    id
-    username
-    currentSession {
-      activeSince
-    }
-  }
-}`}
-  response={`{
-  "data": {
-    "users": [
-      {
-        "id": 1,
-        "username": "sit_amet",
-        "currentSession": {
-          "activeSince": "2024-04-01T07:08:22+0000"
-        }
-      },
-      {
-        "id": 2,
-        "username": "fancy_nibh",
-        "currentSession": {
-          "activeSince": "2024-04-01T07:08:22+0000"
-        }
-      },
-      {
-        "id": 3,
-        "username": "just_joe",
-        "currentSession": {
-          "activeSince": "2024-04-01T07:08:22+0000"
-        }
-      }
-    ]
-  }
-}`}
+<GraphiQLIDE query={`query UsersAndCurrentSession { users { id username currentSession { activeSince } } }`}
+response={`{ "data": { "users": [ { "id": 1, "username": "sit_amet", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } }, { "id": 2, "username": "fancy_nibh", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } }, { "id": 3, "username": "just_joe", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } } ] } }`}
 />
 
 Here is the corresponding relationship configuration which enables this query:
@@ -16311,30 +18073,8 @@ Hasura DDN also allows you to link commands together from a source type to query
 **Example:** fetch the result of one command and use it as input for another command:
 
 <GraphiQLIDE
-  query={`query TrackOrder {
-    trackOrder(orderId: "ORD12345") {
-      trackingNumber
-      shippingDetails {
-        carrier
-        estimatedDeliveryDate
-        currentStatus
-      }
-    }
-  }
-`}
-  response={`{
-  "data": {
-    "trackOrder": {
-      "trackingNumber": "1Z9999999999999999",
-      "shippingDetails": {
-        "carrier": "UPS",
-        "estimatedDeliveryDate": "2024-05-25",
-        "currentStatus": "In Transit"
-      }
-    }
-  }
-}
-`}
+query={`query TrackOrder { trackOrder(orderId: "ORD12345") { trackingNumber shippingDetails { carrier estimatedDeliveryDate currentStatus } } } `}
+response={`{ "data": { "trackOrder": { "trackingNumber": "1Z9999999999999999", "shippingDetails": { "carrier": "UPS", "estimatedDeliveryDate": "2024-05-25", "currentStatus": "In Transit" } } } } `}
 />
 
 And the corresponding relationship configuration which enables this query:
@@ -16374,18 +18114,17 @@ The CLI also works to automatically track your relationships for you whenever yo
 
 ## Metadata structure
 
-
 ### Relationship {#relationship-relationship}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Relationship` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [RelationshipV1](#relationship-relationshipv1) | true | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
+| Key          | Value                                          | Required | Description                                                                                                    |
+| ------------ | ---------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| `kind`       | `Relationship`                                 | true     |                                                                                                                |
+| `version`    | `v1`                                           | true     |                                                                                                                |
+| `definition` | [RelationshipV1](#relationship-relationshipv1) | true     | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: Relationship
@@ -16408,53 +18147,47 @@ definition:
   description: Articles written by an author
 ```
 
-
 #### RelationshipV1 {#relationship-relationshipv1}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [RelationshipName](#relationship-relationshipname) | true | The name of the relationship. |
-| `sourceType` | [CustomTypeName](#relationship-customtypename) | true | The source type of the relationship. |
-| `target` | [RelationshipTarget](#relationship-relationshiptarget) | true | The target of the relationship. |
-| `mapping` | [[RelationshipMapping](#relationship-relationshipmapping)] | true | The mapping configuration of source to target for the relationship. |
-| `description` | string / null | false | The description of the relationship. Gets added to the description of the relationship in the graphql schema. |
-| `deprecated` | [Deprecated](#relationship-deprecated) / null | false | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
-| `graphql` | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false | Configuration for how this relationship should appear in the GraphQL schema. |
-
-
+| Key           | Value                                                                               | Required | Description                                                                                                                  |
+| ------------- | ----------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `name`        | [RelationshipName](#relationship-relationshipname)                                  | true     | The name of the relationship.                                                                                                |
+| `sourceType`  | [CustomTypeName](#relationship-customtypename)                                      | true     | The source type of the relationship.                                                                                         |
+| `target`      | [RelationshipTarget](#relationship-relationshiptarget)                              | true     | The target of the relationship.                                                                                              |
+| `mapping`     | [[RelationshipMapping](#relationship-relationshipmapping)]                          | true     | The mapping configuration of source to target for the relationship.                                                          |
+| `description` | string / null                                                                       | false    | The description of the relationship. Gets added to the description of the relationship in the graphql schema.                |
+| `deprecated`  | [Deprecated](#relationship-deprecated) / null                                       | false    | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
+| `graphql`     | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false    | Configuration for how this relationship should appear in the GraphQL schema.                                                 |
 
 #### RelationshipGraphQlDefinition {#relationship-relationshipgraphqldefinition}
 
 The definition of how a relationship appears in the GraphQL API
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false | The field name to use for the field that represents an aggregate over the relationship |
-
-
+| Key                  | Value                                       | Required | Description                                                                            |
+| -------------------- | ------------------------------------------- | -------- | -------------------------------------------------------------------------------------- |
+| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false    | The field name to use for the field that represents an aggregate over the relationship |
 
 #### Deprecated {#relationship-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
+deprecated.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `reason` | string / null | false | The reason for deprecation. |
-
-
+| Key      | Value         | Required | Description                 |
+| -------- | ------------- | -------- | --------------------------- |
+| `reason` | string / null | false    | The reason for deprecation. |
 
 #### RelationshipMapping {#relationship-relationshipmapping}
 
 Definition of a how a particular field in the source maps to a target field or argument.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true | The source configuration for this relationship mapping. |
-| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true | The target configuration for this relationship mapping. |
+| Key      | Value                                                                | Required | Description                                             |
+| -------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true     | The source configuration for this relationship mapping. |
+| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true     | The target configuration for this relationship mapping. |
 
- **Example:**
+**Example:**
 
 ```yaml
 source:
@@ -16465,107 +18198,86 @@ target:
     - fieldName: author_id
 ```
 
-
 #### RelationshipMappingTarget {#relationship-relationshipmappingtarget}
 
 The target configuration for a relationship mapping.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `argument` | [ArgumentMappingTarget](#relationship-argumentmappingtarget) | false | An argument target for a relationship mapping. |
-| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
-
-
+| Key          | Value                                                                          | Required | Description                                    |
+| ------------ | ------------------------------------------------------------------------------ | -------- | ---------------------------------------------- |
+| `argument`   | [ArgumentMappingTarget](#relationship-argumentmappingtarget)                   | false    | An argument target for a relationship mapping. |
+| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                |
 
 #### ArgumentMappingTarget {#relationship-argumentmappingtarget}
 
 An argument target for a relationship mapping.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `argumentName` | [ArgumentName](#relationship-argumentname) | true |  |
-
-
+| Key            | Value                                      | Required | Description |
+| -------------- | ------------------------------------------ | -------- | ----------- |
+| `argumentName` | [ArgumentName](#relationship-argumentname) | true     |             |
 
 #### ArgumentName {#relationship-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### RelationshipMappingSource {#relationship-relationshipmappingsource}
 
 The source configuration for a relationship mapping.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `value` | [ValueExpression](#relationship-valueexpression) | false | An expression which evaluates to a value that can be used in permissions and various presets. |
-| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
-
-
+| Key         | Value                                                                          | Required | Description                                                                                   |
+| ----------- | ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------- |
+| `value`     | [ValueExpression](#relationship-valueexpression)                               | false    | An expression which evaluates to a value that can be used in permissions and various presets. |
+| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                                                               |
 
 #### RelationshipSourceFieldAccess {#relationship-relationshipsourcefieldaccess}
 
 A field access in a relationship mapping.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [FieldName](#relationship-fieldname) | true |  |
-
-
+| Key         | Value                                | Required | Description |
+| ----------- | ------------------------------------ | -------- | ----------- |
+| `fieldName` | [FieldName](#relationship-fieldname) | true     |             |
 
 #### FieldName {#relationship-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### ValueExpression {#relationship-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key               | Value                                                        | Required | Description |
+| ----------------- | ------------------------------------------------------------ | -------- | ----------- |
+| `literal`         |                                                              | false    |             |
+| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false    |             |
+| `valueFromEnv`    | string                                                       | false    |             |
 
 #### OpenDdSessionVariable {#relationship-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
-
 **Value:** string
-
 
 #### RelationshipTarget {#relationship-relationshiptarget}
 
 The target for a relationship.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `model` | [ModelRelationshipTarget](#relationship-modelrelationshiptarget) | false | The target model for a relationship. |
-| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false | The target command for a relationship. |
+| Key       | Value                                                                | Required | Description                            |
+| --------- | -------------------------------------------------------------------- | -------- | -------------------------------------- |
+| `model`   | [ModelRelationshipTarget](#relationship-modelrelationshiptarget)     | false    | The target model for a relationship.   |
+| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false    | The target command for a relationship. |
 
- **Example:**
+**Example:**
 
 ```yaml
 model:
@@ -16574,103 +18286,81 @@ model:
   relationshipType: Array
 ```
 
-
 #### CommandRelationshipTarget {#relationship-commandrelationshiptarget}
 
 The target command for a relationship.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CommandName](#relationship-commandname) | true | The name of the command. |
-| `subgraph` | string / null | false | The subgraph of the target command. Defaults to the current subgraph. |
-
-
+| Key        | Value                                    | Required | Description                                                           |
+| ---------- | ---------------------------------------- | -------- | --------------------------------------------------------------------- |
+| `name`     | [CommandName](#relationship-commandname) | true     | The name of the command.                                              |
+| `subgraph` | string / null                            | false    | The subgraph of the target command. Defaults to the current subgraph. |
 
 #### CommandName {#relationship-commandname}
 
 The name of a command.
 
-
 **Value:** string
-
 
 #### ModelRelationshipTarget {#relationship-modelrelationshiptarget}
 
 The target model for a relationship.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [ModelName](#relationship-modelname) | true | The name of the data model. |
-| `subgraph` | string / null | false | The subgraph of the target model. Defaults to the current subgraph. |
-| `relationshipType` | [RelationshipType](#relationship-relationshiptype) | true | Type of the relationship - object or array. |
-| `aggregate` | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false | How to aggregate over the relationship. Only valid for array relationships |
-
-
+| Key                | Value                                                                                     | Required | Description                                                                |
+| ------------------ | ----------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `name`             | [ModelName](#relationship-modelname)                                                      | true     | The name of the data model.                                                |
+| `subgraph`         | string / null                                                                             | false    | The subgraph of the target model. Defaults to the current subgraph.        |
+| `relationshipType` | [RelationshipType](#relationship-relationshiptype)                                        | true     | Type of the relationship - object or array.                                |
+| `aggregate`        | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false    | How to aggregate over the relationship. Only valid for array relationships |
 
 #### ModelRelationshipTargetAggregate {#relationship-modelrelationshiptargetaggregate}
 
 Which aggregate expression to use to aggregate the array relationship.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true | The name of the aggregate expression that defines how to aggregate across the relationship. |
-| `description` | string / null | false | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
-
-
+| Key                   | Value                                                            | Required | Description                                                                                                               |
+| --------------------- | ---------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true     | The name of the aggregate expression that defines how to aggregate across the relationship.                               |
+| `description`         | string / null                                                    | false    | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
 
 #### AggregateExpressionName {#relationship-aggregateexpressionname}
 
 The name of an aggregate expression.
 
-
 **Value:** string
-
 
 #### RelationshipType {#relationship-relationshiptype}
 
 Type of the relationship.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| `Object` | Select one related object from the target. |
-| `Array` | Select multiple related objects from the target. |
-
-
+| Value    | Description                                      |
+| -------- | ------------------------------------------------ |
+| `Object` | Select one related object from the target.       |
+| `Array`  | Select multiple related objects from the target. |
 
 #### ModelName {#relationship-modelname}
 
 The name of data model.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#relationship-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
-
 
 #### RelationshipName {#relationship-relationshipname}
 
 The name of the GraphQL relationship field.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # permissions.mdx
 
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/permissions
 
 # Permissions
 
@@ -16860,18 +18550,17 @@ definition:
 
 ## Metadata structure
 
-
 ### TypePermissions {#typepermissions-typepermissions}
 
 Definition of permissions for an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `TypePermissions` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [TypePermissionsV1](#typepermissions-typepermissionsv1) | true | Definition of permissions for an OpenDD type. |
+| Key          | Value                                                   | Required | Description                                   |
+| ------------ | ------------------------------------------------------- | -------- | --------------------------------------------- |
+| `kind`       | `TypePermissions`                                       | true     |                                               |
+| `version`    | `v1`                                                    | true     |                                               |
+| `definition` | [TypePermissionsV1](#typepermissions-typepermissionsv1) | true     | Definition of permissions for an OpenDD type. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: TypePermissions
@@ -16892,29 +18581,26 @@ definition:
           - author_id
 ```
 
-
 #### TypePermissionsV1 {#typepermissions-typepermissionsv1}
 
 Definition of permissions for an OpenDD type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `typeName` | [CustomTypeName](#typepermissions-customtypename) | true | The name of the type for which permissions are being defined. Must be an object type. |
-| `permissions` | [[TypePermission](#typepermissions-typepermission)] | true | A list of type permissions, one for each role. |
-
-
+| Key           | Value                                               | Required | Description                                                                           |
+| ------------- | --------------------------------------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `typeName`    | [CustomTypeName](#typepermissions-customtypename)   | true     | The name of the type for which permissions are being defined. Must be an object type. |
+| `permissions` | [[TypePermission](#typepermissions-typepermission)] | true     | A list of type permissions, one for each role.                                        |
 
 #### TypePermission {#typepermissions-typepermission}
 
 Defines permissions for a particular role for a type.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `role` | [Role](#typepermissions-role) | true | The role for which permissions are being defined. |
-| `output` | [TypeOutputPermission](#typepermissions-typeoutputpermission) / null | false | Permissions for this role when this type is used in an output context. If null, this type is inaccessible for this role in an output context. |
-| `input` | [TypeInputPermission](#typepermissions-typeinputpermission) / null | false | Permissions for this role when this type is used in an input context. If null, this type is accessible for this role in an input context. |
+| Key      | Value                                                                | Required | Description                                                                                                                                   |
+| -------- | -------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `role`   | [Role](#typepermissions-role)                                        | true     | The role for which permissions are being defined.                                                                                             |
+| `output` | [TypeOutputPermission](#typepermissions-typeoutputpermission) / null | false    | Permissions for this role when this type is used in an output context. If null, this type is inaccessible for this role in an output context. |
+| `input`  | [TypeInputPermission](#typepermissions-typeinputpermission) / null   | false    | Permissions for this role when this type is used in an input context. If null, this type is accessible for this role in an input context.     |
 
- **Example:**
+**Example:**
 
 ```yaml
 role: user
@@ -16929,94 +18615,78 @@ input:
         sessionVariable: x-hasura-user-id
 ```
 
-
 #### TypeInputPermission {#typepermissions-typeinputpermission}
 
 Permissions for a type for a particular role when used in an input context.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldPresets` | [[FieldPreset](#typepermissions-fieldpreset)] | false | Preset values for fields of the type |
-
-
+| Key            | Value                                         | Required | Description                          |
+| -------------- | --------------------------------------------- | -------- | ------------------------------------ |
+| `fieldPresets` | [[FieldPreset](#typepermissions-fieldpreset)] | false    | Preset values for fields of the type |
 
 #### FieldPreset {#typepermissions-fieldpreset}
 
 Preset value for a field
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `field` | [FieldName](#typepermissions-fieldname) | true | Field name for preset |
-| `value` | [ValueExpression](#typepermissions-valueexpression) | true | Value for preset |
-
-
+| Key     | Value                                               | Required | Description           |
+| ------- | --------------------------------------------------- | -------- | --------------------- |
+| `field` | [FieldName](#typepermissions-fieldname)             | true     | Field name for preset |
+| `value` | [ValueExpression](#typepermissions-valueexpression) | true     | Value for preset      |
 
 #### ValueExpression {#typepermissions-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#typepermissions-openddsessionvariable) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key               | Value                                                           | Required | Description |
+| ----------------- | --------------------------------------------------------------- | -------- | ----------- |
+| `literal`         |                                                                 | false    |             |
+| `sessionVariable` | [OpenDdSessionVariable](#typepermissions-openddsessionvariable) | false    |             |
+| `valueFromEnv`    | string                                                          | false    |             |
 
 #### OpenDdSessionVariable {#typepermissions-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
-
 **Value:** string
-
 
 #### TypeOutputPermission {#typepermissions-typeoutputpermission}
 
 Permissions for a type for a particular role when used in an output context.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `allowedFields` | [[FieldName](#typepermissions-fieldname)] | true | Fields of the type that are accessible for a role |
-
-
+| Key             | Value                                     | Required | Description                                       |
+| --------------- | ----------------------------------------- | -------- | ------------------------------------------------- |
+| `allowedFields` | [[FieldName](#typepermissions-fieldname)] | true     | Fields of the type that are accessible for a role |
 
 #### FieldName {#typepermissions-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### Role {#typepermissions-role}
 
 The role for which permissions are being defined.
 
-
 **Value:** string
-
 
 #### CustomTypeName {#typepermissions-customtypename}
 
 The name of a user-defined type.
 
-
 **Value:** string
+
 ### ModelPermissions {#modelpermissions-modelpermissions}
 
 Definition of permissions for an OpenDD model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `ModelPermissions` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [ModelPermissionsV1](#modelpermissions-modelpermissionsv1) | true | Definition of permissions for an OpenDD model. |
+| Key          | Value                                                      | Required | Description                                    |
+| ------------ | ---------------------------------------------------------- | -------- | ---------------------------------------------- |
+| `kind`       | `ModelPermissions`                                         | true     |                                                |
+| `version`    | `v1`                                                       | true     |                                                |
+| `definition` | [ModelPermissionsV1](#modelpermissions-modelpermissionsv1) | true     | Definition of permissions for an OpenDD model. |
 
- **Examples:**
+**Examples:**
 
 ```yaml
 kind: ModelPermissions
@@ -17036,8 +18706,6 @@ definition:
             value:
               sessionVariable: x-hasura-user-id
 ```
-
-
 
 ```yaml
 kind: ModelPermissions
@@ -17061,28 +18729,25 @@ definition:
                   sessionVariable: x-hasura-user-id
 ```
 
-
 #### ModelPermissionsV1 {#modelpermissions-modelpermissionsv1}
 
 Definition of permissions for an OpenDD model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `modelName` | [ModelName](#modelpermissions-modelname) | true | The name of the model for which permissions are being defined. |
-| `permissions` | [[ModelPermission](#modelpermissions-modelpermission)] | true | A list of model permissions, one for each role. |
-
-
+| Key           | Value                                                  | Required | Description                                                    |
+| ------------- | ------------------------------------------------------ | -------- | -------------------------------------------------------------- |
+| `modelName`   | [ModelName](#modelpermissions-modelname)               | true     | The name of the model for which permissions are being defined. |
+| `permissions` | [[ModelPermission](#modelpermissions-modelpermission)] | true     | A list of model permissions, one for each role.                |
 
 #### ModelPermission {#modelpermissions-modelpermission}
 
 Defines the permissions for an OpenDD model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `role` | [Role](#modelpermissions-role) | true | The role for which permissions are being defined. |
-| `select` | [SelectPermission](#modelpermissions-selectpermission) / null | false | The permissions for selecting from this model for this role. If this is null, the role is not allowed to query the model. |
+| Key      | Value                                                         | Required | Description                                                                                                               |
+| -------- | ------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `role`   | [Role](#modelpermissions-role)                                | true     | The role for which permissions are being defined.                                                                         |
+| `select` | [SelectPermission](#modelpermissions-selectpermission) / null | false    | The permissions for selecting from this model for this role. If this is null, the role is not allowed to query the model. |
 
- **Example:**
+**Example:**
 
 ```yaml
 role: user
@@ -17099,71 +18764,60 @@ select:
         literal: true
 ```
 
-
 #### SelectPermission {#modelpermissions-selectpermission}
 
 Defines the permissions for selecting a model for a role.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `filter` | null / [ModelPredicate](#modelpermissions-modelpredicate) | true | Filter expression when selecting rows for this model. Null filter implies all rows are selectable. |
-| `argumentPresets` | [[ArgumentPreset](#modelpermissions-argumentpreset)] | false | Preset values for arguments for this role |
-| `allowSubscriptions` | boolean | false | Whether the role is allowed to subscribe to the root fields of this model. |
-
-
+| Key                  | Value                                                     | Required | Description                                                                                        |
+| -------------------- | --------------------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------- |
+| `filter`             | null / [ModelPredicate](#modelpermissions-modelpredicate) | true     | Filter expression when selecting rows for this model. Null filter implies all rows are selectable. |
+| `argumentPresets`    | [[ArgumentPreset](#modelpermissions-argumentpreset)]      | false    | Preset values for arguments for this role                                                          |
+| `allowSubscriptions` | boolean                                                   | false    | Whether the role is allowed to subscribe to the root fields of this model.                         |
 
 #### ArgumentPreset {#modelpermissions-argumentpreset}
 
 Preset value for an argument
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `argument` | [ArgumentName](#modelpermissions-argumentname) | true | Argument name for preset |
-| `value` | [ValueExpressionOrPredicate](#modelpermissions-valueexpressionorpredicate) | true | Value for preset |
-
-
+| Key        | Value                                                                      | Required | Description              |
+| ---------- | -------------------------------------------------------------------------- | -------- | ------------------------ |
+| `argument` | [ArgumentName](#modelpermissions-argumentname)                             | true     | Argument name for preset |
+| `value`    | [ValueExpressionOrPredicate](#modelpermissions-valueexpressionorpredicate) | true     | Value for preset         |
 
 #### ValueExpressionOrPredicate {#modelpermissions-valueexpressionorpredicate}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#modelpermissions-openddsessionvariable) | false | Used to represent the name of a session variable, like "x-hasura-role". |
-| `booleanExpression` | [ModelPredicate](#modelpermissions-modelpredicate) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key                 | Value                                                            | Required | Description                                                             |
+| ------------------- | ---------------------------------------------------------------- | -------- | ----------------------------------------------------------------------- |
+| `literal`           |                                                                  | false    |                                                                         |
+| `sessionVariable`   | [OpenDdSessionVariable](#modelpermissions-openddsessionvariable) | false    | Used to represent the name of a session variable, like "x-hasura-role". |
+| `booleanExpression` | [ModelPredicate](#modelpermissions-modelpredicate)               | false    |                                                                         |
+| `valueFromEnv`      | string                                                           | false    |                                                                         |
 
 #### ArgumentName {#modelpermissions-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### ModelPredicate {#modelpermissions-modelpredicate}
 
 A predicate that can be used to restrict the objects returned when querying a model.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldComparison` | [FieldComparisonPredicate](#modelpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
-| `fieldIsNull` | [FieldIsNullPredicate](#modelpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
-| `relationship` | [RelationshipPredicate](#modelpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
-| `and` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
-| `or` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
-| `not` | [ModelPredicate](#modelpermissions-modelpredicate) | false |  |
+| Key               | Value                                                                  | Required | Description                                                                                         |
+| ----------------- | ---------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
+| `fieldComparison` | [FieldComparisonPredicate](#modelpermissions-fieldcomparisonpredicate) | false    | Field comparison predicate filters objects based on a field value.                                  |
+| `fieldIsNull`     | [FieldIsNullPredicate](#modelpermissions-fieldisnullpredicate)         | false    | Predicate to check if the given field is null.                                                      |
+| `relationship`    | [RelationshipPredicate](#modelpermissions-relationshippredicate)       | false    | Relationship predicate filters objects of a source model based on a predicate on the related model. |
+| `and`             | [[ModelPredicate](#modelpermissions-modelpredicate)]                   | false    |                                                                                                     |
+| `or`              | [[ModelPredicate](#modelpermissions-modelpredicate)]                   | false    |                                                                                                     |
+| `not`             | [ModelPredicate](#modelpermissions-modelpredicate)                     | false    |                                                                                                     |
 
- **Examples:**
+**Examples:**
 
 ```yaml
 fieldComparison:
@@ -17172,8 +18826,6 @@ fieldComparison:
   value:
     sessionVariable: x-hasura-user-id
 ```
-
-
 
 ```yaml
 relationship:
@@ -17185,8 +18837,6 @@ relationship:
       value:
         sessionVariable: x-hasura-user-id
 ```
-
-
 
 ```yaml
 and:
@@ -17202,8 +18852,6 @@ and:
         literal: Hello World
 ```
 
-
-
 ```yaml
 not:
   fieldComparison:
@@ -17213,112 +18861,92 @@ not:
       sessionVariable: x-hasura-user-id
 ```
 
-
 #### RelationshipPredicate {#modelpermissions-relationshippredicate}
 
 Relationship predicate filters objects of a source model based on a predicate on the related model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [RelationshipName](#modelpermissions-relationshipname) | true | The name of the relationship of the object type of the model to follow. |
-| `predicate` | [ModelPredicate](#modelpermissions-modelpredicate) / null | false | The predicate to apply on the related objects. If this is null, then the predicate evaluates to true as long as there is at least one related object present. |
-
-
+| Key         | Value                                                     | Required | Description                                                                                                                                                   |
+| ----------- | --------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`      | [RelationshipName](#modelpermissions-relationshipname)    | true     | The name of the relationship of the object type of the model to follow.                                                                                       |
+| `predicate` | [ModelPredicate](#modelpermissions-modelpredicate) / null | false    | The predicate to apply on the related objects. If this is null, then the predicate evaluates to true as long as there is at least one related object present. |
 
 #### RelationshipName {#modelpermissions-relationshipname}
 
 The name of the GraphQL relationship field.
 
-
 **Value:** string
-
 
 #### FieldIsNullPredicate {#modelpermissions-fieldisnullpredicate}
 
 Predicate to check if the given field is null.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `field` | [FieldName](#modelpermissions-fieldname) | true | The name of the field that should be checked for a null value. |
-
-
+| Key     | Value                                    | Required | Description                                                    |
+| ------- | ---------------------------------------- | -------- | -------------------------------------------------------------- |
+| `field` | [FieldName](#modelpermissions-fieldname) | true     | The name of the field that should be checked for a null value. |
 
 #### FieldComparisonPredicate {#modelpermissions-fieldcomparisonpredicate}
 
 Field comparison predicate filters objects based on a field value.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `field` | [FieldName](#modelpermissions-fieldname) | true | The field name of the object type of the model to compare. |
-| `operator` | [OperatorName](#modelpermissions-operatorname) | true | The name of the operator to use for comparison. |
-| `value` | [ValueExpression](#modelpermissions-valueexpression) | true | The value expression to compare against. |
-
-
+| Key        | Value                                                | Required | Description                                                |
+| ---------- | ---------------------------------------------------- | -------- | ---------------------------------------------------------- |
+| `field`    | [FieldName](#modelpermissions-fieldname)             | true     | The field name of the object type of the model to compare. |
+| `operator` | [OperatorName](#modelpermissions-operatorname)       | true     | The name of the operator to use for comparison.            |
+| `value`    | [ValueExpression](#modelpermissions-valueexpression) | true     | The value expression to compare against.                   |
 
 #### ValueExpression {#modelpermissions-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#modelpermissions-openddsessionvariable) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key               | Value                                                            | Required | Description |
+| ----------------- | ---------------------------------------------------------------- | -------- | ----------- |
+| `literal`         |                                                                  | false    |             |
+| `sessionVariable` | [OpenDdSessionVariable](#modelpermissions-openddsessionvariable) | false    |             |
+| `valueFromEnv`    | string                                                           | false    |             |
 
 #### OpenDdSessionVariable {#modelpermissions-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
-
 **Value:** string
-
 
 #### OperatorName {#modelpermissions-operatorname}
 
 The name of an operator
 
-
 **Value:** string
-
 
 #### FieldName {#modelpermissions-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### Role {#modelpermissions-role}
 
 The role for which permissions are being defined.
 
-
 **Value:** string
-
 
 #### ModelName {#modelpermissions-modelname}
 
 The name of data model.
 
-
 **Value:** string
+
 ### CommandPermissions {#commandpermissions-commandpermissions}
 
 Definition of permissions for an OpenDD command.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `CommandPermissions` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [CommandPermissionsV1](#commandpermissions-commandpermissionsv1) | true | Definition of permissions for an OpenDD command. |
+| Key          | Value                                                            | Required | Description                                      |
+| ------------ | ---------------------------------------------------------------- | -------- | ------------------------------------------------ |
+| `kind`       | `CommandPermissions`                                             | true     |                                                  |
+| `version`    | `v1`                                                             | true     |                                                  |
+| `definition` | [CommandPermissionsV1](#commandpermissions-commandpermissionsv1) | true     | Definition of permissions for an OpenDD command. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: CommandPermissions
@@ -17332,29 +18960,26 @@ definition:
       allowExecution: true
 ```
 
-
 #### CommandPermissionsV1 {#commandpermissions-commandpermissionsv1}
 
 Definition of permissions for an OpenDD command.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `commandName` | [CommandName](#commandpermissions-commandname) | true | The name of the command for which permissions are being defined. |
-| `permissions` | [[CommandPermission](#commandpermissions-commandpermission)] | true | A list of command permissions, one for each role. |
-
-
+| Key           | Value                                                        | Required | Description                                                      |
+| ------------- | ------------------------------------------------------------ | -------- | ---------------------------------------------------------------- |
+| `commandName` | [CommandName](#commandpermissions-commandname)               | true     | The name of the command for which permissions are being defined. |
+| `permissions` | [[CommandPermission](#commandpermissions-commandpermission)] | true     | A list of command permissions, one for each role.                |
 
 #### CommandPermission {#commandpermissions-commandpermission}
 
 Defines the permissions for a role for a command.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `role` | [Role](#commandpermissions-role) | true | The role for which permissions are being defined. |
-| `allowExecution` | boolean | true | Whether the command is executable by the role. |
-| `argumentPresets` | [[ArgumentPreset](#commandpermissions-argumentpreset)] | false | Preset values for arguments for this role |
+| Key               | Value                                                  | Required | Description                                       |
+| ----------------- | ------------------------------------------------------ | -------- | ------------------------------------------------- |
+| `role`            | [Role](#commandpermissions-role)                       | true     | The role for which permissions are being defined. |
+| `allowExecution`  | boolean                                                | true     | Whether the command is executable by the role.    |
+| `argumentPresets` | [[ArgumentPreset](#commandpermissions-argumentpreset)] | false    | Preset values for arguments for this role         |
 
- **Example:**
+**Example:**
 
 ```yaml
 role: user
@@ -17365,51 +18990,44 @@ argumentPresets:
       session_variable: x-hasura-user_id
 ```
 
-
 #### ArgumentPreset {#commandpermissions-argumentpreset}
 
 Preset value for an argument
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `argument` | [ArgumentName](#commandpermissions-argumentname) | true | Argument name for preset |
-| `value` | [ValueExpressionOrPredicate](#commandpermissions-valueexpressionorpredicate) | true | Value for preset |
-
-
+| Key        | Value                                                                        | Required | Description              |
+| ---------- | ---------------------------------------------------------------------------- | -------- | ------------------------ |
+| `argument` | [ArgumentName](#commandpermissions-argumentname)                             | true     | Argument name for preset |
+| `value`    | [ValueExpressionOrPredicate](#commandpermissions-valueexpressionorpredicate) | true     | Value for preset         |
 
 #### ValueExpressionOrPredicate {#commandpermissions-valueexpressionorpredicate}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#commandpermissions-openddsessionvariable) | false | Used to represent the name of a session variable, like "x-hasura-role". |
-| `booleanExpression` | [ModelPredicate](#commandpermissions-modelpredicate) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key                 | Value                                                              | Required | Description                                                             |
+| ------------------- | ------------------------------------------------------------------ | -------- | ----------------------------------------------------------------------- |
+| `literal`           |                                                                    | false    |                                                                         |
+| `sessionVariable`   | [OpenDdSessionVariable](#commandpermissions-openddsessionvariable) | false    | Used to represent the name of a session variable, like "x-hasura-role". |
+| `booleanExpression` | [ModelPredicate](#commandpermissions-modelpredicate)               | false    |                                                                         |
+| `valueFromEnv`      | string                                                             | false    |                                                                         |
 
 #### ModelPredicate {#commandpermissions-modelpredicate}
 
 A predicate that can be used to restrict the objects returned when querying a model.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldComparison` | [FieldComparisonPredicate](#commandpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
-| `fieldIsNull` | [FieldIsNullPredicate](#commandpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
-| `relationship` | [RelationshipPredicate](#commandpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
-| `and` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
-| `or` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
-| `not` | [ModelPredicate](#commandpermissions-modelpredicate) | false |  |
+| Key               | Value                                                                    | Required | Description                                                                                         |
+| ----------------- | ------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------- |
+| `fieldComparison` | [FieldComparisonPredicate](#commandpermissions-fieldcomparisonpredicate) | false    | Field comparison predicate filters objects based on a field value.                                  |
+| `fieldIsNull`     | [FieldIsNullPredicate](#commandpermissions-fieldisnullpredicate)         | false    | Predicate to check if the given field is null.                                                      |
+| `relationship`    | [RelationshipPredicate](#commandpermissions-relationshippredicate)       | false    | Relationship predicate filters objects of a source model based on a predicate on the related model. |
+| `and`             | [[ModelPredicate](#commandpermissions-modelpredicate)]                   | false    |                                                                                                     |
+| `or`              | [[ModelPredicate](#commandpermissions-modelpredicate)]                   | false    |                                                                                                     |
+| `not`             | [ModelPredicate](#commandpermissions-modelpredicate)                     | false    |                                                                                                     |
 
- **Examples:**
+**Examples:**
 
 ```yaml
 fieldComparison:
@@ -17418,8 +19036,6 @@ fieldComparison:
   value:
     sessionVariable: x-hasura-user-id
 ```
-
-
 
 ```yaml
 relationship:
@@ -17431,8 +19047,6 @@ relationship:
       value:
         sessionVariable: x-hasura-user-id
 ```
-
-
 
 ```yaml
 and:
@@ -17448,8 +19062,6 @@ and:
         literal: Hello World
 ```
 
-
-
 ```yaml
 not:
   fieldComparison:
@@ -17459,117 +19071,92 @@ not:
       sessionVariable: x-hasura-user-id
 ```
 
-
 #### RelationshipPredicate {#commandpermissions-relationshippredicate}
 
 Relationship predicate filters objects of a source model based on a predicate on the related model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [RelationshipName](#commandpermissions-relationshipname) | true | The name of the relationship of the object type of the model to follow. |
-| `predicate` | [ModelPredicate](#commandpermissions-modelpredicate) / null | false | The predicate to apply on the related objects. If this is null, then the predicate evaluates to true as long as there is at least one related object present. |
-
-
+| Key         | Value                                                       | Required | Description                                                                                                                                                   |
+| ----------- | ----------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `name`      | [RelationshipName](#commandpermissions-relationshipname)    | true     | The name of the relationship of the object type of the model to follow.                                                                                       |
+| `predicate` | [ModelPredicate](#commandpermissions-modelpredicate) / null | false    | The predicate to apply on the related objects. If this is null, then the predicate evaluates to true as long as there is at least one related object present. |
 
 #### RelationshipName {#commandpermissions-relationshipname}
 
 The name of the GraphQL relationship field.
 
-
 **Value:** string
-
 
 #### FieldIsNullPredicate {#commandpermissions-fieldisnullpredicate}
 
 Predicate to check if the given field is null.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `field` | [FieldName](#commandpermissions-fieldname) | true | The name of the field that should be checked for a null value. |
-
-
+| Key     | Value                                      | Required | Description                                                    |
+| ------- | ------------------------------------------ | -------- | -------------------------------------------------------------- |
+| `field` | [FieldName](#commandpermissions-fieldname) | true     | The name of the field that should be checked for a null value. |
 
 #### FieldComparisonPredicate {#commandpermissions-fieldcomparisonpredicate}
 
 Field comparison predicate filters objects based on a field value.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `field` | [FieldName](#commandpermissions-fieldname) | true | The field name of the object type of the model to compare. |
-| `operator` | [OperatorName](#commandpermissions-operatorname) | true | The name of the operator to use for comparison. |
-| `value` | [ValueExpression](#commandpermissions-valueexpression) | true | The value expression to compare against. |
-
-
+| Key        | Value                                                  | Required | Description                                                |
+| ---------- | ------------------------------------------------------ | -------- | ---------------------------------------------------------- |
+| `field`    | [FieldName](#commandpermissions-fieldname)             | true     | The field name of the object type of the model to compare. |
+| `operator` | [OperatorName](#commandpermissions-operatorname)       | true     | The name of the operator to use for comparison.            |
+| `value`    | [ValueExpression](#commandpermissions-valueexpression) | true     | The value expression to compare against.                   |
 
 #### ValueExpression {#commandpermissions-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` |  | false |  |
-| `sessionVariable` | [OpenDdSessionVariable](#commandpermissions-openddsessionvariable) | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key               | Value                                                              | Required | Description |
+| ----------------- | ------------------------------------------------------------------ | -------- | ----------- |
+| `literal`         |                                                                    | false    |             |
+| `sessionVariable` | [OpenDdSessionVariable](#commandpermissions-openddsessionvariable) | false    |             |
+| `valueFromEnv`    | string                                                             | false    |             |
 
 #### OperatorName {#commandpermissions-operatorname}
 
 The name of an operator
 
-
 **Value:** string
-
 
 #### FieldName {#commandpermissions-fieldname}
 
 The name of a field in a user-defined object type.
 
-
 **Value:** string
-
 
 #### OpenDdSessionVariable {#commandpermissions-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
-
 **Value:** string
-
 
 #### ArgumentName {#commandpermissions-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### Role {#commandpermissions-role}
 
 The role for which permissions are being defined.
 
-
 **Value:** string
-
 
 #### CommandName {#commandpermissions-commandname}
 
 The name of a command.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # graphql-config.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/graphql-config
 
 # Configuration for GraphQL API
 
@@ -17654,218 +19241,181 @@ definition:
 
 ## Metadata structure
 
-
 ### GraphqlConfig {#graphqlconfig-graphqlconfig}
 
 GraphqlConfig object tells us two things:
 
-1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features should be enabled/disabled across the subgraphs
+1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features
+   should be enabled/disabled across the subgraphs
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `GraphqlConfig` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [GraphqlConfigV1](#graphqlconfig-graphqlconfigv1) | true | GraphqlConfig object tells us two things:  1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features should be enabled/disabled across the subgraphs |
-
-
+| Key          | Value                                             | Required | Description                                                                                                                                                                                                      |
+| ------------ | ------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kind`       | `GraphqlConfig`                                   | true     |                                                                                                                                                                                                                  |
+| `version`    | `v1`                                              | true     |                                                                                                                                                                                                                  |
+| `definition` | [GraphqlConfigV1](#graphqlconfig-graphqlconfigv1) | true     | GraphqlConfig object tells us two things: 1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features should be enabled/disabled across the subgraphs |
 
 #### GraphqlConfigV1 {#graphqlconfig-graphqlconfigv1}
 
 GraphqlConfig object tells us two things:
 
-1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features should be enabled/disabled across the subgraphs
+1. How the Graphql schema should look like for the features (`where`, `order_by` etc) Hasura provides 2. What features
+   should be enabled/disabled across the subgraphs
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `query` | [QueryGraphqlConfig](#graphqlconfig-querygraphqlconfig) | true | Configuration for the GraphQL schema of Hasura features for queries. `None` means disable the feature. |
-| `mutation` | [MutationGraphqlConfig](#graphqlconfig-mutationgraphqlconfig) | true | Configuration for the GraphQL schema of Hasura features for mutations. |
-| `subscription` | [SubscriptionGraphqlConfig](#graphqlconfig-subscriptiongraphqlconfig) / null | false |  |
-| `apolloFederation` | [GraphqlApolloFederationConfig](#graphqlconfig-graphqlapollofederationconfig) / null | false |  |
-
-
+| Key                | Value                                                                                | Required | Description                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------ |
+| `query`            | [QueryGraphqlConfig](#graphqlconfig-querygraphqlconfig)                              | true     | Configuration for the GraphQL schema of Hasura features for queries. `None` means disable the feature. |
+| `mutation`         | [MutationGraphqlConfig](#graphqlconfig-mutationgraphqlconfig)                        | true     | Configuration for the GraphQL schema of Hasura features for mutations.                                 |
+| `subscription`     | [SubscriptionGraphqlConfig](#graphqlconfig-subscriptiongraphqlconfig) / null         | false    |                                                                                                        |
+| `apolloFederation` | [GraphqlApolloFederationConfig](#graphqlconfig-graphqlapollofederationconfig) / null | false    |                                                                                                        |
 
 #### GraphqlApolloFederationConfig {#graphqlconfig-graphqlapollofederationconfig}
 
 Configuration for the GraphQL schema of Hasura features for Apollo Federation.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `enableRootFields` | boolean | true | Adds the `_entities` and `_services` root fields required for Apollo Federation. |
-
-
+| Key                | Value   | Required | Description                                                                      |
+| ------------------ | ------- | -------- | -------------------------------------------------------------------------------- |
+| `enableRootFields` | boolean | true     | Adds the `_entities` and `_services` root fields required for Apollo Federation. |
 
 #### SubscriptionGraphqlConfig {#graphqlconfig-subscriptiongraphqlconfig}
 
 Configuration for the GraphQL schema of Hasura features for subscriptions.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true | The name of the root operation type name for subscriptions. Usually `subscription`. |
-
-
+| Key                     | Value                                             | Required | Description                                                                         |
+| ----------------------- | ------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true     | The name of the root operation type name for subscriptions. Usually `subscription`. |
 
 #### MutationGraphqlConfig {#graphqlconfig-mutationgraphqlconfig}
 
 Configuration for the GraphQL schema of Hasura features for mutations.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true | The name of the root operation type name for mutations. Usually `mutation`. |
-
-
+| Key                     | Value                                             | Required | Description                                                                 |
+| ----------------------- | ------------------------------------------------- | -------- | --------------------------------------------------------------------------- |
+| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true     | The name of the root operation type name for mutations. Usually `mutation`. |
 
 #### QueryGraphqlConfig {#graphqlconfig-querygraphqlconfig}
 
 Configuration for the GraphQL schema of Hasura features for queries. `None` means disable the feature.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true | The name of the root operation type name for queries. Usually `query`. |
-| `argumentsInput` | [ArgumentsInputGraphqlConfig](#graphqlconfig-argumentsinputgraphqlconfig) / null | false | Configuration for the arguments input. |
-| `limitInput` | [LimitInputGraphqlConfig](#graphqlconfig-limitinputgraphqlconfig) / null | false | Configuration for the limit operation. |
-| `offsetInput` | [OffsetInputGraphqlConfig](#graphqlconfig-offsetinputgraphqlconfig) / null | false | Configuration for the offset operation. |
-| `filterInput` | [FilterInputGraphqlConfig](#graphqlconfig-filterinputgraphqlconfig) / null | false | Configuration for the filter operation. |
-| `orderByInput` | [OrderByInputGraphqlConfig](#graphqlconfig-orderbyinputgraphqlconfig) / null | false | Configuration for the sort operation. |
-| `aggregate` | [AggregateGraphqlConfig](#graphqlconfig-aggregategraphqlconfig) / null | false | Configuration for aggregates |
-
-
+| Key                     | Value                                                                            | Required | Description                                                            |
+| ----------------------- | -------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `rootOperationTypeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename)                                | true     | The name of the root operation type name for queries. Usually `query`. |
+| `argumentsInput`        | [ArgumentsInputGraphqlConfig](#graphqlconfig-argumentsinputgraphqlconfig) / null | false    | Configuration for the arguments input.                                 |
+| `limitInput`            | [LimitInputGraphqlConfig](#graphqlconfig-limitinputgraphqlconfig) / null         | false    | Configuration for the limit operation.                                 |
+| `offsetInput`           | [OffsetInputGraphqlConfig](#graphqlconfig-offsetinputgraphqlconfig) / null       | false    | Configuration for the offset operation.                                |
+| `filterInput`           | [FilterInputGraphqlConfig](#graphqlconfig-filterinputgraphqlconfig) / null       | false    | Configuration for the filter operation.                                |
+| `orderByInput`          | [OrderByInputGraphqlConfig](#graphqlconfig-orderbyinputgraphqlconfig) / null     | false    | Configuration for the sort operation.                                  |
+| `aggregate`             | [AggregateGraphqlConfig](#graphqlconfig-aggregategraphqlconfig) / null           | false    | Configuration for aggregates                                           |
 
 #### AggregateGraphqlConfig {#graphqlconfig-aggregategraphqlconfig}
 
 Configuration for the GraphQL schema for aggregates.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `filterInputFieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the filter input parameter of aggregate fields and field name in predicates |
-| `countFieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the _count field used for the count aggregate function |
-| `countDistinctFieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the _count_distinct field used for the count distinct aggregate function |
-
-
+| Key                      | Value                                               | Required | Description                                                                             |
+| ------------------------ | --------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `filterInputFieldName`   | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the filter input parameter of aggregate fields and field name in predicates |
+| `countFieldName`         | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the \_count field used for the count aggregate function                     |
+| `countDistinctFieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the \_count_distinct field used for the count distinct aggregate function   |
 
 #### OrderByInputGraphqlConfig {#graphqlconfig-orderbyinputgraphqlconfig}
 
 Configuration for the sort operation.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the filter operation field. Usually `order_by`. |
-| `enumDirectionValues` | [OrderByDirectionValues](#graphqlconfig-orderbydirectionvalues) | true | The names of the direction parameters. |
-| `enumTypeNames` | [[OrderByEnumTypeName](#graphqlconfig-orderbyenumtypename)] | true |  |
-
-
+| Key                   | Value                                                           | Required | Description                                                 |
+| --------------------- | --------------------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| `fieldName`           | [GraphQlFieldName](#graphqlconfig-graphqlfieldname)             | true     | The name of the filter operation field. Usually `order_by`. |
+| `enumDirectionValues` | [OrderByDirectionValues](#graphqlconfig-orderbydirectionvalues) | true     | The names of the direction parameters.                      |
+| `enumTypeNames`       | [[OrderByEnumTypeName](#graphqlconfig-orderbyenumtypename)]     | true     |                                                             |
 
 #### OrderByEnumTypeName {#graphqlconfig-orderbyenumtypename}
 
 Type name for a sort directions enum, with the given set of possible directions.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `directions` | [[OrderByDirection](#graphqlconfig-orderbydirection)] | true |  |
-| `typeName` | [GraphQlTypeName](#graphqlconfig-graphqltypename) | true |  |
-
-
+| Key          | Value                                                 | Required | Description |
+| ------------ | ----------------------------------------------------- | -------- | ----------- |
+| `directions` | [[OrderByDirection](#graphqlconfig-orderbydirection)] | true     |             |
+| `typeName`   | [GraphQlTypeName](#graphqlconfig-graphqltypename)     | true     |             |
 
 #### OrderByDirection {#graphqlconfig-orderbydirection}
 
 Sort direction.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| `Asc` | Ascending. |
+| Value  | Description |
+| ------ | ----------- |
+| `Asc`  | Ascending.  |
 | `Desc` | Descending. |
-
-
 
 #### OrderByDirectionValues {#graphqlconfig-orderbydirectionvalues}
 
 The names of the direction parameters.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `asc` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the ascending parameter. Usually `Asc`. |
-| `desc` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the descending parameter. Usually `Desc`. |
-
-
+| Key    | Value                                               | Required | Description                                           |
+| ------ | --------------------------------------------------- | -------- | ----------------------------------------------------- |
+| `asc`  | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the ascending parameter. Usually `Asc`.   |
+| `desc` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the descending parameter. Usually `Desc`. |
 
 #### FilterInputGraphqlConfig {#graphqlconfig-filterinputgraphqlconfig}
 
 Configuration for the filter operation.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the filter operation field. Usually `where`. |
-| `operatorNames` | [FilterInputOperatorNames](#graphqlconfig-filterinputoperatornames) | true | The names of built-in filter operators. |
-
-
+| Key             | Value                                                               | Required | Description                                              |
+| --------------- | ------------------------------------------------------------------- | -------- | -------------------------------------------------------- |
+| `fieldName`     | [GraphQlFieldName](#graphqlconfig-graphqlfieldname)                 | true     | The name of the filter operation field. Usually `where`. |
+| `operatorNames` | [FilterInputOperatorNames](#graphqlconfig-filterinputoperatornames) | true     | The names of built-in filter operators.                  |
 
 #### FilterInputOperatorNames {#graphqlconfig-filterinputoperatornames}
 
 The names of built-in filter operators.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `and` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the `and` operator. Usually `_and`. |
-| `or` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the `or` operator. Usually `_or`. |
-| `not` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the `not` operator. Usually `_not`. |
-| `isNull` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the `is null` operator. Usually `_is_null`. |
-
-
+| Key      | Value                                               | Required | Description                                             |
+| -------- | --------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `and`    | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the `and` operator. Usually `_and`.         |
+| `or`     | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the `or` operator. Usually `_or`.           |
+| `not`    | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the `not` operator. Usually `_not`.         |
+| `isNull` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the `is null` operator. Usually `_is_null`. |
 
 #### OffsetInputGraphqlConfig {#graphqlconfig-offsetinputgraphqlconfig}
 
 Configuration for the offset operation.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the offset operation field. Usually `offset`. |
-
-
+| Key         | Value                                               | Required | Description                                               |
+| ----------- | --------------------------------------------------- | -------- | --------------------------------------------------------- |
+| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the offset operation field. Usually `offset`. |
 
 #### LimitInputGraphqlConfig {#graphqlconfig-limitinputgraphqlconfig}
 
 Configuration for the limit operation.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of the limit operation field. Usually `limit`. |
-
-
+| Key         | Value                                               | Required | Description                                             |
+| ----------- | --------------------------------------------------- | -------- | ------------------------------------------------------- |
+| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of the limit operation field. Usually `limit`. |
 
 #### ArgumentsInputGraphqlConfig {#graphqlconfig-argumentsinputgraphqlconfig}
 
 Configuration for the arguments input.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true | The name of arguments passing field. Usually `args`. |
-
-
+| Key         | Value                                               | Required | Description                                          |
+| ----------- | --------------------------------------------------- | -------- | ---------------------------------------------------- |
+| `fieldName` | [GraphQlFieldName](#graphqlconfig-graphqlfieldname) | true     | The name of arguments passing field. Usually `args`. |
 
 #### GraphQlFieldName {#graphqlconfig-graphqlfieldname}
 
 The name of a GraphQL object field.
 
-
 **Value:** string
-
 
 #### GraphQlTypeName {#graphqlconfig-graphqltypename}
 
 The name of a GraphQL type.
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # auth-config.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/auth-config
 
 # AuthConfig
 
@@ -17970,84 +19520,71 @@ definition:
               - content-type
         headers:
           additional:
-            user-agent: "Hasura DDN"
-
+            user-agent: 'Hasura DDN'
 ```
 
-| **Field** | **Description**                                                                                                                                                                       | **Reference**                                                          |
-| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| `url`     | The URL of the authentication webhook that will be called to validate authentication. This can be a static URL or an environment variable.                                            | [EnvironmentValue](#authconfig-environmentvalue)                       |
-| `method`  | The HTTP method (`GET` or `POST`) that will be used to make the request to the auth hook.                                                                                             | [AuthHookConfigV3](#authconfig-authhookconfigv3)                       |
+| **Field**             | **Description**                                                                                                                                                           | **Reference**                                                          |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| `url`                 | The URL of the authentication webhook that will be called to validate authentication. This can be a static URL or an environment variable.                                | [EnvironmentValue](#authconfig-environmentvalue)                       |
+| `method`              | The HTTP method (`GET` or `POST`) that will be used to make the request to the auth hook.                                                                                 | [AuthHookConfigV3](#authconfig-authhookconfigv3)                       |
 | `customHeadersConfig` | Configuration for the headers and body to be sent to the auth hook. This can be used to forward headers from the client request or add additional headers to the request. | [AuthHookConfigV3POSTHeaders](#authconfig-authhookconfigv3postheaders) |
 
 ---
 
 ## Metadata structure
 
-
 #### AuthConfig {#authconfig-authconfig}
 
 Definition of the authentication configuration used by the API server.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
+| Value                                  | Description                                                                |
+| -------------------------------------- | -------------------------------------------------------------------------- |
 | [AuthConfig1](#authconfig-authconfig1) | Definition of the authentication configuration v1, used by the API server. |
 | [AuthConfig2](#authconfig-authconfig2) | Definition of the authentication configuration v2, used by the API server. |
-| [AuthConfig3](#authconfig-authconfig3) |  |
-
-
+| [AuthConfig3](#authconfig-authconfig3) |                                                                            |
 
 #### AuthConfig3 {#authconfig-authconfig3}
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `AuthConfig` | true |  |
-| `version` | `v3` | true |  |
-| `definition` | [AuthConfigV3](#authconfig-authconfigv3) | true | Definition of the authentication configuration v3, used by the API server. |
-
-
+| Key          | Value                                    | Required | Description                                                                |
+| ------------ | ---------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `kind`       | `AuthConfig`                             | true     |                                                                            |
+| `version`    | `v3`                                     | true     |                                                                            |
+| `definition` | [AuthConfigV3](#authconfig-authconfigv3) | true     | Definition of the authentication configuration v3, used by the API server. |
 
 #### AuthConfigV3 {#authconfig-authconfigv3}
 
 Definition of the authentication configuration v3, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `mode` | [AuthModeConfigV3](#authconfig-authmodeconfigv3) | true | The configuration for the authentication mode to use - webhook, JWT or NoAuth. |
-
-
+| Key    | Value                                            | Required | Description                                                                    |
+| ------ | ------------------------------------------------ | -------- | ------------------------------------------------------------------------------ |
+| `mode` | [AuthModeConfigV3](#authconfig-authmodeconfigv3) | true     | The configuration for the authentication mode to use - webhook, JWT or NoAuth. |
 
 #### AuthModeConfigV3 {#authconfig-authmodeconfigv3}
 
 The configuration for the authentication mode to use - webhook, JWT or NoAuth.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `webhook` | [AuthHookConfigV3](#authconfig-authhookconfigv3) | false | The configuration of the authentication webhook. |
-| `jwt` | [JWTConfig](#authconfig-jwtconfig) | false |  |
-| `noAuth` | [NoAuthConfig](#authconfig-noauthconfig) | false |  |
-
-
+| Key       | Value                                            | Required | Description                                      |
+| --------- | ------------------------------------------------ | -------- | ------------------------------------------------ |
+| `webhook` | [AuthHookConfigV3](#authconfig-authhookconfigv3) | false    | The configuration of the authentication webhook. |
+| `jwt`     | [JWTConfig](#authconfig-jwtconfig)               | false    |                                                  |
+| `noAuth`  | [NoAuthConfig](#authconfig-noauthconfig)         | false    |                                                  |
 
 #### AuthHookConfigV3 {#authconfig-authhookconfigv3}
 
 The configuration of the authentication webhook.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [AuthHookConfigV3GET](#authconfig-authhookconfigv3get) | The configuration of the GET authentication webhook. |
+| Value                                                    | Description                                           |
+| -------------------------------------------------------- | ----------------------------------------------------- |
+| [AuthHookConfigV3GET](#authconfig-authhookconfigv3get)   | The configuration of the GET authentication webhook.  |
 | [AuthHookConfigV3POST](#authconfig-authhookconfigv3post) | The configuration of the POST authentication webhook. |
 
- **Example:**
+**Example:**
 
 ```yaml
 method: GET
@@ -18061,18 +19598,17 @@ customHeadersConfig:
       user-agent: hasura-ddn
 ```
 
-
 #### AuthHookConfigV3POST {#authconfig-authhookconfigv3post}
 
 The configuration of the POST authentication webhook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `method` | `POST` | true |  |
-| `url` | [EnvironmentValue](#authconfig-environmentvalue) | true | The URL of the POST authentication webhook. |
-| `customHeadersConfig` | [AuthHookConfigV3POSTHeaders](#authconfig-authhookconfigv3postheaders) / null | false | The configuration for the headers to be sent to the POST auth hook. |
+| Key                   | Value                                                                         | Required | Description                                                         |
+| --------------------- | ----------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| `method`              | `POST`                                                                        | true     |                                                                     |
+| `url`                 | [EnvironmentValue](#authconfig-environmentvalue)                              | true     | The URL of the POST authentication webhook.                         |
+| `customHeadersConfig` | [AuthHookConfigV3POSTHeaders](#authconfig-authhookconfigv3postheaders) / null | false    | The configuration for the headers to be sent to the POST auth hook. |
 
- **Example:**
+**Example:**
 
 ```yaml
 url:
@@ -18089,17 +19625,16 @@ customHeadersConfig:
       additional: {}
 ```
 
-
 #### AuthHookConfigV3POSTHeaders {#authconfig-authhookconfigv3postheaders}
 
 The configuration for the headers and body to be sent to the POST auth hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false | The configuration for the headers to be sent to the POST auth hook. |
-| `body` | [AuthHookConfigV3Body](#authconfig-authhookconfigv3body) / null | false | The configuration for the body to be sent to the POST auth hook. |
+| Key       | Value                                                                 | Required | Description                                                         |
+| --------- | --------------------------------------------------------------------- | -------- | ------------------------------------------------------------------- |
+| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false    | The configuration for the headers to be sent to the POST auth hook. |
+| `body`    | [AuthHookConfigV3Body](#authconfig-authhookconfigv3body) / null       | false    | The configuration for the body to be sent to the POST auth hook.    |
 
- **Example:**
+**Example:**
 
 ```yaml
 headers:
@@ -18113,16 +19648,15 @@ body:
     additional: {}
 ```
 
-
 #### AuthHookConfigV3Body {#authconfig-authhookconfigv3body}
 
 The configuration for the body to be sent to the POST auth hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false | The configuration for the headers to be sent as part of the body to the POST auth hook. |
+| Key       | Value                                                                 | Required | Description                                                                             |
+| --------- | --------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false    | The configuration for the headers to be sent as part of the body to the POST auth hook. |
 
- **Example:**
+**Example:**
 
 ```yaml
 headers:
@@ -18131,18 +19665,17 @@ headers:
   additional: {}
 ```
 
-
 #### AuthHookConfigV3GET {#authconfig-authhookconfigv3get}
 
 The configuration of the GET authentication webhook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `method` | `GET` | true |  |
-| `url` | [EnvironmentValue](#authconfig-environmentvalue) | true | The URL of the GET authentication webhook. |
-| `customHeadersConfig` | [AuthHookConfigV3GETHeaders](#authconfig-authhookconfigv3getheaders) / null | false | The configuration for the headers to be sent to the GET auth hook. |
+| Key                   | Value                                                                       | Required | Description                                                        |
+| --------------------- | --------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| `method`              | `GET`                                                                       | true     |                                                                    |
+| `url`                 | [EnvironmentValue](#authconfig-environmentvalue)                            | true     | The URL of the GET authentication webhook.                         |
+| `customHeadersConfig` | [AuthHookConfigV3GETHeaders](#authconfig-authhookconfigv3getheaders) / null | false    | The configuration for the headers to be sent to the GET auth hook. |
 
- **Example:**
+**Example:**
 
 ```yaml
 url:
@@ -18155,16 +19688,15 @@ customHeadersConfig:
       user-agent: hasura-ddn
 ```
 
-
 #### AuthHookConfigV3GETHeaders {#authconfig-authhookconfigv3getheaders}
 
 The configuration for the headers to be sent to the GET auth hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false |  |
+| Key       | Value                                                                 | Required | Description |
+| --------- | --------------------------------------------------------------------- | -------- | ----------- |
+| `headers` | [AuthHookConfigV3Headers](#authconfig-authhookconfigv3headers) / null | false    |             |
 
- **Example:**
+**Example:**
 
 ```yaml
 headers:
@@ -18174,17 +19706,16 @@ headers:
     user-agent: hasura-ddn
 ```
 
-
 #### AuthHookConfigV3Headers {#authconfig-authhookconfigv3headers}
 
 The configuration for the headers to be sent to the auth hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `forward` | [AllOrList](#authconfig-allorlist) | false | The headers to be forwarded from the client request. |
-| `additional` | [AdditionalHeaders](#authconfig-additionalheaders) | false | The additional headers to be sent to the auth hook. |
+| Key          | Value                                              | Required | Description                                          |
+| ------------ | -------------------------------------------------- | -------- | ---------------------------------------------------- |
+| `forward`    | [AllOrList](#authconfig-allorlist)                 | false    | The headers to be forwarded from the client request. |
+| `additional` | [AdditionalHeaders](#authconfig-additionalheaders) | false    | The additional headers to be sent to the auth hook.  |
 
- **Example:**
+**Example:**
 
 ```yaml
 forward:
@@ -18193,114 +19724,96 @@ additional:
   user-agent: hasura-ddn
 ```
 
-
 #### AdditionalHeaders {#authconfig-additionalheaders}
 
 The additional headers to be sent to the auth hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | string | false |  |
-
-
+| Key           | Value  | Required | Description |
+| ------------- | ------ | -------- | ----------- |
+| `<customKey>` | string | false    |             |
 
 #### AllOrList {#authconfig-allorlist}
 
 A list of items or a wildcard.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
+| Value                  | Description               |
+| ---------------------- | ------------------------- |
 | [All](#authconfig-all) | Wildcard: match all items |
-| [string] |  |
+| [string]               |                           |
 
- **Example:**
+**Example:**
 
 ```yaml
 '*'
 ```
 
-
 #### All {#authconfig-all}
 
 Wildcard: match all items
 
-
 **Value:** `*`
-
 
 #### AuthConfig2 {#authconfig-authconfig2}
 
 Definition of the authentication configuration v2, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `AuthConfig` | true |  |
-| `version` | `v2` | true |  |
-| `definition` | [AuthConfigV2](#authconfig-authconfigv2) | true | Definition of the authentication configuration v2, used by the API server. |
-
-
+| Key          | Value                                    | Required | Description                                                                |
+| ------------ | ---------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `kind`       | `AuthConfig`                             | true     |                                                                            |
+| `version`    | `v2`                                     | true     |                                                                            |
+| `definition` | [AuthConfigV2](#authconfig-authconfigv2) | true     | Definition of the authentication configuration v2, used by the API server. |
 
 #### AuthConfigV2 {#authconfig-authconfigv2}
 
 Definition of the authentication configuration v2, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `mode` | [AuthModeConfig](#authconfig-authmodeconfig) | true |  |
-
-
+| Key    | Value                                        | Required | Description |
+| ------ | -------------------------------------------- | -------- | ----------- |
+| `mode` | [AuthModeConfig](#authconfig-authmodeconfig) | true     |             |
 
 #### AuthConfig1 {#authconfig-authconfig1}
 
 Definition of the authentication configuration v1, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `AuthConfig` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [AuthConfigV1](#authconfig-authconfigv1) | true | Definition of the authentication configuration v1, used by the API server. |
-
-
+| Key          | Value                                    | Required | Description                                                                |
+| ------------ | ---------------------------------------- | -------- | -------------------------------------------------------------------------- |
+| `kind`       | `AuthConfig`                             | true     |                                                                            |
+| `version`    | `v1`                                     | true     |                                                                            |
+| `definition` | [AuthConfigV1](#authconfig-authconfigv1) | true     | Definition of the authentication configuration v1, used by the API server. |
 
 #### AuthConfigV1 {#authconfig-authconfigv1}
 
 Definition of the authentication configuration v1, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `allowRoleEmulationBy` | [Role](#authconfig-role) / null | false |  |
-| `mode` | [AuthModeConfig](#authconfig-authmodeconfig) | true | The configuration for the authentication mode to use - webhook, JWT or NoAuth. |
-
-
+| Key                    | Value                                        | Required | Description                                                                    |
+| ---------------------- | -------------------------------------------- | -------- | ------------------------------------------------------------------------------ |
+| `allowRoleEmulationBy` | [Role](#authconfig-role) / null              | false    |                                                                                |
+| `mode`                 | [AuthModeConfig](#authconfig-authmodeconfig) | true     | The configuration for the authentication mode to use - webhook, JWT or NoAuth. |
 
 #### AuthModeConfig {#authconfig-authmodeconfig}
 
 The configuration for the authentication mode to use - webhook, JWT or NoAuth.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `webhook` | [AuthHookConfig](#authconfig-authhookconfig) | false | The configuration of the authentication webhook. |
-| `jwt` | [JWTConfig](#authconfig-jwtconfig) | false | JWT config according to which the incoming JWT will be verified and decoded to extract the session variable claims. |
-| `noAuth` | [NoAuthConfig](#authconfig-noauthconfig) | false | Configuration used when running engine without authentication |
-
-
+| Key       | Value                                        | Required | Description                                                                                                         |
+| --------- | -------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
+| `webhook` | [AuthHookConfig](#authconfig-authhookconfig) | false    | The configuration of the authentication webhook.                                                                    |
+| `jwt`     | [JWTConfig](#authconfig-jwtconfig)           | false    | JWT config according to which the incoming JWT will be verified and decoded to extract the session variable claims. |
+| `noAuth`  | [NoAuthConfig](#authconfig-noauthconfig)     | false    | Configuration used when running engine without authentication                                                       |
 
 #### NoAuthConfig {#authconfig-noauthconfig}
 
 Configuration used when running engine without authentication
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `role` | [Role](#authconfig-role) | true | role to assume whilst running the engine |
-| `sessionVariables` | [SessionVariables](#authconfig-sessionvariables) | true | static session variables to use whilst running the engine |
+| Key                | Value                                            | Required | Description                                               |
+| ------------------ | ------------------------------------------------ | -------- | --------------------------------------------------------- |
+| `role`             | [Role](#authconfig-role)                         | true     | role to assume whilst running the engine                  |
+| `sessionVariables` | [SessionVariables](#authconfig-sessionvariables) | true     | static session variables to use whilst running the engine |
 
- **Example:**
+**Example:**
 
 ```yaml
 role: admin
@@ -18308,31 +19821,28 @@ sessionVariables:
   x-hasura-user-id: '100'
 ```
 
-
 #### SessionVariables {#authconfig-sessionvariables}
 
 static session variables to use whilst running the engine
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` |  | false | JSON value of a session variable |
-
-
+| Key           | Value | Required | Description                      |
+| ------------- | ----- | -------- | -------------------------------- |
+| `<customKey>` |       | false    | JSON value of a session variable |
 
 #### JWTConfig {#authconfig-jwtconfig}
 
 JWT config according to which the incoming JWT will be verified and decoded to extract the session variable claims.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `audience` | [string] / null | false | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
-| `issuer` | string / null | false | Optional validation to check that the `iss` field is a member of the `iss` received, otherwise will throw error. |
-| `allowedSkew` | integer / null | false | Allowed leeway (in seconds) to the `exp` validation to account for clock skew. |
-| `claimsConfig` | [JWTClaimsConfig](#authconfig-jwtclaimsconfig) | true | Claims config. Either specified via `claims_mappings` or `claims_namespace_path` |
-| `tokenLocation` | [JWTTokenLocation](#authconfig-jwttokenlocation) | true | Source of the JWT authentication token. |
-| `key` | [JWTKey](#authconfig-jwtkey) | true | Mode according to which the JWT auth is configured. |
+| Key             | Value                                            | Required | Description                                                                                                           |
+| --------------- | ------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------- |
+| `audience`      | [string] / null                                  | false    | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
+| `issuer`        | string / null                                    | false    | Optional validation to check that the `iss` field is a member of the `iss` received, otherwise will throw error.      |
+| `allowedSkew`   | integer / null                                   | false    | Allowed leeway (in seconds) to the `exp` validation to account for clock skew.                                        |
+| `claimsConfig`  | [JWTClaimsConfig](#authconfig-jwtclaimsconfig)   | true     | Claims config. Either specified via `claims_mappings` or `claims_namespace_path`                                      |
+| `tokenLocation` | [JWTTokenLocation](#authconfig-jwttokenlocation) | true     | Source of the JWT authentication token.                                                                               |
+| `key`           | [JWTKey](#authconfig-jwtkey)                     | true     | Mode according to which the JWT auth is configured.                                                                   |
 
- **Example:**
+**Example:**
 
 ```yaml
 audience: null
@@ -18351,230 +19861,189 @@ key:
       value: token
 ```
 
-
 #### JWTKey {#authconfig-jwtkey}
 
 JWT key configuration according to which the incoming JWT will be decoded.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `fixed` | [JWTKeyConfig](#authconfig-jwtkeyconfig) | false | JWT Secret config according to which the incoming JWT will be decoded. |
-| `jwkFromUrl` | string | false |  |
-
-
+| Key          | Value                                    | Required | Description                                                            |
+| ------------ | ---------------------------------------- | -------- | ---------------------------------------------------------------------- |
+| `fixed`      | [JWTKeyConfig](#authconfig-jwtkeyconfig) | false    | JWT Secret config according to which the incoming JWT will be decoded. |
+| `jwkFromUrl` | string                                   | false    |                                                                        |
 
 #### JWTKeyConfig {#authconfig-jwtkeyconfig}
 
 JWT Secret config according to which the incoming JWT will be decoded.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `algorithm` | [JWTAlgorithm](#authconfig-jwtalgorithm) | true | The algorithm used to decode the JWT. |
-| `key` | [EnvironmentValue](#authconfig-environmentvalue) | true | The key to use for decoding the JWT. |
-
-
+| Key         | Value                                            | Required | Description                           |
+| ----------- | ------------------------------------------------ | -------- | ------------------------------------- |
+| `algorithm` | [JWTAlgorithm](#authconfig-jwtalgorithm)         | true     | The algorithm used to decode the JWT. |
+| `key`       | [EnvironmentValue](#authconfig-environmentvalue) | true     | The key to use for decoding the JWT.  |
 
 #### EnvironmentValue {#authconfig-environmentvalue}
 
 Either a literal string or a reference to a Hasura secret
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `value` | string | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key            | Value  | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `value`        | string | false    |             |
+| `valueFromEnv` | string | false    |             |
 
 #### JWTAlgorithm {#authconfig-jwtalgorithm}
 
 The algorithm used to decode the JWT.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| `HS256` | HMAC using SHA-256 |
-| `HS384` | HMAC using SHA-384 |
-| `HS512` | HMAC using SHA-512 |
-| `ES256` | ECDSA using SHA-256 |
-| `ES384` | ECDSA using SHA-384 |
-| `RS256` | RSASSA-PKCS1-v1_5 using SHA-256 |
-| `RS384` | RSASSA-PKCS1-v1_5 using SHA-384 |
-| `RS512` | RSASSA-PKCS1-v1_5 using SHA-512 |
-| `PS256` | RSASSA-PSS using SHA-256 |
-| `PS384` | RSASSA-PSS using SHA-384 |
-| `PS512` | RSASSA-PSS using SHA-512 |
+| Value   | Description                                       |
+| ------- | ------------------------------------------------- |
+| `HS256` | HMAC using SHA-256                                |
+| `HS384` | HMAC using SHA-384                                |
+| `HS512` | HMAC using SHA-512                                |
+| `ES256` | ECDSA using SHA-256                               |
+| `ES384` | ECDSA using SHA-384                               |
+| `RS256` | RSASSA-PKCS1-v1_5 using SHA-256                   |
+| `RS384` | RSASSA-PKCS1-v1_5 using SHA-384                   |
+| `RS512` | RSASSA-PKCS1-v1_5 using SHA-512                   |
+| `PS256` | RSASSA-PSS using SHA-256                          |
+| `PS384` | RSASSA-PSS using SHA-384                          |
+| `PS512` | RSASSA-PSS using SHA-512                          |
 | `EdDSA` | Edwards-curve Digital Signature Algorithm (EdDSA) |
-
-
 
 #### JWTTokenLocation {#authconfig-jwttokenlocation}
 
 Source of the Authorization token
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [JWTBearerAuthorizationLocation](#authconfig-jwtbearerauthorizationlocation) | Get the bearer token from the `Authorization` header. |
-| [JWTCookieLocation](#authconfig-jwtcookielocation) | Get the token from the Cookie header under the specified cookie name. |
-| [JWTHeaderLocation](#authconfig-jwtheaderlocation) | Custom header from where the header should be parsed from. |
-
-
+| Value                                                                        | Description                                                           |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [JWTBearerAuthorizationLocation](#authconfig-jwtbearerauthorizationlocation) | Get the bearer token from the `Authorization` header.                 |
+| [JWTCookieLocation](#authconfig-jwtcookielocation)                           | Get the token from the Cookie header under the specified cookie name. |
+| [JWTHeaderLocation](#authconfig-jwtheaderlocation)                           | Custom header from where the header should be parsed from.            |
 
 #### JWTHeaderLocation {#authconfig-jwtheaderlocation}
 
 Custom header from where the header should be parsed from.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `type` | `Header` | true |  |
-| `name` | string | true |  |
-
-
+| Key    | Value    | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `type` | `Header` | true     |             |
+| `name` | string   | true     |             |
 
 #### JWTCookieLocation {#authconfig-jwtcookielocation}
 
 Get the token from the Cookie header under the specified cookie name.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `type` | `Cookie` | true |  |
-| `name` | string | true |  |
-
-
+| Key    | Value    | Required | Description |
+| ------ | -------- | -------- | ----------- |
+| `type` | `Cookie` | true     |             |
+| `name` | string   | true     |             |
 
 #### JWTBearerAuthorizationLocation {#authconfig-jwtbearerauthorizationlocation}
 
 Get the bearer token from the `Authorization` header.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `type` | `BearerAuthorization` | true |  |
-
-
+| Key    | Value                 | Required | Description |
+| ------ | --------------------- | -------- | ----------- |
+| `type` | `BearerAuthorization` | true     |             |
 
 #### JWTClaimsConfig {#authconfig-jwtclaimsconfig}
 
 Config to describe how/where the engine should look for the claims within the decoded token.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `locations` | [JWTClaimsMap](#authconfig-jwtclaimsmap) | false | Can be used when Hasura claims are not all present in the single object, but individual claims are provided a JSON pointer within the decoded JWT and optionally a default value. |
-| `namespace` | [JWTClaimsNamespace](#authconfig-jwtclaimsnamespace) | false | Used when all of the Hasura claims are present in a single object within the decoded JWT. |
-
-
+| Key         | Value                                                | Required | Description                                                                                                                                                                       |
+| ----------- | ---------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `locations` | [JWTClaimsMap](#authconfig-jwtclaimsmap)             | false    | Can be used when Hasura claims are not all present in the single object, but individual claims are provided a JSON pointer within the decoded JWT and optionally a default value. |
+| `namespace` | [JWTClaimsNamespace](#authconfig-jwtclaimsnamespace) | false    | Used when all of the Hasura claims are present in a single object within the decoded JWT.                                                                                         |
 
 #### JWTClaimsNamespace {#authconfig-jwtclaimsnamespace}
 
 Used when all of the Hasura claims are present in a single object within the decoded JWT.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `claimsFormat` | [JWTClaimsFormat](#authconfig-jwtclaimsformat) | true | Format in which the Hasura claims will be present. |
-| `location` | string | true | Pointer to lookup the Hasura claims within the decoded claims. |
-
-
+| Key            | Value                                          | Required | Description                                                    |
+| -------------- | ---------------------------------------------- | -------- | -------------------------------------------------------------- |
+| `claimsFormat` | [JWTClaimsFormat](#authconfig-jwtclaimsformat) | true     | Format in which the Hasura claims will be present.             |
+| `location`     | string                                         | true     | Pointer to lookup the Hasura claims within the decoded claims. |
 
 #### JWTClaimsFormat {#authconfig-jwtclaimsformat}
 
 Format in which the Hasura claims will be present.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| `Json` | Claims will be in the JSON format. |
+| Value             | Description                                    |
+| ----------------- | ---------------------------------------------- |
+| `Json`            | Claims will be in the JSON format.             |
 | `StringifiedJson` | Claims will be in the Stringified JSON format. |
-
-
 
 #### JWTClaimsMap {#authconfig-jwtclaimsmap}
 
-Can be used when Hasura claims are not all present in the single object, but individual claims are provided a JSON pointer within the decoded JWT and optionally a default value.
+Can be used when Hasura claims are not all present in the single object, but individual claims are provided a JSON
+pointer within the decoded JWT and optionally a default value.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `x-hasura-default-role` | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | true | JSON pointer to lookup the default role within the decoded JWT. |
-| `x-hasura-allowed-roles` | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | true | JSON pointer to lookup the allowed roles within the decoded JWT. |
-| `<customKey>` | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | false |  |
-
-
+| Key                      | Value                                                      | Required | Description                                                      |
+| ------------------------ | ---------------------------------------------------------- | -------- | ---------------------------------------------------------------- |
+| `x-hasura-default-role`  | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | true     | JSON pointer to lookup the default role within the decoded JWT.  |
+| `x-hasura-allowed-roles` | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | true     | JSON pointer to lookup the allowed roles within the decoded JWT. |
+| `<customKey>`            | [JWTClaimsMappingEntry](#authconfig-jwtclaimsmappingentry) | false    |                                                                  |
 
 #### JWTClaimsMappingEntry {#authconfig-jwtclaimsmappingentry}
 
 JSON pointer to lookup the default role within the decoded JWT.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `literal` | [Role](#authconfig-role) | false |  |
-| `path` | [JWTClaimsMappingPathEntry](#authconfig-jwtclaimsmappingpathentry) | false | Entry to lookup the Hasura claims at the specified JSON Pointer |
-
-
+| Key       | Value                                                              | Required | Description                                                     |
+| --------- | ------------------------------------------------------------------ | -------- | --------------------------------------------------------------- |
+| `literal` | [Role](#authconfig-role)                                           | false    |                                                                 |
+| `path`    | [JWTClaimsMappingPathEntry](#authconfig-jwtclaimsmappingpathentry) | false    | Entry to lookup the Hasura claims at the specified JSON Pointer |
 
 #### JWTClaimsMappingPathEntry {#authconfig-jwtclaimsmappingpathentry}
 
 Entry to lookup the Hasura claims at the specified JSON Pointer
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `path` | string | true | JSON pointer to find the particular claim in the decoded JWT token. |
-| `default` | [Role](#authconfig-role) / null | false | Default value to be used when no value is found when looking up the value using the `path`. |
-
-
+| Key       | Value                           | Required | Description                                                                                 |
+| --------- | ------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `path`    | string                          | true     | JSON pointer to find the particular claim in the decoded JWT token.                         |
+| `default` | [Role](#authconfig-role) / null | false    | Default value to be used when no value is found when looking up the value using the `path`. |
 
 #### AuthHookConfig {#authconfig-authhookconfig}
 
 The configuration of the authentication webhook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `url` | string | true | The URL of the authentication webhook. |
-| `method` | [AuthHookMethod](#authconfig-authhookmethod) | true | The HTTP method to be used to make the request to the auth hook. |
+| Key      | Value                                        | Required | Description                                                      |
+| -------- | -------------------------------------------- | -------- | ---------------------------------------------------------------- |
+| `url`    | string                                       | true     | The URL of the authentication webhook.                           |
+| `method` | [AuthHookMethod](#authconfig-authhookmethod) | true     | The HTTP method to be used to make the request to the auth hook. |
 
- **Example:**
+**Example:**
 
 ```yaml
 url: http://auth_hook:3050/validate-request
 method: Post
 ```
 
-
 #### AuthHookMethod {#authconfig-authhookmethod}
 
 The HTTP method to be used to make the request to the auth hook.
 
-
 **Value:** `Get` / `Post`
-
 
 #### Role {#authconfig-role}
 
-
 **Value:** string
-
-
 
 ==============================
 
-
-
 # compatibility-config.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/compatibility-config
 
 # Compatibility Config
 
@@ -18604,6 +20073,7 @@ CompatibilityConfig `date`s prior to these dates will have these features disabl
 ##### Validate scalar boolean expression operators
 
 A build error is now raised if any of the following validations for operators in scalar boolean expressions fail.
+
 - Non-list argument types are not allowed for the `_in` operator
 - Argument type must match the scalar type for `_eq`, `_lt`, `_lte`, `_gt` and `_gte` operators
 - Mapped operators must exist in the data connector
@@ -19041,37 +20511,31 @@ project metadata.
 
 ## Metadata structure
 
-
 ### v2_CompatibilityConfig {#v2_compatibilityconfig-v2_compatibilityconfig}
 
 The compatibility configuration of the Hasura metadata.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `CompatibilityConfig` | true |  |
-| `date` | [CompatibilityDate](#v2_compatibilityconfig-compatibilitydate) | true | Any backwards incompatible changes made to Hasura DDN after this date won't impact the metadata. |
-
-
+| Key    | Value                                                          | Required | Description                                                                                      |
+| ------ | -------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `kind` | `CompatibilityConfig`                                          | true     |                                                                                                  |
+| `date` | [CompatibilityDate](#v2_compatibilityconfig-compatibilitydate) | true     | Any backwards incompatible changes made to Hasura DDN after this date won't impact the metadata. |
 
 #### CompatibilityDate {#v2_compatibilityconfig-compatibilitydate}
 
 Any backwards incompatible changes made to Hasura DDN after this date won't impact the metadata
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
+| Value                                                                                                                                                                                                                                                                                                                                                                 | Description               |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
 | `2024-06-30` / `2024-09-03` / `2024-09-18` / `2024-09-26` / `2024-10-07` / `2024-10-16` / `2024-10-31` / `2024-11-13` / `2024-11-15` / `2024-11-18` / `2024-11-26` / `2024-12-05` / `2024-12-10` / `2024-12-18` / `2025-01-07` / `2025-01-25` / `2025-02-04` / `2025-02-08` / `2025-02-20` / `2025-02-27` / `2025-03-11` / `2025-03-12` / `2025-03-21` / `2025-03-26` | Known compatibility dates |
-| string | Any date |
-
-
+| string                                                                                                                                                                                                                                                                                                                                                                | Any date                  |
 
 ==============================
 
-
-
 # engine-plugins.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/engine-plugins
 
 # Engine Plugins
 
@@ -19127,18 +20591,17 @@ definition:
 
 ## Metadata structure
 
-
 ### LifecyclePluginHook {#lifecyclepluginhook-lifecyclepluginhook}
 
 Definition of a lifecycle plugin hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `LifecyclePluginHook` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [LifecyclePluginHookV1](#lifecyclepluginhook-lifecyclepluginhookv1) | true | Definition of a lifecycle plugin hook - version 1. |
+| Key          | Value                                                               | Required | Description                                        |
+| ------------ | ------------------------------------------------------------------- | -------- | -------------------------------------------------- |
+| `kind`       | `LifecyclePluginHook`                                               | true     |                                                    |
+| `version`    | `v1`                                                                | true     |                                                    |
+| `definition` | [LifecyclePluginHookV1](#lifecyclepluginhook-lifecyclepluginhookv1) | true     | Definition of a lifecycle plugin hook - version 1. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: LifecyclePluginHook
@@ -19160,230 +20623,190 @@ definition:
         variables: {}
 ```
 
-
 #### LifecyclePluginHookV1 {#lifecyclepluginhook-lifecyclepluginhookv1}
 
 Definition of a lifecycle plugin hook - version 1.
 
-
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
-| [LifecyclePreParsePluginHook](#lifecyclepluginhook-lifecyclepreparsepluginhook) | Definition of a lifecycle plugin hook for the pre-parse stage. |
+| Value                                                                                 | Description                                                       |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| [LifecyclePreParsePluginHook](#lifecyclepluginhook-lifecyclepreparsepluginhook)       | Definition of a lifecycle plugin hook for the pre-parse stage.    |
 | [LifecyclePreResponsePluginHook](#lifecyclepluginhook-lifecyclepreresponsepluginhook) | Definition of a lifecycle plugin hook for the pre-response stage. |
-| [LifecyclePreRoutePluginHook](#lifecyclepluginhook-lifecyclepreroutepluginhook) | Definition of a lifecycle plugin hook for the pre-route stage. |
-
-
+| [LifecyclePreRoutePluginHook](#lifecyclepluginhook-lifecyclepreroutepluginhook)       | Definition of a lifecycle plugin hook for the pre-route stage.    |
 
 #### LifecyclePreRoutePluginHook {#lifecyclepluginhook-lifecyclepreroutepluginhook}
 
 Definition of a lifecycle plugin hook for the pre-route stage.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `pre` | `route` | true |  |
-| `name` | string | true | The name of the lifecycle plugin hook. |
-| `url` | [EnvironmentValue](#lifecyclepluginhook-environmentvalue) | true | The URL to access the lifecycle plugin hook. |
-| `config` | [LifecyclePreRoutePluginHookConfig](#lifecyclepluginhook-lifecyclepreroutepluginhookconfig) | true | Configuration for the lifecycle plugin hook. |
-
-
+| Key      | Value                                                                                       | Required | Description                                  |
+| -------- | ------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| `pre`    | `route`                                                                                     | true     |                                              |
+| `name`   | string                                                                                      | true     | The name of the lifecycle plugin hook.       |
+| `url`    | [EnvironmentValue](#lifecyclepluginhook-environmentvalue)                                   | true     | The URL to access the lifecycle plugin hook. |
+| `config` | [LifecyclePreRoutePluginHookConfig](#lifecyclepluginhook-lifecyclepreroutepluginhookconfig) | true     | Configuration for the lifecycle plugin hook. |
 
 #### LifecyclePreRoutePluginHookConfig {#lifecyclepluginhook-lifecyclepreroutepluginhookconfig}
 
 Configuration for a lifecycle plugin hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `matchPath` | string | true | Regex to match the request path |
-| `matchMethods` | [[RequestMethod](#lifecyclepluginhook-requestmethod)] | true | Possible HTTP methods for the request |
-| `request` | [LifecyclePreRoutePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequest) | true | Configuration for the request to the lifecycle plugin hook. |
-| `response` | [LifecyclePreRoutePluginHookConfigResponse](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigresponse) / null | false | Configuration for the response to the lifecycle plugin hook. |
-
-
+| Key            | Value                                                                                                              | Required | Description                                                  |
+| -------------- | ------------------------------------------------------------------------------------------------------------------ | -------- | ------------------------------------------------------------ |
+| `matchPath`    | string                                                                                                             | true     | Regex to match the request path                              |
+| `matchMethods` | [[RequestMethod](#lifecyclepluginhook-requestmethod)]                                                              | true     | Possible HTTP methods for the request                        |
+| `request`      | [LifecyclePreRoutePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequest)          | true     | Configuration for the request to the lifecycle plugin hook.  |
+| `response`     | [LifecyclePreRoutePluginHookConfigResponse](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigresponse) / null | false    | Configuration for the response to the lifecycle plugin hook. |
 
 #### LifecyclePreRoutePluginHookConfigResponse {#lifecyclepluginhook-lifecyclepreroutepluginhookconfigresponse}
 
 Configuration for a lifecycle plugin hook response.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false | Configuration for the headers in the response from the engine. |
-
-
+| Key       | Value                                                                                            | Required | Description                                                    |
+| --------- | ------------------------------------------------------------------------------------------------ | -------- | -------------------------------------------------------------- |
+| `headers` | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false    | Configuration for the headers in the response from the engine. |
 
 #### LifecyclePreRoutePluginHookConfigRequest {#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequest}
 
 Configuration for a lifecycle plugin hook request.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false | Configuration for the headers in the pre-route plugin hook HTTP requests. |
-| `method` | [LifecyclePreRoutePluginHookConfigRequestMethods](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequestmethods) | true | Configuration for the HTTP method for the pre-route plugin hook HTTP requests. |
-| `rawRequest` | [PreRouteRequestConfig](#lifecyclepluginhook-prerouterequestconfig) | true | Configuration for the raw request body for the pre-route plugin hook HTTP requests. |
-
-
+| Key          | Value                                                                                                                   | Required | Description                                                                         |
+| ------------ | ----------------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
+| `headers`    | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null                        | false    | Configuration for the headers in the pre-route plugin hook HTTP requests.           |
+| `method`     | [LifecyclePreRoutePluginHookConfigRequestMethods](#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequestmethods) | true     | Configuration for the HTTP method for the pre-route plugin hook HTTP requests.      |
+| `rawRequest` | [PreRouteRequestConfig](#lifecyclepluginhook-prerouterequestconfig)                                                     | true     | Configuration for the raw request body for the pre-route plugin hook HTTP requests. |
 
 #### PreRouteRequestConfig {#lifecyclepluginhook-prerouterequestconfig}
 
 Configuration for the raw request body for the pre-route plugin hook HTTP requests.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `path` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for adding/excluding the request path of the incoming request |
-| `method` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for adding/excluding the request method of the incoming request |
-| `query` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for adding/excluding the query params of the incoming request |
-| `body` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for adding/excluding the body of the incoming request |
-
-
+| Key      | Value                                                | Required | Description                                                                   |
+| -------- | ---------------------------------------------------- | -------- | ----------------------------------------------------------------------------- |
+| `path`   | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for adding/excluding the request path of the incoming request   |
+| `method` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for adding/excluding the request method of the incoming request |
+| `query`  | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for adding/excluding the query params of the incoming request   |
+| `body`   | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for adding/excluding the body of the incoming request           |
 
 #### LifecyclePreRoutePluginHookConfigRequestMethods {#lifecyclepluginhook-lifecyclepreroutepluginhookconfigrequestmethods}
 
 Configuration for the method for the pre-route plugin hook HTTP requests.
 
-
 **Value:** `GET` / `POST`
-
 
 #### RequestMethod {#lifecyclepluginhook-requestmethod}
 
 Possible HTTP Request Methods for the incoming requests handled by the pre-route plugin hook.
 
-
 **Value:** `GET` / `POST` / `PUT` / `DELETE` / `PATCH`
-
 
 #### LifecyclePreResponsePluginHook {#lifecyclepluginhook-lifecyclepreresponsepluginhook}
 
 Definition of a lifecycle plugin hook for the pre-response stage.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `pre` | `response` | true |  |
-| `name` | string | true | The name of the lifecycle plugin hook. |
-| `url` | [EnvironmentValue](#lifecyclepluginhook-environmentvalue) | true | The URL to access the lifecycle plugin hook. |
-| `config` | [LifecyclePreResponsePluginHookConfig](#lifecyclepluginhook-lifecyclepreresponsepluginhookconfig) | true | Configuration for the lifecycle plugin hook. |
-
-
+| Key      | Value                                                                                             | Required | Description                                  |
+| -------- | ------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| `pre`    | `response`                                                                                        | true     |                                              |
+| `name`   | string                                                                                            | true     | The name of the lifecycle plugin hook.       |
+| `url`    | [EnvironmentValue](#lifecyclepluginhook-environmentvalue)                                         | true     | The URL to access the lifecycle plugin hook. |
+| `config` | [LifecyclePreResponsePluginHookConfig](#lifecyclepluginhook-lifecyclepreresponsepluginhookconfig) | true     | Configuration for the lifecycle plugin hook. |
 
 #### LifecyclePreResponsePluginHookConfig {#lifecyclepluginhook-lifecyclepreresponsepluginhookconfig}
 
 Configuration for a lifecycle plugin hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `request` | [LifecyclePreResponsePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreresponsepluginhookconfigrequest) | true | Configuration for the request to the lifecycle plugin hook. |
-
-
+| Key       | Value                                                                                                           | Required | Description                                                 |
+| --------- | --------------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| `request` | [LifecyclePreResponsePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreresponsepluginhookconfigrequest) | true     | Configuration for the request to the lifecycle plugin hook. |
 
 #### LifecyclePreResponsePluginHookConfigRequest {#lifecyclepluginhook-lifecyclepreresponsepluginhookconfigrequest}
 
 Configuration for a lifecycle plugin hook request.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false | Configuration for the headers. |
-| `session` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for the session (includes roles and session variables). |
-| `rawRequest` | [RawRequestConfig](#lifecyclepluginhook-rawrequestconfig) | true | Configuration for the raw request. |
-| `rawResponse` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for the response. |
-
-
+| Key           | Value                                                                                            | Required | Description                                                           |
+| ------------- | ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `headers`     | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false    | Configuration for the headers.                                        |
+| `session`     | [LeafConfig](#lifecyclepluginhook-leafconfig) / null                                             | false    | Configuration for the session (includes roles and session variables). |
+| `rawRequest`  | [RawRequestConfig](#lifecyclepluginhook-rawrequestconfig)                                        | true     | Configuration for the raw request.                                    |
+| `rawResponse` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null                                             | false    | Configuration for the response.                                       |
 
 #### LifecyclePreParsePluginHook {#lifecyclepluginhook-lifecyclepreparsepluginhook}
 
 Definition of a lifecycle plugin hook for the pre-parse stage.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `pre` | `parse` | true |  |
-| `name` | string | true | The name of the lifecycle plugin hook. |
-| `url` | [EnvironmentValue](#lifecyclepluginhook-environmentvalue) | true | The URL to access the lifecycle plugin hook. |
-| `config` | [LifecyclePreParsePluginHookConfig](#lifecyclepluginhook-lifecyclepreparsepluginhookconfig) | true | Configuration for the lifecycle plugin hook. |
-
-
+| Key      | Value                                                                                       | Required | Description                                  |
+| -------- | ------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| `pre`    | `parse`                                                                                     | true     |                                              |
+| `name`   | string                                                                                      | true     | The name of the lifecycle plugin hook.       |
+| `url`    | [EnvironmentValue](#lifecyclepluginhook-environmentvalue)                                   | true     | The URL to access the lifecycle plugin hook. |
+| `config` | [LifecyclePreParsePluginHookConfig](#lifecyclepluginhook-lifecyclepreparsepluginhookconfig) | true     | Configuration for the lifecycle plugin hook. |
 
 #### LifecyclePreParsePluginHookConfig {#lifecyclepluginhook-lifecyclepreparsepluginhookconfig}
 
 Configuration for a lifecycle plugin hook.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `request` | [LifecyclePreParsePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreparsepluginhookconfigrequest) | true | Configuration for the request to the lifecycle plugin hook. |
-
-
+| Key       | Value                                                                                                     | Required | Description                                                 |
+| --------- | --------------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------- |
+| `request` | [LifecyclePreParsePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreparsepluginhookconfigrequest) | true     | Configuration for the request to the lifecycle plugin hook. |
 
 #### LifecyclePreParsePluginHookConfigRequest {#lifecyclepluginhook-lifecyclepreparsepluginhookconfigrequest}
 
 Configuration for a lifecycle plugin hook request.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `headers` | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false | Configuration for the headers. |
-| `session` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for the session (includes roles and session variables). |
-| `rawRequest` | [RawRequestConfig](#lifecyclepluginhook-rawrequestconfig) | true | Configuration for the raw request. |
-
-
+| Key          | Value                                                                                            | Required | Description                                                           |
+| ------------ | ------------------------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------- |
+| `headers`    | [LifecyclePluginHookHeadersConfig](#lifecyclepluginhook-lifecyclepluginhookheadersconfig) / null | false    | Configuration for the headers.                                        |
+| `session`    | [LeafConfig](#lifecyclepluginhook-leafconfig) / null                                             | false    | Configuration for the session (includes roles and session variables). |
+| `rawRequest` | [RawRequestConfig](#lifecyclepluginhook-rawrequestconfig)                                        | true     | Configuration for the raw request.                                    |
 
 #### RawRequestConfig {#lifecyclepluginhook-rawrequestconfig}
 
 Configuration for the raw request.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `query` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for the query. |
-| `variables` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false | Configuration for the variables. |
-
-
+| Key         | Value                                                | Required | Description                      |
+| ----------- | ---------------------------------------------------- | -------- | -------------------------------- |
+| `query`     | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for the query.     |
+| `variables` | [LeafConfig](#lifecyclepluginhook-leafconfig) / null | false    | Configuration for the variables. |
 
 #### LeafConfig {#lifecyclepluginhook-leafconfig}
 
 Leaf Configuration.
 
 | Key | Value | Required | Description |
-|-----|-----|-----|-----|
-
-
+| --- | ----- | -------- | ----------- |
 
 #### LifecyclePluginHookHeadersConfig {#lifecyclepluginhook-lifecyclepluginhookheadersconfig}
 
 Configuration for a lifecycle plugin hook headers.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `additional` | [HttpHeaders](#lifecyclepluginhook-httpheaders) / null | false | Additional headers to be sent with the request. |
-| `forward` | [string] | false | Headers to be forwarded from the incoming request. |
-
-
+| Key          | Value                                                  | Required | Description                                        |
+| ------------ | ------------------------------------------------------ | -------- | -------------------------------------------------- |
+| `additional` | [HttpHeaders](#lifecyclepluginhook-httpheaders) / null | false    | Additional headers to be sent with the request.    |
+| `forward`    | [string]                                               | false    | Headers to be forwarded from the incoming request. |
 
 #### HttpHeaders {#lifecyclepluginhook-httpheaders}
 
-Key value map of HTTP headers to be sent with an HTTP request. The key is the header name and the value is a potential reference to an environment variable.
+Key value map of HTTP headers to be sent with an HTTP request. The key is the header name and the value is a potential
+reference to an environment variable.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [EnvironmentValue](#lifecyclepluginhook-environmentvalue) | false |  |
-
-
+| Key           | Value                                                     | Required | Description |
+| ------------- | --------------------------------------------------------- | -------- | ----------- |
+| `<customKey>` | [EnvironmentValue](#lifecyclepluginhook-environmentvalue) | false    |             |
 
 #### EnvironmentValue {#lifecyclepluginhook-environmentvalue}
 
 Either a literal string or a reference to a Hasura secret
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `value` | string | false |  |
-| `valueFromEnv` | string | false |  |
-
-
+| Key            | Value  | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `value`        | string | false    |             |
+| `valueFromEnv` | string | false    |             |
 
 ==============================
 
-
-
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/
 
 # Hasura CLI
 
@@ -19397,20 +20820,41 @@ builds, and author metadata — all without leaving your favorite terminal.
 - [Install the CLI](/reference/cli/installation.mdx)
 - [Learn about the commands](/reference/cli/commands/index.mdx)
 
-
-
 ==============================
-
-
 
 # installation.mdx
 
+URL: https://hasura.io/docs/promptql/reference/cli/installation
 
 # Installation {#install-instructions}
 
 ## Install the CLI
 
-<InstallTheCli />
+<Tabs groupId="os-preference" className="api-tabs">
+
+<TabItem value="macOS-or-linux" label="macOS and Linux">
+
+Simply run the installer script in your terminal:
+
+<CodeBlock language="bash">
+  {`curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/get.sh | bash`}
+</CodeBlock>
+
+<Admonition type="info" title="ARM-based Linux Machines">
+  Currently, the CLI does not support installation on ARM-based Linux systems.
+</Admonition>
+
+</TabItem>
+
+<TabItem value="windows" label="Windows">
+- Download the latest <a href={`https://graphql-engine-cdn.hasura.io/ddn/cli/${props.revision || "v4"}/latest/DDN_CLI_Setup.exe`}>DDN CLI installer for Windows.</a> 
+- Run the `DDN_CLI_Setup.exe` installer file and follow the instructions. This will only take a minute.
+- By default, the DDN CLI is installed under `C:\Users\{Username}\AppData\Local\Programs\DDN_CLI`
+- The DDN CLI is added to your `%PATH%` environment variable so that you can use the `ddn` command from your terminal.
+<br />
+
+</TabItem>
+</Tabs>
 
 ## Verify the installation
 
@@ -19558,76 +21002,11 @@ Restart your shell so the changes take effect
 
 Try using the DDN CLI with auto-completion by typing part of a command and pressing `TAB` to verify.
 
-
-
 ==============================
-
-
-
-# ddn.mdx
-
-# DDN CLI: ddn
-
-DDN Command Line Interface.
-
-## Synopsis
-
-```
-
-       
-
-DDDDDDD\   DDDDDDD\   NN\   NN\ 
-DD  __DD\  DD  __DD\  NNN\  NN |
-DD |  DD | DD |  DD | NNNN\ NN |
-DD |  DD | DD |  DD | NN NN\NN |
-DD |  DD | DD |  DD | NN \NNNN |
-DD |  DD | DD |  DD | NN |\NNN |
-DDDDDDD  | DDDDDDD  | NN | \NN |
-\_______/  \_______/  \__|  \__|
-
-
-
-```
-
-```bash
-ddn [flags]
-```
-
-## Available operations
-
-- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
-- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
-- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
-- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
-- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
-- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
-- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
-- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
-- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
-- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
-- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
-- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
-- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
-- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
-- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
-
-## Options
-
-```sass
--h, --help               help for ddn
-    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
-    --no-prompt          Do not prompt for required but missing flags
-    --out string         Output format. Can be table, json or yaml. (default "table")
-    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-
-
-==============================
-
-
 
 # index.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/
 
 # DDN CLI: Commands
 
@@ -19653,7 +21032,9 @@ You can configure additional behavior for the CLI using environment variables.
 
 ### `HASURA_DDN_PROJECT_DIRECTORY`
 
-Set the `HASURA_DDN_PROJECT_DIRECTORY` environment variable to the path of your project directory, which contains the `hasura.yaml` file. This is helpful when scripting automations and ensures that any scripts or commands run from different locations will automatically reference the correct project configuration.
+Set the `HASURA_DDN_PROJECT_DIRECTORY` environment variable to the path of your project directory, which contains the
+`hasura.yaml` file. This is helpful when scripting automations and ensures that any scripts or commands run from
+different locations will automatically reference the correct project configuration.
 
 ## Getting help
 
@@ -19714,13 +21095,72 @@ Use "ddn [command] --help" for more information about a command.
 
 ```
 
+==============================
 
+# ddn.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn
+
+# DDN CLI: ddn
+
+DDN Command Line Interface.
+
+## Synopsis
+
+```
+
+
+
+DDDDDDD\   DDDDDDD\   NN\   NN\
+DD  __DD\  DD  __DD\  NNN\  NN |
+DD |  DD | DD |  DD | NNNN\ NN |
+DD |  DD | DD |  DD | NN NN\NN |
+DD |  DD | DD |  DD | NN \NNNN |
+DD |  DD | DD |  DD | NN |\NNN |
+DDDDDDD  | DDDDDDD  | NN | \NN |
+\_______/  \_______/  \__|  \__|
+
+
+
+```
+
+```bash
+ddn [flags]
+```
+
+## Available operations
+
+- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
+- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
+- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
+- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
+- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
+- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
+- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
+- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
+- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
+- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
+- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
+- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
+- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
+- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
+- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
+
+## Options
+
+```sass
+-h, --help               help for ddn
+    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+    --no-prompt          Do not prompt for required but missing flags
+    --out string         Output format. Can be table, json or yaml. (default "table")
+    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
 
 ==============================
 
-
-
 # ddn_auth.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth
 
 # DDN CLI: ddn auth
 
@@ -19728,15 +21168,18 @@ Manage Hasura DDN CLI Auth.
 
 ## Synopsis
 
-The auth commands allow you to manage the authentication status of your CLI using a browser or an access token. Additionally, you can generate and print secret keys for a PromptQL instance if it's associated with the project.
+The auth commands allow you to manage the authentication status of your CLI using a browser or an access token.
+Additionally, you can generate and print secret keys for a PromptQL instance if it's associated with the project.
 
 ## Available operations
 
-- [ddn auth generate-promptql-secret-key](/reference/cli/commands/ddn_auth_generate-promptql-secret-key) - Generates the project's PromptQL secret key and saves to global config
+- [ddn auth generate-promptql-secret-key](/reference/cli/commands/ddn_auth_generate-promptql-secret-key) - Generates the
+  project's PromptQL secret key and saves to global config
 - [ddn auth login](/reference/cli/commands/ddn_auth_login) - Login to DDN
 - [ddn auth logout](/reference/cli/commands/ddn_auth_logout) - Logout from DDN
 - [ddn auth print-access-token](/reference/cli/commands/ddn_auth_print-access-token) - Prints the access token to STDOUT
-- [ddn auth print-promptql-secret-key](/reference/cli/commands/ddn_auth_print-promptql-secret-key) - Prints the project's PromptQL secret key to STDOUT
+- [ddn auth print-promptql-secret-key](/reference/cli/commands/ddn_auth_print-promptql-secret-key) - Prints the
+  project's PromptQL secret key to STDOUT
 
 ## Options
 
@@ -19757,13 +21200,11 @@ The auth commands allow you to manage the authentication status of your CLI usin
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_auth_generate-promptql-secret-key.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth_generate-promptql-secret-key
 
 # DDN CLI: ddn auth generate-promptql-secret-key
 
@@ -19806,13 +21247,11 @@ ddn auth generate-promptql-secret-key [flags]
 
 - [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
 
-
-
 ==============================
 
-
-
 # ddn_auth_login.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth_login
 
 # DDN CLI: ddn auth login
 
@@ -19820,7 +21259,8 @@ Login to DDN.
 
 ## Synopsis
 
-Use this command to authenticate your DDN CLI with your Hasura Cloud account. By passing the --access-token flag, you can bypass the need for a browser, which is optimal for headless and CI environments.
+Use this command to authenticate your DDN CLI with your Hasura Cloud account. By passing the --access-token flag, you
+can bypass the need for a browser, which is optimal for headless and CI environments.
 
 ```bash
 ddn auth login [flags]
@@ -19857,13 +21297,11 @@ ddn auth login [flags]
 
 - [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
 
-
-
 ==============================
 
-
-
 # ddn_auth_logout.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth_logout
 
 # DDN CLI: ddn auth logout
 
@@ -19903,13 +21341,11 @@ ddn auth logout [flags]
 
 - [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
 
-
-
 ==============================
 
-
-
 # ddn_auth_print-access-token.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth_print-access-token
 
 # DDN CLI: ddn auth print-access-token
 
@@ -19917,7 +21353,8 @@ Prints the access token to STDOUT.
 
 ## Synopsis
 
-Your access token is stored locally and is only available after authenticating your CLI using one of the options via the ddn auth login command.
+Your access token is stored locally and is only available after authenticating your CLI using one of the options via the
+ddn auth login command.
 
 ```bash
 ddn auth print-access-token [flags]
@@ -19954,13 +21391,11 @@ ddn auth print-access-token [flags]
 
 - [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
 
-
-
 ==============================
 
-
-
 # ddn_auth_print-promptql-secret-key.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_auth_print-promptql-secret-key
 
 # DDN CLI: ddn auth print-promptql-secret-key
 
@@ -19968,7 +21403,8 @@ Prints the project's PromptQL secret key to STDOUT.
 
 ## Synopsis
 
-Your project's PromptQL secret is stored locally and is only available after enabling PromptQL for a local project and attaching it to a Hasura Cloud project.
+Your project's PromptQL secret is stored locally and is only available after enabling PromptQL for a local project and
+attaching it to a Hasura Cloud project.
 
 ```bash
 ddn auth print-promptql-secret-key [flags]
@@ -20008,13 +21444,11 @@ ddn auth print-promptql-secret-key [flags]
 
 - [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
 
-
-
 ==============================
 
-
-
 # ddn_codemod.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod
 
 # DDN CLI: ddn codemod
 
@@ -20022,21 +21456,33 @@ Perform transformations on your Hasura project directory.
 
 ## Synopsis
 
-From time to time, the configuration and features available to a local project will evolve. This family of commands allows you to quickly and easily update your local project to enable new features and conventions.
+From time to time, the configuration and features available to a local project will evolve. This family of commands
+allows you to quickly and easily update your local project to enable new features and conventions.
 
 ## Available operations
 
-- [ddn codemod configure-header-forwarding](/reference/cli/commands/ddn_codemod_configure-header-forwarding) - Configure headers to be forwarded to your connector
-- [ddn codemod fix-traces-env-var](/reference/cli/commands/ddn_codemod_fix-traces-env-var) - Fix env var used for configuring traces for connectors
-- [ddn codemod rename-graphql-prefixes](/reference/cli/commands/ddn_codemod_rename-graphql-prefixes) - Rename GraphQL root field and type name prefixes in metadata
-- [ddn codemod upgrade-auth-config-to-v3](/reference/cli/commands/ddn_codemod_upgrade-auth-config-to-v3) - Upgrade AuthConfig version from "v1"/"v2" to "v3"
-- [ddn codemod upgrade-context-v2-to-v3](/reference/cli/commands/ddn_codemod_upgrade-context-v2-to-v3) - Upgrade project's context config from v2 to v3
-- [ddn codemod upgrade-graphqlconfig-aggregate](/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-aggregate) - Upgrade GraphqlConfig to support aggregates
-- [ddn codemod upgrade-graphqlconfig-subscriptions](/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-subscriptions) - Upgrade GraphqlConfig to support subscriptions
-- [ddn codemod upgrade-model-v1-to-v2](/reference/cli/commands/ddn_codemod_upgrade-model-v1-to-v2) - Upgrade model from "version" "v1" to "v2" in metadata
-- [ddn codemod upgrade-object-boolean-expression-types](/reference/cli/commands/ddn_codemod_upgrade-object-boolean-expression-types) - Upgrade object boolean expression types metadata
-- [ddn codemod upgrade-project-config-v2-to-v3](/reference/cli/commands/ddn_codemod_upgrade-project-config-v2-to-v3) - Upgrade project directory from version v2 to v3
-- [ddn codemod upgrade-supergraph-config-v1-to-v2](/reference/cli/commands/ddn_codemod_upgrade-supergraph-config-v1-to-v2) - Upgrade all Supergraph config files at the root of the project directory from v1 to v2
+- [ddn codemod configure-header-forwarding](/reference/cli/commands/ddn_codemod_configure-header-forwarding) - Configure
+  headers to be forwarded to your connector
+- [ddn codemod fix-traces-env-var](/reference/cli/commands/ddn_codemod_fix-traces-env-var) - Fix env var used for
+  configuring traces for connectors
+- [ddn codemod rename-graphql-prefixes](/reference/cli/commands/ddn_codemod_rename-graphql-prefixes) - Rename GraphQL
+  root field and type name prefixes in metadata
+- [ddn codemod upgrade-auth-config-to-v3](/reference/cli/commands/ddn_codemod_upgrade-auth-config-to-v3) - Upgrade
+  AuthConfig version from "v1"/"v2" to "v3"
+- [ddn codemod upgrade-context-v2-to-v3](/reference/cli/commands/ddn_codemod_upgrade-context-v2-to-v3) - Upgrade
+  project's context config from v2 to v3
+- [ddn codemod upgrade-graphqlconfig-aggregate](/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-aggregate) -
+  Upgrade GraphqlConfig to support aggregates
+- [ddn codemod upgrade-graphqlconfig-subscriptions](/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-subscriptions) -
+  Upgrade GraphqlConfig to support subscriptions
+- [ddn codemod upgrade-model-v1-to-v2](/reference/cli/commands/ddn_codemod_upgrade-model-v1-to-v2) - Upgrade model from
+  "version" "v1" to "v2" in metadata
+- [ddn codemod upgrade-object-boolean-expression-types](/reference/cli/commands/ddn_codemod_upgrade-object-boolean-expression-types) -
+  Upgrade object boolean expression types metadata
+- [ddn codemod upgrade-project-config-v2-to-v3](/reference/cli/commands/ddn_codemod_upgrade-project-config-v2-to-v3) -
+  Upgrade project directory from version v2 to v3
+- [ddn codemod upgrade-supergraph-config-v1-to-v2](/reference/cli/commands/ddn_codemod_upgrade-supergraph-config-v1-to-v2) -
+  Upgrade all Supergraph config files at the root of the project directory from v1 to v2
 
 ## Options
 
@@ -20057,13 +21503,11 @@ From time to time, the configuration and features available to a local project w
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_codemod_configure-header-forwarding.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_configure-header-forwarding
 
 # DDN CLI: ddn codemod configure-header-forwarding
 
@@ -20071,7 +21515,8 @@ Configure headers to be forwarded to your connector.
 
 ## Synopsis
 
-This codemod updates your local project's metadata to forward headers from the initial request against your API to the specified connector.
+This codemod updates your local project's metadata to forward headers from the initial request against your API to the
+specified connector.
 
 ```bash
 ddn codemod configure-header-forwarding connector-name [flags]
@@ -20112,13 +21557,11 @@ ddn codemod configure-header-forwarding connector-name [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_enable-promptql.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_enable-promptql
 
 # DDN CLI: ddn codemod enable-promptql
 
@@ -20164,13 +21607,11 @@ ddn codemod enable-promptql --dir <project-dir> [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_fix-traces-env-var.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_fix-traces-env-var
 
 # DDN CLI: ddn codemod fix-traces-env-var
 
@@ -20211,13 +21652,11 @@ ddn codemod fix-traces-env-var --dir <project-dir> [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_rename-graphql-prefixes.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_rename-graphql-prefixes
 
 # DDN CLI: ddn codemod rename-graphql-prefixes
 
@@ -20225,7 +21664,8 @@ Rename GraphQL root field and type name prefixes in metadata.
 
 ## Synopsis
 
-Rename GraphQL root field and type name prefixes in metadata. The from prefix will be stripped if provided, and the new prefix will be added. If the new prefix is already present, it will not be reapplied.
+Rename GraphQL root field and type name prefixes in metadata. The from prefix will be stripped if provided, and the new
+prefix will be added. If the new prefix is already present, it will not be reapplied.
 
 By default, subgraph.yaml is updated with the new prefixes.
 
@@ -20270,13 +21710,11 @@ ddn codemod rename-graphql-prefixes [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-auth-config-to-v3.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-auth-config-to-v3
 
 # DDN CLI: ddn codemod upgrade-auth-config-to-v3
 
@@ -20326,13 +21764,11 @@ ddn codemod upgrade-auth-config-to-v3 [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-context-v2-to-v3.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-context-v2-to-v3
 
 # DDN CLI: ddn codemod upgrade-context-v2-to-v3
 
@@ -20340,7 +21776,8 @@ Upgrade project's context config from v2 to v3.
 
 ## Synopsis
 
-For more information on what's changed, check out the docs: https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-context-v3
+For more information on what's changed, check out the docs:
+https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-context-v3
 
 ```bash
 ddn codemod upgrade-context-v2-to-v3 --dir <project-dir> [flags]
@@ -20373,13 +21810,11 @@ ddn codemod upgrade-context-v2-to-v3 --dir <project-dir> [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-graphqlconfig-aggregate.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-aggregate
 
 # DDN CLI: ddn codemod upgrade-graphqlconfig-aggregate
 
@@ -20429,13 +21864,11 @@ ddn codemod upgrade-graphqlconfig-aggregate [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-graphqlconfig-subscriptions.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-graphqlconfig-subscriptions
 
 # DDN CLI: ddn codemod upgrade-graphqlconfig-subscriptions
 
@@ -20485,13 +21918,11 @@ ddn codemod upgrade-graphqlconfig-subscriptions [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-model-v1-to-v2.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-model-v1-to-v2
 
 # DDN CLI: ddn codemod upgrade-model-v1-to-v2
 
@@ -20541,13 +21972,11 @@ ddn codemod upgrade-model-v1-to-v2 [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-object-boolean-expression-types.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-object-boolean-expression-types
 
 # DDN CLI: ddn codemod upgrade-object-boolean-expression-types
 
@@ -20597,13 +22026,11 @@ ddn codemod upgrade-object-boolean-expression-types [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-project-config-v2-to-v3.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-project-config-v2-to-v3
 
 # DDN CLI: ddn codemod upgrade-project-config-v2-to-v3
 
@@ -20611,7 +22038,8 @@ Upgrade project directory from version v2 to v3.
 
 ## Synopsis
 
-For more information on what's changed, check out the docs: https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-project-v3
+For more information on what's changed, check out the docs:
+https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-project-v3
 
 ```bash
 ddn codemod upgrade-project-config-v2-to-v3 --dir <project-dir> [flags]
@@ -20644,13 +22072,11 @@ ddn codemod upgrade-project-config-v2-to-v3 --dir <project-dir> [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_codemod_upgrade-supergraph-config-v1-to-v2.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_codemod_upgrade-supergraph-config-v1-to-v2
 
 # DDN CLI: ddn codemod upgrade-supergraph-config-v1-to-v2
 
@@ -20658,7 +22084,8 @@ Upgrade all Supergraph config files at the root of the project directory from v1
 
 ## Synopsis
 
-For more information on what's changed, check out the docs: https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-project-v2
+For more information on what's changed, check out the docs:
+https://hasura.io/docs/3.0/project-configuration/upgrading-project-config/upgrade-project-v2
 
 ```bash
 ddn codemod upgrade-supergraph-config-v1-to-v2 --dir <project-dir> [flags]
@@ -20691,13 +22118,11 @@ ddn codemod upgrade-supergraph-config-v1-to-v2 --dir <project-dir> [flags]
 
 - [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
 
-
-
 ==============================
 
-
-
 # ddn_command.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command
 
 # DDN CLI: ddn command
 
@@ -20705,16 +22130,20 @@ Perform Command-related operations.
 
 ## Synopsis
 
-Commands represent actions that can be executed within a data domain. To learn more, check out the docs: https://hasura.io/docs/3.0/reference/metadata-reference/commands/
+Commands represent actions that can be executed within a data domain. To learn more, check out the docs:
+https://hasura.io/docs/3.0/reference/metadata-reference/commands/
 
 **Alias:** commands
 
 ## Available operations
 
 - [ddn command add](/reference/cli/commands/ddn_command_add) - Add new Commands to the local metadata
-- [ddn command list](/reference/cli/commands/ddn_command_list) - Lists details about the functions/procedures of DataConnectorLink, and their corresponding Commands
-- [ddn command remove](/reference/cli/commands/ddn_command_remove) - Removes Commands (and related metadata) in the local metadata
-- [ddn command show](/reference/cli/commands/ddn_command_show) - Show diff between the command and its corresponding ndc function/procedure
+- [ddn command list](/reference/cli/commands/ddn_command_list) - Lists details about the functions/procedures of
+  DataConnectorLink, and their corresponding Commands
+- [ddn command remove](/reference/cli/commands/ddn_command_remove) - Removes Commands (and related metadata) in the
+  local metadata
+- [ddn command show](/reference/cli/commands/ddn_command_show) - Show diff between the command and its corresponding ndc
+  function/procedure
 - [ddn command update](/reference/cli/commands/ddn_command_update) - Update Commands in the local metadata
 
 ## Options
@@ -20736,13 +22165,11 @@ Commands represent actions that can be executed within a data domain. To learn m
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_command_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command_add
 
 # DDN CLI: ddn command add
 
@@ -20750,7 +22177,8 @@ Add new Commands to the local metadata.
 
 ## Synopsis
 
-When adding a command to your local metadata, the CLI will generate boilerplate metadata that — when the supergraph is built — will make it available to the exposed API.
+When adding a command to your local metadata, the CLI will generate boilerplate metadata that — when the supergraph is
+built — will make it available to the exposed API.
 
 ```bash
 ddn command add <connector-link-name> <procedure/function-name> [flags]
@@ -20795,13 +22223,11 @@ ddn command add <connector-link-name> <procedure/function-name> [flags]
 
 - [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
 
-
-
 ==============================
 
-
-
 # ddn_command_list.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command_list
 
 # DDN CLI: ddn command list
 
@@ -20844,13 +22270,11 @@ ddn command list <connector-link-name> [flags]
 
 - [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
 
-
-
 ==============================
 
-
-
 # ddn_command_remove.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command_remove
 
 # DDN CLI: ddn command remove
 
@@ -20903,13 +22327,11 @@ ddn command remove <command-name> [flags]
 
 - [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
 
-
-
 ==============================
 
-
-
 # ddn_command_show.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command_show
 
 # DDN CLI: ddn command show
 
@@ -20956,13 +22378,11 @@ ddn command show <command-name> [flags]
 
 - [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
 
-
-
 ==============================
 
-
-
 # ddn_command_update.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_command_update
 
 # DDN CLI: ddn command update
 
@@ -20970,7 +22390,8 @@ Update Commands in the local metadata.
 
 ## Synopsis
 
-When the underlying data source changes, it's necessary to update the command's metadata to ensure Hasura DDN is aware of any modifications. Typically, before updating a command, you'll have re-introspected the underlying data source.
+When the underlying data source changes, it's necessary to update the command's metadata to ensure Hasura DDN is aware
+of any modifications. Typically, before updating a command, you'll have re-introspected the underlying data source.
 
 ```bash
 ddn command update <command-name> [flags]
@@ -21015,13 +22436,11 @@ ddn command update <command-name> [flags]
 
 - [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector
 
 # DDN CLI: ddn connector
 
@@ -21029,7 +22448,8 @@ Perform Connector related operations.
 
 ## Synopsis
 
-Native Data Connectors (or connectors for short) are the link between your data source(s) and your API. To learn more, check out the docs: https://hasura.io/docs/3.0/data-sources/overview/
+Native Data Connectors (or connectors for short) are the link between your data source(s) and your API. To learn more,
+check out the docs: https://hasura.io/docs/3.0/data-sources/overview/
 
 **Alias:** connectors
 
@@ -21038,11 +22458,14 @@ Native Data Connectors (or connectors for short) are the link between your data 
 - [ddn connector build](/reference/cli/commands/ddn_connector_build) - Perform ConnectorBuild-related operations
 - [ddn connector env](/reference/cli/commands/ddn_connector_env) - Manage environment variables for Connectors
 - [ddn connector init](/reference/cli/commands/ddn_connector_init) - Add a new Connector
-- [ddn connector introspect](/reference/cli/commands/ddn_connector_introspect) - Introspect the Connector data source to update the Connector configuration
+- [ddn connector introspect](/reference/cli/commands/ddn_connector_introspect) - Introspect the Connector data source to
+  update the Connector configuration
 - [ddn connector list](/reference/cli/commands/ddn_connector_list) - List available versions of connectors
 - [ddn connector plugin](/reference/cli/commands/ddn_connector_plugin) - Run a subcommand from a Connector plugin
-- [ddn connector remove](/reference/cli/commands/ddn_connector_remove) - Remove a Connector, its corresponding DataConnectorLink and all its associated metadata objects
-- [ddn connector setenv](/reference/cli/commands/ddn_connector_setenv) - Run specified command with environment variables set
+- [ddn connector remove](/reference/cli/commands/ddn_connector_remove) - Remove a Connector, its corresponding
+  DataConnectorLink and all its associated metadata objects
+- [ddn connector setenv](/reference/cli/commands/ddn_connector_setenv) - Run specified command with environment
+  variables set
 - [ddn connector show-resources](/reference/cli/commands/ddn_connector_show-resources) - Show resources of a Connector
 
 ## Options
@@ -21064,13 +22487,11 @@ Native Data Connectors (or connectors for short) are the link between your data 
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_connector_build.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_build
 
 # DDN CLI: ddn connector build
 
@@ -21078,14 +22499,19 @@ Perform ConnectorBuild-related operations.
 
 ## Synopsis
 
-The lifecycle of a connector can be independent of the supergraph of which it is a part. These commands allow you to easily create, delete, and inspect builds for a connector.
+The lifecycle of a connector can be independent of the supergraph of which it is a part. These commands allow you to
+easily create, delete, and inspect builds for a connector.
 
 ## Available operations
 
-- [ddn connector build create](/reference/cli/commands/ddn_connector_build_create) - Create a ConnectorBuild on Hasura DDN
-- [ddn connector build delete](/reference/cli/commands/ddn_connector_build_delete) - Delete a ConnectorBuild from a Project
-- [ddn connector build get](/reference/cli/commands/ddn_connector_build_get) - List ConnectorBuilds or get details of a specific one from Hasura DDN
-- [ddn connector build logs](/reference/cli/commands/ddn_connector_build_logs) - Get logs of a ConnectorBuild from Hasura DDN
+- [ddn connector build create](/reference/cli/commands/ddn_connector_build_create) - Create a ConnectorBuild on Hasura
+  DDN
+- [ddn connector build delete](/reference/cli/commands/ddn_connector_build_delete) - Delete a ConnectorBuild from a
+  Project
+- [ddn connector build get](/reference/cli/commands/ddn_connector_build_get) - List ConnectorBuilds or get details of a
+  specific one from Hasura DDN
+- [ddn connector build logs](/reference/cli/commands/ddn_connector_build_logs) - Get logs of a ConnectorBuild from
+  Hasura DDN
 
 ## Options
 
@@ -21106,13 +22532,11 @@ The lifecycle of a connector can be independent of the supergraph of which it is
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_build_create.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_build_create
 
 # DDN CLI: ddn connector build create
 
@@ -21162,13 +22586,11 @@ ddn connector build create --connector <path-to-connector-config-file-.yaml> [fl
 
 - [ddn connector build](/reference/cli/commands/ddn_connector_build) - Perform ConnectorBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_build_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_build_delete
 
 # DDN CLI: ddn connector build delete
 
@@ -21208,13 +22630,11 @@ ddn connector build delete <connector-build-id> [flags]
 
 - [ddn connector build](/reference/cli/commands/ddn_connector_build) - Perform ConnectorBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_build_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_build_get
 
 # DDN CLI: ddn connector build get
 
@@ -21276,13 +22696,11 @@ ddn connector build get [connector-build-id] [flags]
 
 - [ddn connector build](/reference/cli/commands/ddn_connector_build) - Perform ConnectorBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_build_logs.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_build_logs
 
 # DDN CLI: ddn connector build logs
 
@@ -21334,13 +22752,11 @@ ddn connector build logs <connector-build-id> [flags]
 
 - [ddn connector build](/reference/cli/commands/ddn_connector_build) - Perform ConnectorBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_env.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_env
 
 # DDN CLI: ddn connector env
 
@@ -21352,7 +22768,8 @@ Manage environment variables for Connectors
 
 ## Available operations
 
-- [ddn connector env add](/reference/cli/commands/ddn_connector_env_add) - Add environment variables and its corresponding mapping to a Connector
+- [ddn connector env add](/reference/cli/commands/ddn_connector_env_add) - Add environment variables and its
+  corresponding mapping to a Connector
 
 ## Options
 
@@ -21373,13 +22790,11 @@ Manage environment variables for Connectors
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_env_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_env_add
 
 # DDN CLI: ddn connector env add
 
@@ -21387,7 +22802,8 @@ Add environment variables and its corresponding mapping to a Connector.
 
 ## Synopsis
 
-This convenience command makes it easy to add environment variables (such as to the NodeJS Lambda connector) which can then be referenced in the connector's code.
+This convenience command makes it easy to add environment variables (such as to the NodeJS Lambda connector) which can
+then be referenced in the connector's code.
 
 ```bash
 ddn connector env add [flags]
@@ -21430,13 +22846,11 @@ ddn connector env add [flags]
 
 - [ddn connector env](/reference/cli/commands/ddn_connector_env) - Manage environment variables for Connectors
 
-
-
 ==============================
 
-
-
 # ddn_connector_init.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_init
 
 # DDN CLI: ddn connector init
 
@@ -21444,7 +22858,8 @@ Add a new Connector.
 
 ## Synopsis
 
-For each data source you wish to connect to your project and eventually expose via your API, you'll need to initialize a new data connector.
+For each data source you wish to connect to your project and eventually expose via your API, you'll need to initialize a
+new data connector.
 
 ```bash
 ddn connector init [connector-name] --hub-connector <connector-type> [flags]
@@ -21463,7 +22878,7 @@ ddn connector init [connector-name] --hub-connector <connector-type> [flags]
  ddn connector init mydb --dir ./connector --hub-connector hasura/postgres
 
 # Initialize a NodeJS Connector "mylambda" in the Subgraph "app" on port 8765
- ddn connector init mylambda --subgraph ./app/subgraph.yaml  --hub-connector hasura/nodejs --configure-port 8765 
+ ddn connector init mylambda --subgraph ./app/subgraph.yaml  --hub-connector hasura/nodejs --configure-port 8765
 ```
 
 ## Options
@@ -21497,13 +22912,11 @@ ddn connector init [connector-name] --hub-connector <connector-type> [flags]
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_introspect.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_introspect
 
 # DDN CLI: ddn connector introspect
 
@@ -21511,7 +22924,9 @@ Introspect the Connector data source to update the Connector configuration.
 
 ## Synopsis
 
-After you've initialized a data connector, you'll need to run this introspection command to complete or update the local configuration for the connector. The generated configuration file will then be used by the CLI to incorporate various resources (such as models, commands, and relationships) into your API.
+After you've initialized a data connector, you'll need to run this introspection command to complete or update the local
+configuration for the connector. The generated configuration file will then be used by the CLI to incorporate various
+resources (such as models, commands, and relationships) into your API.
 
 ```bash
 ddn connector introspect <connector-name> --subgraph <path-to-subgraph-config-file> [flags]
@@ -21557,13 +22972,11 @@ ddn connector introspect <connector-name> --subgraph <path-to-subgraph-config-fi
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_list.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_list
 
 # DDN CLI: ddn connector list
 
@@ -21607,13 +23020,11 @@ ddn connector list [flags]
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_plugin.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_plugin
 
 # DDN CLI: ddn connector plugin
 
@@ -21658,13 +23069,11 @@ ddn connector plugin [flags] [-- <args>]
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_remove.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_remove
 
 # DDN CLI: ddn connector remove
 
@@ -21719,13 +23128,11 @@ ddn connector remove <connector-name> [flags]
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_setenv.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_setenv
 
 # DDN CLI: ddn connector setenv
 
@@ -21733,7 +23140,8 @@ Run specified command with environment variables set.
 
 ## Synopsis
 
-If you wish to run a connector independently of your supergraph (e.g., for testing), you can run a specific command along with any necessary environment variables the connector requires.
+If you wish to run a connector independently of your supergraph (e.g., for testing), you can run a specific command
+along with any necessary environment variables the connector requires.
 
 ```bash
 ddn connector setenv --connector <path-to-connector-config-file-.yaml> -- <command> [flags]
@@ -21770,13 +23178,11 @@ ddn connector setenv --connector <path-to-connector-config-file-.yaml> -- <comma
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector_show-resources.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector_show-resources
 
 # DDN CLI: ddn connector show-resources
 
@@ -21784,7 +23190,8 @@ Show resources of a Connector.
 
 ## Synopsis
 
-A connector will typically have a number of resources associated with it. This convenience command will show you all available resources (such as models, commands, and relationships) along with their current state.
+A connector will typically have a number of resources associated with it. This convenience command will show you all
+available resources (such as models, commands, and relationships) along with their current state.
 
 ```bash
 ddn connector show-resources <connector-name> [flags]
@@ -21819,13 +23226,11 @@ ddn connector show-resources <connector-name> [flags]
 
 - [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector-link.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link
 
 # DDN CLI: ddn connector-link
 
@@ -21833,17 +23238,22 @@ Perform DataConnectorLink related operations.
 
 ## Synopsis
 
-DataConnectorLinks are the bridge between your data source(s) — wired into your API via a Native Data Connector — and your API. To learn more, check out the docs: https://hasura.io/docs/3.0/reference/metadata-reference/data-connector-links/
+DataConnectorLinks are the bridge between your data source(s) — wired into your API via a Native Data Connector — and
+your API. To learn more, check out the docs:
+https://hasura.io/docs/3.0/reference/metadata-reference/data-connector-links/
 
 **Alias:** connector-links
 
 ## Available operations
 
 - [ddn connector-link add](/reference/cli/commands/ddn_connector-link_add) - Add a new DataConnectorLink to a Subgraph
-- [ddn connector-link add-resources](/reference/cli/commands/ddn_connector-link_add-resources) - Add all models, commands and relationships from a DataConnectorLink's schema
-- [ddn connector-link remove](/reference/cli/commands/ddn_connector-link_remove) - Remove a DataConnectorLink from a Subgraph
+- [ddn connector-link add-resources](/reference/cli/commands/ddn_connector-link_add-resources) - Add all models,
+  commands and relationships from a DataConnectorLink's schema
+- [ddn connector-link remove](/reference/cli/commands/ddn_connector-link_remove) - Remove a DataConnectorLink from a
+  Subgraph
 - [ddn connector-link show](/reference/cli/commands/ddn_connector-link_show) - Show DataConnectorLink details
-- [ddn connector-link update](/reference/cli/commands/ddn_connector-link_update) - Fetch NDC details from the Connector and update the DataConnectorLink
+- [ddn connector-link update](/reference/cli/commands/ddn_connector-link_update) - Fetch NDC details from the Connector
+  and update the DataConnectorLink
 
 ## Options
 
@@ -21864,13 +23274,11 @@ DataConnectorLinks are the bridge between your data source(s) — wired into you
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_connector-link_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link_add
 
 # DDN CLI: ddn connector-link add
 
@@ -21878,7 +23286,8 @@ Add a new DataConnectorLink to a Subgraph.
 
 ## Synopsis
 
-When you initialize a new connector, a DataConnectorLink is automatically added and configured to the current or specified subrgaph.
+When you initialize a new connector, a DataConnectorLink is automatically added and configured to the current or
+specified subrgaph.
 
 ```bash
 ddn connector-link add <connector-link-name> [flags]
@@ -21919,13 +23328,11 @@ ddn connector-link add <connector-link-name> [flags]
 
 - [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector-link_add-resources.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link_add-resources
 
 # DDN CLI: ddn connector-link add-resources
 
@@ -21968,13 +23375,11 @@ ddn connector-link add-resources <connector-link-name> [flags]
 
 - [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector-link_remove.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link_remove
 
 # DDN CLI: ddn connector-link remove
 
@@ -22020,13 +23425,11 @@ ddn connector-link remove <connector-link-name> [flags]
 
 - [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector-link_show.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link_show
 
 # DDN CLI: ddn connector-link show
 
@@ -22069,13 +23472,11 @@ ddn connector-link show <connector-link-name> [flags]
 
 - [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
 
-
-
 ==============================
 
-
-
 # ddn_connector-link_update.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_connector-link_update
 
 # DDN CLI: ddn connector-link update
 
@@ -22124,13 +23525,11 @@ ddn connector-link update <connector-link-name> [flags]
 
 - [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
 
-
-
 ==============================
 
-
-
 # ddn_console.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_console
 
 # DDN CLI: ddn console
 
@@ -22186,13 +23585,11 @@ ddn console [flags]
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_context.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context
 
 # DDN CLI: ddn context
 
@@ -22200,14 +23597,17 @@ Perform context operations.
 
 ## Synopsis
 
-Manage default value of keys to be used in DDN CLI commands. Contexts allow you to simplify your development workflow. To learn more, check out the docs: https://hasura.io/docs/3.0/project-configuration/project-management/manage-contexts
+Manage default value of keys to be used in DDN CLI commands. Contexts allow you to simplify your development workflow.
+To learn more, check out the docs: https://hasura.io/docs/3.0/project-configuration/project-management/manage-contexts
 
 ## Available operations
 
 - [ddn context create-context](/reference/cli/commands/ddn_context_create-context) - Create a new context
 - [ddn context get](/reference/cli/commands/ddn_context_get) - Get the value of a key in the context
-- [ddn context get-context](/reference/cli/commands/ddn_context_get-context) - List contexts or get details of a specific context
-- [ddn context get-current-context](/reference/cli/commands/ddn_context_get-current-context) - Get name and contents of current context
+- [ddn context get-context](/reference/cli/commands/ddn_context_get-context) - List contexts or get details of a
+  specific context
+- [ddn context get-current-context](/reference/cli/commands/ddn_context_get-current-context) - Get name and contents of
+  current context
 - [ddn context set](/reference/cli/commands/ddn_context_set) - Set the value of a key in the context
 - [ddn context set-current-context](/reference/cli/commands/ddn_context_set-current-context) - Set the current context
 - [ddn context unset](/reference/cli/commands/ddn_context_unset) - Unset the value of a key in the context
@@ -22231,13 +23631,11 @@ Manage default value of keys to be used in DDN CLI commands. Contexts allow you 
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_context_create-context.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_create-context
 
 # DDN CLI: ddn context create-context
 
@@ -22277,13 +23675,11 @@ ddn context create-context <name> [flags]
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_get
 
 # DDN CLI: ddn context get
 
@@ -22327,13 +23723,11 @@ ddn context get <key> (Allowed keys: project, supergraph, subgraph, localEnvFile
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_get-context.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_get-context
 
 # DDN CLI: ddn context get-context
 
@@ -22376,13 +23770,11 @@ ddn context get-context [name] [flags]
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_get-current-context.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_get-current-context
 
 # DDN CLI: ddn context get-current-context
 
@@ -22422,13 +23814,11 @@ ddn context get-current-context [flags]
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_set.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_set
 
 # DDN CLI: ddn context set
 
@@ -22475,13 +23865,11 @@ ddn context set <key> <value> (Allowed keys: supergraph, subgraph, localEnvFile,
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_set-current-context.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_set-current-context
 
 # DDN CLI: ddn context set-current-context
 
@@ -22521,13 +23909,11 @@ ddn context set-current-context <name> [flags]
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_context_unset.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_context_unset
 
 # DDN CLI: ddn context unset
 
@@ -22571,13 +23957,11 @@ ddn context unset <key> (Allowed keys: noBuildConnectors, project, supergraph, s
 
 - [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
 
-
-
 ==============================
 
-
-
 # ddn_doctor.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_doctor
 
 # DDN CLI: ddn doctor
 
@@ -22585,7 +23969,8 @@ Check if the dependencies of DDN CLI are present.
 
 ## Synopsis
 
-Check if the dependencies (Docker and Docker Compose) of DDN CLI are installed, are of the required version and if they are running.
+Check if the dependencies (Docker and Docker Compose) of DDN CLI are installed, are of the required version and if they
+are running.
 
 ```bash
 ddn doctor [flags]
@@ -22610,13 +23995,11 @@ ddn doctor [flags]
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_model.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model
 
 # DDN CLI: ddn model
 
@@ -22624,16 +24007,20 @@ Perform Model-related operations.
 
 ## Synopsis
 
-Models represent a collection of data objects within a data domain. To learn more, check out the docs: https://hasura.io/docs/3.0/reference/metadata-reference/models/
+Models represent a collection of data objects within a data domain. To learn more, check out the docs:
+https://hasura.io/docs/3.0/reference/metadata-reference/models/
 
 **Alias:** models
 
 ## Available operations
 
 - [ddn model add](/reference/cli/commands/ddn_model_add) - Add new Models to the local metadata
-- [ddn model list](/reference/cli/commands/ddn_model_list) - Lists details about the collections of DataConnectorLink, and their corresponding Models
-- [ddn model remove](/reference/cli/commands/ddn_model_remove) - Removes Models (and related metadata) in the local metadata
-- [ddn model show](/reference/cli/commands/ddn_model_show) - Show diff between the model and its corresponding ndc collection
+- [ddn model list](/reference/cli/commands/ddn_model_list) - Lists details about the collections of DataConnectorLink,
+  and their corresponding Models
+- [ddn model remove](/reference/cli/commands/ddn_model_remove) - Removes Models (and related metadata) in the local
+  metadata
+- [ddn model show](/reference/cli/commands/ddn_model_show) - Show diff between the model and its corresponding ndc
+  collection
 - [ddn model update](/reference/cli/commands/ddn_model_update) - Update Models in the local metadata
 
 ## Options
@@ -22655,13 +24042,11 @@ Models represent a collection of data objects within a data domain. To learn mor
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_model_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model_add
 
 # DDN CLI: ddn model add
 
@@ -22669,7 +24054,8 @@ Add new Models to the local metadata.
 
 ## Synopsis
 
-When adding a model to your local metadata, the CLI will generate boilerplate metadata that — when the supergraph is built — will make it available to the exposed API.
+When adding a model to your local metadata, the CLI will generate boilerplate metadata that — when the supergraph is
+built — will make it available to the exposed API.
 
 ```bash
 ddn model add <connector-link-name> <collection-name> [flags]
@@ -22714,13 +24100,11 @@ ddn model add <connector-link-name> <collection-name> [flags]
 
 - [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
 
-
-
 ==============================
 
-
-
 # ddn_model_list.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model_list
 
 # DDN CLI: ddn model list
 
@@ -22763,13 +24147,11 @@ ddn model list <connector-link-name> [flags]
 
 - [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
 
-
-
 ==============================
 
-
-
 # ddn_model_remove.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model_remove
 
 # DDN CLI: ddn model remove
 
@@ -22822,13 +24204,11 @@ ddn model remove <model-name> [flags]
 
 - [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
 
-
-
 ==============================
 
-
-
 # ddn_model_show.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model_show
 
 # DDN CLI: ddn model show
 
@@ -22875,13 +24255,11 @@ ddn model show <model-name> [flags]
 
 - [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
 
-
-
 ==============================
 
-
-
 # ddn_model_update.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_model_update
 
 # DDN CLI: ddn model update
 
@@ -22889,7 +24267,8 @@ Update Models in the local metadata.
 
 ## Synopsis
 
-When the underlying data source changes, it's necessary to update the model's metadata to ensure Hasura DDN is aware of any modifications. Typically, before updating a model, you'll have re-introspected the underlying data source.
+When the underlying data source changes, it's necessary to update the model's metadata to ensure Hasura DDN is aware of
+any modifications. Typically, before updating a model, you'll have re-introspected the underlying data source.
 
 ```bash
 ddn model update <model-name> [flags]
@@ -22934,13 +24313,11 @@ ddn model update <model-name> [flags]
 
 - [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
 
-
-
 ==============================
 
-
-
 # ddn_plugins.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_plugins
 
 # DDN CLI: ddn plugins
 
@@ -22948,7 +24325,8 @@ Manage plugins for the CLI.
 
 ## Synopsis
 
-The functionality of the CLI can be extended by using plugins. For a list of all available plugins, run ``ddn plugins list``, or visit this repository: https://github.com/hasura/cli-plugins-index.
+The functionality of the CLI can be extended by using plugins. For a list of all available plugins, run
+`ddn plugins list`, or visit this repository: https://github.com/hasura/cli-plugins-index.
 
 If you're interested in contributing, please open a PR against this repo.
 
@@ -22957,7 +24335,8 @@ If you're interested in contributing, please open a PR against this repo.
 ## Available operations
 
 - [ddn plugins install](/reference/cli/commands/ddn_plugins_install) - Install a plugin from the index
-- [ddn plugins list](/reference/cli/commands/ddn_plugins_list) - List all available plugins with index, versions and installation status
+- [ddn plugins list](/reference/cli/commands/ddn_plugins_list) - List all available plugins with index, versions and
+  installation status
 - [ddn plugins uninstall](/reference/cli/commands/ddn_plugins_uninstall) - Uninstall a plugin
 - [ddn plugins upgrade](/reference/cli/commands/ddn_plugins_upgrade) - Upgrade a plugin to a newer version
 
@@ -22980,13 +24359,11 @@ If you're interested in contributing, please open a PR against this repo.
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_plugins_install.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_plugins_install
 
 # DDN CLI: ddn plugins install
 
@@ -22994,7 +24371,8 @@ Install a plugin from the index.
 
 ## Synopsis
 
-To install plugins that extend the functionality of the DDN CLI, you can use the install command. This command will install the plugin from the index and add it to your configuration file.
+To install plugins that extend the functionality of the DDN CLI, you can use the install command. This command will
+install the plugin from the index and add it to your configuration file.
 
 ```bash
 ddn plugins install <name> [flags]
@@ -23029,13 +24407,11 @@ ddn plugins install <name> [flags]
 
 - [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
 
-
-
 ==============================
 
-
-
 # ddn_plugins_list.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_plugins_list
 
 # DDN CLI: ddn plugins list
 
@@ -23043,7 +24419,8 @@ List all available plugins with index, versions and installation status.
 
 ## Synopsis
 
-Run the plugins list command to see a list of all the available plugins which extend the functionality of the CLI, their versions and installation status.
+Run the plugins list command to see a list of all the available plugins which extend the functionality of the CLI, their
+versions and installation status.
 
 ```bash
 ddn plugins list [flags]
@@ -23081,13 +24458,11 @@ ddn plugins list [flags]
 
 - [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
 
-
-
 ==============================
 
-
-
 # ddn_plugins_uninstall.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_plugins_uninstall
 
 # DDN CLI: ddn plugins uninstall
 
@@ -23095,7 +24470,8 @@ Uninstall a plugin.
 
 ## Synopsis
 
-To uninstall a plugin, run the uninstall command with the name of the plugin as an argument. If unsure of the plugin's name, you can run the `ddn plugins list` command to see a list of all the available plugins.
+To uninstall a plugin, run the uninstall command with the name of the plugin as an argument. If unsure of the plugin's
+name, you can run the `ddn plugins list` command to see a list of all the available plugins.
 
 ```bash
 ddn plugins uninstall <plugin-name> [flags]
@@ -23129,13 +24505,11 @@ ddn plugins uninstall <plugin-name> [flags]
 
 - [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
 
-
-
 ==============================
 
-
-
 # ddn_plugins_upgrade.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_plugins_upgrade
 
 # DDN CLI: ddn plugins upgrade
 
@@ -23143,7 +24517,8 @@ Upgrade a plugin to a newer version.
 
 ## Synopsis
 
-To upgrade a plugin, run the upgrade command with the name of the plugin as an argument. If unsure of the plugin's name, you can run the `ddn plugins list` command to see a list of all the available plugins.
+To upgrade a plugin, run the upgrade command with the name of the plugin as an argument. If unsure of the plugin's name,
+you can run the `ddn plugins list` command to see a list of all the available plugins.
 
 ```bash
 ddn plugins upgrade <plugin-name> [flags]
@@ -23178,13 +24553,11 @@ ddn plugins upgrade <plugin-name> [flags]
 
 - [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
 
-
-
 ==============================
 
-
-
 # ddn_project.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project
 
 # DDN CLI: ddn project
 
@@ -23199,9 +24572,12 @@ This subset of commands makes it easy to control the lifecycle of a project host
 - [ddn project create](/reference/cli/commands/ddn_project_create) - Create a new Project on Hasura DDN
 - [ddn project delete](/reference/cli/commands/ddn_project_delete) - Delete a Project on Hasura DDN
 - [ddn project get](/reference/cli/commands/ddn_project_get) - List Hasura DDN Projects or get details of a specific one
-- [ddn project init](/reference/cli/commands/ddn_project_init) - Configure the local directory to use a Hasura DDN project, creating a DDN project and subgraphs as necessary
-- [ddn project set-api-access-mode](/reference/cli/commands/ddn_project_set-api-access-mode) - Set the API access mode for a Project on Hasura DDN
-- [ddn project set-self-hosted-engine-url](/reference/cli/commands/ddn_project_set-self-hosted-engine-url) - Set the engine's URL for a project in a self hosted data plane.
+- [ddn project init](/reference/cli/commands/ddn_project_init) - Configure the local directory to use a Hasura DDN
+  project, creating a DDN project and subgraphs as necessary
+- [ddn project set-api-access-mode](/reference/cli/commands/ddn_project_set-api-access-mode) - Set the API access mode
+  for a Project on Hasura DDN
+- [ddn project set-self-hosted-engine-url](/reference/cli/commands/ddn_project_set-self-hosted-engine-url) - Set the
+  engine's URL for a project in a self hosted data plane.
 - [ddn project subgraph](/reference/cli/commands/ddn_project_subgraph) - Manage Subgraphs in a Hasura DDN Project
 
 ## Options
@@ -23223,13 +24599,11 @@ This subset of commands makes it easy to control the lifecycle of a project host
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_project_create.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_create
 
 # DDN CLI: ddn project create
 
@@ -23274,13 +24648,11 @@ ddn project create [project-name] [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_delete
 
 # DDN CLI: ddn project delete
 
@@ -23321,13 +24693,11 @@ ddn project delete <project-name> [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_get
 
 # DDN CLI: ddn project get
 
@@ -23370,13 +24740,11 @@ ddn project get [project-name] [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_init.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_init
 
 # DDN CLI: ddn project init
 
@@ -23428,13 +24796,11 @@ ddn project init [project-name] [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_version.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_version
 
 # DDN CLI: ddn version
 
@@ -23468,13 +24834,11 @@ ddn version [flags]
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_project_set-api-access-mode.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_set-api-access-mode
 
 # DDN CLI: ddn project set-api-access-mode
 
@@ -23482,7 +24846,9 @@ Set the API access mode for a Project on Hasura DDN.
 
 ## Synopsis
 
-Hosted projects are set to private by default. This protects your data before configuring any kind of authentication mode aside from the default (NoAuth) mode. Switching a project to public — while NoAuth mode is configured — will allow any client to access the API.
+Hosted projects are set to private by default. This protects your data before configuring any kind of authentication
+mode aside from the default (NoAuth) mode. Switching a project to public — while NoAuth mode is configured — will allow
+any client to access the API.
 
 To learn more about setting an auth mode, see the docs: https://hasura.io/docs/3.0/auth/overview
 
@@ -23528,13 +24894,11 @@ ddn project set-api-access-mode <public|private> [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_set-self-hosted-engine-url.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_set-self-hosted-engine-url
 
 # DDN CLI: ddn project set-self-hosted-engine-url
 
@@ -23577,13 +24941,11 @@ ddn project set-self-hosted-engine-url <url> [flags]
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_subgraph
 
 # DDN CLI: ddn project subgraph
 
@@ -23595,9 +24957,11 @@ Manage Subgraphs in a Hasura DDN Project
 
 ## Available operations
 
-- [ddn project subgraph create](/reference/cli/commands/ddn_project_subgraph_create) - Create a new Subgraph in a Hasura DDN Project
+- [ddn project subgraph create](/reference/cli/commands/ddn_project_subgraph_create) - Create a new Subgraph in a Hasura
+  DDN Project
 - [ddn project subgraph delete](/reference/cli/commands/ddn_project_subgraph_delete) - Delete a Subgraph from a Project
-- [ddn project subgraph get](/reference/cli/commands/ddn_project_subgraph_get) - List Subgraphs for a Hasura DDN Project or get details of a specific one
+- [ddn project subgraph get](/reference/cli/commands/ddn_project_subgraph_get) - List Subgraphs for a Hasura DDN Project
+  or get details of a specific one
 
 ## Options
 
@@ -23618,13 +24982,11 @@ Manage Subgraphs in a Hasura DDN Project
 
 - [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_subgraph_create.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_subgraph_create
 
 # DDN CLI: ddn project subgraph create
 
@@ -23671,13 +25033,11 @@ ddn project subgraph create <subgraph-name> [flags]
 
 - [ddn project subgraph](/reference/cli/commands/ddn_project_subgraph) - Manage Subgraphs in a Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_subgraph_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_subgraph_delete
 
 # DDN CLI: ddn project subgraph delete
 
@@ -23720,13 +25080,11 @@ ddn project subgraph delete <subgraph-name> [flags]
 
 - [ddn project subgraph](/reference/cli/commands/ddn_project_subgraph) - Manage Subgraphs in a Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_project_subgraph_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_project_subgraph_get
 
 # DDN CLI: ddn project subgraph get
 
@@ -23772,13 +25130,11 @@ ddn project subgraph get [subgraph-name] [flags]
 
 - [ddn project subgraph](/reference/cli/commands/ddn_project_subgraph) - Manage Subgraphs in a Hasura DDN Project
 
-
-
 ==============================
 
-
-
 # ddn_relationship.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_relationship
 
 # DDN CLI: ddn relationship
 
@@ -23786,14 +25142,17 @@ Perform Relationship related operations.
 
 ## Synopsis
 
-Relationships allow you to make queries across linked information. To learn more, check out the docs: https://hasura.io/docs/3.0/reference/metadata-reference/relationships/
+Relationships allow you to make queries across linked information. To learn more, check out the docs:
+https://hasura.io/docs/3.0/reference/metadata-reference/relationships/
 
 **Alias:** relationships
 
 ## Available operations
 
-- [ddn relationship add](/reference/cli/commands/ddn_relationship_add) - Adds Relationships from foreign keys on collection-name or targeting collection-name
-- [ddn relationship list](/reference/cli/commands/ddn_relationship_list) - Lists Relationships for a given DataConnectorLink
+- [ddn relationship add](/reference/cli/commands/ddn_relationship_add) - Adds Relationships from foreign keys on
+  collection-name or targeting collection-name
+- [ddn relationship list](/reference/cli/commands/ddn_relationship_list) - Lists Relationships for a given
+  DataConnectorLink
 
 ## Options
 
@@ -23814,13 +25173,11 @@ Relationships allow you to make queries across linked information. To learn more
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_relationship_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_relationship_add
 
 # DDN CLI: ddn relationship add
 
@@ -23875,13 +25232,11 @@ ddn relationship add <connector-link-name> <collection-name> [flags]
 
 - [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
 
-
-
 ==============================
 
-
-
 # ddn_relationship_list.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_relationship_list
 
 # DDN CLI: ddn relationship list
 
@@ -23931,13 +25286,11 @@ ddn relationship list [flags]
 
 - [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
 
-
-
 ==============================
 
-
-
 # ddn_run.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_run
 
 # DDN CLI: ddn run
 
@@ -23980,13 +25333,11 @@ ddn run <script-name> [flags] [-- <args>]
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph
 
 # DDN CLI: ddn subgraph
 
@@ -24002,7 +25353,8 @@ Perform Subgraph-related operations
 
 - [ddn subgraph add](/reference/cli/commands/ddn_subgraph_add) - Add a Subgraph config file to Supergraph config file
 - [ddn subgraph build](/reference/cli/commands/ddn_subgraph_build) - Perform SubgraphBuild-related operations
-- [ddn subgraph delete](/reference/cli/commands/ddn_subgraph_delete) - Delete a Subgraph, its corresponding Connectors and all its associated metadata objects from local project metadata
+- [ddn subgraph delete](/reference/cli/commands/ddn_subgraph_delete) - Delete a Subgraph, its corresponding Connectors
+  and all its associated metadata objects from local project metadata
 - [ddn subgraph init](/reference/cli/commands/ddn_subgraph_init) - Initialize a new Subgraph in local metadata
 
 ## Options
@@ -24024,13 +25376,11 @@ Perform Subgraph-related operations
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_subgraph_add.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_add
 
 # DDN CLI: ddn subgraph add
 
@@ -24038,7 +25388,8 @@ Add a Subgraph config file to Supergraph config file.
 
 ## Synopsis
 
-Adding a subgraph configuration file to the supergraph config allows the CLI to recognize the subgraph when generating new builds using the supergraph config.
+Adding a subgraph configuration file to the supergraph config allows the CLI to recognize the subgraph when generating
+new builds using the supergraph config.
 
 ```bash
 ddn subgraph add --subgraph <path-to-subgraph-config-file> --target-supergraph <path-to-supergraph-config-file> [flags]
@@ -24075,13 +25426,11 @@ ddn subgraph add --subgraph <path-to-subgraph-config-file> --target-supergraph <
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
 
-
-
 ==============================
 
-
-
 # ddn_subgraph_build.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_build
 
 # DDN CLI: ddn subgraph build
 
@@ -24095,7 +25444,8 @@ Perform SubgraphBuild-related operations
 
 - [ddn subgraph build apply](/reference/cli/commands/ddn_subgraph_build_apply) - Apply a Subgraph build on Hasura DDN
 - [ddn subgraph build create](/reference/cli/commands/ddn_subgraph_build_create) - Create a SubgraphBuild on Hasura DDN
-- [ddn subgraph build get](/reference/cli/commands/ddn_subgraph_build_get) - List SubgraphBuilds or get details of a specific one
+- [ddn subgraph build get](/reference/cli/commands/ddn_subgraph_build_get) - List SubgraphBuilds or get details of a
+  specific one
 
 ## Options
 
@@ -24116,13 +25466,11 @@ Perform SubgraphBuild-related operations
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
 
-
-
 ==============================
 
-
-
 # ddn_subgraph_build_apply.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_build_apply
 
 # DDN CLI: ddn subgraph build apply
 
@@ -24166,13 +25514,11 @@ ddn subgraph build apply <subgraph-build-version> [flags]
 
 - [ddn subgraph build](/reference/cli/commands/ddn_subgraph_build) - Perform SubgraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_subgraph_build_create.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_build_create
 
 # DDN CLI: ddn subgraph build create
 
@@ -24223,13 +25569,11 @@ ddn subgraph build create [flags]
 
 - [ddn subgraph build](/reference/cli/commands/ddn_subgraph_build) - Perform SubgraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_subgraph_build_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_build_get
 
 # DDN CLI: ddn subgraph build get
 
@@ -24275,67 +25619,11 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 - [ddn subgraph build](/reference/cli/commands/ddn_subgraph_build) - Perform SubgraphBuild-related operations
 
-
-
 ==============================
-
-
-
-# ddn_update-cli.mdx
-
-# DDN CLI: ddn update-cli
-
-Update this CLI to the latest version or to a specific version.
-
-## Synopsis
-
-You can use this command to update the CLI to the latest version or a specific version.
-
-```bash
-ddn update-cli [flags]
-```
-
-## Examples
-
-```bash
-# Update CLI to latest version:
- ddn update-cli
-
-# Update CLI to a specific version (say v1.0.0):
- ddn update-cli --version v1.0.0
-
-# To disable the auto-update check on the CLI, set
-# "show_update_notification": false
-# in ~/.ddn/config.yaml
-```
-
-## Options
-
-```sass
--h, --help             help for update-cli
-    --version string   A specific version to install
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
-
-
-
-==============================
-
-
 
 # ddn_subgraph_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_delete
 
 # DDN CLI: ddn subgraph delete
 
@@ -24384,13 +25672,63 @@ ddn subgraph delete <subgraph-name> [flags]
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
 
+==============================
 
+# ddn_update-cli.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
 ==============================
 
-
-
 # ddn_subgraph_init.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_init
 
 # DDN CLI: ddn subgraph init
 
@@ -24398,7 +25736,8 @@ Initialize a new Subgraph in local metadata.
 
 ## Synopsis
 
-This command will create a new named directory which will contain all relevant metadata and connector configuration files for any data sources added to this subgraph.
+This command will create a new named directory which will contain all relevant metadata and connector configuration
+files for any data sources added to this subgraph.
 
 ```bash
 ddn subgraph init <subgraph-name> --dir <dir-name> [flags]
@@ -24438,13 +25777,11 @@ ddn subgraph init <subgraph-name> --dir <dir-name> [flags]
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph
 
 # DDN CLI: ddn supergraph
 
@@ -24481,13 +25818,11 @@ Perform Supergraph-related operations
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build
 
 # DDN CLI: ddn supergraph build
 
@@ -24499,13 +25834,20 @@ This subset of commands will help you manage the lifecycle of local and cloud bu
 
 ## Available operations
 
-- [ddn supergraph build apply](/reference/cli/commands/ddn_supergraph_build_apply) - Apply a SupergraphBuild to its Project on Hasura DDN
-- [ddn supergraph build create](/reference/cli/commands/ddn_supergraph_build_create) - Create a SupergraphBuild on Hasura DDN
-- [ddn supergraph build delete](/reference/cli/commands/ddn_supergraph_build_delete) - Delete a SupergraphBuild from a Project
-- [ddn supergraph build diff](/reference/cli/commands/ddn_supergraph_build_diff) - See changes made to the GraphQL schema from one build version to another.
-- [ddn supergraph build get](/reference/cli/commands/ddn_supergraph_build_get) - List SupergraphBuilds or get details of a specific one
-- [ddn supergraph build local](/reference/cli/commands/ddn_supergraph_build_local) - Build the Supergraph and generate assets to run the local Engine
-- [ddn supergraph build set-self-hosted-engine-url](/reference/cli/commands/ddn_supergraph_build_set-self-hosted-engine-url) - Set the engine's URL for a build for a project in a self hosted data plane.
+- [ddn supergraph build apply](/reference/cli/commands/ddn_supergraph_build_apply) - Apply a SupergraphBuild to its
+  Project on Hasura DDN
+- [ddn supergraph build create](/reference/cli/commands/ddn_supergraph_build_create) - Create a SupergraphBuild on
+  Hasura DDN
+- [ddn supergraph build delete](/reference/cli/commands/ddn_supergraph_build_delete) - Delete a SupergraphBuild from a
+  Project
+- [ddn supergraph build diff](/reference/cli/commands/ddn_supergraph_build_diff) - See changes made to the GraphQL
+  schema from one build version to another.
+- [ddn supergraph build get](/reference/cli/commands/ddn_supergraph_build_get) - List SupergraphBuilds or get details of
+  a specific one
+- [ddn supergraph build local](/reference/cli/commands/ddn_supergraph_build_local) - Build the Supergraph and generate
+  assets to run the local Engine
+- [ddn supergraph build set-self-hosted-engine-url](/reference/cli/commands/ddn_supergraph_build_set-self-hosted-engine-url) -
+  Set the engine's URL for a build for a project in a self hosted data plane.
 
 ## Options
 
@@ -24526,13 +25868,11 @@ This subset of commands will help you manage the lifecycle of local and cloud bu
 
 - [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
 
-
-
 ==============================
 
-
-
 # ddn_completion.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion
 
 # DDN CLI: ddn completion
 
@@ -24573,13 +25913,60 @@ ddn completion [command] [flags]
 
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
+==============================
 
+# ddn_supergraph_build_apply.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_apply
+
+# DDN CLI: ddn supergraph build apply
+
+Apply a SupergraphBuild to its Project on Hasura DDN.
+
+## Synopsis
+
+Apply a SupergraphBuild to its Project on Hasura DDN
+
+```bash
+ddn supergraph build apply <supergraph-build-version> [flags]
+```
+
+## Examples
+
+```bash
+# Apply a SupergraphBuild to a Project "pet-lion-2649"
+ ddn supergraph build apply <supergraph-build-version> --project pet-lion-2649
+```
+
+## Options
+
+```sass
+    --ci                       Disables the use of context
+-c, --context string           Name of the context to use. (default <current_context>)
+-h, --help                     help for apply
+    --no-diff                  Do not do a GraphQL schema diff against the applied build
+-p, --project string           DDN Project name
+    --self-hosted-data-plane   Is the data plane self hosted?
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
 ==============================
 
-
-
 # ddn_completion_bash.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_bash
 
 # DDN CLI: ddn completion
 
@@ -24630,113 +26017,11 @@ You will need to start a new shell for this setup to take effect.
 
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
-
-
 ==============================
-
-
-
-# ddn_supergraph_build_apply.mdx
-
-# DDN CLI: ddn supergraph build apply
-
-Apply a SupergraphBuild to its Project on Hasura DDN.
-
-## Synopsis
-
-Apply a SupergraphBuild to its Project on Hasura DDN
-
-```bash
-ddn supergraph build apply <supergraph-build-version> [flags]
-```
-
-## Examples
-
-```bash
-# Apply a SupergraphBuild to a Project "pet-lion-2649"
- ddn supergraph build apply <supergraph-build-version> --project pet-lion-2649
-```
-
-## Options
-
-```sass
-    --ci                       Disables the use of context
--c, --context string           Name of the context to use. (default <current_context>)
--h, --help                     help for apply
-    --no-diff                  Do not do a GraphQL schema diff against the applied build
--p, --project string           DDN Project name
-    --self-hosted-data-plane   Is the data plane self hosted?
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
-
-
-
-==============================
-
-
-
-# ddn_completion_fish.mdx
-
-# DDN CLI: ddn completion
-
-Generate autocompletion scripts for the DDN CLI for the fish shell.
-
-## Synopsis
-
-Generate the autocompletion script for DDN for the fish shell.
-
-To load completions in your current shell session:
-
-```sass
-        ddn completion fish | source
-```
-
-To load completions for every new session, execute once:
-
-```sass
-        ddn completion fish > ~/.config/fish/completions/ddn.fish
-```
-
-You will need to start a new shell for this setup to take effect.
-
-## Options
-
-```sass
--h, --help   help for fish completion
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
-
-
-
-==============================
-
-
 
 # ddn_supergraph_build_create.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_create
 
 # DDN CLI: ddn supergraph build create
 
@@ -24808,13 +26093,58 @@ ddn supergraph build create [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
+==============================
 
+# ddn_completion_fish.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_fish
+
+# DDN CLI: ddn completion
+
+Generate autocompletion scripts for the DDN CLI for the fish shell.
+
+## Synopsis
+
+Generate the autocompletion script for DDN for the fish shell.
+
+To load completions in your current shell session:
+
+```sass
+        ddn completion fish | source
+```
+
+To load completions for every new session, execute once:
+
+```sass
+        ddn completion fish > ~/.config/fish/completions/ddn.fish
+```
+
+You will need to start a new shell for this setup to take effect.
+
+## Options
+
+```sass
+-h, --help   help for fish completion
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
 ==============================
 
-
-
 # ddn_completion_powershell.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_powershell
 
 # DDN CLI: ddn completion
 
@@ -24851,13 +26181,11 @@ To load completions for every new session, add the output of the above command t
 
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_delete
 
 # DDN CLI: ddn supergraph build delete
 
@@ -24900,13 +26228,11 @@ ddn supergraph build delete <supergraph-build-version> [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_completion_zsh.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_zsh
 
 # DDN CLI: ddn completion
 
@@ -24964,13 +26290,11 @@ You will need to start a new shell for this setup to take effect.
 
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build_diff.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_diff
 
 # DDN CLI: ddn supergraph build diff
 
@@ -25013,13 +26337,11 @@ ddn supergraph build diff <build-version-1> <build-version-2> [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build_get.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_get
 
 # DDN CLI: ddn supergraph build get
 
@@ -25065,13 +26387,11 @@ ddn supergraph build get [supergraph-build-version] [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build_local.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_local
 
 # DDN CLI: ddn supergraph build local
 
@@ -25122,13 +26442,11 @@ ddn supergraph build local [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_build_set-self-hosted-engine-url.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_set-self-hosted-engine-url
 
 # DDN CLI: ddn supergraph build set-self-hosted-engine-url
 
@@ -25172,13 +26490,11 @@ ddn supergraph build set-self-hosted-engine-url <url> --build-version <build-ver
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_init.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_init
 
 # DDN CLI: ddn supergraph init
 
@@ -25186,7 +26502,8 @@ Initialize a new Supergraph project directory.
 
 ## Synopsis
 
-This command is most often the first run with a new project. Use this to create a new supergraph directory and then begin to create your API. To learn more, check out the quickstart: https://hasura.io/docs/3.0/quickstart
+This command is most often the first run with a new project. Use this to create a new supergraph directory and then
+begin to create your API. To learn more, check out the quickstart: https://hasura.io/docs/3.0/quickstart
 
 ```bash
 ddn supergraph init <path-to-project-dir> [flags]
@@ -25232,13 +26549,11 @@ ddn supergraph init <path-to-project-dir> [flags]
 
 - [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
 
-
-
 ==============================
 
-
-
 # ddn_supergraph_prune.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_prune
 
 # DDN CLI: ddn supergraph prune
 
@@ -25275,14 +26590,11 @@ ddn supergraph prune [flags]
 
 - [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
 
-
-
 ==============================
-
-
 
 # faq.mdx
 
+URL: https://hasura.io/docs/promptql/reference/cli/faq
 
 # Troubleshooting FAQ
 
@@ -25435,13 +26747,11 @@ like subscriptions may need corresponding changes to your metadata. If your meta
 of the CLI, then these features may not be available and you [may need to upgrade your
 metadata](/project/configuration/overview.mdx
 
-
-
 ==============================
 
-
-
 # Connectors
+
+URL: https://hasura.io/docs/promptql/reference/connectors/
 
 # Connectors
 
@@ -25462,13 +26772,11 @@ If you're getting started with a connector and want to connect it to your data s
 - [PostgreSQL](/reference/connectors/postgresql/index.mdx)
 - [Snowflake](/reference/connectors/snowflake/index.mdx)
 
-
-
 ==============================
 
-
-
 # Amazon Athena
+
+URL: https://hasura.io/docs/promptql/reference/connectors/athena/
 
 # Amazon Athena
 
@@ -25492,24 +26800,152 @@ with Amazon Athena and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/athena/configuration.mdx)
 
-
-
 ==============================
-
-
 
 # Configuration
 
+URL: https://hasura.io/docs/promptql/reference/connectors/athena/configuration
 
-<Config />
+## Introduction
 
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. It never changes during the lifetime of the data connector service
+instance. When your database schema changes you will have to update the configuration accordingly.
 
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
 
 ==============================
 
-
-
 # Amazon Redshift
+
+URL: https://hasura.io/docs/promptql/reference/connectors/redshift/
 
 # Amazon Redshift
 
@@ -25533,24 +26969,152 @@ with Amazon Redshift and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/redshift/configuration.mdx)
 
-
-
 ==============================
-
-
 
 # Configuration
 
+URL: https://hasura.io/docs/promptql/reference/connectors/redshift/configuration
 
-<Config />
+## Introduction
 
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. It never changes during the lifetime of the data connector service
+instance. When your database schema changes you will have to update the configuration accordingly.
 
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
 
 ==============================
 
-
-
 # BigQuery
+
+URL: https://hasura.io/docs/promptql/reference/connectors/bigquery/
 
 # BigQuery
 
@@ -25574,24 +27138,152 @@ with BigQuery and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/bigquery/configuration.mdx)
 
-
-
 ==============================
-
-
 
 # Configuration
 
+URL: https://hasura.io/docs/promptql/reference/connectors/bigquery/configuration
 
-<Config />
+## Introduction
 
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. It never changes during the lifetime of the data connector service
+instance. When your database schema changes you will have to update the configuration accordingly.
 
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
 
 ==============================
 
-
-
 # Databricks
+
+URL: https://hasura.io/docs/promptql/reference/connectors/databricks/
 
 # Databricks
 
@@ -25615,13 +27307,11 @@ with Databricks and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/databricks/configuration.mdx)
 
-
-
 ==============================
 
-
-
 # configuration.mdx
+
+URL: https://hasura.io/docs/promptql/reference/connectors/databricks/configuration
 
 # Configuration Reference
 
@@ -25672,13 +27362,11 @@ Running `update` in a configuration directory will:
 - Scan available tables and columns
 - Generate an updated configuration file reflecting the current schema
 
-
-
 ==============================
 
-
-
 # MySQL
+
+URL: https://hasura.io/docs/promptql/reference/connectors/mysql/
 
 # MySQL
 
@@ -25702,13 +27390,11 @@ with MySQL and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/mysql/configuration.mdx)
 
-
-
 ==============================
 
-
-
 # configuration.mdx
+
+URL: https://hasura.io/docs/promptql/reference/connectors/mysql/configuration
 
 # Configuration Reference
 
@@ -25919,13 +27605,11 @@ Running `update` in a configuration directory will do the following:
 
 - Fill in default values for any fields absent from the configuration
 
-
-
 ==============================
 
-
-
 # PostgreSQL
+
+URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/
 
 # PostgreSQL for PromptQL
 
@@ -25948,24 +27632,152 @@ with PostgreSQL and Hasura DDN as quickly as possible, check out our
 
 - [Connector configuration](/reference/connectors/postgresql/configuration.mdx)
 
-
-
 ==============================
-
-
 
 # Configuration
 
+URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/configuration
 
-<Config />
+## Introduction
 
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. It never changes during the lifetime of the data connector service
+instance. When your database schema changes you will have to update the configuration accordingly.
 
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
 
 ==============================
 
-
-
 # Snowflake
+
+URL: https://hasura.io/docs/promptql/reference/connectors/snowflake/
 
 # Snowflake
 
@@ -25993,13 +27805,11 @@ processing.**
 
 - [Connector configuration](/reference/connectors/snowflake/configuration.mdx)
 
-
-
 ==============================
 
-
-
 # configuration.mdx
+
+URL: https://hasura.io/docs/promptql/reference/connectors/snowflake/configuration
 
 # Configuration Reference
 
@@ -26200,14 +28010,11 @@ Running `update` in a configuration directory will do the following:
 
 - Fill in default values for any fields absent from the configuration
 
-
-
 ==============================
-
-
 
 # Specification
 
+URL: https://hasura.io/docs/promptql/reference/spec
 
 # PromptQL Spec
 
@@ -26466,14 +28273,11 @@ for email in result:
         mark_email_as_spam(email['email'])
 ```
 
-
-
 ==============================
-
-
 
 # Benchmark
 
+URL: https://hasura.io/docs/promptql/reference/benchmark
 
 # Case-study I - PromptQL vs MCP
 
@@ -26697,14 +28501,11 @@ cases, or run the benchmark on your own systems by visiting our
 participation helps us continually improve and validate the effectiveness of PromptQL and other agentic data access
 methods.
 
-
-
 ==============================
-
-
 
 # 100% accuracy
 
+URL: https://hasura.io/docs/promptql/reference/rag-hundred-percent-accuracy
 
 # Achieving 100% Accuracy with RAG with Agentic Planning
 
@@ -26888,13 +28689,11 @@ the answer for one of the questions.
 The code that was used to try out the different approaches is available
 [on github](https://github.com/hasura/rag-benchmark).
 
-
-
 ==============================
 
-
-
 # Overview
+
+URL: https://hasura.io/docs/promptql/help/overview
 
 # Help and Support Overview
 
@@ -26923,13 +28722,11 @@ For details on our Service-Level Agreements (SLAs), version support, data privac
 bug fixes, please refer to our [policies documentation](/help/policies/index.mdx). This comprehensive resource outlines
 everything you need to know about our commitments, processes, and how we handle updates for Enterprise clients.
 
-
-
 ==============================
 
-
-
 # glossary.mdx
+
+URL: https://hasura.io/docs/promptql/help/glossary
 
 # PromptQL and Hasura DDN Glossary
 
@@ -27280,13 +29077,11 @@ This refers to a personal authentication token that Hasura Cloud creates automat
 creation. This ensures that your application always has a security mechanism. The auto-generated PAT is included in the
 API header `cloud_pat`.
 
-
-
 ==============================
 
-
-
 # Security
+
+URL: https://hasura.io/docs/promptql/help/security
 
 # Security in PromptQL and Hasura DDN
 
@@ -27483,13 +29278,11 @@ Check out these common questions, and if you still need help, reach out to us on
 Join the [Hasura Security Announcements](https://groups.google.com/forum/#!forum/hasura-security-announce) group for
 emails about security announcements.
 
-
-
 ==============================
 
-
-
 # Hasura policies
+
+URL: https://hasura.io/docs/promptql/help/policies/
 
 # Hasura Policies
 
@@ -27497,13 +29290,11 @@ This section contains documents and strategies which outline Hasura's operationa
 
 - [Version Support Policy](/help/policies/versioning.mdx)
 
-
-
 ==============================
 
-
-
 # versioning.mdx
+
+URL: https://hasura.io/docs/promptql/help/policies/versioning
 
 # Hasura Version Support Policy
 
@@ -27620,9 +29411,4 @@ Hasura ensures a seamless update experience for enterprise customers by followin
    - Comprehensive release notes and upgrade guides accompany every update.
    - Our support team is available to assist with planning and executing updates, ensuring minimal impact on operations.
 
-
-
 ==============================
-
-
-
