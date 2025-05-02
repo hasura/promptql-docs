@@ -22,6 +22,7 @@ export async function collectDocsRecursive(dir: string, parentPosition: number[]
             title: parsed.data.title ?? page.name,
             position: [...parentPosition, position],
             content: parsed.content,
+            path: fullPath,
           } as DocsFile;
         }
 
