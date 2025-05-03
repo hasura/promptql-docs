@@ -1,12 +1,12 @@
 name: Update LLM Docs
 
 on:
-  pull_request_target:
-    types: [closed]
+  push:
+    branches:
+      - main
 
 jobs:
   update-and-commit:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
     runs-on: ubuntu-latest
 
     permissions:
@@ -14,17 +14,15 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout PR commit
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Check for changes in /docs
         id: check_docs_changes
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          if git diff --quiet origin/${{ github.event.pull_request.base.ref }} -- docs/; then
+          if git diff --quiet HEAD^ HEAD -- docs/; then
             echo "No changes in /docs. Skipping job."
             echo "skip=true" >> $GITHUB_OUTPUT
           else
@@ -61,6 +59,6 @@ jobs:
           fi
 
           git commit -m "Chore: update LLM markdown"
-          git push origin HEAD:refs/heads/main
+          git push origin HEAD
         env:
           GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
