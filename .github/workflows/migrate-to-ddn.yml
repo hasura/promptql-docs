@@ -1,0 +1,317 @@
+# Migration Workflow: promptql-docs to ddn-docs
+# =============================================
+#
+# PURPOSE:
+# This workflow automatically migrates changes from the promptql-docs repository
+# to the ddn-docs repository when a PR is merged with the 'migrate-to-ddn' label.
+#
+# HOW IT WORKS:
+# 1. Triggers when a PR with the 'migrate-to-ddn' label is merged to main branch
+# 2. Creates individual patch files for each file changed in the merged PR (only files in the docs/ and static/ directories)
+# 3. Checks out the target ddn-docs repository and creates a new branch
+# 4. Creates a draft PR in the ddn-docs repository
+# 5. Loops through each patch file and attempts to apply it:
+#    - If a patch applies successfully, it's committed
+#    - If a patch fails, a comment is added to the PR with the diff information
+# 6. Once all patches are processed, the PR is assigned and un-drafted
+#
+# REQUIREMENTS:
+# - DDN_REPO_TOKEN secret: GitHub token with permission to create PRs in the ddn-docs repository
+# - 'migrate-to-ddn' label must exist in the repository
+#
+# USAGE:
+# To migrate changes from a PR to ddn-docs, simply add the 'migrate-to-ddn' label
+# to the PR before or after merging it.
+
+name: Migrate Changes to DDN Docs
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  migrate-to-ddn:
+    runs-on: ubuntu-latest
+    # Only run when PR is merged and has the migrate-to-ddn label
+    if: github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'migrate-to-ddn')
+
+    steps:
+      - name: Checkout promptql-docs repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - name: Create per-file patches
+        id: create-patches
+        run: |
+          # Get the merge commit SHA
+          MERGE_COMMIT_SHA="${{ github.event.pull_request.merge_commit_sha }}"
+
+          echo "Debug: Merge commit SHA: ${MERGE_COMMIT_SHA}"
+
+          # Create patches directory
+          mkdir -p patches
+
+          # Get list of changed files in docs/ and static/ directories
+          CHANGED_FILES=$(git show --pretty="" --name-only ${MERGE_COMMIT_SHA} -- docs/ static/)
+
+          # Check if any relevant files were changed
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "patch_created=false" >> $GITHUB_OUTPUT
+            echo "No relevant changes detected in the PR that need to be migrated."
+            exit 0
+          fi
+
+          echo "patch_created=true" >> $GITHUB_OUTPUT
+
+          # Save the list of changed files
+          echo "$CHANGED_FILES" > changed_files.txt
+          echo "FILES_CHANGED<<EOF" >> $GITHUB_ENV
+          cat changed_files.txt >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+          # Count number of files changed
+          FILES_COUNT=$(wc -l < changed_files.txt)
+          echo "files_count=$FILES_COUNT" >> $GITHUB_OUTPUT
+          echo "Debug: Number of files changed: ${FILES_COUNT}"
+
+          # Create individual patch for each file
+          for file in $CHANGED_FILES; do
+            # Create a clean filename for the patch
+            patch_name=$(echo "$file" | sed 's/\//_/g')
+            
+            echo "Creating patch for $file as $patch_name.patch"
+            git show --pretty=format: ${MERGE_COMMIT_SHA} -- "$file" > "patches/$patch_name.patch"
+          done
+
+          echo "Debug: Created patches:"
+          ls -la patches/
+
+      - name: Checkout ddn-docs repository
+        if: steps.create-patches.outputs.patch_created == 'true'
+        uses: actions/checkout@v3
+        with:
+          repository: hasura/ddn-docs
+          path: ddn-docs
+          token: ${{ secrets.DDN_REPO_TOKEN }}
+
+      - name: Setup Git in ddn-docs and create branch
+        if: steps.create-patches.outputs.patch_created == 'true'
+        working-directory: ddn-docs
+        run: |
+          git config user.name "seanparkross"
+          git config user.email "sean@hasura.io"
+
+          # Create a new branch for the changes
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          BRANCH_NAME="promptql-sync-${PR_NUMBER}"
+          git checkout -b ${BRANCH_NAME}
+
+          echo "branch_name=${BRANCH_NAME}" >> $GITHUB_OUTPUT
+        id: setup-git
+
+      - name: Apply patches and process results
+        if: steps.create-patches.outputs.patch_created == 'true'
+        working-directory: ddn-docs
+        id: apply-patches
+        run: |
+          # Initialize variables
+          SUCCESSFUL_PATCHES=0
+          FAILED_PATCHES=0
+          FAILED_PATCH_INFO=""
+
+          # Loop through each patch file
+          for patch_file in ../patches/*.patch; do
+            echo "Processing patch: $patch_file"
+            
+            # Extract original filename from patch filename
+            original_file=$(basename "$patch_file" .patch | sed 's/_/\//g')
+            echo "Original file: $original_file"
+            
+            # Ensure directory exists
+            mkdir -p "$(dirname "$original_file")"
+            
+            # Try to apply the patch
+            if git apply --check "$patch_file" 2>/dev/null; then
+              echo "✅ Patch check passed for $original_file, applying..."
+              git apply "$patch_file"
+              
+              # Stage and commit the changes for this file
+              git add -A
+              git commit -m "Sync $original_file from promptql-docs PR #${{ github.event.pull_request.number }}" || true
+              
+              SUCCESSFUL_PATCHES=$((SUCCESSFUL_PATCHES + 1))
+            else
+              echo "❌ Patch failed for $original_file"
+              
+              # Create a diff for the failed patch
+              PATCH_CONTENT=$(cat "$patch_file")
+              
+              # Add to failed patch info
+              FAILED_PATCH_INFO="${FAILED_PATCH_INFO}
+              ## Failed Patch: \`$original_file\`
+              
+          \`\`\`diff
+          $PATCH_CONTENT
+          \`\`\`
+              
+              "
+              
+              FAILED_PATCHES=$((FAILED_PATCHES + 1))
+            fi
+          done
+
+          # Push the branch to the remote repository
+          git push origin ${{ steps.setup-git.outputs.branch_name }}
+
+          # Set outputs for next steps
+          echo "successful_patches=$SUCCESSFUL_PATCHES" >> $GITHUB_OUTPUT
+          echo "failed_patches=$FAILED_PATCHES" >> $GITHUB_OUTPUT
+
+          # Create a file with failed patch info for the next step
+          if [ $FAILED_PATCHES -gt 0 ]; then
+            echo "$FAILED_PATCH_INFO" > ../failed_patches.md
+          fi
+
+      - name: Create placeholder commit if all patches failed
+        if:
+          steps.create-patches.outputs.patch_created == 'true' && steps.apply-patches.outputs.successful_patches == '0'
+        working-directory: ddn-docs
+        run: |
+          echo "# Migration attempted but all patches failed" > migration-failed.md
+          git add migration-failed.md
+          git commit -m "Record failed migration attempt from PR #${{ github.event.pull_request.number }}"
+          git push origin ${{ steps.setup-git.outputs.branch_name }}
+
+      - name: Create draft PR in ddn-docs
+        if: steps.create-patches.outputs.patch_created == 'true'
+        id: create-pr
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.DDN_REPO_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const prBody = `## Synced Changes from promptql-docs
+
+            This PR contains synced changes from promptql-docs PR #${{ github.event.pull_request.number }}.
+
+            **Original PR:** ${{ github.event.pull_request.html_url }}
+            **Original Author:** @${{ github.event.pull_request.user.login }}
+
+            ### Files Being Processed (${{ steps.create-patches.outputs.files_count }})
+
+            \`\`\`
+            ${{ env.FILES_CHANGED }}
+            \`\`\`
+
+            This PR is currently being processed by the migration workflow...`;
+
+            try {
+              const result = await github.rest.pulls.create({
+                owner: 'seanparkross',
+                repo: 'ddn-docs',
+                title: '[Sync] ${{ github.event.pull_request.title }}',
+                head: 'seanparkross:${{ steps.setup-git.outputs.branch_name }}',
+                base: 'main',
+                body: prBody,
+                draft: true
+              });
+              
+              if (result.data) {
+                // Add labels
+                await github.rest.issues.addLabels({
+                  owner: 'seanparkross',
+                  repo: 'ddn-docs',
+                  issue_number: result.data.number,
+                  labels: ['sync-from-promptql']
+                });
+                
+                console.log(`Draft PR created: ${result.data.html_url}`);
+                return result.data.number;
+              }
+            } catch (error) {
+              console.error('Failed to create PR:', error);
+              core.setFailed(error.message);
+            }
+
+      - name: Add comment about failed patches
+        if: steps.apply-patches.outputs.failed_patches != '0' && steps.create-pr.outputs.result
+        uses: actions/github-script@v6
+        env:
+          FAILED_PATCHES: ${{ steps.apply-patches.outputs.failed_patches }}
+          PR_NUMBER: ${{ steps.create-pr.outputs.result }}
+        with:
+          github-token: ${{ secrets.DDN_REPO_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const failedPatchesContent = fs.readFileSync('failed_patches.md', 'utf8');
+
+            const commentBody = `# ⚠️ Failed Patches Report
+
+            ${process.env.FAILED_PATCHES} patches failed to apply and require manual attention.
+
+            ${failedPatchesContent}
+
+            Please manually apply these changes as needed.`;
+
+            await github.rest.issues.createComment({
+              owner: 'seanparkross',
+              repo: 'ddn-docs',
+              issue_number: parseInt(process.env.PR_NUMBER),
+              body: commentBody
+            });
+
+      - name: Update PR with final status and un-draft
+        if: steps.create-patches.outputs.patch_created == 'true' && steps.create-pr.outputs.result
+        uses: actions/github-script@v6
+        env:
+          PR_NUMBER: ${{ steps.create-pr.outputs.result }}
+          SUCCESSFUL_PATCHES: ${{ steps.apply-patches.outputs.successful_patches }}
+          FAILED_PATCHES: ${{ steps.apply-patches.outputs.failed_patches }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        with:
+          github-token: ${{ secrets.DDN_REPO_TOKEN }}
+          script: |
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            const successfulPatches = parseInt(process.env.SUCCESSFUL_PATCHES);
+            const failedPatches = parseInt(process.env.FAILED_PATCHES);
+
+            const statusSummary = `## Migration Complete
+
+            **Summary:**
+            - ✅ Successfully applied: ${successfulPatches} files
+            - ${failedPatches > 0 ? `❌ Failed to apply: ${failedPatches} files` : '✅ All files applied successfully'}
+
+            ${failedPatches > 0 ? 'See comments for details on failed patches that require manual attention.' : ''}`;
+
+            // Update PR description with final status
+            const { data: pr } = await github.rest.pulls.get({
+              owner: 'seanparkross',
+              repo: 'ddn-docs',
+              pull_number: prNumber
+            });
+
+            const updatedBody = pr.body.replace(
+              'This PR is currently being processed by the migration workflow...',
+              statusSummary
+            );
+
+            // Update PR description and un-draft
+            await github.rest.pulls.update({
+              owner: 'seanparkross',
+              repo: 'ddn-docs',
+              pull_number: prNumber,
+              body: updatedBody,
+              draft: false
+            });
+
+            // Assign PR to original author instead of requesting review
+            await github.rest.issues.update({
+              owner: 'seanparkross',
+              repo: 'ddn-docs',
+              issue_number: prNumber,
+              assignees: [process.env.PR_AUTHOR]
+            });
+
+            console.log(`PR ${prNumber} updated, assigned to ${process.env.PR_AUTHOR}, and marked as ready for review`);
