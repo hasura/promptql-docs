@@ -24,8 +24,8 @@ jobs:
           # we'll checkout release-prod
           git checkout release-prod
 
-          # then, we'll merge main into release-prod
-          git merge release-stage -m "Merge release-stage into release-prod"
+          # then, we'll merge release-stage into release-prod
+          git merge -X theirs origin/release-stage -m "Merge release-stage into release-prod"
 
           # and push the changes
           git push origin release-prod
