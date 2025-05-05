@@ -1,12 +1,12 @@
 name: Update LLM Docs
 
 on:
-  pull_request_target:
-    types: [closed]
+  push:
+    branches:
+      - main
 
 jobs:
-  update-and-commit:
-    if: github.event.pull_request.merged == true && github.event.pull_request.base.ref == 'main'
+  update-and-pr:
     runs-on: ubuntu-latest
 
     permissions:
@@ -14,53 +14,54 @@ jobs:
       pull-requests: write
 
     steps:
-      - name: Checkout PR commit
+      - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 2
 
       - name: Check for changes in /docs
         id: check_docs_changes
         run: |
-          git fetch origin ${{ github.event.pull_request.base.ref }}
-          if git diff --quiet origin/${{ github.event.pull_request.base.ref }} -- docs/; then
-            echo "No changes in /docs. Skipping job."
-            echo "skip=true" >> $GITHUB_OUTPUT
+          if git diff --name-only HEAD^ HEAD | grep '^docs/'; then
+            echo "should_run=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Changes detected in /docs."
-            echo "skip=false" >> $GITHUB_OUTPUT
+            echo "No changes in /docs."
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Set up Bun
-        if: steps.check_docs_changes.outputs.skip == 'false'
+        if: steps.check_docs_changes.outputs.should_run == 'true'
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
 
       - name: Install dependencies
-        if: steps.check_docs_changes.outputs.skip == 'false'
+        if: steps.check_docs_changes.outputs.should_run == 'true'
         working-directory: utilities/one-click-llm
         run: bun install
 
       - name: Run Bun script
-        if: steps.check_docs_changes.outputs.skip == 'false'
+        if: steps.check_docs_changes.outputs.should_run == 'true'
         working-directory: utilities/one-click-llm
         run: bun run start
 
-      - name: Commit and push changes
-        if: steps.check_docs_changes.outputs.skip == 'false'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Create Pull Request
+        if: steps.check_docs_changes.outputs.should_run == 'true'
+        id: create-pr
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.DOCS_GITHUB_TOKEN }}
+          commit-message: 'Chore: update LLM markdown'
+          title: 'Chore: update LLM markdown'
+          body: 'This PR updates the LLM-generated markdown.'
+          branch: update-llm-docs
+          base: main
+          delete-branch: false
 
-          git add -u
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-            exit 0
-          fi
-
-          git commit -m "Chore: update markdown before merge"
-          git push origin HEAD
-        env:
-          GITHUB_TOKEN: ${{ secrets.DOCS_GITHUB_TOKEN }}
+      - name: Enable Auto-Merge
+        if: steps.check_docs_changes.outputs.should_run == 'true'
+        uses: peter-evans/enable-pull-request-automerge@v2
+        with:
+          token: ${{ secrets.DOCS_GITHUB_TOKEN }}
+          pull-request-number: ${{ steps.create-pr.outputs.pull-request-number }}
+          merge-method: squash

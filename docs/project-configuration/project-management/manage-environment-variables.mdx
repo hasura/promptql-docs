@@ -1,0 +1,142 @@
+---
+sidebar_position: 6
+sidebar_label: Manage environment variables
+description: "Learn how to manage environment variables across your project."
+keywords:
+  - promptql
+  - quickstart
+  - getting started
+  - guide
+  - collaborate
+  - environment variables
+  - env vars
+  - .env
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Manage Environment Variables
+
+## Introduction
+
+Environment variables are a crucial part of configuring your PromptQL project. They allow you to manage various
+deployments of your application and its connectors. This guide covers how to manage environment variables at both the
+project and connector levels, and how to collaborate effectively with your team.
+
+## Project-level variables
+
+By default, your project uses two main environment files:
+
+1. `.env` - Used for local development
+2. `.env.cloud` - Used for cloud deployments
+
+The root-level `.env` file is automatically loaded by Docker Compose and contains variables that control your local
+development environment. Key variables include:
+
+- `HASURA_DDN_PAT` - Your Hasura Data Delivery Network Personal Access Token
+- `PROMPTQL_SECRET_KEY` - Secret key for PromptQL services
+- `HASURA_DDN_URL` - URL for the Hasura Data Delivery Network
+- `HASURA_LLM_URI` - URI for the LLM service
+- `CORS_ORIGINS` - Allowed CORS origins for the playground
+- `OTEL_EXPORTER_OTLP_ENDPOINT` - OpenTelemetry endpoint
+
+The `.env.cloud` file follows the same structure but contains values specific to your cloud deployment. This separation
+ensures that your local development environment remains isolated from production settings.
+
+:::info You can specify environment variable files using contexts
+
+While these filenames follow our default conventions, you can configure and specify filenames using your project's
+`./hasura/context.yaml` file. Learn more about managing contexts
+[here](/project-configuration/project-management/manage-contexts.mdx).
+
+:::
+
+## Connector-level variables
+
+Each connector in your project can define its own environment variables. These are prefixed with the subgraph name
+(e.g., `APP`) followed by the connector name (e.g., `IMDB`). For example, from our [quickstart](/quickstart.mdx):
+
+For the IMDB connector:
+
+- `APP_IMDB_CONNECTION_URI`
+- `APP_IMDB_HASURA_SERVICE_TOKEN_SECRET`
+- `APP_IMDB_OTEL_EXPORTER_OTLP_ENDPOINT`
+- `APP_IMDB_OTEL_SERVICE_NAME`
+
+For the PromptFlix connector:
+
+- `APP_PROMPTFLIX_HASURA_SERVICE_TOKEN_SECRET`
+- `APP_PROMPTFLIX_OTEL_EXPORTER_OTLP_ENDPOINT`
+- `APP_PROMPTFLIX_OTEL_SERVICE_NAME`
+
+These variables are mapped in the respective `compose.yaml` files of each connector and are automatically loaded from
+your root `.env` or `.env.cloud` file.
+
+## Collaborate
+
+When working with environment variables in a team setting:
+
+1. **Never commit sensitive values**: Your `.env` and `.env.cloud` files should be in `.gitignore`
+2. **Share template files**: Create `.env.example` and `.env.cloud.example` files that show the required variables
+   without actual values
+3. **Document requirements**: Use comments in your environment files to explain what each variable does
+4. **Use consistent naming**: Follow the established naming conventions (e.g., `APP_` prefix for connector variables)
+5. **Version control**: Keep your `.env.cloud` file in version control (without sensitive values) to track deployment
+   configurations
+
+## Add custom environment variables
+
+The [`ddn connector env add` command](reference/cli/commands/ddn_connector_env_add.mdx) is a powerful tool that manages
+environment variables across your entire project. When you add a variable using this command, it:
+
+1. Updates your root-level environment variable files.
+2. Ensures the variable is properly mapped in your connector's configuration.
+3. Maintains consistency across your development and deployment environments.
+
+### How it works
+
+When you run the command, it performs several actions:
+
+1. **Environment File Updates**: The command adds your variable to the specified environment file (defaulting to `.env`
+   if not specified)
+2. **Connector Configuration**: Updates the connector's configuration to recognize the new variable
+3. **Subgraph Integration**: If specified, ensures the variable is properly integrated with your subgraph configuration
+
+:::info Custom environment variables are often used with lambda connectors
+
+While you can use this command to add custom environment variables to any connector, this is most often used with lambda
+connectors which require environment variables for external services, sensitive keys, etc.
+
+Learn more [here](/business-logic/add-env-vars-to-a-lambda.mdx).
+
+:::
+
+## Dynamic cloud variables
+
+Some environment variables in your `.env.cloud` file are dynamic and will change with each new build or deployment.
+These typically include:
+
+- Connector read/write URLs
+- Deployment-specific tokens
+- Build-specific identifiers
+
+### Managing dynamic variables
+
+For production deployments, we strongly recommend using CI/CD pipelines to manage these dynamic variables. This ensures:
+
+1. Variables are always up-to-date with the latest build
+2. No conflicts between team members' local `.env.cloud` files
+3. Consistent deployment configurations
+4. Automated updates of dynamic values
+
+### Handling local development
+
+For local development with dynamic variables:
+
+1. Use the development environment (`.env`) for most testing
+2. Only use `.env.cloud` when testing production-specific features
+3. Be aware that some features requiring dynamic URLs may not work locally
+4. Use the development playground for testing instead of production endpoints
+
+Remember that while you can manually update some values in `.env.cloud`, the dynamic variables should be managed through
+your CI/CD pipeline to ensure consistency and prevent conflicts.
