@@ -4001,17 +4001,46 @@ URL: https://hasura.io/docs/promptql/data-modeling/iterate
 
 # Iterate on your Data Model
 
-After you have successfully created a DDN supergraph to use with PromptQL, you will soon want to iterate on your data
-model to reflect changes in the underlying data sources
+## Introduction
 
-## Changing your underlying data model
+After you've created a DDN supergraph to use with PromptQL, you'll often need to iterate on your data model — whether
+you're adding a new table, refining a command, or evolving your business logic.
+
+This guide explains when and why you need to run `ddn supergraph build local` to ensure your changes are reflected in
+your API.
+
+As a general rule:
+
+- **If your metadata changes** (like models, commands, or relationships): ✅ rebuild.
+- **If your connector signature changes** (like a function’s arguments or return type): ✅ rebuild.
+- **If you're only changing implementation logic** inside a lambda connector (like editing function body): ❌ no rebuild
+  required.
+
+## When to rebuild your application
+
+### You add a new source
+
+Each time you [add a new data source](/data-sources/connect-to-a-source.mdx), you're generating new metadata. This is a
+good rule of thumb: **when metadata changes, a rebuild is required.**
+
+After following the steps in the doc referenced above, introspect your source and add your metadata objects before
+rebuilding.
+
+### You edit metadata
+
+Whether your metadata changes are generated via the CLI or you've hand-authored a change (using the
+[VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura)), you'll need to create a new
+build of your application. This will ensure the JSON configuration files consumed by your Hasura Engine are updated with
+the latest changes.
+
+### You make changes to your underlying data model
 
 Depending on your data source, you may be adding a column to a table in PostgreSQL, or a creating a new collection in
 MongoDB. You may have written new custom logic in TypeScript or want to import a new command from the Stripe connector.
 Whatever it is, you will follow the same steps each time anything changes in your data source schema to iterate on your
 data model.
 
-## Re-introspecting your data model
+#### Re-introspecting your data model
 
 Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
 
@@ -4019,13 +4048,13 @@ Re-introspecting your data model will update the connector configuration to refl
 ddn connector introspect my_connector
 ```
 
-## Viewing resources
+#### Viewing resources
 
 ```ddn title="You can then view the resources that have been discovered by running:"
 ddn connector show-resources my_connector
 ```
 
-## Adding resources
+#### Adding resources
 
 ```ddn title="And add precisely the resources you need running any of the following commands with real values:"
 ddn model add my_connector my_model
@@ -4039,7 +4068,7 @@ ddn command add my_connector "*"
 ddn relationship add my_connector "*"
 ```
 
-## Adding semantic Information
+#### Adding semantic Information
 
 It's highly recommended to provide extra natural language descriptions of the resources in your project so that the
 PromptQL can better understand your data and create appropriate query plans.
@@ -4047,7 +4076,7 @@ PromptQL can better understand your data and create appropriate query plans.
 The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
 context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
-## Building a new supergraph
+#### Building a new supergraph
 
 ```ddn title="You can then build a new local supergraph by running:"
 ddn supergraph build local
@@ -4071,13 +4100,23 @@ ddn supergraph build create
 
 :::
 
-## Restarting services locally
+#### Restarting services locally
 
 If you are iterating locally, you then need to restart the Docker services by running:
 
 ```ddn
 ddn run docker-start
 ```
+
+:::info When is rebuilding not necessary?
+
+In short: any time you make modifications that don't require metadata updates. Notably, if you're quickly iterating on
+the logic of lambda connectors, you can [enable Compose Watch](/business-logic/dev-mode.mdx) to reflect your changes
+instantly and rebuild your lambda connector's container.
+
+:::
+
+
 
 ==============================
 
@@ -17997,9 +18036,46 @@ type** and you want to relate that to a `customers` **model** and whatever objec
 
 **Example:** Fetch a list of orders along with the customer details for each order:
 
-<GraphiQLIDE query={`query OrdersAndCustomers { orders { orderId orderDate customer { customerId name email } } }`}
-response={`{ "data": { "orders": [ { "orderId": "ORD001", "orderDate": "2024-05-10", "customer": { "customerId": "CUST001", "name": "John Doe", "email": "john.doe@example.com" } }, { "orderId": "ORD002", "orderDate": "2024-05-11", "customer": { "customerId": "CUST002", "name": "Jane Smith", "email": "jane.smith@example.com" } } ] } }`}
-/>
+```graphql
+query OrdersAndCustomers {
+  orders {
+    orderId
+    orderDate
+    customer {
+      customerId
+      name
+      email
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "orders": [
+      {
+        "orderId": "ORD001",
+        "orderDate": "2024-05-10",
+        "customer": {
+          "customerId": "CUST001",
+          "name": "John Doe",
+          "email": "john.doe@example.com"
+        }
+      },
+      {
+        "orderId": "ORD002",
+        "orderDate": "2024-05-11",
+        "customer": {
+          "customerId": "CUST002",
+          "name": "Jane Smith",
+          "email": "jane.smith@example.com"
+        }
+      }
+    ]
+  }
+}
+```
 
 Here is the corresponding relationship configuration which enables this query:
 
@@ -18040,9 +18116,47 @@ data and their current session information.
 
 **Example:** fetch a list of users and the current session information of each user:
 
-<GraphiQLIDE query={`query UsersAndCurrentSession { users { id username currentSession { activeSince } } }`}
-response={`{ "data": { "users": [ { "id": 1, "username": "sit_amet", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } }, { "id": 2, "username": "fancy_nibh", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } }, { "id": 3, "username": "just_joe", "currentSession": { "activeSince": "2024-04-01T07:08:22+0000" } } ] } }`}
-/>
+```graphql
+query UsersAndCurrentSession {
+  users {
+    id
+    username
+    currentSession {
+      activeSince
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "users": [
+      {
+        "id": 1,
+        "username": "sit_amet",
+        "currentSession": {
+          "activeSince": "2024-04-01T07:08:22+0000"
+        }
+      },
+      {
+        "id": 2,
+        "username": "fancy_nibh",
+        "currentSession": {
+          "activeSince": "2024-04-01T07:08:22+0000"
+        }
+      },
+      {
+        "id": 3,
+        "username": "just_joe",
+        "currentSession": {
+          "activeSince": "2024-04-01T07:08:22+0000"
+        }
+      }
+    ]
+  }
+}
+```
 
 Here is the corresponding relationship configuration which enables this query:
 
@@ -18072,10 +18186,33 @@ Hasura DDN also allows you to link commands together from a source type to query
 
 **Example:** fetch the result of one command and use it as input for another command:
 
-<GraphiQLIDE
-query={`query TrackOrder { trackOrder(orderId: "ORD12345") { trackingNumber shippingDetails { carrier estimatedDeliveryDate currentStatus } } } `}
-response={`{ "data": { "trackOrder": { "trackingNumber": "1Z9999999999999999", "shippingDetails": { "carrier": "UPS", "estimatedDeliveryDate": "2024-05-25", "currentStatus": "In Transit" } } } } `}
-/>
+```graphql
+query TrackOrder {
+  trackOrder(orderId: "ORD12345") {
+    trackingNumber
+    shippingDetails {
+      carrier
+      estimatedDeliveryDate
+      currentStatus
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "trackOrder": {
+      "trackingNumber": "1Z9999999999999999",
+      "shippingDetails": {
+        "carrier": "UPS",
+        "estimatedDeliveryDate": "2024-05-25",
+        "currentStatus": "In Transit"
+      }
+    }
+  }
+}
+```
 
 And the corresponding relationship configuration which enables this query:
 
