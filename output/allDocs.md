@@ -4190,17 +4190,46 @@ URL: https://hasura.io/docs/promptql/data-modeling/iterate
 
 # Iterate on your Data Model
 
-After you have successfully created a DDN supergraph to use with PromptQL, you will soon want to iterate on your data
-model to reflect changes in the underlying data sources
+## Introduction
 
-## Changing your underlying data model
+After you've created a DDN supergraph to use with PromptQL, you'll often need to iterate on your data model — whether
+you're adding a new table, refining a command, or evolving your business logic.
+
+This guide explains when and why you need to run `ddn supergraph build local` to ensure your changes are reflected in
+your API.
+
+As a general rule:
+
+- **If your metadata changes** (like models, commands, or relationships): ✅ rebuild.
+- **If your connector signature changes** (like a function’s arguments or return type): ✅ rebuild.
+- **If you're only changing implementation logic** inside a lambda connector (like editing function body): ❌ no rebuild
+  required.
+
+## When to rebuild your application
+
+### You add a new source
+
+Each time you [add a new data source](/data-sources/connect-to-a-source.mdx), you're generating new metadata. This is a
+good rule of thumb: **when metadata changes, a rebuild is required.**
+
+After following the steps in the doc referenced above, introspect your source and add your metadata objects before
+rebuilding.
+
+### You edit metadata
+
+Whether your metadata changes are generated via the CLI or you've hand-authored a change (using the
+[VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura)), you'll need to create a new
+build of your application. This will ensure the JSON configuration files consumed by your Hasura Engine are updated with
+the latest changes.
+
+### You make changes to your underlying data model
 
 Depending on your data source, you may be adding a column to a table in PostgreSQL, or a creating a new collection in
 MongoDB. You may have written new custom logic in TypeScript or want to import a new command from the Stripe connector.
 Whatever it is, you will follow the same steps each time anything changes in your data source schema to iterate on your
 data model.
 
-## Re-introspecting your data model
+#### Re-introspecting your data model
 
 Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
 
@@ -4208,13 +4237,13 @@ Re-introspecting your data model will update the connector configuration to refl
 ddn connector introspect my_connector
 ```
 
-## Viewing resources
+#### Viewing resources
 
 ```ddn title="You can then view the resources that have been discovered by running:"
 ddn connector show-resources my_connector
 ```
 
-## Adding resources
+#### Adding resources
 
 ```ddn title="And add precisely the resources you need running any of the following commands with real values:"
 ddn model add my_connector my_model
@@ -4228,7 +4257,7 @@ ddn command add my_connector "*"
 ddn relationship add my_connector "*"
 ```
 
-## Adding semantic Information
+#### Adding semantic Information
 
 It's highly recommended to provide extra natural language descriptions of the resources in your project so that the
 PromptQL can better understand your data and create appropriate query plans.
@@ -4236,7 +4265,7 @@ PromptQL can better understand your data and create appropriate query plans.
 The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
 context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
-## Building a new supergraph
+#### Building a new supergraph
 
 ```ddn title="You can then build a new local supergraph by running:"
 ddn supergraph build local
@@ -4260,13 +4289,21 @@ ddn supergraph build create
 
 :::
 
-## Restarting services locally
+#### Restarting services locally
 
 If you are iterating locally, you then need to restart the Docker services by running:
 
 ```ddn
 ddn run docker-start
 ```
+
+:::info When is rebuilding not necessary?
+
+In short: any time you make modifications that don't require metadata updates. Notably, if you're quickly iterating on
+the logic of lambda connectors, you can [enable Compose Watch](/business-logic/dev-mode.mdx) to reflect your changes
+instantly and rebuild your lambda connector's container.
+
+:::
 
 
 
