@@ -99,6 +99,40 @@ plan. The execution of the query plan should be mechanical and 100% repeatable.
 PromptQL's query plans are composed of steps that are computational and cognitive. These ensures intelligence can be
 precisely used only in the isolated context of the step (eg: "extract project_id from the ticket description").
 
+```mermaid
+flowchart TD
+  subgraph "Create query plan (LLM task)"
+    A[Fetch last 20 open tickets]
+    B[Extract project_id]
+    C[Enrich tickets with more project information]
+    D[Fetch ticket comments]
+    E[Classify ticket criticality]
+    F[Enrich ticket with all the required information]
+    G[Run ranking algorithm]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+    F --> G
+  end
+
+  UI[User input] --> A
+
+  G --> H["Run query plan<br/><i>programmatically</i>"]
+
+  subgraph Inputs
+    I[Tools]
+    J[LLM]
+  end
+
+  I --> H
+  J --> H
+
+  H --> R[Result]
+```
+
 ## 5. Evaluation Methodology
 
 To measure usefulness of introducing an AI system into business processes, we calculate a usefulness score that is a
