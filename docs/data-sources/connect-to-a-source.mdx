@@ -114,6 +114,12 @@ username, and password) or more granular depending on your settings within Snowf
 </TabItem>
 </Tabs>
 
+:::note Escape characters
+
+If your connection string contains special characters, you may need to escape them.
+
+:::
+
 If your data source requires a connection string or endpoint, the CLI will confirm that it successfully tested the
 connection to your source. Additionally, it generates configuration files, which you can find in the `connector`
 directory of the subgraph where you added the connector (default: `app`). Finally, the CLI will create a
