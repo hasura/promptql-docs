@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-sidebar_label: Handle errors
+sidebar_label: Debug & handle errors
 description:
   "Learn how to handle errors effectively to improve PromptQL's understanding and accuracy when interacting with your
   custom business logic."
@@ -14,29 +14,69 @@ keywords:
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 
-# Handle Errors with Lambda Connectors
+# Debug and Handle Errors with Lambda Connectors
 
 ## Introduction
 
-By default, lambda connectors return a generic `internal error` message whenever an exception is encountered in your
-custom business logic and **log the details of the error in the OpenTelemetry trace associated with the request**.
+When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
+error itself. By default, lambda connectors return a generic `internal error` message when exceptions occur, while the
+full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that request.
 
-The Native Data Connector specification identifies a
-[valid set of status codes](https://hasura.github.io/ndc-spec/specification/error-handling.html) which can be used to
-improve PromptQL's understanding of errors when they occur.
+This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
+deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes
+to improve PromptQL's understanding and self-corrective capabilities.
 
-:::info How detailed should error messages be?
+For a full list of supported status codes, refer to the
+[Native Data Connector error specification](https://hasura.github.io/ndc-spec/specification/error-handling.html).
 
-Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
-OpenTelemetry traces to access detailed stack trace information.
+## Debugging
 
-That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
-understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
-accurate interactions with your data over time.
+### Local development
+
+As your connector is running inside a Docker container, any logs (i.e., `console.log()`, `print()`, or `fmt.Println()`)
+from your custom business logic will be visible in the container's logs.
+
+These logs are printed to your terminal when running the default `ddn run docker-start` command, can be viewed by
+running `docker logs <lambda_container_name>`, or via Docker Desktop.
+
+:::info Enable watch mode
+
+We recommend enabling Compose Watch on your lambda connectors to create a shorter feedback loop during development. See
+the guide [here](/business-logic/dev-mode.mdx).
 
 :::
 
-## Return custom error messages
+### Deployed connectors
+
+For deployed connectors, you can use the DDN CLI to locate the connector's build ID and then output the logs to your
+terminal.
+
+#### Step 1. List all builds for a connector
+
+Start by entering a project directory.
+
+```ddn title="For example, to get the list of builds for a connector named my_ts:"
+ddn connector build get --connector-name my_ts
+```
+
+```plaintext title="Which will return a list of all builds for my_ts:"
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+|    CREATION TIME    | SUBGRAPH |          CONNECTORBUILD ID           |   CONNECTOR   |                                   READ URL                                   |                                  WRITE URL                                   |     STATUS     |     HUBCONNECTOR      |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+| 13 Apr 25 19:07 PDT | app      | b336c2f5-de3a-4d11-9f88-52578f3d8d92 | my_ts         | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | deploy_success | hasura/nodejs:v1.13.0 |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+```
+
+#### Step 2. Fetch the logs for a build
+
+```ddn title="Then, use the CONNECTORBUILD ID to fetch the logs:"
+ddn connector build logs b336c2f5-de3a-4d11-9f88-52578f3d8d92
+```
+
+The [`ddn connector build logs` command](/reference/cli/commands/ddn_connector_build_logs.mdx) supports tailing logs
+along with other customizations.
+
+## Returning custom error messages
 
 Lambda connectors allow you to throw classes of errors with your own custom message and metadata to indicate specific
 error conditions. These classes are designed to provide clarity in error handling when PromptQL interacts with your data
@@ -138,7 +178,18 @@ func FunctionHello(ctx context.Context, state *types.State, arguments *HelloArgu
 
 </Tabs>
 
-## Access OpenTelemetry traces
+:::info How detailed should error messages be?
+
+Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
+OpenTelemetry traces to access detailed stack trace information.
+
+That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
+understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
+accurate interactions with your data over time.
+
+:::
+
+### Access OpenTelemetry traces {#access-opentelemetry-traces}
 
 Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
