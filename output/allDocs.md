@@ -4181,17 +4181,240 @@ You can see an example below:
   </Pql>
 </PqlChat>
 
+Threads produce [artifacts](/promptql-playground/artifacts.mdx), which you can export and re-use throughout your thread.
 Additionally, the Playground makes it collaborate and share your project with others, whether as collaborators or
 publicly.
 
 ## Next steps
 
+- [Learn more about threads](/promptql-playground/threads/index.mdx).
+- [Learn what types of artifacts are available](/promptql-playground/artifacts.mdx).
 - [Learn how to make your project public](/promptql-playground/public-projects.mdx).
-- [Learn how to share threads](/promptql-playground/shared-threads.mdx).
 - [Learn how to use saved prompts](/promptql-playground/saved-prompts.mdx).
 - [Learn how to deal with the most common issues](/promptql-playground/troubleshooting.mdx).
 
 ==============================
+
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/
+
+# Threads
+
+Threads are the conversations you have with your data. They are the backbone of the PromptQL Playground and are how you
+interact with your data.
+
+In this section, you'll find tutorials that walk you through some common use cases and best practices for using threads.
+Initially, we recommend checking out common use cases:
+
+- [Share a thread](/promptql-playground/threads/1-shared-threads.mdx)
+- [Check threads history across all users (as an admin)](/promptql-playground/threads/2-thread-history.mdx)
+
+
+
+==============================
+
+
+
+# 2-thread-history.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/2-thread-history
+
+
+# Thread History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads created within your project. This powerful feature
+allows you to monitor conversations, review interactions, and gain insights into how users are engaging with your data.
+
+- View all threads from every user in your project
+- Access complete conversation history in read-only mode
+- Filter and search through threads to find specific interactions
+- Analyze usage patterns and identify common queries
+
+## Accessing Thread History
+
+Navigate to the **Insights** tab in your project dashboard, then select the **Thread History** section to view all
+threads.
+
+<Thumbnail src="/img/get-started/thread-history-1.png" alt="Thread History Location" />
+
+## Select date range
+
+The Thread History interface allows you to select a date range to filter the threads.
+
+<Thumbnail src="/img/get-started/thread-history-2.png" alt="Thread History List" />
+
+## Viewing Threads
+
+The Thread History interface displays all conversations in a chronological list. Each entry shows:
+
+- Thread ID
+- Thread title
+- User who created the thread
+- Creation date and time
+
+<Thumbnail src="/img/get-started/thread-history-3.png" alt="Thread History List" />
+
+## Thread Details
+
+Click on any thread ID to view its complete contents. The detailed view provides:
+
+- Full conversation history
+- All queries executed within the thread
+- Any visualizations or results generated
+- Timestamps for each interaction
+
+<Thumbnail src="/img/get-started/thread-history-4.png" alt="Thread History Detail View" />
+
+## Admin Capabilities
+
+This feature is only available to users with the `admin` role. As an admin, you can view threads in read-only mode. This
+ensures that the original conversations remain intact while still providing complete visibility into how users are
+interacting with your data.
+
+This feature is particularly valuable for:
+
+- Troubleshooting user issues
+- Identifying common usage patterns
+- Improving data models based on user queries
+- Monitoring for potential misuse or security concerns
+
+
+
+==============================
+
+
+
+# 1-shared-threads.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/1-shared-threads
+
+
+# Shared Threads
+
+## Introduction
+
+You can extend the functionality of the Public PromptQL Playground and share a thread publicly.
+
+- You can share specific chat threads with anyone — quickly and effortlessly.
+- Users can view a shared thread without logging in.
+- Your shared thread is accessible via a public link, with no sign-up or login required for viewers. Allowing you to
+  share your insights with the world, whether it's an interesting conversation or an impressive query result with
+  artifacts.
+
+## Share
+
+To share a thread publicly, simply click the `Share` button in the thread.
+
+<Thumbnail src="/img/get-started/shared-threads.jpeg" alt="Shared Threads" />
+
+Sharing a thread doesn't reveal any identifiable information about your project. Only the content of the thread itself
+is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
+conversation intact.
+
+
+
+==============================
+
+
+
+# artifacts.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/artifacts
+
+
+# Artifacts
+
+## Introduction
+
+Artifacts are reusable outputs generated by programs in the Playground. They allow you to reference, inspect, and reuse
+results such as text, tables, and visualizations across interactions.
+
+When a program returns a supported output type, PromptQL automatically stores it as an artifact. These artifacts can
+then be linked across steps in a thread, reused in new instructions, or exported for use elsewhere.
+
+## Types of artifacts
+
+### TextArtifact
+
+**Type**: `"text"`  
+**Data shape**: `string`
+
+Text artifacts store plain text — like summaries, explanations, or generated responses. They're ideal for lightweight
+results that don’t require structure or formatting. In the Playground, a short preview is shown to help you quickly
+identify the content.
+
+For example, if a program returns a single paragraph explaining a dataset, PromptQL will save that result as a
+`TextArtifact`.
+
+<Thumbnail alt="Text artifact in the Playground" src="/img/promptql-playground/textartifact.png" />
+
+### TableArtifact
+
+**Type**: `"table"`  
+**Data shape**: `list of objects`, where each object represents a row and keys are column names
+
+Table artifacts are used for structured data. Whether you're returning a list of users, products, or any tabular output,
+the system recognizes it and saves it as a `TableArtifact`.
+
+In the Playground, you'll see the number of rows and a small sample preview. This is useful for quickly scanning the
+data before diving deeper or using it as input to a follow-up question.
+
+<Thumbnail alt="Table artifact in the Playground" src="/img/promptql-playground/tableartifact.png" />
+
+### VisualizationArtifact
+
+**Type**: `"visualization"`  
+**Data shape**: an object containing:
+
+- `html`: string of rendered visualization markup
+- `visualization_data`: the structured data used to create the visualization
+
+Visualization artifacts are built for more expressive output — like charts, graphs, or custom visuals. When a program
+returns a visualization with HTML and data, it’s stored as a `VisualizationArtifact`, enabling rich visual exploration
+directly in the Playground.
+
+In the interface, the visualization is rendered from the HTML output, giving you a visual snapshot of your program’s
+result.
+
+<Thumbnail alt="Visualization artifact in the Playground" src="/img/promptql-playground/visualizationartifact.png" />
+
+## Exporting artifacts
+
+Each artifact contains set of three options for exporting data.
+
+### Copy data
+
+The first allows you to copy the raw data. For text artifacts, this is simply a string of text; for table artifacts,
+it's an array of JSON objects; and for visualization artifacts, this is the HTML of the visualization in addition to the
+JSON of the underlying and visualized data.
+
+### Download data
+
+The download option is identical to the copy option, but provides a context-appropriate file type (e.g., tables are
+represented as CSV files).
+
+### Download artifact definition
+
+The artifact definition option provides a JSON file for each artifact that provides additional information, such as the
+identifier, along with the artifact's raw data.
+
+:::info reuse artifacts
+
+You can reuse artifacts via the PromptQL Playground; look for the share icon in the top-right corner of an artifact to
+reuse it in a new thread.
+
+:::
+
+
+
+==============================
+
+
 
 # public-projects.mdx
 
@@ -4310,33 +4533,7 @@ complex prompts with spaces or special symbols can be shared without issues.
 
 ==============================
 
-# shared-threads.mdx
 
-URL: https://hasura.io/docs/promptql/promptql-playground/shared-threads
-
-# Shared Threads
-
-## Introduction
-
-You can extend the functionality of the Public PromptQL Playground with and share a thread publicly.
-
-- You can share specific chat threads with anyone — quickly and effortlessly.
-- Users can view a shared thread without logging in.
-- Your shared thread is accessible via a public link, with no sign-up or login required for viewers. It's as simple as
-  sharing your insights with the world, whether it's an interesting conversation or an impressive query result with
-  artifacts.
-
-## Share
-
-To share a thread publicly, simply click the `Share` button in the thread.
-
-<Thumbnail src="/img/get-started/shared-threads.jpeg" alt="Shared Threads" />
-
-Sharing a thread doesn't reveal any publicly identifiable information about your project—only the content of the thread
-itself is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
-conversation intact.
-
-==============================
 
 # troubleshooting.mdx
 
