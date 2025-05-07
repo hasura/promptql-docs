@@ -4372,17 +4372,142 @@ You can see an example below:
   </Pql>
 </PqlChat>
 
-Conversations produce [artifacts](/promptql-playground/artifacts.mdx), which you can export and re-use throughout your
-thread. Additionally, the Playground makes it collaborate and share your project with others, whether as collaborators
-or publicly.
+Threads produce [artifacts](/promptql-playground/artifacts.mdx), which you can export and re-use throughout your thread.
+Additionally, the Playground makes it collaborate and share your project with others, whether as collaborators or
+publicly.
 
 ## Next steps
 
+- [Learn more about threads](/promptql-playground/threads/index.mdx).
 - [Learn what types of artifacts are available](/promptql-playground/artifacts.mdx).
 - [Learn how to make your project public](/promptql-playground/public-projects.mdx).
-- [Learn how to share threads](/promptql-playground/shared-threads.mdx).
 - [Learn how to use saved prompts](/promptql-playground/saved-prompts.mdx).
 - [Learn how to deal with the most common issues](/promptql-playground/troubleshooting.mdx).
+
+
+
+==============================
+
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/
+
+# Threads
+
+Threads are the conversations you have with your data. They are the backbone of the PromptQL Playground and are how you
+interact with your data.
+
+In this section, you'll find tutorials that walk you through some common use cases and best practices for using threads.
+Initially, we recommend checking out common use cases:
+
+- [Share a thread](/promptql-playground/threads/1-shared-threads.mdx)
+- [Check threads history across all users (as an admin)](/promptql-playground/threads/2-thread-history.mdx)
+
+
+
+==============================
+
+
+
+# 2-thread-history.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/2-thread-history
+
+
+# Thread History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads created within your project. This powerful feature
+allows you to monitor conversations, review interactions, and gain insights into how users are engaging with your data.
+
+- View all threads from every user in your project
+- Access complete conversation history in read-only mode
+- Filter and search through threads to find specific interactions
+- Analyze usage patterns and identify common queries
+
+## Accessing Thread History
+
+Navigate to the **Insights** tab in your project dashboard, then select the **Thread History** section to view all
+threads.
+
+<Thumbnail src="/img/get-started/thread-history-1.png" alt="Thread History Location" />
+
+## Select date range
+
+The Thread History interface allows you to select a date range to filter the threads.
+
+<Thumbnail src="/img/get-started/thread-history-2.png" alt="Thread History List" />
+
+## Viewing Threads
+
+The Thread History interface displays all conversations in a chronological list. Each entry shows:
+
+- Thread ID
+- Thread title
+- User who created the thread
+- Creation date and time
+
+<Thumbnail src="/img/get-started/thread-history-3.png" alt="Thread History List" />
+
+## Thread Details
+
+Click on any thread ID to view its complete contents. The detailed view provides:
+
+- Full conversation history
+- All queries executed within the thread
+- Any visualizations or results generated
+- Timestamps for each interaction
+
+<Thumbnail src="/img/get-started/thread-history-4.png" alt="Thread History Detail View" />
+
+## Admin Capabilities
+
+This feature is only available to users with the `admin` role. As an admin, you can view threads in read-only mode. This
+ensures that the original conversations remain intact while still providing complete visibility into how users are
+interacting with your data.
+
+This feature is particularly valuable for:
+
+- Troubleshooting user issues
+- Identifying common usage patterns
+- Improving data models based on user queries
+- Monitoring for potential misuse or security concerns
+
+
+
+==============================
+
+
+
+# 1-shared-threads.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/1-shared-threads
+
+
+# Shared Threads
+
+## Introduction
+
+You can extend the functionality of the Public PromptQL Playground and share a thread publicly.
+
+- You can share specific chat threads with anyone — quickly and effortlessly.
+- Users can view a shared thread without logging in.
+- Your shared thread is accessible via a public link, with no sign-up or login required for viewers. Allowing you to
+  share your insights with the world, whether it's an interesting conversation or an impressive query result with
+  artifacts.
+
+## Share
+
+To share a thread publicly, simply click the `Share` button in the thread.
+
+<Thumbnail src="/img/get-started/shared-threads.jpeg" alt="Shared Threads" />
+
+Sharing a thread doesn't reveal any identifiable information about your project. Only the content of the thread itself
+is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
+conversation intact.
 
 
 
@@ -4603,39 +4728,6 @@ link is opened.
 
 Special characters in the prompt are automatically escaped to ensure proper functionality. This ensures that even
 complex prompts with spaces or special symbols can be shared without issues.
-
-
-
-==============================
-
-
-
-# shared-threads.mdx
-
-URL: https://hasura.io/docs/promptql/promptql-playground/shared-threads
-
-
-# Shared Threads
-
-## Introduction
-
-You can extend the functionality of the Public PromptQL Playground with and share a thread publicly.
-
-- You can share specific chat threads with anyone — quickly and effortlessly.
-- Users can view a shared thread without logging in.
-- Your shared thread is accessible via a public link, with no sign-up or login required for viewers. It's as simple as
-  sharing your insights with the world, whether it's an interesting conversation or an impressive query result with
-  artifacts.
-
-## Share
-
-To share a thread publicly, simply click the `Share` button in the thread.
-
-<Thumbnail src="/img/get-started/shared-threads.jpeg" alt="Shared Threads" />
-
-Sharing a thread doesn't reveal any publicly identifiable information about your project—only the content of the thread
-itself is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
-conversation intact.
 
 
 
