@@ -1,85 +1,3 @@
-# Hasura PromptQL Documentation
-
-URL: https://hasura.io/docs/promptql/
-
-# Hasura PromptQL Documentation
-
-<div className={'front-matter'}>
-  <div>
-    Talk to your all your data accurately with natural language. 
-    
-    PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
-    tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
-    arbitrarily complex tasks.
-
-    PromptQL's data layer (Hasura DDN) comes with out of the box connectors to a wide range of data sources. These
-    connectors introspect your data sources and code and help you build a high-quality realtime data product.
-
-    <ul>
-      <li>Semantic metadata with relationships</li>
-      <li>Fine-grained entitlements and access control</li>
-    </ul>
-
-    <Link to="/quickstart/">Quickstart.</Link>
-
-  </div>
-  <div className={'video-wrapper'}>
-    <div className={'video-aspect-ratio'}>
-      <iframe
-        src={"https://www.youtube.com/embed/nGcf09iVQbk"}
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    </div>
-  </div>
-</div>
-
-## Demos
-
-Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
-connected data sources and will suggest some ways of interacting with the application.
-
-<div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Handshake className="demo-icon" />
-  </div>
-  <h3>GTM</h3>
-  <p>
-    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
-    drive strategic business decisions.
-  </p>
-  <div class="demo-cta-button">Explore the GTM demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Healthcare className="demo-icon" />
-  </div>
-  <h3>Healthcare</h3>
-  <p>
-    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
-    operational efficiency while maintaining compliance.
-  </p>
-  <div class="demo-cta-button">Explore the Healthcare demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Banking className="demo-icon" />
-  </div>
-  <h3>AML</h3>
-  <p>
-    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
-    transaction data, uncovering suspicious patterns, and enhancing compliance.
-  </p>
-  <div class="demo-cta-button">Explore the AML demo</div>
-</a>
-
-</div>
-
-==============================
-
 # quickstart.mdx
 
 URL: https://hasura.io/docs/promptql/quickstart
@@ -370,6 +288,95 @@ project or invite additional users.
 You can also choose “Request Access” so that anyone who arrives at the project URL can request access.
 
 ==============================
+
+
+
+# Hasura PromptQL Documentation
+
+URL: https://hasura.io/docs/promptql/
+
+
+# Hasura PromptQL Documentation
+
+<div className={'front-matter'}>
+  <div>
+    Talk to your all your data accurately with natural language. 
+    
+    PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
+    tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
+    arbitrarily complex tasks.
+
+    PromptQL's data layer (Hasura DDN) comes with out of the box connectors to a wide range of data sources. These
+    connectors introspect your data sources and code and help you build a high-quality realtime data product.
+
+    <ul>
+      <li>Semantic metadata with relationships</li>
+      <li>Fine-grained entitlements and access control</li>
+    </ul>
+
+    <Link to="/quickstart/">Quickstart.</Link>
+
+  </div>
+  <div className={'video-wrapper'}>
+    <div className={'video-aspect-ratio'}>
+      <iframe
+        src={"https://www.youtube.com/embed/nGcf09iVQbk"}
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  </div>
+</div>
+
+## Demos
+
+Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
+connected data sources and will suggest some ways of interacting with the application.
+
+<div className="homepage-demo-grid">
+  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Handshake className="demo-icon" />
+  </div>
+  <h3>GTM</h3>
+  <p>
+    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
+    drive strategic business decisions.
+  </p>
+  <div class="demo-cta-button">Explore the GTM demo</div>
+</a>
+
+<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Healthcare className="demo-icon" />
+  </div>
+  <h3>Healthcare</h3>
+  <p>
+    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
+    operational efficiency while maintaining compliance.
+  </p>
+  <div class="demo-cta-button">Explore the Healthcare demo</div>
+</a>
+
+<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Banking className="demo-icon" />
+  </div>
+  <h3>AML</h3>
+  <p>
+    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
+    transaction data, uncovering suspicious patterns, and enhancing compliance.
+  </p>
+  <div class="demo-cta-button">Explore the AML demo</div>
+</a>
+
+</div>
+
+
+
+==============================
+
+
 
 # overview.mdx
 
@@ -3394,6 +3401,8 @@ You can learn more about models in the metadata reference [docs](/reference/meta
 
 ==============================
 
+
+
 # command.mdx
 
 URL: https://hasura.io/docs/promptql/data-modeling/command
@@ -3838,6 +3847,175 @@ You can learn more about relationships in the metadata reference
 [docs](/reference/metadata-reference/relationships.mdx).
 
 ==============================
+
+# relationship.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/relationship
+
+
+# Relationships Connect Data
+
+## Introduction
+
+Relationships allow you to connect your data, enabling PromptQL to understand the semantic connections between your data
+entities and accurately talk to all your data. By defining these relationships, PromptQL can generate intelligent query
+plans that navigate complex data structures to provide meaningful insights.
+
+Examples of how PromptQL uses relationships to deliver powerful insights:
+
+- When asking PromptQL about a customer's purchasing patterns, it can understand the relationship between `Customer`,
+  their `Orders`, and each `Product` item in those orders, delivering comprehensive purchasing analysis. (Model to
+  Model)
+- When requesting customer behavior analytics, PromptQL can correlate a `Customer` with their app usage metrics from
+  another data source, providing cross-data-source insights. (Model to Model in another subgraph or data connector)
+- When analyzing international sales performance, PromptQL can combine `Order` data with live currency conversions from
+  an external API through a lambda data connector, delivering real-time financial analysis. (Model to Command)
+
+Relationships can be added between _any_ kind of semantically related models and/or commands. They do not need to be
+related in the data source by, for example, a foreign key. They also do not need to be backed by the same data source or
+be in the same subgraph.
+
+## Lifecycle
+
+Many relationships can be created automatically by the DDN CLI from detected underlying connections such as foreign
+keys. In such cases the lifecycle in creating a relationship in your metadata is as follows:
+
+1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
+2. Add the detected relationships to your metadata with the DDN CLI.
+3. Create a build of your supergraph API with the DDN CLI.
+4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
+5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
+
+<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
+
+If the relationship cannot be detected automatically, you can easily manually create a relationship in your metadata and
+then perform lifecycle steps 3-5 from above as needed.
+
+## Create a relationship
+
+Relationships are defined in metadata from an
+[object type](/reference/metadata-reference/types.mdx#objecttype-objecttype), to a
+[model](/reference/metadata-reference/models.mdx) or [command](/reference/metadata-reference/commands.mdx). But since
+models and commands are also defined with object types, you can think of relationships as being between models and/or
+commands.
+
+The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
+operation.
+
+### Using the DDN CLI
+
+The DDN CLI and your data connectors will detect many relationships in your data sources automatically, for instance
+from foreign keys in a relational database, and once introspected, you can add them to your metadata.
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Show the found relationships:"
+ddn connector show-resources <connector_name>
+```
+
+```ddn title="Add a relationship to your metadata:"
+ddn relationship add <connector_link_name> <collection_name>
+```
+
+Or optionally add all relationships found for a connector at once:
+
+```ddn
+ddn relationship add <connector_link_name> "*"
+```
+
+:::info Context for CLI commands
+
+Note that the above CLI commands work without also adding the relevant subgraph to the command with the `--subgraph`
+flag because this has been set in the CLI context. You can learn more about creating and switching contexts in the
+[CLI context](/) section. {/* TODO: Add link */}
+
+:::
+
+### Manually creating a relationship
+
+Relationships can also be manually added to your metadata.
+
+The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you to author
+relationships.
+
+For example, you can configure a relationship so that when a user asks PromptQL about a Customer's purchasing history,
+it can also access their Orders data.
+
+```yaml title="Create a relationship in your metadata:"
+---
+kind: Relationship
+version: v1
+definition:
+  sourceType: Customers # The existing source object type which also defines the model
+  name: orders # A name we want to use when we query the Orders from the Customer
+  description: |
+    Links customers to their purchase orders.
+    One customer can have multiple orders.
+    This is a critical business relationship that supports order history lookups, 
+    customer purchase analysis, and revenue attribution.
+    Historical orders are retained even if customer becomes inactive.
+  target:
+    model: # The target can be a model or a command
+      name: Orders # The existing model that we want to access when we query the Orders from the Customer
+      relationshipType: Array # The relationship type which can be Object or Array. Since a customer can have many orders, we use an Array.
+  mapping: # The mapping defines which field on the source object type maps to which field on the target model
+    - source:
+        fieldPath:
+          - fieldName: customerId # The existing field on the source object type that we want to map to the target model
+      target:
+        modelField:
+          - fieldName: customerId # The existing field on the target model that we want to map to the source object type
+```
+
+By defining this `Relationship` object, PromptQL will understand that customers and orders are connected, allowing it to
+generate accurate query plans that can navigate from customer data to their associated orders when responding to user
+queries about customer purchasing behavior.
+
+Learn more about the [Relationship](/reference/metadata-reference/relationships.mdx) object.
+
+## Update a relationship
+
+Your underlying data source may change over time. You can update your relationship to reflect these changes.
+
+If you have an automatically detected relationship and a property on the source object type has changed, you can update
+the relationship to reflect this change.
+
+First, update your connector configuration and models.
+
+```ddn title="Update your source introspection:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Then, update your model:"
+ddn model update <connector_name> <model_name>
+```
+
+Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
+
+```ddn title="Delete your existing relationship manually and add it again:"
+ddn relationship add <connector_link_name> <collection_name>
+```
+
+Or you can update the `Relationship` object manually. Learn more about the
+[Relationship](/reference/metadata-reference/relationships.mdx) object.
+
+## Delete a relationship
+
+If you no longer need a relationship, simply delete the `Relationship` metadata object manually. It is fully
+self-contained.
+
+## Reference
+
+You can learn more about relationships in the metadata reference
+[docs](/reference/metadata-reference/relationships.mdx).
+
+
+
+==============================
+
+
 
 # permissions.mdx
 
@@ -5100,6 +5278,288 @@ the Query Plan in the playground.
 
 ==============================
 
+
+
+# auth.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/auth
+
+# Authentication in APIs
+
+## Introduction
+
+PromptQL endpoints accept a `ddn` object which contains details like your project's URL and what headers to pass along.
+These endpoints accept all DDN-compatible authentication strategies; learn more about these in our
+[auth docs](/auth/overview.mdx).
+
+## Modes
+
+### Default
+
+```json {10} title="By default, you can use the short-lived x-hasura-ddn-token to make requests against the Execute Program API:"
+{
+  "code": "# Get Saving Private Ryan's details\nsql = \"\"\"\nSELECT series_title, overview, genre, director, imdb_rating, released_year\nFROM app.movies\nWHERE LOWER(series_title) = 'saving private ryan'\n\"\"\"\nmovie = executor.run_sql(sql)\n\nif len(movie) == 0:\n    executor.print(\"Movie not found\")\nelse:\n    movie = movie[0]\n    # Prepare text for classification\n    classification_text = f\"\"\"\nMovie: {movie['series_title']}\nOverview: {movie['overview']}\n\"\"\"",
+  "promptql_api_key": "<YOUR_API_KEY>",
+  "ai_primitives_llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN_FROM_THE_PLAYGROUND>"
+    }
+  },
+  "artifacts": []
+}
+```
+
+### JWT & Webhook Mode
+
+```json {10} title="If you're using JWT or Webhook Mode, you'll pass your authentication header:"
+{
+  "code": "# Get Saving Private Ryan's details\nsql = \"\"\"\nSELECT series_title, overview, genre, director, imdb_rating, released_year\nFROM app.movies\nWHERE LOWER(series_title) = 'saving private ryan'\n\"\"\"\nmovie = executor.run_sql(sql)\n\nif len(movie) == 0:\n    executor.print(\"Movie not found\")\nelse:\n    movie = movie[0]\n    # Prepare text for classification\n    classification_text = f\"\"\"\nMovie: {movie['series_title']}\nOverview: {movie['overview']}\n\"\"\"",
+  "promptql_api_key": "<YOUR_API_KEY>",
+  "ai_primitives_llm": {
+    "provider": "hasura"
+  },
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "authorization": "Bearer <YOUR_TOKEN>"
+    }
+  },
+  "artifacts": []
+}
+```
+
+:::info Authorization Strategies
+
+The example above uses the Bearer strategy for the `tokenLocation`. Your setup may be different; consult our
+[auth docs](/auth/overview.mdx) for more information about setting up an authentication mode.
+
+:::
+
+
+
+==============================
+
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/sdk/
+
+# Available SDKs
+
+## Introduction
+
+Hasura provides a set of officially-supported SDKs to make development with PromptQL easier. The following libraries
+enable you to connect to a PromptQL instance and interact with both the
+[Natural Language](/promptql-apis/natural-language-api.mdx) and
+[Execute Program](/promptql-apis/execute-program-api.mdx) APIs.
+
+## Learn more
+
+- [Node.js](/promptql-apis/sdk/nodejs.mdx)
+- [Python](/promptql-apis/sdk/python.mdx)
+- [Go](/promptql-apis/sdk/go.mdx)
+
+
+
+==============================
+
+
+
+# nodejs.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/sdk/nodejs
+
+# Node.js SDK
+
+## Introduction
+
+The Node.js SDK is available [here](https://www.npmjs.com/package/@hasura/promptql).
+
+## Install
+
+```sh title="The SDK can be installed using npm:"
+npm i @hasura/promptql
+```
+
+## Connect
+
+```js title="You'll connect to an instnace by creating a client:"
+
+const client = createPromptQLClient({
+  apiKey: "<your-promptql-api-key>",
+  ddn: {
+    url: "<your-project-endpoint>",
+    headers: {
+      Authorization: "<credential>",
+    },
+  },
+});
+```
+
+## Query the Natural Language API
+
+```js title="Then, use your client to query the Natural Language API:"
+client
+    .queryStream({
+        artifacts: [],
+        interactions: [
+            user_message: {
+                text: 'what can you do?',
+            }
+        ],
+    },
+    async (chunk) => {
+        console.log(chunk);
+    },
+);
+```
+
+## Query the Execute Program API
+
+```ts title="Or, the Exceute Program API:"
+function executeProgram(body: PromptQLExecuteRequest, executeOptions?: FetchOptions) Promise<PromptQlExecutionResult>;
+```
+
+
+
+==============================
+
+
+
+# python.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/sdk/python
+
+# Python SDK
+
+## Introduction
+
+The Python SDK is available [here](https://pypi.org/project/promptql-api-sdk/).
+
+:::info The Python SDK currently supports the Natural Language API
+
+Support for the Execute Program API will be released soon.
+
+:::
+
+## Install
+
+```sh title="The SDK can be installed using pip:"
+pip install promptql-api-sdk
+```
+
+```sh title="Or Poetry:"
+poetry add promptql-api-sdk
+```
+
+## Connect
+
+```python title="You'll connect to an instnace by creating a client:"
+from promptql_api_sdk import PromptQLClient
+from promptql_api_sdk.types.models import HasuraLLMProvider
+
+# Initialize the client
+client = PromptQLClient(
+    api_key="your-promptql-api-key",
+    ddn_url="your-ddn-url",
+    llm_provider=HasuraLLMProvider(),
+    timezone="America/Los_Angeles",
+)
+```
+
+## Query the Natural Language API
+
+```python title="Then, use your client to query the Natural Language API:"
+# Send a simple query
+response = client.query("What is the average temperature in San Francisco?")
+print(response.assistant_actions[0].message)
+
+# Use streaming for real-time responses
+for chunk in client.query("Tell me about the weather in New York", stream=True):
+    if hasattr(chunk, "message") and chunk.message:
+        print(chunk.message, end="", flush=True)
+```
+
+
+
+==============================
+
+
+
+# go.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-apis/sdk/go
+
+# Go SDK
+
+## Introduction
+
+The Go SDK is available [here](https://github.com/hasura/promptql-go-sdk).
+
+## Install
+
+```sh title="The SDK can be installed using the Go CLI:"
+go get github.com/hasura/promptql-go-sdk
+```
+
+## Connect
+
+```go title="You'll connect to an instnace by creating a client:"
+    "github.com/hasura/promptql-go-sdk/promptql"
+)
+
+client, err := promptql.NewClient("<promptql-api-key>", &promptql.ClientConfig{
+    DdnBaseURL: "https://your-ddn-project",
+    DdnHeaders: map[string]string{
+        // Optional: add authorization headers if required by your DDN project
+        // "Authorization": "Bearer <token>",
+    },
+})
+
+if err != nil {
+    log.Fatalf("failed to create client: %s", err)
+}
+```
+
+## Query the Natural Language API
+
+```js title="Then, use your client to query the Natural Language API:"
+result, err := client.Query(
+    context.Background(),
+    promptql.NewQueryRequestMessage("what can you do?"),
+)
+
+if err != nil {
+    log.Fatalf("query failed: %s", err)
+}
+
+
+// Get the response
+if len(result.AssistantActions) > 0 {
+    if msg := result.AssistantActions[0].Message.Get(); msg != nil {
+        log.Println(msg)
+    }
+}
+
+```
+
+## Query the Execute Program API
+
+```go title="Or, the Exceute Program API:"
+func (c *Client) ExecuteProgram(ctx context.Context, body api.ExecuteRequest) (*api.PromptQlExecutionResult, error)
+```
+
+
+
+==============================
+
+
+
 # overview.mdx
 
 URL: https://hasura.io/docs/promptql/business-logic/overview
@@ -5564,29 +6024,70 @@ conventions your language of choice prefers. For detailed instructions, refer to
 
 URL: https://hasura.io/docs/promptql/business-logic/errors
 
-# Handle Errors with Lambda Connectors
+
+# Debug and Handle Errors with Lambda Connectors
 
 ## Introduction
 
-By default, lambda connectors return a generic `internal error` message whenever an exception is encountered in your
-custom business logic and **log the details of the error in the OpenTelemetry trace associated with the request**.
+When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
+error itself. By default for security reasons, lambda connectors return a generic `internal error` message when exceptions occur, while the
+full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that request.
 
-The Native Data Connector specification identifies a
-[valid set of status codes](https://hasura.github.io/ndc-spec/specification/error-handling.html) which can be used to
-improve PromptQL's understanding of errors when they occur.
+This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
+deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes
+to improve PromptQL's understanding and self-corrective capabilities.
 
-:::info How detailed should error messages be?
+For a full list of supported status codes, refer to the
+[Native Data Connector error specification](https://hasura.github.io/ndc-spec/specification/error-handling.html).
 
-Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
-OpenTelemetry traces to access detailed stack trace information.
+## Debugging
 
-That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
-understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
-accurate interactions with your data over time.
+### Local development
+
+As your connector is running inside a Docker container, any logs (i.e., `console.log()`, `print()`, or `fmt.Println()`)
+from your custom business logic will be visible in the container's logs.
+
+These logs are printed to your terminal when running the default `ddn run docker-start` command, can be viewed by
+running `docker logs <lambda_container_name>`, or via Docker Desktop.
+
+:::info Enable watch mode
+
+We recommend enabling Compose Watch on your lambda connectors to create a shorter feedback loop during development. See
+the guide [here](/business-logic/dev-mode.mdx).
 
 :::
 
-## Return custom error messages
+### Deployed connectors
+
+For deployed connectors, you can use the DDN CLI to locate the connector's build ID and then output the logs to your
+terminal.
+
+#### Step 1. List all builds for a connector
+
+Start by entering a project directory.
+
+```ddn title="For example, to get the list of builds for a connector named my_ts:"
+ddn connector build get --connector-name my_ts
+```
+
+```plaintext title="Which will return a list of all builds for my_ts:"
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+|    CREATION TIME    | SUBGRAPH |          CONNECTORBUILD ID           |   CONNECTOR   |                                   READ URL                                   |                                  WRITE URL                                   |     STATUS     |     HUBCONNECTOR      |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+| 13 Apr 25 19:07 PDT | app      | b336c2f5-de3a-4d11-9f88-52578f3d8d92 | my_ts         | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | deploy_success | hasura/nodejs:v1.13.0 |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+```
+
+#### Step 2. Fetch the logs for a build
+
+```ddn title="Then, use the CONNECTORBUILD ID to fetch the logs:"
+ddn connector build logs b336c2f5-de3a-4d11-9f88-52578f3d8d92
+```
+
+The [`ddn connector build logs` command](/reference/cli/commands/ddn_connector_build_logs.mdx) supports tailing logs
+along with other customizations.
+
+## Returning custom error messages
 
 Lambda connectors allow you to throw classes of errors with your own custom message and metadata to indicate specific
 error conditions. These classes are designed to provide clarity in error handling when PromptQL interacts with your data
@@ -5685,13 +6186,26 @@ func FunctionHello(ctx context.Context, state *types.State, arguments *HelloArgu
 
 </Tabs>
 
-## Access OpenTelemetry traces
+:::info How detailed should error messages be?
+
+Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
+OpenTelemetry traces to access detailed stack trace information.
+
+That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
+understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
+accurate interactions with your data over time.
+
+:::
+
+### Access OpenTelemetry traces {#access-opentelemetry-traces}
 
 Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
 improvements can be made to enhance accuracy.
 
 ==============================
+
+
 
 # Authentication and Authorization Overview
 
@@ -5780,6 +6294,47 @@ variables if there are any set.
 <Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
 
 ==============================
+
+# playground-auth.mdx
+
+URL: https://hasura.io/docs/promptql/auth/playground-auth
+
+
+# PromptQL Playground Auth
+
+You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
+of the chat dialogue.
+
+<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
+
+## Configure headers
+
+<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
+
+In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
+engine for each request.
+
+You can also add custom headers to the request by clicking the `+` button.
+
+:::info Reserved headers
+
+The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
+passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
+
+:::
+
+## Authorization
+
+The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
+variables if there are any set.
+
+<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
+
+
+
+==============================
+
+
 
 # Recipes
 
@@ -10810,6 +11365,8 @@ subgraph can be added to an existing or private team repository. Learn more
 
 ==============================
 
+
+
 # work-with-multiple-repositories.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-repositories
@@ -11323,6 +11880,109 @@ CLI-generated environment variables for a subgraph typically start with the `<SU
 - [Project configuration](/project-configuration/overview.mdx)
 
 ==============================
+
+# remove-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
+
+
+
+==============================
+
+
 
 # rename-subgraph.mdx
 
@@ -13574,24 +14234,7 @@ Ready to get started with Hasura Private DDN? Here's what you can do next:
 
 ==============================
 
-# index.mdx
 
-URL: https://hasura.io/docs/promptql/private-ddn/architecture/
-
-# Private DDN
-
-With Private deployment for Hasura DDN and PromptQL, you can run Hasura and your connectors either on dedicated
-infrastructure hosted by Hasura or on your own infrastructure. In both cases, Hasura's automated systems will be
-managing the infrastructure ensuring uptime and reliability.
-
-Private Hasura DDN offers enhanced security and isolation by enabling private connectivity for your databases, APIs, and
-connectors. Hasura communicates with your sources over a dedicated private network, bypassing the public internet.
-
-- [Dedicated](/private-ddn/architecture/dedicated) private deployments
-- [BYOC](/private-ddn/architecture/byoc) private deployments
-- [Fully Self-Hosted](/private-ddn/architecture/self-hosted) private deployments
-
-==============================
 
 # dedicated.mdx
 
@@ -13622,6 +14265,31 @@ Please reach out to us if you need support for another cloud or configuration th
 To get started with Hasura DDN in Hasura Hosted VPC deployment mode, [contact sales](https://hasura.io/contact-us).
 
 ==============================
+
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/
+
+# Private DDN
+
+With Private deployment for Hasura DDN and PromptQL, you can run Hasura and your connectors either on dedicated
+infrastructure hosted by Hasura or on your own infrastructure. In both cases, Hasura's automated systems will be
+managing the infrastructure ensuring uptime and reliability.
+
+Private Hasura DDN offers enhanced security and isolation by enabling private connectivity for your databases, APIs, and
+connectors. Hasura communicates with your sources over a dedicated private network, bypassing the public internet.
+
+- [Dedicated](/private-ddn/architecture/dedicated) private deployments
+- [BYOC](/private-ddn/architecture/byoc) private deployments
+- [Fully Self-Hosted](/private-ddn/architecture/self-hosted) private deployments
+
+
+
+==============================
+
+
 
 # byoc.mdx
 
@@ -13747,19 +14415,7 @@ To get started with Hasura DDN in your own infrastructure, [contact sales](https
 
 ==============================
 
-# index.mdx
 
-URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/
-
-# Introduction
-
-A Data Plane in Hasura provides dedicated infrastructure for running your GraphQL workloads. This guide walks you
-through the process of creating a new Data Plane.
-
-- [Dedicated](/private-ddn/creating-a-data-plane/dedicated.mdx) private deployment
-- [BYOC](/private-ddn/creating-a-data-plane/byoc.mdx) private deployment
-
-==============================
 
 # dedicated.mdx
 
@@ -14016,6 +14672,26 @@ Now that you've created a Data Plane on dedicated Private DDN,
 [learn how to add collaborators](/private-ddn/data-plane-collaboration.mdx) so they can create projects.
 
 ==============================
+
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/
+
+# Introduction
+
+A Data Plane in Hasura provides dedicated infrastructure for running your GraphQL workloads. This guide walks you
+through the process of creating a new Data Plane.
+
+- [Dedicated](/private-ddn/creating-a-data-plane/dedicated.mdx) private deployment
+- [BYOC](/private-ddn/creating-a-data-plane/byoc.mdx) private deployment
+
+
+
+==============================
+
+
 
 # byoc.mdx
 
@@ -25961,6 +26637,8 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 ==============================
 
+
+
 # ddn_subgraph_delete.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_delete
@@ -26066,6 +26744,62 @@ ddn update-cli [flags]
 
 ==============================
 
+# ddn_update-cli.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+
+
+
+==============================
+
+
+
 # ddn_subgraph_init.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_init
@@ -26160,6 +26894,57 @@ Perform Supergraph-related operations
 
 ==============================
 
+
+
+# ddn_completion.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion
+
+# DDN CLI: ddn completion
+
+Generate autocompletion scripts for the DDN CLI for the specified shell.
+
+## Synopsis
+
+Generate the autocompletion script for DDN for the specified shell.  
+See each sub-command's help for details on how to use the generated script.
+
+```bash
+ddn completion [command] [flags]
+```
+
+## Available commands
+
+- [bash](/reference/cli/commands/ddn_completion_bash): Generate the autocompletion script for bash
+- [fish](/reference/cli/commands/ddn_completion_fish): Generate the autocompletion script for fish
+- [powershell](/reference/cli/commands/ddn_completion_powershell): Generate the autocompletion script for PowerShell
+- [zsh](/reference/cli/commands/ddn_completion_zsh): Generate the autocompletion script for zsh
+
+## Options
+
+```sass
+-h, --help   help for completion
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+
+
+
+==============================
+
+
+
 # ddn_supergraph_build.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build
@@ -26210,34 +26995,40 @@ This subset of commands will help you manage the lifecycle of local and cloud bu
 
 ==============================
 
-# ddn_completion.mdx
 
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion
 
-# DDN CLI: ddn completion
+# ddn_supergraph_build_apply.mdx
 
-Generate autocompletion scripts for the DDN CLI for the specified shell.
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_apply
+
+# DDN CLI: ddn supergraph build apply
+
+Apply a SupergraphBuild to its Project on Hasura DDN.
 
 ## Synopsis
 
-Generate the autocompletion script for DDN for the specified shell.  
-See each sub-command's help for details on how to use the generated script.
+Apply a SupergraphBuild to its Project on Hasura DDN
 
 ```bash
-ddn completion [command] [flags]
+ddn supergraph build apply <supergraph-build-version> [flags]
 ```
 
-## Available commands
+## Examples
 
-- [bash](/reference/cli/commands/ddn_completion_bash): Generate the autocompletion script for bash
-- [fish](/reference/cli/commands/ddn_completion_fish): Generate the autocompletion script for fish
-- [powershell](/reference/cli/commands/ddn_completion_powershell): Generate the autocompletion script for PowerShell
-- [zsh](/reference/cli/commands/ddn_completion_zsh): Generate the autocompletion script for zsh
+```bash
+# Apply a SupergraphBuild to a Project "pet-lion-2649"
+ ddn supergraph build apply <supergraph-build-version> --project pet-lion-2649
+```
 
 ## Options
 
 ```sass
--h, --help   help for completion
+    --ci                       Disables the use of context
+-c, --context string           Name of the context to use. (default <current_context>)
+-h, --help                     help for apply
+    --no-diff                  Do not do a GraphQL schema diff against the applied build
+-p, --project string           DDN Project name
+    --self-hosted-data-plane   Is the data plane self hosted?
 ```
 
 ## Options inherited from parent operations
@@ -26251,7 +27042,7 @@ ddn completion [command] [flags]
 
 ## Parent operation
 
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
 ==============================
 
@@ -26358,6 +27149,59 @@ You will need to start a new shell for this setup to take effect.
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
 
 ==============================
+
+
+
+# ddn_completion_fish.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_fish
+
+# DDN CLI: ddn completion
+
+Generate autocompletion scripts for the DDN CLI for the fish shell.
+
+## Synopsis
+
+Generate the autocompletion script for DDN for the fish shell.
+
+To load completions in your current shell session:
+
+```sass
+        ddn completion fish | source
+```
+
+To load completions for every new session, execute once:
+
+```sass
+        ddn completion fish > ~/.config/fish/completions/ddn.fish
+```
+
+You will need to start a new shell for this setup to take effect.
+
+## Options
+
+```sass
+-h, --help   help for fish completion
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
+
+
+
+==============================
+
+
 
 # ddn_supergraph_build_create.mdx
 
@@ -26482,6 +27326,57 @@ You will need to start a new shell for this setup to take effect.
 
 ==============================
 
+# ddn_supergraph_build_delete.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_delete
+
+# DDN CLI: ddn supergraph build delete
+
+Delete a SupergraphBuild from a Project.
+
+## Synopsis
+
+Delete a SupergraphBuild from a Project
+
+```bash
+ddn supergraph build delete <supergraph-build-version> [flags]
+```
+
+## Examples
+
+```bash
+# Delete a SupergraphBuild from a Project "pet-lion-2649"
+ ddn supergraph build delete <supergraph-build-version> --project pet-lion-2649
+```
+
+## Options
+
+```sass
+    --ci               Disables the use of context
+-c, --context string   Name of the context to use. (default <current_context>)
+-h, --help             help for delete
+-p, --project string   DDN Project name
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
+
+
+
+==============================
+
+
+
 # ddn_completion_powershell.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_powershell
@@ -26523,27 +27418,29 @@ To load completions for every new session, add the output of the above command t
 
 ==============================
 
-# ddn_supergraph_build_delete.mdx
 
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_delete
 
-# DDN CLI: ddn supergraph build delete
+# ddn_supergraph_build_diff.mdx
 
-Delete a SupergraphBuild from a Project.
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_diff
+
+# DDN CLI: ddn supergraph build diff
+
+See changes made to the GraphQL schema from one build version to another..
 
 ## Synopsis
 
-Delete a SupergraphBuild from a Project
+See changes made to the GraphQL schema from one build version to another.
 
 ```bash
-ddn supergraph build delete <supergraph-build-version> [flags]
+ddn supergraph build diff <build-version-1> <build-version-2> [flags]
 ```
 
 ## Examples
 
 ```bash
-# Delete a SupergraphBuild from a Project "pet-lion-2649"
- ddn supergraph build delete <supergraph-build-version> --project pet-lion-2649
+# Compare changes made to the GraphQL schema from build version "qfrr5e5jyw" to "g6v6nh73h0" for Project "pet-lion-2649"
+ ddn supergraph build diff qfrr5e5jyw g6v6nh73h0 --project pet-lion-2649
 ```
 
 ## Options
@@ -26551,7 +27448,7 @@ ddn supergraph build delete <supergraph-build-version> [flags]
 ```sass
     --ci               Disables the use of context
 -c, --context string   Name of the context to use. (default <current_context>)
--h, --help             help for delete
+-h, --help             help for diff
 -p, --project string   DDN Project name
 ```
 
@@ -26632,27 +27529,29 @@ You will need to start a new shell for this setup to take effect.
 
 ==============================
 
-# ddn_supergraph_build_diff.mdx
 
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_diff
 
-# DDN CLI: ddn supergraph build diff
+# ddn_supergraph_build_export-descriptions.mdx
 
-See changes made to the GraphQL schema from one build version to another..
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_export-descriptions
+
+# DDN CLI: ddn supergraph build export-descriptions
+
+Export descriptions for a specific supergraph build.
 
 ## Synopsis
 
-See changes made to the GraphQL schema from one build version to another.
+Export descriptions for a specific supergraph build
 
 ```bash
-ddn supergraph build diff <build-version-1> <build-version-2> [flags]
+ddn supergraph build export-descriptions <supergraph-build-version> [flags]
 ```
 
 ## Examples
 
 ```bash
-# Compare changes made to the GraphQL schema from build version "qfrr5e5jyw" to "g6v6nh73h0" for Project "pet-lion-2649"
- ddn supergraph build diff qfrr5e5jyw g6v6nh73h0 --project pet-lion-2649
+# Export descriptions for a specific supergraph build version
+ ddn supergraph build export-descriptions <supergraph-build-version>
 ```
 
 ## Options
@@ -26660,8 +27559,7 @@ ddn supergraph build diff <build-version-1> <build-version-2> [flags]
 ```sass
     --ci               Disables the use of context
 -c, --context string   Name of the context to use. (default <current_context>)
--h, --help             help for diff
--p, --project string   DDN Project name
+-h, --help             help for export-descriptions
 ```
 
 ## Options inherited from parent operations
@@ -26677,7 +27575,11 @@ ddn supergraph build diff <build-version-1> <build-version-2> [flags]
 
 - [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
 
+
+
 ==============================
+
+
 
 # ddn_supergraph_build_get.mdx
 
