@@ -1,0 +1,63 @@
+---
+sidebar_position: 2
+sidebar_label: Node.js
+description: "Get started with the Node.js SDK for PromptQL."
+keywords:
+  - hasura ddn
+  - promptql apis
+  - apis
+  - sdk
+  - node
+---
+
+# Node.js SDK
+
+## Introduction
+
+The Node.js SDK is available [here](https://www.npmjs.com/package/@hasura/promptql).
+
+## Install
+
+```sh title="The SDK can be installed using npm:"
+npm i @hasura/promptql
+```
+
+## Connect
+
+```js title="You'll connect to an instnace by creating a client:"
+import { createPromptQLClient } from "@hasura/promptql";
+
+const client = createPromptQLClient({
+  apiKey: "<your-promptql-api-key>",
+  ddn: {
+    url: "<your-project-endpoint>",
+    headers: {
+      Authorization: "<credential>",
+    },
+  },
+});
+```
+
+## Query the Natural Language API
+
+```js title="Then, use your client to query the Natural Language API:"
+client
+    .queryStream({
+        artifacts: [],
+        interactions: [
+            user_message: {
+                text: 'what can you do?',
+            }
+        ],
+    },
+    async (chunk) => {
+        console.log(chunk);
+    },
+);
+```
+
+## Query the Execute Program API
+
+```ts title="Or, the Exceute Program API:"
+function executeProgram(body: PromptQLExecuteRequest, executeOptions?: FetchOptions) Promise<PromptQlExecutionResult>;
+```
