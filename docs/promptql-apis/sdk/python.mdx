@@ -1,0 +1,61 @@
+---
+sidebar_position: 3
+sidebar_label: Python
+description: "Get started with the Python SDK for PromptQL."
+keywords:
+  - hasura ddn
+  - promptql apis
+  - apis
+  - sdk
+  - python
+---
+
+# Python SDK
+
+## Introduction
+
+The Python SDK is available [here](https://pypi.org/project/promptql-api-sdk/).
+
+:::info The Python SDK currently supports the Natural Language API
+
+Support for the Execute Program API will be released soon.
+
+:::
+
+## Install
+
+```sh title="The SDK can be installed using pip:"
+pip install promptql-api-sdk
+```
+
+```sh title="Or Poetry:"
+poetry add promptql-api-sdk
+```
+
+## Connect
+
+```python title="You'll connect to an instnace by creating a client:"
+from promptql_api_sdk import PromptQLClient
+from promptql_api_sdk.types.models import HasuraLLMProvider
+
+# Initialize the client
+client = PromptQLClient(
+    api_key="your-promptql-api-key",
+    ddn_url="your-ddn-url",
+    llm_provider=HasuraLLMProvider(),
+    timezone="America/Los_Angeles",
+)
+```
+
+## Query the Natural Language API
+
+```python title="Then, use your client to query the Natural Language API:"
+# Send a simple query
+response = client.query("What is the average temperature in San Francisco?")
+print(response.assistant_actions[0].message)
+
+# Use streaming for real-time responses
+for chunk in client.query("Tell me about the weather in New York", stream=True):
+    if hasattr(chunk, "message") and chunk.message:
+        print(chunk.message, end="", flush=True)
+```

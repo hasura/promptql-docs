@@ -1,0 +1,71 @@
+---
+sidebar_position: 4
+sidebar_label: Go
+description: "Get started with the Go SDK for PromptQL."
+keywords:
+  - hasura ddn
+  - promptql apis
+  - apis
+  - sdk
+  - go
+---
+
+# Go SDK
+
+## Introduction
+
+The Go SDK is available [here](https://github.com/hasura/promptql-go-sdk).
+
+## Install
+
+```sh title="The SDK can be installed using the Go CLI:"
+go get github.com/hasura/promptql-go-sdk
+```
+
+## Connect
+
+```go title="You'll connect to an instnace by creating a client:"
+import (
+    "github.com/hasura/promptql-go-sdk/promptql"
+)
+
+client, err := promptql.NewClient("<promptql-api-key>", &promptql.ClientConfig{
+    DdnBaseURL: "https://your-ddn-project",
+    DdnHeaders: map[string]string{
+        // Optional: add authorization headers if required by your DDN project
+        // "Authorization": "Bearer <token>",
+    },
+})
+
+if err != nil {
+    log.Fatalf("failed to create client: %s", err)
+}
+```
+
+## Query the Natural Language API
+
+```js title="Then, use your client to query the Natural Language API:"
+result, err := client.Query(
+    context.Background(),
+    promptql.NewQueryRequestMessage("what can you do?"),
+)
+
+if err != nil {
+    log.Fatalf("query failed: %s", err)
+}
+
+
+// Get the response
+if len(result.AssistantActions) > 0 {
+    if msg := result.AssistantActions[0].Message.Get(); msg != nil {
+        log.Println(msg)
+    }
+}
+
+```
+
+## Query the Execute Program API
+
+```go title="Or, the Exceute Program API:"
+func (c *Client) ExecuteProgram(ctx context.Context, body api.ExecuteRequest) (*api.PromptQlExecutionResult, error)
+```
