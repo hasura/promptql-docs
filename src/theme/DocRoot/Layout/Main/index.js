@@ -5,7 +5,7 @@ import styles from './styles.module.css';
 import Logo from '@site/static/img/logo-light.svg';
 import GithubIcon from '@site/static/icons/github.svg';
 import TwitterIcon from '@site/static/icons/twitter.svg';
-import DiscordIcon from '@site/static/icons/discord.svg';
+import DiscourseIcon from '@site/static/icons/discourse.svg';
 import YoutubeIcon from '@site/static/icons/youtube.svg';
 import LinkedinIcon from '@site/static/icons/linkedin.svg';
 
@@ -36,8 +36,8 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
               <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
                 <TwitterIcon />
               </a>
-              <a href="https://discord.com/invite/hasura" target="_blank" rel="noopener noreferrer">
-                <DiscordIcon />
+              <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
+                <DiscourseIcon />
               </a>
               <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">
                 <YoutubeIcon />
