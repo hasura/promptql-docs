@@ -3,7 +3,7 @@ import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import GithubIcon from '@site/static/icons/github.svg';
 import TwitterIcon from '@site/static/icons/twitter.svg';
-import DiscordIcon from '@site/static/icons/discord.svg';
+import DiscourseIcon from '@site/static/icons/discourse.svg';
 import LinkedInIcon from '@site/static/icons/linkedin.svg';
 import YoutubeIcon from '@site/static/icons/youtube.svg';
 import styles from './styles.module.css';
@@ -39,8 +39,8 @@ const CustomFooter = () => {
           </Link>
         </div>
         <div className={styles['socialBrands']}>
-          <Link href={'https://discord.com/invite/hasura'} rel="noopener noreferrer" aria-label={'Discord'}>
-            <DiscordIcon />
+          <Link href={'https://forum.hasura.io'} rel="noopener noreferrer" aria-label={'Hasura Community Forum'}>
+            <DiscourseIcon />
           </Link>
         </div>
         <div className={styles['socialBrands']}>

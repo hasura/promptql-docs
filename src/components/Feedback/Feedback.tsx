@@ -156,15 +156,15 @@ export const Feedback = () => {
                 <p>
                   If you need help with the issue that led to this low score, you can create a{' '}
                   <a
-                    href="https://github.com/hasura/graphql-engine/issues/new/choose"
+                    href="https://github.com/hasura/promptql-bug-tracker/issues/new/choose"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
                     GitHub issue
                   </a>{' '}
                   if you think this is a bug, or check out our{' '}
-                  <a href="https://hasura.io/discord" target="_blank" rel="noopener noreferrer">
-                    Discord server
+                  <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
+                    Hasura Community Forum
                   </a>
                   , where Hasurians and community users are ready to engage.
                 </p>
