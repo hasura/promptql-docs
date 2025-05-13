@@ -1,3 +1,90 @@
+# Hasura PromptQL Documentation
+
+URL: https://hasura.io/docs/promptql/
+
+
+# Hasura PromptQL Documentation
+
+<div className={'front-matter'}>
+  <div>
+    Talk to your all your data accurately with natural language. 
+    
+    PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
+    tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
+    arbitrarily complex tasks.
+
+    PromptQL's data layer (Hasura DDN) comes with out of the box connectors to a wide range of data sources. These
+    connectors introspect your data sources and code and help you build a high-quality realtime data product.
+
+    <ul>
+      <li>Semantic metadata with relationships</li>
+      <li>Fine-grained entitlements and access control</li>
+    </ul>
+
+    <Link to="/quickstart/">Quickstart.</Link>
+
+  </div>
+  <div className={'video-wrapper'}>
+    <div className={'video-aspect-ratio'}>
+      <iframe
+        src={"https://www.youtube.com/embed/nGcf09iVQbk"}
+        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allowFullScreen
+      />
+    </div>
+  </div>
+</div>
+
+## Demos
+
+Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
+connected data sources and will suggest some ways of interacting with the application.
+
+<div className="homepage-demo-grid">
+  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Handshake className="demo-icon" />
+  </div>
+  <h3>GTM</h3>
+  <p>
+    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
+    drive strategic business decisions.
+  </p>
+  <div class="demo-cta-button">Explore the GTM demo</div>
+</a>
+
+<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Healthcare className="demo-icon" />
+  </div>
+  <h3>Healthcare</h3>
+  <p>
+    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
+    operational efficiency while maintaining compliance.
+  </p>
+  <div class="demo-cta-button">Explore the Healthcare demo</div>
+</a>
+
+<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
+  <div className="icon-wrapper">
+    <Banking className="demo-icon" />
+  </div>
+  <h3>AML</h3>
+  <p>
+    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
+    transaction data, uncovering suspicious patterns, and enhancing compliance.
+  </p>
+  <div class="demo-cta-button">Explore the AML demo</div>
+</a>
+
+</div>
+
+
+
+==============================
+
+
+
 # quickstart.mdx
 
 URL: https://hasura.io/docs/promptql/quickstart
@@ -286,93 +373,6 @@ Users with any access level, including “Read only” can access your PromptQL 
 project or invite additional users.
 
 You can also choose “Request Access” so that anyone who arrives at the project URL can request access.
-
-==============================
-
-
-
-# Hasura PromptQL Documentation
-
-URL: https://hasura.io/docs/promptql/
-
-
-# Hasura PromptQL Documentation
-
-<div className={'front-matter'}>
-  <div>
-    Talk to your all your data accurately with natural language. 
-    
-    PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems. It composes 
-    tool calls and LLM tasks in a way that provides a high degree of explainability, accuracy and repeatability, for 
-    arbitrarily complex tasks.
-
-    PromptQL's data layer (Hasura DDN) comes with out of the box connectors to a wide range of data sources. These
-    connectors introspect your data sources and code and help you build a high-quality realtime data product.
-
-    <ul>
-      <li>Semantic metadata with relationships</li>
-      <li>Fine-grained entitlements and access control</li>
-    </ul>
-
-    <Link to="/quickstart/">Quickstart.</Link>
-
-  </div>
-  <div className={'video-wrapper'}>
-    <div className={'video-aspect-ratio'}>
-      <iframe
-        src={"https://www.youtube.com/embed/nGcf09iVQbk"}
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-        allowFullScreen
-      />
-    </div>
-  </div>
-</div>
-
-## Demos
-
-Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
-connected data sources and will suggest some ways of interacting with the application.
-
-<div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Handshake className="demo-icon" />
-  </div>
-  <h3>GTM</h3>
-  <p>
-    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
-    drive strategic business decisions.
-  </p>
-  <div class="demo-cta-button">Explore the GTM demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Healthcare className="demo-icon" />
-  </div>
-  <h3>Healthcare</h3>
-  <p>
-    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
-    operational efficiency while maintaining compliance.
-  </p>
-  <div class="demo-cta-button">Explore the Healthcare demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Banking className="demo-icon" />
-  </div>
-  <h3>AML</h3>
-  <p>
-    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
-    transaction data, uncovering suspicious patterns, and enhancing compliance.
-  </p>
-  <div class="demo-cta-button">Explore the AML demo</div>
-</a>
-
-</div>
-
-
 
 ==============================
 
@@ -3403,6 +3403,175 @@ You can learn more about models in the metadata reference [docs](/reference/meta
 
 
 
+# relationship.mdx
+
+URL: https://hasura.io/docs/promptql/data-modeling/relationship
+
+
+# Relationships Connect Data
+
+## Introduction
+
+Relationships allow you to connect your data, enabling PromptQL to understand the semantic connections between your data
+entities and accurately talk to all your data. By defining these relationships, PromptQL can generate intelligent query
+plans that navigate complex data structures to provide meaningful insights.
+
+Examples of how PromptQL uses relationships to deliver powerful insights:
+
+- When asking PromptQL about a customer's purchasing patterns, it can understand the relationship between `Customer`,
+  their `Orders`, and each `Product` item in those orders, delivering comprehensive purchasing analysis. (Model to
+  Model)
+- When requesting customer behavior analytics, PromptQL can correlate a `Customer` with their app usage metrics from
+  another data source, providing cross-data-source insights. (Model to Model in another subgraph or data connector)
+- When analyzing international sales performance, PromptQL can combine `Order` data with live currency conversions from
+  an external API through a lambda data connector, delivering real-time financial analysis. (Model to Command)
+
+Relationships can be added between _any_ kind of semantically related models and/or commands. They do not need to be
+related in the data source by, for example, a foreign key. They also do not need to be backed by the same data source or
+be in the same subgraph.
+
+## Lifecycle
+
+Many relationships can be created automatically by the DDN CLI from detected underlying connections such as foreign
+keys. In such cases the lifecycle in creating a relationship in your metadata is as follows:
+
+1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
+2. Add the detected relationships to your metadata with the DDN CLI.
+3. Create a build of your supergraph API with the DDN CLI.
+4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
+5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
+
+<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
+
+If the relationship cannot be detected automatically, you can easily manually create a relationship in your metadata and
+then perform lifecycle steps 3-5 from above as needed.
+
+## Create a relationship
+
+Relationships are defined in metadata from an
+[object type](/reference/metadata-reference/types.mdx#objecttype-objecttype), to a
+[model](/reference/metadata-reference/models.mdx) or [command](/reference/metadata-reference/commands.mdx). But since
+models and commands are also defined with object types, you can think of relationships as being between models and/or
+commands.
+
+The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
+operation.
+
+### Using the DDN CLI
+
+The DDN CLI and your data connectors will detect many relationships in your data sources automatically, for instance
+from foreign keys in a relational database, and once introspected, you can add them to your metadata.
+
+```ddn title="Introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Show the found relationships:"
+ddn connector show-resources <connector_name>
+```
+
+```ddn title="Add a relationship to your metadata:"
+ddn relationship add <connector_link_name> <collection_name>
+```
+
+Or optionally add all relationships found for a connector at once:
+
+```ddn
+ddn relationship add <connector_link_name> "*"
+```
+
+:::info Context for CLI commands
+
+Note that the above CLI commands work without also adding the relevant subgraph to the command with the `--subgraph`
+flag because this has been set in the CLI context. You can learn more about creating and switching contexts in the
+[CLI context](/) section. {/* TODO: Add link */}
+
+:::
+
+### Manually creating a relationship
+
+Relationships can also be manually added to your metadata.
+
+The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you to author
+relationships.
+
+For example, you can configure a relationship so that when a user asks PromptQL about a Customer's purchasing history,
+it can also access their Orders data.
+
+```yaml title="Create a relationship in your metadata:"
+---
+kind: Relationship
+version: v1
+definition:
+  sourceType: Customers # The existing source object type which also defines the model
+  name: orders # A name we want to use when we query the Orders from the Customer
+  description: |
+    Links customers to their purchase orders.
+    One customer can have multiple orders.
+    This is a critical business relationship that supports order history lookups, 
+    customer purchase analysis, and revenue attribution.
+    Historical orders are retained even if customer becomes inactive.
+  target:
+    model: # The target can be a model or a command
+      name: Orders # The existing model that we want to access when we query the Orders from the Customer
+      relationshipType: Array # The relationship type which can be Object or Array. Since a customer can have many orders, we use an Array.
+  mapping: # The mapping defines which field on the source object type maps to which field on the target model
+    - source:
+        fieldPath:
+          - fieldName: customerId # The existing field on the source object type that we want to map to the target model
+      target:
+        modelField:
+          - fieldName: customerId # The existing field on the target model that we want to map to the source object type
+```
+
+By defining this `Relationship` object, PromptQL will understand that customers and orders are connected, allowing it to
+generate accurate query plans that can navigate from customer data to their associated orders when responding to user
+queries about customer purchasing behavior.
+
+Learn more about the [Relationship](/reference/metadata-reference/relationships.mdx) object.
+
+## Update a relationship
+
+Your underlying data source may change over time. You can update your relationship to reflect these changes.
+
+If you have an automatically detected relationship and a property on the source object type has changed, you can update
+the relationship to reflect this change.
+
+First, update your connector configuration and models.
+
+```ddn title="Update your source introspection:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Then, update your model:"
+ddn model update <connector_name> <model_name>
+```
+
+Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
+
+```ddn title="Delete your existing relationship manually and add it again:"
+ddn relationship add <connector_link_name> <collection_name>
+```
+
+Or you can update the `Relationship` object manually. Learn more about the
+[Relationship](/reference/metadata-reference/relationships.mdx) object.
+
+## Delete a relationship
+
+If you no longer need a relationship, simply delete the `Relationship` metadata object manually. It is fully
+self-contained.
+
+## Reference
+
+You can learn more about relationships in the metadata reference
+[docs](/reference/metadata-reference/relationships.mdx).
+
+
+
+==============================
+
+
+
 # command.mdx
 
 URL: https://hasura.io/docs/promptql/data-modeling/command
@@ -3847,175 +4016,6 @@ You can learn more about relationships in the metadata reference
 [docs](/reference/metadata-reference/relationships.mdx).
 
 ==============================
-
-# relationship.mdx
-
-URL: https://hasura.io/docs/promptql/data-modeling/relationship
-
-
-# Relationships Connect Data
-
-## Introduction
-
-Relationships allow you to connect your data, enabling PromptQL to understand the semantic connections between your data
-entities and accurately talk to all your data. By defining these relationships, PromptQL can generate intelligent query
-plans that navigate complex data structures to provide meaningful insights.
-
-Examples of how PromptQL uses relationships to deliver powerful insights:
-
-- When asking PromptQL about a customer's purchasing patterns, it can understand the relationship between `Customer`,
-  their `Orders`, and each `Product` item in those orders, delivering comprehensive purchasing analysis. (Model to
-  Model)
-- When requesting customer behavior analytics, PromptQL can correlate a `Customer` with their app usage metrics from
-  another data source, providing cross-data-source insights. (Model to Model in another subgraph or data connector)
-- When analyzing international sales performance, PromptQL can combine `Order` data with live currency conversions from
-  an external API through a lambda data connector, delivering real-time financial analysis. (Model to Command)
-
-Relationships can be added between _any_ kind of semantically related models and/or commands. They do not need to be
-related in the data source by, for example, a foreign key. They also do not need to be backed by the same data source or
-be in the same subgraph.
-
-## Lifecycle
-
-Many relationships can be created automatically by the DDN CLI from detected underlying connections such as foreign
-keys. In such cases the lifecycle in creating a relationship in your metadata is as follows:
-
-1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
-2. Add the detected relationships to your metadata with the DDN CLI.
-3. Create a build of your supergraph API with the DDN CLI.
-4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
-5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
-
-<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
-
-If the relationship cannot be detected automatically, you can easily manually create a relationship in your metadata and
-then perform lifecycle steps 3-5 from above as needed.
-
-## Create a relationship
-
-Relationships are defined in metadata from an
-[object type](/reference/metadata-reference/types.mdx#objecttype-objecttype), to a
-[model](/reference/metadata-reference/models.mdx) or [command](/reference/metadata-reference/commands.mdx). But since
-models and commands are also defined with object types, you can think of relationships as being between models and/or
-commands.
-
-The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
-operation.
-
-### Using the DDN CLI
-
-The DDN CLI and your data connectors will detect many relationships in your data sources automatically, for instance
-from foreign keys in a relational database, and once introspected, you can add them to your metadata.
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Show the found relationships:"
-ddn connector show-resources <connector_name>
-```
-
-```ddn title="Add a relationship to your metadata:"
-ddn relationship add <connector_link_name> <collection_name>
-```
-
-Or optionally add all relationships found for a connector at once:
-
-```ddn
-ddn relationship add <connector_link_name> "*"
-```
-
-:::info Context for CLI commands
-
-Note that the above CLI commands work without also adding the relevant subgraph to the command with the `--subgraph`
-flag because this has been set in the CLI context. You can learn more about creating and switching contexts in the
-[CLI context](/) section. {/* TODO: Add link */}
-
-:::
-
-### Manually creating a relationship
-
-Relationships can also be manually added to your metadata.
-
-The [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) can help you to author
-relationships.
-
-For example, you can configure a relationship so that when a user asks PromptQL about a Customer's purchasing history,
-it can also access their Orders data.
-
-```yaml title="Create a relationship in your metadata:"
----
-kind: Relationship
-version: v1
-definition:
-  sourceType: Customers # The existing source object type which also defines the model
-  name: orders # A name we want to use when we query the Orders from the Customer
-  description: |
-    Links customers to their purchase orders.
-    One customer can have multiple orders.
-    This is a critical business relationship that supports order history lookups, 
-    customer purchase analysis, and revenue attribution.
-    Historical orders are retained even if customer becomes inactive.
-  target:
-    model: # The target can be a model or a command
-      name: Orders # The existing model that we want to access when we query the Orders from the Customer
-      relationshipType: Array # The relationship type which can be Object or Array. Since a customer can have many orders, we use an Array.
-  mapping: # The mapping defines which field on the source object type maps to which field on the target model
-    - source:
-        fieldPath:
-          - fieldName: customerId # The existing field on the source object type that we want to map to the target model
-      target:
-        modelField:
-          - fieldName: customerId # The existing field on the target model that we want to map to the source object type
-```
-
-By defining this `Relationship` object, PromptQL will understand that customers and orders are connected, allowing it to
-generate accurate query plans that can navigate from customer data to their associated orders when responding to user
-queries about customer purchasing behavior.
-
-Learn more about the [Relationship](/reference/metadata-reference/relationships.mdx) object.
-
-## Update a relationship
-
-Your underlying data source may change over time. You can update your relationship to reflect these changes.
-
-If you have an automatically detected relationship and a property on the source object type has changed, you can update
-the relationship to reflect this change.
-
-First, update your connector configuration and models.
-
-```ddn title="Update your source introspection:"
-ddn connector introspect <connector_name>
-```
-
-```ddn title="Then, update your model:"
-ddn model update <connector_name> <model_name>
-```
-
-Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
-
-```ddn title="Delete your existing relationship manually and add it again:"
-ddn relationship add <connector_link_name> <collection_name>
-```
-
-Or you can update the `Relationship` object manually. Learn more about the
-[Relationship](/reference/metadata-reference/relationships.mdx) object.
-
-## Delete a relationship
-
-If you no longer need a relationship, simply delete the `Relationship` metadata object manually. It is fully
-self-contained.
-
-## Reference
-
-You can learn more about relationships in the metadata reference
-[docs](/reference/metadata-reference/relationships.mdx).
-
-
-
-==============================
-
-
 
 # permissions.mdx
 
@@ -6207,6 +6207,47 @@ improvements can be made to enhance accuracy.
 
 
 
+# playground-auth.mdx
+
+URL: https://hasura.io/docs/promptql/auth/playground-auth
+
+
+# PromptQL Playground Auth
+
+You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
+of the chat dialogue.
+
+<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
+
+## Configure headers
+
+<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
+
+In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
+engine for each request.
+
+You can also add custom headers to the request by clicking the `+` button.
+
+:::info Reserved headers
+
+The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
+passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
+
+:::
+
+## Authorization
+
+The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
+variables if there are any set.
+
+<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
+
+
+
+==============================
+
+
+
 # Authentication and Authorization Overview
 
 URL: https://hasura.io/docs/promptql/auth/overview
@@ -6294,47 +6335,6 @@ variables if there are any set.
 <Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
 
 ==============================
-
-# playground-auth.mdx
-
-URL: https://hasura.io/docs/promptql/auth/playground-auth
-
-
-# PromptQL Playground Auth
-
-You can check the auth which the PromptQL Playground client is using by clicking the Auth button on the left-hand side
-of the chat dialogue.
-
-<Thumbnail src="/img/auth/piql-auth-button.png" alt="Authentication using JWT" />
-
-## Configure headers
-
-<Thumbnail src="/img/auth/piql-configure-headers.png" alt="Authentication using JWT" />
-
-In the headers tab you will be able to see the key value pairs of the headers which are being sent to the Hasura DDN
-engine for each request.
-
-You can also add custom headers to the request by clicking the `+` button.
-
-:::info Reserved headers
-
-The `x-hasura-ddn-token` header is automatically added by the PromptQL Playground client and should not be modified. If
-passing a custom JWT in [JWT mode](/auth/jwt/jwt-mode.mdx) it should be set with another `x-hasura-*` header key.
-
-:::
-
-## Authorization
-
-The `Authorization` tab shows the current authorization mode, current user role, and will show any values of session
-variables if there are any set.
-
-<Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
-
-
-
-==============================
-
-
 
 # Recipes
 
@@ -6721,7 +6721,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ## Ask questions about personal health
 
@@ -6943,7 +6943,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ## Ask questions about your dataset
 
@@ -7101,7 +7101,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ==============================
 
@@ -7227,7 +7227,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ## Ask questions about your dataset
 
@@ -7413,7 +7413,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ## Ask questions about your dataset
 
@@ -7561,7 +7561,7 @@ ddn console --local
 
 This should open up your browser (or print a browser URL) for displaying the Hasura Console. It’ll typically be
 something like:
-[https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
+[https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282](https://promptql.console.hasura.io/local?engine=localhost:3280&promptql=localhost:3282)
 
 ## Ask questions with access to DuckDuckGo search
 
@@ -11367,6 +11367,109 @@ subgraph can be added to an existing or private team repository. Learn more
 
 
 
+# remove-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
+
+
+
+==============================
+
+
+
 # work-with-multiple-repositories.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-repositories
@@ -11438,7 +11541,7 @@ This will serve as the foundation for your first **subgraph** build to expand up
 
 ### Step 5. Invite collaborators
 
-Head to the project's console at [console.hasura.io](https://console.hasura.io) and navigate to
+Head to the project's console at [console.hasura.io](https://promptql.console.hasura.io) and navigate to
 `Setetings/Collaborators`. Then, invite collaborators based on their role:
 
 | Role               | Description                                                                                                    |
@@ -11880,109 +11983,6 @@ CLI-generated environment variables for a subgraph typically start with the `<SU
 - [Project configuration](/project-configuration/overview.mdx)
 
 ==============================
-
-# remove-subgraph.mdx
-
-URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
-
-# Remove a subgraph
-
-## Introduction
-
-In this recipe, you'll learn how to remove a subgraph from your local project directory.
-
-:::info Prerequisites
-
-Before continuing, ensure you have:
-
-- A [local Hasura project](/quickstart.mdx).
-- Stopped any running docker services related to the project.
-
-:::
-
-## Recipe
-
-### Step 1. Delete subgraph directory
-
-Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
-directory is typically located at `<subgraph-name>`.
-
-### Step 2. Update supergraph config files
-
-Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
-
-```yaml title="supergraph.yaml"
-kind: Supergraph
-version: v2
-definition:
-  subgraphs:
-    - globals/subgraph.yaml
-    #highlight-start
-    - <subgraph-name>/subgraph.yaml
-    #highlight-end
-    ...
-```
-
-### Step 3. Update engine compose file
-
-Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
-compose file is typically located at `<project-root>/compose.yaml`.
-
-```yaml title="<project-root>/compose.yaml"
-include:
-  #highlight-start
-  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
-  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
-  #highlight-end
-  ...
-services:
-  engine: ...
-```
-
-### Step 4. Remove subgraph config file from context
-
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
-the `subgraph` key if set as the deleted subgraph config file.
-
-```yaml title=".hasura/context.yaml"
-kind: Context
-version: v3
-definition:
-  current: default
-  contexts:
-    default:
-      supergraph: ../supergraph.yaml
-      #highlight-start
-      subgraph: ../<subgraph-name>/subgraph.yaml
-      #highlight-end
-      ...
-```
-
-### Step 5. (Optional) Remove subgraph relevant environment variables
-
-You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
-CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
-
-```.env title="For example, .env"
-...
-#highlight-start
-<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
-#highlight-end
-...
-```
-
-## Learn more
-
-- [Project configuration](/project-configuration/overview.mdx)
-
-
-
-==============================
-
-
 
 # rename-subgraph.mdx
 
@@ -13322,9 +13322,9 @@ The following are the detailed permissions for the above roles:
 
 ### Step 1. Navigate to the Collaborators section
 
-Open your project's console at [https://console.hasura.io](https://console.hasura.io) and select it from the list of
-available projects. Once the project is open, click `Settings` in the bottom-left corner and then select `Collaborators`
-from the `Project Settings` menu:
+Open your project's console at [https://promptql.console.hasura.io](https://promptql.console.hasura.io) and select it
+from the list of available projects. Once the project is open, click `Settings` in the bottom-left corner and then
+select `Collaborators` from the `Project Settings` menu:
 
 <Thumbnail src="/img/ci-cd/0.0.1_console_invite-collaborator.png" alt="Invite a collaborator" width="1000" />
 
@@ -13349,8 +13349,8 @@ The invitee will receive an email with a link allowing them to accept the invite
 ### Step 1. Click the link in your email
 
 From your email, click the `View invitation` button. This will send you to
-[https://console.hasura.io](https://console.hasura.io) where you can accept it and then explore and contribute to the
-project according your [role](#roles).
+[https://promptql.console.hasura.io](https://promptql.console.hasura.io) where you can accept it and then explore and
+contribute to the project according your [role](#roles).
 
 ### Step 2. Explore the project
 
@@ -13470,8 +13470,8 @@ In order to create service accounts, your project must either be a
 ### Step 1: Navigate to the Service Accounts section
 
 As an owner or administrator on the project, open your project's console at
-[https://console.hasura.io](https://console.hasura.io) and click `Settings` in the bottom-left corner. Then select
-`Service Accounts` from the `Project Settings` menu and click `New Service Account`:
+[https://promptql.console.hasura.io](https://promptql.console.hasura.io) and click `Settings` in the bottom-left corner.
+Then select `Service Accounts` from the `Project Settings` menu and click `New Service Account`:
 
 <Thumbnail
   src="/img/service-account/0.0.1_console_create_service_account.png"
@@ -14236,6 +14236,29 @@ Ready to get started with Hasura Private DDN? Here's what you can do next:
 
 
 
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/architecture/
+
+# Private DDN
+
+With Private deployment for Hasura DDN and PromptQL, you can run Hasura and your connectors either on dedicated
+infrastructure hosted by Hasura or on your own infrastructure. In both cases, Hasura's automated systems will be
+managing the infrastructure ensuring uptime and reliability.
+
+Private Hasura DDN offers enhanced security and isolation by enabling private connectivity for your databases, APIs, and
+connectors. Hasura communicates with your sources over a dedicated private network, bypassing the public internet.
+
+- [Dedicated](/private-ddn/architecture/dedicated) private deployments
+- [BYOC](/private-ddn/architecture/byoc) private deployments
+- [Fully Self-Hosted](/private-ddn/architecture/self-hosted) private deployments
+
+
+
+==============================
+
+
+
 # dedicated.mdx
 
 URL: https://hasura.io/docs/promptql/private-ddn/architecture/dedicated
@@ -14263,29 +14286,6 @@ Please reach out to us if you need support for another cloud or configuration th
 ## Get started
 
 To get started with Hasura DDN in Hasura Hosted VPC deployment mode, [contact sales](https://hasura.io/contact-us).
-
-==============================
-
-
-
-# index.mdx
-
-URL: https://hasura.io/docs/promptql/private-ddn/architecture/
-
-# Private DDN
-
-With Private deployment for Hasura DDN and PromptQL, you can run Hasura and your connectors either on dedicated
-infrastructure hosted by Hasura or on your own infrastructure. In both cases, Hasura's automated systems will be
-managing the infrastructure ensuring uptime and reliability.
-
-Private Hasura DDN offers enhanced security and isolation by enabling private connectivity for your databases, APIs, and
-connectors. Hasura communicates with your sources over a dedicated private network, bypassing the public internet.
-
-- [Dedicated](/private-ddn/architecture/dedicated) private deployments
-- [BYOC](/private-ddn/architecture/byoc) private deployments
-- [Fully Self-Hosted](/private-ddn/architecture/self-hosted) private deployments
-
-
 
 ==============================
 
@@ -14417,6 +14417,24 @@ To get started with Hasura DDN in your own infrastructure, [contact sales](https
 
 
 
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/
+
+# Introduction
+
+A Data Plane in Hasura provides dedicated infrastructure for running your GraphQL workloads. This guide walks you
+through the process of creating a new Data Plane.
+
+- [Dedicated](/private-ddn/creating-a-data-plane/dedicated.mdx) private deployment
+- [BYOC](/private-ddn/creating-a-data-plane/byoc.mdx) private deployment
+
+
+
+==============================
+
+
+
 # dedicated.mdx
 
 URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/dedicated
@@ -14439,7 +14457,7 @@ To create a Data Plane in Private DDN, you'll need an Enterprise contract. Reach
 
 ### Step 1. Create a new Data Plane
 
-Navigate to the `Private DDN` section in your [Hasura console](https://console.hasura.io).
+Navigate to the `Private DDN` section in your [Hasura console](https://promptql.console.hasura.io).
 
 <Thumbnail src="/img/data-plane/private-ddn.png" alt="Data Plane Management" width="1000px" />
 
@@ -14670,24 +14688,6 @@ detailed view page of the selected Data Plane, as illustrated below.
 
 Now that you've created a Data Plane on dedicated Private DDN,
 [learn how to add collaborators](/private-ddn/data-plane-collaboration.mdx) so they can create projects.
-
-==============================
-
-
-
-# index.mdx
-
-URL: https://hasura.io/docs/promptql/private-ddn/creating-a-data-plane/
-
-# Introduction
-
-A Data Plane in Hasura provides dedicated infrastructure for running your GraphQL workloads. This guide walks you
-through the process of creating a new Data Plane.
-
-- [Dedicated](/private-ddn/creating-a-data-plane/dedicated.mdx) private deployment
-- [BYOC](/private-ddn/creating-a-data-plane/byoc.mdx) private deployment
-
-
 
 ==============================
 
@@ -15190,25 +15190,27 @@ and remove collaborators for multi-team collaboration.
 ### Inviting a collaborator
 
 To invite a user to your Data Plane, you need to open the
-[Data Plane Management Dashboard](https://console.hasura.io/data-plane/). The dashboard will show all available Data
-Planes. Select the Data Plane for which you have the `owner` role. Click `Invite Collaborator`. Enter the email address
-of the user you want to invite and click `Send Invites`. The invited user will receive an email with an invitation link.
+[Data Plane Management Dashboard](https://promptql.console.hasura.io/data-plane/). The dashboard will show all available
+Data Planes. Select the Data Plane for which you have the `owner` role. Click `Invite Collaborator`. Enter the email
+address of the user you want to invite and click `Send Invites`. The invited user will receive an email with an
+invitation link.
 
 <Thumbnail src="/img/deployment/invite_data_plane_collaborator.png" alt="Invite Data Plane Collaborator" />
 
 ### Accepting or rejecting an invitation
 
 The invited user can accept or reject the invitation by clicking on the invitation link received in the email or going
-to the [Data Plane Management Dashboard](https://console.hasura.io/data-plane/). The dashboard will show all the invites
-received by the user. The user can accept or reject the invitation by clicking `Accept` or `Decline`.
+to the [Data Plane Management Dashboard](https://promptql.console.hasura.io/data-plane/). The dashboard will show all
+the invites received by the user. The user can accept or reject the invitation by clicking `Accept` or `Decline`.
 
 <Thumbnail src="/img/deployment/accept_reject_data_plane_invitation.png" alt="Accept or Reject Data Plane Invitation" />
 
 ### Removing a collaborator
 
 You can remove any Data Plane collaborator by going to the
-[Data Plane Management Dashboard](https://console.hasura.io/data-plane/). Select the Data Plane for which you have the
-`owner` role, you'll be able to see all the collaborators of the Data Plane. Click `Remove` to remove the collaborator.
+[Data Plane Management Dashboard](https://promptql.console.hasura.io/data-plane/). Select the Data Plane for which you
+have the `owner` role, you'll be able to see all the collaborators of the Data Plane. Click `Remove` to remove the
+collaborator.
 
 <Thumbnail src="/img/deployment/remove_data_plane_collaborator.png" alt="Remove Data Plane Collaborator" />
 
@@ -15522,7 +15524,7 @@ To provision a new workspace in Private DDN, please reach out to us [here](https
 :::
 
 We recommend a dedicated workspace for each developer working on Private DDN API development. Once the workspace has
-been provisioned, it can be launched from the [Private DDN page](https://console.hasura.io/data-plane).
+been provisioned, it can be launched from the [Private DDN page](https://promptql.console.hasura.io/data-plane).
 
 ## Advantages
 
@@ -15562,7 +15564,7 @@ token there.
 
 :::info Get Data Plane ID
 
-You can find all the Data Planes you have access to on this page: https://console.hasura.io/data-plane
+You can find all the Data Planes you have access to on this page: https://promptql.console.hasura.io/data-plane
 
 :::
 
@@ -26639,6 +26641,62 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 
 
+# ddn_update-cli.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+
+
+
+==============================
+
+
+
 # ddn_subgraph_delete.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_delete
@@ -26744,62 +26802,6 @@ ddn update-cli [flags]
 
 ==============================
 
-# ddn_update-cli.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
-
-# DDN CLI: ddn update-cli
-
-Update this CLI to the latest version or to a specific version.
-
-## Synopsis
-
-You can use this command to update the CLI to the latest version or a specific version.
-
-```bash
-ddn update-cli [flags]
-```
-
-## Examples
-
-```bash
-# Update CLI to latest version:
- ddn update-cli
-
-# Update CLI to a specific version (say v1.0.0):
- ddn update-cli --version v1.0.0
-
-# To disable the auto-update check on the CLI, set
-# "show_update_notification": false
-# in ~/.ddn/config.yaml
-```
-
-## Options
-
-```sass
--h, --help             help for update-cli
-    --version string   A specific version to install
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
-
-
-
-==============================
-
-
-
 # ddn_subgraph_init.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_init
@@ -26896,55 +26898,6 @@ Perform Supergraph-related operations
 
 
 
-# ddn_completion.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion
-
-# DDN CLI: ddn completion
-
-Generate autocompletion scripts for the DDN CLI for the specified shell.
-
-## Synopsis
-
-Generate the autocompletion script for DDN for the specified shell.  
-See each sub-command's help for details on how to use the generated script.
-
-```bash
-ddn completion [command] [flags]
-```
-
-## Available commands
-
-- [bash](/reference/cli/commands/ddn_completion_bash): Generate the autocompletion script for bash
-- [fish](/reference/cli/commands/ddn_completion_fish): Generate the autocompletion script for fish
-- [powershell](/reference/cli/commands/ddn_completion_powershell): Generate the autocompletion script for PowerShell
-- [zsh](/reference/cli/commands/ddn_completion_zsh): Generate the autocompletion script for zsh
-
-## Options
-
-```sass
--h, --help   help for completion
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
-
-
-
-==============================
-
-
-
 # ddn_supergraph_build.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build
@@ -26997,38 +26950,34 @@ This subset of commands will help you manage the lifecycle of local and cloud bu
 
 
 
-# ddn_supergraph_build_apply.mdx
+# ddn_completion.mdx
 
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_apply
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion
 
-# DDN CLI: ddn supergraph build apply
+# DDN CLI: ddn completion
 
-Apply a SupergraphBuild to its Project on Hasura DDN.
+Generate autocompletion scripts for the DDN CLI for the specified shell.
 
 ## Synopsis
 
-Apply a SupergraphBuild to its Project on Hasura DDN
+Generate the autocompletion script for DDN for the specified shell.  
+See each sub-command's help for details on how to use the generated script.
 
 ```bash
-ddn supergraph build apply <supergraph-build-version> [flags]
+ddn completion [command] [flags]
 ```
 
-## Examples
+## Available commands
 
-```bash
-# Apply a SupergraphBuild to a Project "pet-lion-2649"
- ddn supergraph build apply <supergraph-build-version> --project pet-lion-2649
-```
+- [bash](/reference/cli/commands/ddn_completion_bash): Generate the autocompletion script for bash
+- [fish](/reference/cli/commands/ddn_completion_fish): Generate the autocompletion script for fish
+- [powershell](/reference/cli/commands/ddn_completion_powershell): Generate the autocompletion script for PowerShell
+- [zsh](/reference/cli/commands/ddn_completion_zsh): Generate the autocompletion script for zsh
 
 ## Options
 
 ```sass
-    --ci                       Disables the use of context
--c, --context string           Name of the context to use. (default <current_context>)
--h, --help                     help for apply
-    --no-diff                  Do not do a GraphQL schema diff against the applied build
--p, --project string           DDN Project name
-    --self-hosted-data-plane   Is the data plane self hosted?
+-h, --help   help for completion
 ```
 
 ## Options inherited from parent operations
@@ -27042,7 +26991,7 @@ ddn supergraph build apply <supergraph-build-version> [flags]
 
 ## Parent operation
 
-- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
 ==============================
 
@@ -27147,6 +27096,59 @@ You will need to start a new shell for this setup to take effect.
 ## Parent operation
 
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
+
+==============================
+
+
+
+# ddn_supergraph_build_apply.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_apply
+
+# DDN CLI: ddn supergraph build apply
+
+Apply a SupergraphBuild to its Project on Hasura DDN.
+
+## Synopsis
+
+Apply a SupergraphBuild to its Project on Hasura DDN
+
+```bash
+ddn supergraph build apply <supergraph-build-version> [flags]
+```
+
+## Examples
+
+```bash
+# Apply a SupergraphBuild to a Project "pet-lion-2649"
+ ddn supergraph build apply <supergraph-build-version> --project pet-lion-2649
+```
+
+## Options
+
+```sass
+    --ci                       Disables the use of context
+-c, --context string           Name of the context to use. (default <current_context>)
+-h, --help                     help for apply
+    --no-diff                  Do not do a GraphQL schema diff against the applied build
+-p, --project string           DDN Project name
+    --self-hosted-data-plane   Is the data plane self hosted?
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
+
+
 
 ==============================
 
@@ -27326,57 +27328,6 @@ You will need to start a new shell for this setup to take effect.
 
 ==============================
 
-# ddn_supergraph_build_delete.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_delete
-
-# DDN CLI: ddn supergraph build delete
-
-Delete a SupergraphBuild from a Project.
-
-## Synopsis
-
-Delete a SupergraphBuild from a Project
-
-```bash
-ddn supergraph build delete <supergraph-build-version> [flags]
-```
-
-## Examples
-
-```bash
-# Delete a SupergraphBuild from a Project "pet-lion-2649"
- ddn supergraph build delete <supergraph-build-version> --project pet-lion-2649
-```
-
-## Options
-
-```sass
-    --ci               Disables the use of context
--c, --context string   Name of the context to use. (default <current_context>)
--h, --help             help for delete
--p, --project string   DDN Project name
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
-
-
-
-==============================
-
-
-
 # ddn_completion_powershell.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_completion_powershell
@@ -27420,27 +27371,27 @@ To load completions for every new session, add the output of the above command t
 
 
 
-# ddn_supergraph_build_diff.mdx
+# ddn_supergraph_build_delete.mdx
 
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_diff
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_delete
 
-# DDN CLI: ddn supergraph build diff
+# DDN CLI: ddn supergraph build delete
 
-See changes made to the GraphQL schema from one build version to another..
+Delete a SupergraphBuild from a Project.
 
 ## Synopsis
 
-See changes made to the GraphQL schema from one build version to another.
+Delete a SupergraphBuild from a Project
 
 ```bash
-ddn supergraph build diff <build-version-1> <build-version-2> [flags]
+ddn supergraph build delete <supergraph-build-version> [flags]
 ```
 
 ## Examples
 
 ```bash
-# Compare changes made to the GraphQL schema from build version "qfrr5e5jyw" to "g6v6nh73h0" for Project "pet-lion-2649"
- ddn supergraph build diff qfrr5e5jyw g6v6nh73h0 --project pet-lion-2649
+# Delete a SupergraphBuild from a Project "pet-lion-2649"
+ ddn supergraph build delete <supergraph-build-version> --project pet-lion-2649
 ```
 
 ## Options
@@ -27448,7 +27399,7 @@ ddn supergraph build diff <build-version-1> <build-version-2> [flags]
 ```sass
     --ci               Disables the use of context
 -c, --context string   Name of the context to use. (default <current_context>)
--h, --help             help for diff
+-h, --help             help for delete
 -p, --project string   DDN Project name
 ```
 
@@ -27526,6 +27477,57 @@ You will need to start a new shell for this setup to take effect.
 ## Parent operation
 
 - [ddn completion](/reference/cli/commands/ddn_completion) - Generate autocompletion scripts for the DDN CLI
+
+==============================
+
+
+
+# ddn_supergraph_build_diff.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_supergraph_build_diff
+
+# DDN CLI: ddn supergraph build diff
+
+See changes made to the GraphQL schema from one build version to another..
+
+## Synopsis
+
+See changes made to the GraphQL schema from one build version to another.
+
+```bash
+ddn supergraph build diff <build-version-1> <build-version-2> [flags]
+```
+
+## Examples
+
+```bash
+# Compare changes made to the GraphQL schema from build version "qfrr5e5jyw" to "g6v6nh73h0" for Project "pet-lion-2649"
+ ddn supergraph build diff qfrr5e5jyw g6v6nh73h0 --project pet-lion-2649
+```
+
+## Options
+
+```sass
+    --ci               Disables the use of context
+-c, --context string   Name of the context to use. (default <current_context>)
+-h, --help             help for diff
+-p, --project string   DDN Project name
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn supergraph build](/reference/cli/commands/ddn_supergraph_build) - Perform SupergraphBuild-related operations
+
+
 
 ==============================
 
