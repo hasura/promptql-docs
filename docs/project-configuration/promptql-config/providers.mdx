@@ -52,15 +52,16 @@ model.
 
 ### Anthropic
 
-You can use any [Anthropic model](https://docs.anthropic.com/en/docs/about-claude/models/all-models); the following have
-been tested with PromptQL:
+To use an [Anthropic model](https://docs.anthropic.com/en/docs/about-claude/models/all-models), set the `provider` to
+`anthropic`. The following have been tested with PromptQL:
 
 - `claude-3-5-sonnet-latest`
 - `claude-3-7-sonnet-latest`
 
 ### AWS Bedrock
 
-You can use any [Bedrock-wrapped model](https://aws.amazon.com/bedrock/); the following have been tested with PromptQL:
+To use a [Bedrock-wrapped model](https://aws.amazon.com/bedrock/), set the `provider` to `bedorck`. The following have
+been tested with PromptQL:
 
 - Claude 3.5 Sonnet
 - Claude 3.7 Sonnet
@@ -73,8 +74,8 @@ arn:aws:bedrock:<AWS region>:<AWS account ID>:inference-profile/us.anthropic.cla
 
 ### Google Gemini
 
-You can use any [Google Gemini model](https://ai.google.dev/gemini-api/docs/models); the following have been tested with
-PromptQL:
+To use a [Google Gemini model](https://ai.google.dev/gemini-api/docs/models), set the `provider` to `gemini`. The
+following have been tested with PromptQL:
 
 - `gemini-1.5-flash`
 - `gemini-2.0-flash`
@@ -85,11 +86,13 @@ With Hasura—used as the default provider—there is **no specific model necess
 
 ### Microsoft Azure
 
-You can use any [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models).
+To use an [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models), set the
+`provider` to `azure`.
 
 ### OpenAI
 
-You can use any [OpenAI model](https://platform.openai.com/docs/models); the following have been tested with PromptQL:
+To use an [OpenAI model](https://platform.openai.com/docs/models), set the `provider` to `openai`. The following have
+been tested with PromptQL:
 
 - `o1`
 - `o3-mini`
