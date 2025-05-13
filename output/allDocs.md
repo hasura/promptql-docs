@@ -12350,9 +12350,114 @@ definition:
 
 :::info Considerations
 
-- The `model` key is **not supported** when using the `hasura` provider.
-- If `ai_primitives_llm` is not defined, it defaults to the provider specified in the `llm` configuration.
-- `system_instructions` are optional.
+- Set the LLM provider and model used across the application.
+- Define a separate LLM for AI Primitives such as **Classification**, **Summarization**, and **Extraction**.
+- Add system instructions that apply to every PromptQL interaction.
+
+## Next steps
+
+- [Check out how to configure your LLM of choice](/project-configuration/promptql-config/providers.mdx).
+- [Learn how to improve performance by using system instructions](/project-configuration/promptql-config/system-instructions.mdx).
+
+
+
+==============================
+
+
+
+# providers.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/promptql-config/providers
+
+# Providers & Models
+
+## Introduction
+
+PromptQL supports configuring different LLM providers and models to tailor the experience to your application's needs.
+
+This gives you the flexibility to choose the most performance-efficient and cost-effective solution for your use case,
+and the freedom to switch between providers and models as needed depending the task.
+
+For example, you can use one model for conversational tasks and another for advanced AI primitives:
+
+```yaml {5-6,8-9}
+kind: PromptQlConfig
+version: v1
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+```
+
+### `llm`
+
+The `llm` configuration is used to define the LLM provider and model for **conversational tasks** in your application.
+In the example above, we're using `openai` as the provider with the `o3-mini` model.
+
+### `ai_primitives_llm`
+
+The `ai_primitives_llm` configuration is used to define the LLM provider and model for
+[**AI primitives** in your application](/promptql-apis/execute-program-api.mdx). This is used for tasks such as
+**program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
+model.
+
+## Available providers & models
+
+### Anthropic
+
+To use an [Anthropic model](https://docs.anthropic.com/en/docs/about-claude/models/all-models), set the `provider` to
+`anthropic`. The following have been tested with PromptQL:
+
+- `claude-3-5-sonnet-latest`
+- `claude-3-7-sonnet-latest`
+
+### AWS Bedrock
+
+To use a [Bedrock-wrapped model](https://aws.amazon.com/bedrock/), set the `provider` to `bedorck`. The following have
+been tested with PromptQL:
+
+- Claude 3.5 Sonnet
+- Claude 3.7 Sonnet
+
+**NB: For Bedrock models, you'll need to provide a `model_id` that resembles this string:**
+
+```
+arn:aws:bedrock:<AWS region>:<AWS account ID>:inference-profile/us.anthropic.claude-3-5-sonnet-20241022-v2:0
+```
+
+### Google Gemini
+
+To use a [Google Gemini model](https://ai.google.dev/gemini-api/docs/models), set the `provider` to `gemini`. The
+following have been tested with PromptQL:
+
+- `gemini-1.5-flash`
+- `gemini-2.0-flash`
+
+### Hasura
+
+With Hasura—used as the default provider—there is **no specific model necessary** in your configuration.
+
+### Microsoft Azure
+
+To use an [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models), set the
+`provider` to `azure`.
+
+### OpenAI
+
+To use an [OpenAI model](https://platform.openai.com/docs/models), set the `provider` to `openai`. The following have
+been tested with PromptQL:
+
+- `o1`
+- `o3-mini`
+- `gpt-4o`
+
+:::info Base Model
+
+When using the `hasura` provider, the default model is `claude-3-5-sonnet-latest`. This is the recommended model for
+PromptQL program generation.
 
 :::
 
