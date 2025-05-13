@@ -26,6 +26,7 @@ yarn-error.log*
 .vscode
 .cursor
 .idea
+.dev.sh
 
 .pnp.*
 .yarn/*
