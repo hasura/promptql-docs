@@ -17,11 +17,12 @@ import Prereqs from "@site/docs/_prereqs.mdx";
 
 # Lambda Connector Basics
 
-You can use lambda connectors to give PromptQL the ability to execute custom business logic on behalf of the user.
+You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user.
 
-Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with TypeScript, Python, or Go.
+Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with TypeScript, Python, or Go, which will be exposed
+to PromptQL as a tool it can use.
 
-## Add a Lambda Connector
+## Initialize a Lambda Connector
 
 In an existing supergraph project, you can add a new lambda connector by running the following command:
 
@@ -69,60 +70,11 @@ in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn c
 
 :::
 
-# Return Complex Information
+## Retrieve Information with a Lambda Connector
 
-## Introduction
-
-In this tutorial, you'll use a lambda connector to add custom business logic to your application and retrieve
-information.
-
-This tutorial should take about five minutes.
-
-:::info Should you use a native data connector instead?
-
-We've developed a set of native data connectors that make it easy to retrieve data from specific sources. You can learn
-more [here](/data-sources/overview.mdx).
-
-This guide is intended to illustrate use cases wherein a native data connector doesn't exist for your source, or you
-need to do custom transformations of the data before its returned to your application.
-
-:::
-
-## Guide
-
-You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
-
-# With API Endpoints
+### From API Endpoints
 
 We can connect PromptQL to API endpoints to query them directly.
-
-Sometimes bulk loading data from API services might be overkill. In such cases, connecting to API endpoints directly is
-useful or a convenient way to test your API integration.
-
-However, if you expect to run into API rate limits, or need more flexible access to data that would require filtering
-data in ways that the API doesn't natively allow for, consider
-[bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
-
-<Prereqs />
-
-## Tutorial
-
-Instead of adding a connector that is backed by a persistent data store (like a database, or DuckDB), we'll add a
-**lambda** connector.
-
-After creating your supergraph project with:
-
-```ddn
-ddn supergraph init myproject --with-promptql
-```
-
-Load one of the following connectors:
-
-1. TypeScript + DuckDB: `hasura/duckduckapi`
-2. TypeScript with NodeJS runtime: `hasura/nodejs`
-3. Python: `hasura/python`
-
-All of these connectors follow the same design, but for the purposes of this guide we'll follow the TypeScript guide.
 
 ### Step 1. Initialize the connector
 
@@ -193,6 +145,10 @@ Head over to the PromptQL Playground and see if the AI assistant is able to call
 ```plaintext
 say hello from httpBin for everyone
 ```
+
+
+
+
 
 # Take Action on Behalf of a User
 
@@ -455,3 +411,30 @@ While not wholly necessary, you can create explicit relationships between your c
 from other datasources. Typically, PromptQL can pick up on the context of how to use your business logic in conjunction
 with your data, but you can always improve its understanding by creating a
 [relationship object](/data-modeling/relationship.mdx).
+
+---
+
+Notes:
+
+Retrieve:
+
+:::info Should you use a native data connector instead?
+
+We've developed a set of native data connectors that make it easy to retrieve data from specific sources. You can learn
+more [here](/data-sources/overview.mdx).
+
+This guide is intended to illustrate use cases wherein a native data connector doesn't exist for your source, or you
+need to do custom transformations of the data before its returned to your application.
+
+:::
+
+## Guide
+
+You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
+
+Sometimes bulk loading data from API services might be overkill. In such cases, connecting to API endpoints directly is
+useful or a convenient way to test your API integration.
+
+However, if you expect to run into API rate limits, or need more flexible access to data that would require filtering
+data in ways that the API doesn't natively allow for, consider
+[bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
