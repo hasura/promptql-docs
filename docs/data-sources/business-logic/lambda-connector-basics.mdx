@@ -1,9 +1,9 @@
 ---
-sidebar_position: 2
-sidebar_label: Take Action for a User
+sidebar_position: 3
+sidebar_label: Lambda Connector Basics
 description:
-  "Learn how to add simple custom business logic to your PromptQL application and build on this example with your own
-  custom logic."
+  "Learn how to add a lambda connector to empower PromptQL with custom business logic that can be used to act on a
+  user's behalf."
 keywords:
   - hasura
   - promptql
@@ -13,6 +13,184 @@ keywords:
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
+
+# Lambda Connector Basics
+
+## Introduction
+
+You can add a lambda connector just like any other [data source](/data-sources/overview.mdx).
+
+## Add a connector
+
+```ddn title="Initialize a new connector in a project directory:"
+ddn connector init <your_name_for_the_connector> -i
+```
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+When you add the `hasura/nodejs` connector, the CLI will generate a Node.js package with a `functions.ts` file. This
+file is the entrypoint for your connector.
+
+As this is a Node.js project, you can easily add any dependencies you desire by running `npm i <package-name>` from this
+connector's directory.
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+When you add the `hasura/python` connector, the CLI will generate a Python application with a `functions.py` file. This
+file is the entrypoint for your connector.
+
+As this is a Python project, you can easily add any dependencies you desire by adding them to the `requirements.txt` in
+this connector's directory.
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+When you add the `hasura/go` connector, the CLI will generate a Go application with a `/functions` directory. The
+connector will use this directory — and any `*.go` file in it — as the entrypoint for your connector.
+
+As this is a Go project, you can easily add any dependencies you desire by adding them to the `go.mod` file and running
+`go mod tidy` from this connector's directory.
+
+</TabItem>
+
+</Tabs>
+
+:::info Customization
+
+You can customize which subgraph this connector is added to by
+[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
+in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
+
+:::
+
+# Return Complex Information
+
+## Introduction
+
+In this tutorial, you'll use a lambda connector to add custom business logic to your application and retrieve
+information.
+
+This tutorial should take about five minutes.
+
+:::info Should you use a native data connector instead?
+
+We've developed a set of native data connectors that make it easy to retrieve data from specific sources. You can learn
+more [here](/data-sources/overview.mdx).
+
+This guide is intended to illustrate use cases wherein a native data connector doesn't exist for your source, or you
+need to do custom transformations of the data before its returned to your application.
+
+:::
+
+## Guide
+
+You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
+
+# With API Endpoints
+
+We can connect PromptQL to API endpoints to query them directly.
+
+Sometimes bulk loading data from API services might be overkill. In such cases, connecting to API endpoints directly is
+useful or a convenient way to test your API integration.
+
+However, if you expect to run into API rate limits, or need more flexible access to data that would require filtering
+data in ways that the API doesn't natively allow for, consider
+[bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
+
+<Prereqs />
+
+## Tutorial
+
+Instead of adding a connector that is backed by a persistent data store (like a database, or DuckDB), we'll add a
+**lambda** connector.
+
+After creating your supergraph project with:
+
+```ddn
+ddn supergraph init myproject --with-promptql
+```
+
+Load one of the following connectors:
+
+1. TypeScript + DuckDB: `hasura/duckduckapi`
+2. TypeScript with NodeJS runtime: `hasura/nodejs`
+3. Python: `hasura/python`
+
+All of these connectors follow the same design, but for the purposes of this guide we'll follow the TypeScript guide.
+
+### Step 1. Initialize the connector
+
+**Install the connector and say hello!**
+
+```ddn
+ddn connector init typescript -i
+```
+
+### Step 2. Introspect the connector
+
+```ddn
+ddn connector introspect typescript
+ddn commands list typescript
+```
+
+You should see a default `hello` command being `AVAILABLE` which means that it’s not yet added to the supergraph.
+
+### Step 3. Call an external API
+
+Open the `app/connector/typescript/functions.ts` file.
+
+```ts title="Replace the contents with the following:"
+/**
+ * This is an API to say hello from httpbin for a given name
+ * @readonly
+ */
+export async function helloFromHttpBin(name?: string): Promise<{ greeting?: string }> {
+  const greeting = { greeting: name };
+
+  const response = await fetch("https://httpbin.org/post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ greeting: `Hello ${name}!` }),
+  });
+
+  const data: any = await response.json();
+  return { greeting: data?.json?.greeting };
+}
+```
+
+### Step 4. Add the metadata
+
+```ddn
+ddn connector introspect typescript
+ddn commands list typescript
+ddn commands add typescript helloFromHttpBin
+```
+
+### Step 5. Create and run a new build
+
+```ddn title="Create a new local build:"
+ddn supergraph build local
+```
+
+```ddn title="Run your services:"
+ddn run docker-start
+```
+
+```ddn title="In a new terminal tab, open the devlopment console:"
+ddn console --local
+```
+
+Head over to the PromptQL Playground and see if the AI assistant is able to call your API integration.
+
+```plaintext
+say hello from httpBin for everyone
+```
 
 # Take Action on Behalf of a User
 
