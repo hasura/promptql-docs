@@ -17,10 +17,13 @@ import Prereqs from "@site/docs/_prereqs.mdx";
 
 # Lambda Connector Basics
 
-You can use lambda connectors in conjunction with connectors to conventional data sources to allow PromptQL to run
-custom business logic on behalf of a user.
+You can use lambda connectors to give PromptQL the ability to execute custom business logic on behalf of the user.
 
-## Add a connector
+Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with TypeScript, Python, or Go.
+
+## Add a Lambda Connector
+
+In an existing supergraph project, you can add a new lambda connector by running the following command:
 
 ```ddn title="Initialize a new connector in a project directory:"
 ddn connector init <your_name_for_the_connector> -i
