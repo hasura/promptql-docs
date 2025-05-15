@@ -927,6 +927,9 @@ if __name__ == "__main__":
     start(connector)
 ```
 
+The addition of the `@connector.register_mutation` decorator indicates that the function will modify data, and PromptQL
+will ask for confirmation before calling it.
+
 </TabItem>
 
 <TabItem value="Go" label="Go">
@@ -968,6 +971,9 @@ func ProcedureTakeActionOnBehalfOfUser(
 	}, nil
 }
 ```
+
+By prefixing the function name with `Procedure`, we indicate that the function will modify data, and PromptQL will ask
+for confirmation before calling it.
 
 </TabItem>
 
