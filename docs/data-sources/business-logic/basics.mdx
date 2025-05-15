@@ -1,6 +1,6 @@
 ---
-sidebar_position: 3
-sidebar_label: Lambda Connector Basics
+sidebar_position: 1
+sidebar_label: Basics
 description:
   "Learn how to add a lambda connector to empower PromptQL with custom business logic that can be used to act on a
   user's behalf."
@@ -9,6 +9,7 @@ keywords:
   - hasura
   - promptql
   - business logic
+  - lambda connector
 ---
 
 import Tabs from "@theme/Tabs";
@@ -18,10 +19,25 @@ import Prereqs from "@site/docs/_prereqs.mdx";
 
 # Lambda Connector Basics
 
-You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user.
+You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user. We can
+add a lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and expose functions to PromptQL
+as tools it can use. This means PromptQL isn't limited to querying data — it can **trigger logic**, **run workflows**,
+or **transform inputs into actions**, all within a secure and consistent API environment.
 
-Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and
-expose functions to PromptQL as tools it can use.
+By treating logic like a first-class data source, PromptQL ensures your application has a unified surface for
+interacting with databases, API services, and whatever actions you want your application to be able to take. You define
+how the system should respond to user queries, apply business rules, or even call third-party APIs.
+
+This approach simplifies your architecture and unlocks a powerful new interaction model: **applications that respond,
+reason, and act**...not just fetch data.
+
+:::info What about custom native operations?
+
+If you're curious about native queries and mutations, check out the
+[connector-specific reference docs](/reference/connectors/index.mdx) for generating queries and mutations using the
+native capabilities of your data source.
+
+:::
 
 ## Initialize a lambda connector
 
