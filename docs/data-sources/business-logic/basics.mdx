@@ -43,8 +43,8 @@ the native capabilities of your data source.
 
 ## Initialize a lambda connector
 
-In an existing supergraph project, you can add a new lambda connector by running the following command to start the
-process in the DDN CLI in interactive mode:
+In an existing supergraph project which has PromptQL enabled, you can add a new lambda connector by running the
+following command to start the process in the DDN CLI in interactive mode:
 
 ```ddn title="Initialize a new connector in a project directory:"
 ddn connector init <your_name_for_the_connector> -i
@@ -797,7 +797,7 @@ func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *Hel
 
 </Tabs>
 
-### Step 2. Add the metadata
+### Step 2. Introspect the connector and add the metadata
 
 ```ddn
 ddn connector introspect <connector-name>
@@ -951,7 +951,7 @@ func ProcedureTakeActionOnBehalfOfUser(
 
 </Tabs>
 
-### Step 2. Introspect the source file(s)
+### Step 2. Introspect the source file(s) and add the metadata
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -1001,7 +1001,8 @@ generated Hasura metadata for each. Look for `take_action_on_behalf_of_user.hml`
 
 :::info Add semantic metadata
 
-We highly recommend adding a `description` to the command object referenced above. Why?
+If you did not add comments to your function, we highly recommend adding a `description` to the command object
+referenced above.
 
 PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
 function does and how it should be used in the application, you'll get better results.
