@@ -146,7 +146,6 @@ type HelloResult struct {
 }
 
 // FunctionHello takes an optional name parameter and returns a friendly greeting string
-// Function is an operation type of query, so it will be treated as read-only
 func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments) (*HelloResult, error) {
 	name := "world"
 	if args.Name != nil {
@@ -465,7 +464,6 @@ package functions
 
 import (
 	"context"
-	"time"
 
 	"hasura-ndc.dev/ndc-go/types"
 )
@@ -522,37 +520,6 @@ func FunctionProcessUser(ctx context.Context, state *types.State, args *ProcessU
 		Success: true,
 		Data:    fmt.Sprintf("User %s is %d years old", args.User.Name, args.User.Age),
 	}, nil
-}
-```
-
-### Slices (Arrays)
-
-Slices of a single type are supported:
-
-```go
-package functions
-
-import (
-	"context"
-
-	"hasura-ndc.dev/ndc-go/types"
-)
-
-type SumNumbersArguments struct {
-	Numbers []int `json:"numbers"`
-}
-
-type SumNumbersResult struct {
-	Sum int `json:"sum"`
-}
-
-// FunctionSumNumbers demonstrates using slice/array types
-func FunctionSumNumbers(ctx context.Context, state *types.State, args *SumNumbersArguments) (*SumNumbersResult, error) {
-	sum := 0
-	for _, num := range args.Numbers {
-		sum += num
-	}
-	return &SumNumbersResult{Sum: sum}, nil
 }
 ```
 
