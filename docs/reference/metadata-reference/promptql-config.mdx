@@ -48,17 +48,7 @@ Definition of the configuration of PromptQL for the project
 | `systemInstructions` | string / null | false | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
 | `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | Configuration of the LLM to be used for PromptQL |
 | `aiPrimitivesLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | Configuration of the LLM to be used for AI primitives, such as classification, summarization etc |
-| `featureFlags` | [undefined](#promptqlconfigv2-undefined) / null | false | Feature flags to be used for PromptQL |
-
-
-
-#### undefined {#promptqlconfigv2-undefined}
-
-Feature flags to be used for PromptQL
-
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` |  | false |  |
+| `featureFlags` | object / null | false | Feature flags to be used for PromptQL |
 
 
 
