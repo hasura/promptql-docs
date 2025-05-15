@@ -16876,14 +16876,16 @@ definition:
 
 Definition of a user-defined Open DD object type.
 
-| Key                        | Value                                                                               | Required | Description                                                                                                                                                                                                                                                                                      |
-| -------------------------- | ----------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `name`                     | [CustomTypeName](#objecttype-customtypename)                                        | true     | The name to give this object type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph.                                                                                                                                                      |
-| `fields`                   | [[ObjectFieldDefinition](#objecttype-objectfielddefinition)]                        | true     | The list of fields defined for this object type.                                                                                                                                                                                                                                                 |
-| `globalIdFields`           | [[FieldName](#objecttype-fieldname)] / null                                         | false    | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
-| `graphql`                  | [ObjectTypeGraphQLConfiguration](#objecttype-objecttypegraphqlconfiguration) / null | false    | Configuration for how this object type should appear in the GraphQL schema.                                                                                                                                                                                                                      |
-| `description`              | string / null                                                                       | false    | The description of the object. Gets added to the description of the object's definition in the graphql schema.                                                                                                                                                                                   |
-| `dataConnectorTypeMapping` | [[DataConnectorTypeMapping](#objecttype-dataconnectortypemapping)]                  | false    | Mapping of this object type to corresponding object types in various data connectors.                                                                                                                                                                                                            |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [CustomTypeName](#objecttype-customtypename) | true | The name to give this object type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
+| `fields` | [[ObjectFieldDefinition](#objecttype-objectfielddefinition)] | true | The list of fields defined for this object type. |
+| `globalIdFields` | array / null | false | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
+| `graphql` | [ObjectTypeGraphQLConfiguration](#objecttype-objecttypegraphqlconfiguration) / null | false | Configuration for how this object type should appear in the GraphQL schema. |
+| `description` | string / null | false | The description of the object. Gets added to the description of the object's definition in the graphql schema. |
+| `dataConnectorTypeMapping` | [[DataConnectorTypeMapping](#objecttype-dataconnectortypemapping)] | false | Mapping of this object type to corresponding object types in various data connectors. |
+
+
 
 #### DataConnectorTypeMapping {#objecttype-dataconnectortypemapping}
 
@@ -19237,17 +19239,18 @@ The CLI also works to automatically track your relationships for you whenever yo
 
 ## Metadata structure
 
+
 ### Relationship {#relationship-relationship}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key          | Value                                          | Required | Description                                                                                                    |
-| ------------ | ---------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
-| `kind`       | `Relationship`                                 | true     |                                                                                                                |
-| `version`    | `v1`                                           | true     |                                                                                                                |
-| `definition` | [RelationshipV1](#relationship-relationshipv1) | true     | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `kind` | `Relationship` | true |  |
+| `version` | `v1` | true |  |
+| `definition` | [RelationshipV1](#relationship-relationshipv1) | true | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 kind: Relationship
@@ -19270,47 +19273,53 @@ definition:
   description: Articles written by an author
 ```
 
+
 #### RelationshipV1 {#relationship-relationshipv1}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key           | Value                                                                               | Required | Description                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | [RelationshipName](#relationship-relationshipname)                                  | true     | The name of the relationship.                                                                                                |
-| `sourceType`  | [CustomTypeName](#relationship-customtypename)                                      | true     | The source type of the relationship.                                                                                         |
-| `target`      | [RelationshipTarget](#relationship-relationshiptarget)                              | true     | The target of the relationship.                                                                                              |
-| `mapping`     | [[RelationshipMapping](#relationship-relationshipmapping)]                          | true     | The mapping configuration of source to target for the relationship.                                                          |
-| `description` | string / null                                                                       | false    | The description of the relationship. Gets added to the description of the relationship in the graphql schema.                |
-| `deprecated`  | [Deprecated](#relationship-deprecated) / null                                       | false    | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
-| `graphql`     | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false    | Configuration for how this relationship should appear in the GraphQL schema.                                                 |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [RelationshipName](#relationship-relationshipname) | true | The name of the relationship. |
+| `sourceType` | [CustomTypeName](#relationship-customtypename) | true | The source type of the relationship. |
+| `target` | [RelationshipTarget](#relationship-relationshiptarget) | true | The target of the relationship. |
+| `mapping` | [[RelationshipMapping](#relationship-relationshipmapping)] | true | The mapping configuration of source to target for the relationship. |
+| `description` | string / null | false | The description of the relationship. Gets added to the description of the relationship in the graphql schema. |
+| `deprecated` | [Deprecated](#relationship-deprecated) / null | false | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
+| `graphql` | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false | Configuration for how this relationship should appear in the GraphQL schema. |
+
+
 
 #### RelationshipGraphQlDefinition {#relationship-relationshipgraphqldefinition}
 
 The definition of how a relationship appears in the GraphQL API
 
-| Key                  | Value                                       | Required | Description                                                                            |
-| -------------------- | ------------------------------------------- | -------- | -------------------------------------------------------------------------------------- |
-| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false    | The field name to use for the field that represents an aggregate over the relationship |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false | The field name to use for the field that represents an aggregate over the relationship |
+
+
 
 #### Deprecated {#relationship-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
-deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
 
-| Key      | Value         | Required | Description                 |
-| -------- | ------------- | -------- | --------------------------- |
-| `reason` | string / null | false    | The reason for deprecation. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `reason` | string / null | false | The reason for deprecation. |
+
+
 
 #### RelationshipMapping {#relationship-relationshipmapping}
 
 Definition of a how a particular field in the source maps to a target field or argument.
 
-| Key      | Value                                                                | Required | Description                                             |
-| -------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
-| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true     | The source configuration for this relationship mapping. |
-| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true     | The target configuration for this relationship mapping. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true | The source configuration for this relationship mapping. |
+| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true | The target configuration for this relationship mapping. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 source:
@@ -19321,86 +19330,107 @@ target:
     - fieldName: author_id
 ```
 
+
 #### RelationshipMappingTarget {#relationship-relationshipmappingtarget}
 
 The target configuration for a relationship mapping.
 
+
 **Must have exactly one of the following fields:**
 
-| Key          | Value                                                                          | Required | Description                                    |
-| ------------ | ------------------------------------------------------------------------------ | -------- | ---------------------------------------------- |
-| `argument`   | [ArgumentMappingTarget](#relationship-argumentmappingtarget)                   | false    | An argument target for a relationship mapping. |
-| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `argument` | [ArgumentMappingTarget](#relationship-argumentmappingtarget) | false | An argument target for a relationship mapping. |
+| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
+
+
 
 #### ArgumentMappingTarget {#relationship-argumentmappingtarget}
 
 An argument target for a relationship mapping.
 
-| Key            | Value                                      | Required | Description |
-| -------------- | ------------------------------------------ | -------- | ----------- |
-| `argumentName` | [ArgumentName](#relationship-argumentname) | true     |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `argumentName` | [ArgumentName](#relationship-argumentname) | true |  |
+
+
 
 #### ArgumentName {#relationship-argumentname}
 
 The name of an argument.
 
+
 **Value:** string
+
 
 #### RelationshipMappingSource {#relationship-relationshipmappingsource}
 
 The source configuration for a relationship mapping.
 
+
 **Must have exactly one of the following fields:**
 
-| Key         | Value                                                                          | Required | Description                                                                                   |
-| ----------- | ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------- |
-| `value`     | [ValueExpression](#relationship-valueexpression)                               | false    | An expression which evaluates to a value that can be used in permissions and various presets. |
-| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                                                               |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `value` | [ValueExpression](#relationship-valueexpression) | false | An expression which evaluates to a value that can be used in permissions and various presets. |
+| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
+
+
 
 #### RelationshipSourceFieldAccess {#relationship-relationshipsourcefieldaccess}
 
 A field access in a relationship mapping.
 
-| Key         | Value                                | Required | Description |
-| ----------- | ------------------------------------ | -------- | ----------- |
-| `fieldName` | [FieldName](#relationship-fieldname) | true     |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#relationship-fieldname) | true |  |
+
+
 
 #### FieldName {#relationship-fieldname}
 
 The name of a field in a user-defined object type.
 
+
 **Value:** string
+
 
 #### ValueExpression {#relationship-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
+
 **Must have exactly one of the following fields:**
 
-| Key               | Value                                                        | Required | Description |
-| ----------------- | ------------------------------------------------------------ | -------- | ----------- |
-| `literal`         |                                                              | false    |             |
-| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false    |             |
-| `valueFromEnv`    | string                                                       | false    |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `literal` |  | false |  |
+| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false |  |
+| `valueFromEnv` | string | false |  |
+
+
 
 #### OpenDdSessionVariable {#relationship-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
+
 **Value:** string
+
 
 #### RelationshipTarget {#relationship-relationshiptarget}
 
 The target for a relationship.
 
+
 **Must have exactly one of the following fields:**
 
-| Key       | Value                                                                | Required | Description                            |
-| --------- | -------------------------------------------------------------------- | -------- | -------------------------------------- |
-| `model`   | [ModelRelationshipTarget](#relationship-modelrelationshiptarget)     | false    | The target model for a relationship.   |
-| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false    | The target command for a relationship. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `model` | [ModelRelationshipTarget](#relationship-modelrelationshiptarget) | false | The target model for a relationship. |
+| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false | The target command for a relationship. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 model:
@@ -19409,73 +19439,92 @@ model:
   relationshipType: Array
 ```
 
+
 #### CommandRelationshipTarget {#relationship-commandrelationshiptarget}
 
 The target command for a relationship.
 
-| Key        | Value                                    | Required | Description                                                           |
-| ---------- | ---------------------------------------- | -------- | --------------------------------------------------------------------- |
-| `name`     | [CommandName](#relationship-commandname) | true     | The name of the command.                                              |
-| `subgraph` | string / null                            | false    | The subgraph of the target command. Defaults to the current subgraph. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [CommandName](#relationship-commandname) | true | The name of the command. |
+| `subgraph` | string / null | false | The subgraph of the target command. Defaults to the current subgraph. |
+
+
 
 #### CommandName {#relationship-commandname}
 
 The name of a command.
 
+
 **Value:** string
+
 
 #### ModelRelationshipTarget {#relationship-modelrelationshiptarget}
 
 The target model for a relationship.
 
-| Key                | Value                                                                                     | Required | Description                                                                |
-| ------------------ | ----------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
-| `name`             | [ModelName](#relationship-modelname)                                                      | true     | The name of the data model.                                                |
-| `subgraph`         | string / null                                                                             | false    | The subgraph of the target model. Defaults to the current subgraph.        |
-| `relationshipType` | [RelationshipType](#relationship-relationshiptype)                                        | true     | Type of the relationship - object or array.                                |
-| `aggregate`        | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false    | How to aggregate over the relationship. Only valid for array relationships |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [ModelName](#relationship-modelname) | true | The name of the data model. |
+| `subgraph` | string / null | false | The subgraph of the target model. Defaults to the current subgraph. |
+| `relationshipType` | [RelationshipType](#relationship-relationshiptype) | true | Type of the relationship - object or array. |
+| `aggregate` | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false | How to aggregate over the relationship. Only valid for array relationships |
+
+
 
 #### ModelRelationshipTargetAggregate {#relationship-modelrelationshiptargetaggregate}
 
 Which aggregate expression to use to aggregate the array relationship.
 
-| Key                   | Value                                                            | Required | Description                                                                                                               |
-| --------------------- | ---------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true     | The name of the aggregate expression that defines how to aggregate across the relationship.                               |
-| `description`         | string / null                                                    | false    | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true | The name of the aggregate expression that defines how to aggregate across the relationship. |
+| `description` | string / null | false | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
+
+
 
 #### AggregateExpressionName {#relationship-aggregateexpressionname}
 
 The name of an aggregate expression.
 
+
 **Value:** string
+
 
 #### RelationshipType {#relationship-relationshiptype}
 
 Type of the relationship.
 
+
 **One of the following values:**
 
-| Value    | Description                                      |
-| -------- | ------------------------------------------------ |
-| `Object` | Select one related object from the target.       |
-| `Array`  | Select multiple related objects from the target. |
+| Value | Description |
+|-----|-----|
+| `Object` | Select one related object from the target. |
+| `Array` | Select multiple related objects from the target. |
+
+
 
 #### ModelName {#relationship-modelname}
 
 The name of data model.
 
+
 **Value:** string
+
 
 #### CustomTypeName {#relationship-customtypename}
 
 The name of a user-defined type.
 
+
 **Value:** string
+
 
 #### RelationshipName {#relationship-relationshipname}
 
 The name of the GraphQL relationship field.
+
 
 **Value:** string
 
@@ -19931,14 +19980,15 @@ A predicate that can be used to restrict the objects returned when querying a mo
 
 **Must have exactly one of the following fields:**
 
-| Key               | Value                                                                  | Required | Description                                                                                         |
-| ----------------- | ---------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------------- |
-| `fieldComparison` | [FieldComparisonPredicate](#modelpermissions-fieldcomparisonpredicate) | false    | Field comparison predicate filters objects based on a field value.                                  |
-| `fieldIsNull`     | [FieldIsNullPredicate](#modelpermissions-fieldisnullpredicate)         | false    | Predicate to check if the given field is null.                                                      |
-| `relationship`    | [RelationshipPredicate](#modelpermissions-relationshippredicate)       | false    | Relationship predicate filters objects of a source model based on a predicate on the related model. |
-| `and`             | [[ModelPredicate](#modelpermissions-modelpredicate)]                   | false    |                                                                                                     |
-| `or`              | [[ModelPredicate](#modelpermissions-modelpredicate)]                   | false    |                                                                                                     |
-| `not`             | [ModelPredicate](#modelpermissions-modelpredicate)                     | false    |                                                                                                     |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldComparison` | [FieldComparisonPredicate](#modelpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
+| `fieldIsNull` | [FieldIsNullPredicate](#modelpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
+| `nestedField` | [NestedFieldPredicate](#modelpermissions-nestedfieldpredicate) | false | Nested field predicate filters objects of a source model based on a predicate on the nested field. |
+| `relationship` | [RelationshipPredicate](#modelpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
+| `and` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
+| `or` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
+| `not` | [ModelPredicate](#modelpermissions-modelpredicate) | false |  |
 
 **Examples:**
 
@@ -19998,6 +20048,18 @@ Relationship predicate filters objects of a source model based on a predicate on
 The name of the GraphQL relationship field.
 
 **Value:** string
+
+
+#### NestedFieldPredicate {#modelpermissions-nestedfieldpredicate}
+
+Nested field predicate filters objects of a source model based on a predicate on the nested field.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#modelpermissions-fieldname) | true | The name of the field in the object type of the model to follow. |
+| `predicate` | [ModelPredicate](#modelpermissions-modelpredicate) | true | The predicate to apply on the related objects. |
+
+
 
 #### FieldIsNullPredicate {#modelpermissions-fieldisnullpredicate}
 
@@ -20141,14 +20203,15 @@ A predicate that can be used to restrict the objects returned when querying a mo
 
 **Must have exactly one of the following fields:**
 
-| Key               | Value                                                                    | Required | Description                                                                                         |
-| ----------------- | ------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------- |
-| `fieldComparison` | [FieldComparisonPredicate](#commandpermissions-fieldcomparisonpredicate) | false    | Field comparison predicate filters objects based on a field value.                                  |
-| `fieldIsNull`     | [FieldIsNullPredicate](#commandpermissions-fieldisnullpredicate)         | false    | Predicate to check if the given field is null.                                                      |
-| `relationship`    | [RelationshipPredicate](#commandpermissions-relationshippredicate)       | false    | Relationship predicate filters objects of a source model based on a predicate on the related model. |
-| `and`             | [[ModelPredicate](#commandpermissions-modelpredicate)]                   | false    |                                                                                                     |
-| `or`              | [[ModelPredicate](#commandpermissions-modelpredicate)]                   | false    |                                                                                                     |
-| `not`             | [ModelPredicate](#commandpermissions-modelpredicate)                     | false    |                                                                                                     |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldComparison` | [FieldComparisonPredicate](#commandpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
+| `fieldIsNull` | [FieldIsNullPredicate](#commandpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
+| `nestedField` | [NestedFieldPredicate](#commandpermissions-nestedfieldpredicate) | false | Nested field predicate filters objects of a source model based on a predicate on the nested field. |
+| `relationship` | [RelationshipPredicate](#commandpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
+| `and` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
+| `or` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
+| `not` | [ModelPredicate](#commandpermissions-modelpredicate) | false |  |
 
 **Examples:**
 
@@ -20208,6 +20271,18 @@ Relationship predicate filters objects of a source model based on a predicate on
 The name of the GraphQL relationship field.
 
 **Value:** string
+
+
+#### NestedFieldPredicate {#commandpermissions-nestedfieldpredicate}
+
+Nested field predicate filters objects of a source model based on a predicate on the nested field.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#commandpermissions-fieldname) | true | The name of the field in the object type of the model to follow. |
+| `predicate` | [ModelPredicate](#commandpermissions-modelpredicate) | true | The predicate to apply on the related objects. |
+
+
 
 #### FieldIsNullPredicate {#commandpermissions-fieldisnullpredicate}
 
@@ -20956,14 +21031,14 @@ static session variables to use whilst running the engine
 
 JWT config according to which the incoming JWT will be verified and decoded to extract the session variable claims.
 
-| Key             | Value                                            | Required | Description                                                                                                           |
-| --------------- | ------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------- |
-| `audience`      | [string] / null                                  | false    | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
-| `issuer`        | string / null                                    | false    | Optional validation to check that the `iss` field is a member of the `iss` received, otherwise will throw error.      |
-| `allowedSkew`   | integer / null                                   | false    | Allowed leeway (in seconds) to the `exp` validation to account for clock skew.                                        |
-| `claimsConfig`  | [JWTClaimsConfig](#authconfig-jwtclaimsconfig)   | true     | Claims config. Either specified via `claims_mappings` or `claims_namespace_path`                                      |
-| `tokenLocation` | [JWTTokenLocation](#authconfig-jwttokenlocation) | true     | Source of the JWT authentication token.                                                                               |
-| `key`           | [JWTKey](#authconfig-jwtkey)                     | true     | Mode according to which the JWT auth is configured.                                                                   |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `audience` | array / null | false | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
+| `issuer` | string / null | false | Optional validation to check that the `iss` field is a member of the `iss` received, otherwise will throw error. |
+| `allowedSkew` | integer / null | false | Allowed leeway (in seconds) to the `exp` validation to account for clock skew. |
+| `claimsConfig` | [JWTClaimsConfig](#authconfig-jwtclaimsconfig) | true | Claims config. Either specified via `claims_mappings` or `claims_namespace_path` |
+| `tokenLocation` | [JWTTokenLocation](#authconfig-jwttokenlocation) | true | Source of the JWT authentication token. |
+| `key` | [JWTKey](#authconfig-jwtkey) | true | Mode according to which the JWT auth is configured. |
 
 **Example:**
 
@@ -21649,10 +21724,12 @@ Any backwards incompatible changes made to Hasura DDN after this date won't impa
 
 **One of the following values:**
 
-| Value                                                                                                                                                                                                                                                                                                                                                                 | Description               |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
-| `2024-06-30` / `2024-09-03` / `2024-09-18` / `2024-09-26` / `2024-10-07` / `2024-10-16` / `2024-10-31` / `2024-11-13` / `2024-11-15` / `2024-11-18` / `2024-11-26` / `2024-12-05` / `2024-12-10` / `2024-12-18` / `2025-01-07` / `2025-01-25` / `2025-02-04` / `2025-02-08` / `2025-02-20` / `2025-02-27` / `2025-03-11` / `2025-03-12` / `2025-03-21` / `2025-03-26` | Known compatibility dates |
-| string                                                                                                                                                                                                                                                                                                                                                                | Any date                  |
+| Value | Description |
+|-----|-----|
+| `2024-06-30` / `2024-09-03` / `2024-09-18` / `2024-09-26` / `2024-10-07` / `2024-10-16` / `2024-10-31` / `2024-11-13` / `2024-11-15` / `2024-11-18` / `2024-11-26` / `2024-12-05` / `2024-12-10` / `2024-12-18` / `2025-01-07` / `2025-01-25` / `2025-02-04` / `2025-02-08` / `2025-02-20` / `2025-02-27` / `2025-03-11` / `2025-03-12` / `2025-03-21` / `2025-03-26` / `2025-04-03` / `2025-04-24` | Known compatibility dates |
+| string | Any date |
+
+
 
 ==============================
 
@@ -21926,6 +22003,152 @@ Either a literal string or a reference to a Hasura secret
 | `valueFromEnv` | string | false    |             |
 
 ==============================
+
+
+
+# promptql-config.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/promptql-config
+
+# PromptQL Configuration
+
+## Introduction
+
+Your PromptQlConfig is a metadata object that defines the configuration of PromptQL for your project. It includes the
+LLM to be used, the system instructions, and other settings.
+
+```yaml title="Example PromptQlConfig"
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+  system_instructions: |
+    You are a helpful AI Assistant.
+```
+
+## Metadata structure
+
+### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
+
+Definition of the configuration of PromptQL, v2
+
+| Key          | Value                                                  | Required | Description                                                 |
+| ------------ | ------------------------------------------------------ | -------- | ----------------------------------------------------------- |
+| `kind`       | `PromptQlConfig`                                       | true     |                                                             |
+| `version`    | `v2`                                                   | true     |                                                             |
+| `definition` | [PromptQlConfigV2](#promptqlconfigv2-promptqlconfigv2) | true     | Definition of the configuration of PromptQL for the project |
+
+#### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
+
+Definition of the configuration of PromptQL for the project
+
+| Key                  | Value                                           | Required | Description                                                                                                                              |
+| -------------------- | ----------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `systemInstructions` | string / null                                   | false    | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
+| `llm`                | [LlmConfig](#promptqlconfigv2-llmconfig)        | true     | Configuration of the LLM to be used for PromptQL                                                                                         |
+| `aiPrimitivesLlm`    | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false    | Configuration of the LLM to be used for AI primitives, such as classification, summarization etc                                         |
+| `featureFlags`       | object / null                                   | false    | Feature flags to be used for PromptQL                                                                                                    |
+
+#### LlmConfig {#promptqlconfigv2-llmconfig}
+
+Configuration of the LLM to be used for PromptQL
+
+**One of the following values:**
+
+| Value                                                      | Description                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------ |
+| [HasuraLlmConfig](#promptqlconfigv2-hasurallmconfig)       | Configuration settings for the Hasura-configured LLM   |
+| [OpenAiLlmConfig](#promptqlconfigv2-openaillmconfig)       | Configuration settings for an OpenAI LLM               |
+| [AnthropicLlmConfig](#promptqlconfigv2-anthropicllmconfig) | Configuration settings for an Anthropic LLM            |
+| [AzureLlmConfig](#promptqlconfigv2-azurellmconfig)         | Configuration settings for an Azure-provided LLM       |
+| [GeminiLlmConfig](#promptqlconfigv2-geminillmconfig)       | Configuration settings for a Gemini LLM                |
+| [BedrockLlmConfig](#promptqlconfigv2-bedrockllmconfig)     | Configuration settings for an AWS Bedrock-provided LLM |
+
+#### BedrockLlmConfig {#promptqlconfigv2-bedrockllmconfig}
+
+Configuration settings for an AWS Bedrock-provided LLM
+
+| Key                  | Value                                                  | Required | Description                                              |
+| -------------------- | ------------------------------------------------------ | -------- | -------------------------------------------------------- |
+| `provider`           | `bedrock`                                              | true     |                                                          |
+| `modelId`            | string                                                 | true     | The specific AWS Bedrock model to use.                   |
+| `regionName`         | string                                                 | true     | The specific AWS Bedrock region to use.                  |
+| `awsAccessKeyId`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS access key ID to use for the AWS Bedrock API     |
+| `awsSecretAccessKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS secret access key to use for the AWS Bedrock API |
+
+#### GeminiLlmConfig {#promptqlconfigv2-geminillmconfig}
+
+Configuration settings for a Gemini LLM
+
+| Key        | Value                                                  | Required | Description                                                                         |
+| ---------- | ------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------- |
+| `provider` | `gemini`                                               | true     |                                                                                     |
+| `model`    | string / null                                          | false    | The specific Gemini model to use. If not specified, the default model will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Gemini API                                               |
+
+#### AzureLlmConfig {#promptqlconfigv2-azurellmconfig}
+
+Configuration settings for an Azure-provided LLM
+
+| Key          | Value                                                  | Required | Description                                                                                |
+| ------------ | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
+| `provider`   | `azure`                                                | true     |                                                                                            |
+| `apiVersion` | string / null                                          | false    | The specific Azure API version to use. If not specified, the default version will be used. |
+| `model`      | string / null                                          | false    | The specific Azure model to use. If not specified, the default model will be used.         |
+| `endpoint`   | string                                                 | true     | The endpoint to use for the Azure LLM API                                                  |
+| `apiKey`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Azure API                                                       |
+
+#### AnthropicLlmConfig {#promptqlconfigv2-anthropicllmconfig}
+
+Configuration settings for an Anthropic LLM
+
+| Key        | Value                                                  | Required | Description                                                                                |
+| ---------- | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
+| `provider` | `anthropic`                                            | true     |                                                                                            |
+| `model`    | string / null                                          | false    | The specific Anthropic model to use. If not specified, the default model will be used.     |
+| `baseUrl`  | string / null                                          | false    | The base URL to use for the Anthropic API. If not specified, the default URL will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Anthropic API                                                   |
+
+#### OpenAiLlmConfig {#promptqlconfigv2-openaillmconfig}
+
+Configuration settings for an OpenAI LLM
+
+| Key        | Value                                                  | Required | Description                                                                             |
+| ---------- | ------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------- |
+| `provider` | `openai`                                               | true     |                                                                                         |
+| `model`    | string / null                                          | false    | The specific OpenAI model to use. If not specified, the default model will be used.     |
+| `baseUrl`  | string / null                                          | false    | The base URL to use for the OpenAI API. If not specified, the default URL will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the OpenAI API                                                   |
+
+#### EnvironmentValue {#promptqlconfigv2-environmentvalue}
+
+Either a literal string or a reference to a Hasura secret
+
+**Must have exactly one of the following fields:**
+
+| Key            | Value  | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `value`        | string | false    |             |
+| `valueFromEnv` | string | false    |             |
+
+#### HasuraLlmConfig {#promptqlconfigv2-hasurallmconfig}
+
+Configuration settings for the Hasura-configured LLM
+
+| Key        | Value    | Required | Description |
+| ---------- | -------- | -------- | ----------- |
+| `provider` | `hasura` | true     |             |
+
+
+
+==============================
+
+
 
 # index.mdx
 
