@@ -36,6 +36,7 @@ export const topLevelMetadataObjects: Record<string, string> = {
   Subgraph: 'build-configs',
   Connector: 'build-configs',
   LifecyclePluginHook: 'engine-plugins',
+  PromptQlConfig: 'promptql-config',
 };
 
 export const topLevelMetadataRefs: Record<string, string> = {};
