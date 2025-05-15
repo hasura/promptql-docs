@@ -4,6 +4,7 @@ sidebar_label: Lambda Connector Basics
 description:
   "Learn how to add a lambda connector to empower PromptQL with custom business logic that can be used to act on a
   user's behalf."
+toc_max_heading_level: 2
 keywords:
   - hasura
   - promptql
@@ -19,16 +20,19 @@ import Prereqs from "@site/docs/_prereqs.mdx";
 
 You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user.
 
-Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with TypeScript, Python, or Go, which will be exposed
-to PromptQL as a tool it can use.
+Using Hasura DDN, we can add a Lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and
+expose functions to PromptQL as tools it can use.
 
-## Initialize a Lambda Connector
+## Initialize a lambda connector
 
-In an existing supergraph project, you can add a new lambda connector by running the following command:
+In an existing supergraph project, you can add a new lambda connector by running the following command to start the
+process in the DDN CLI in interactive mode:
 
 ```ddn title="Initialize a new connector in a project directory:"
 ddn connector init <your_name_for_the_connector> -i
 ```
+
+Choose the lambda connector to correspond with the language you'd like to use for your functions.
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -62,44 +66,190 @@ As this is a Go project, you can easily add any dependencies you desire by addin
 
 </Tabs>
 
-:::info Customization
+## Basic lambda functions
 
-You can customize which subgraph this connector is added to by
-[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
-in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
+The following examples show how to create basic lambda functions in each language.
 
-:::
+<Tabs groupId="source-preference" className="api-tabs">
 
-## Retrieve Information with a Lambda Connector
+<TabItem value="TypeScript" label="TypeScript">
 
-### From API Endpoints
-
-We can connect PromptQL to API endpoints to query them directly.
-
-### Step 1. Initialize the connector
-
-**Install the connector and say hello!**
-
-```ddn
-ddn connector init typescript -i
+```ts title="<subgraph-name>/connector/<connector-name>/functions.ts"
+/**
+ * Takes an optional name parameter and returns a friendly greeting string
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {string} A greeting in the format "hello {name}" or "hello world" if no name provided
+ * @readonly
+ */
+export function hello(name?: string) {
+  return `hello ${name ?? "world"}`;
+}
 ```
 
-### Step 2. Introspect the connector
+The JSDoc comments are optional, but the first general comment is highly recommended to help PromptQL understand the
+function's purpose and parameters and will be added to the function's metadata.
 
-```ddn
-ddn connector introspect typescript
-ddn commands list typescript
+The `@readonly` tag indicates that the function does not modify any data, and PromptQL will be able to call this without
+asking for confirmation. Under the hood, DDN will create an NDC function for `@readonly` functions and an NDC procedure
+for functions that are not marked as `@readonly`.
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+</TabItem>
+
+</Tabs>
+
+## Supported types
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+When creating TypeScript lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `number` - Maps to NDC scalar type: `Float`
+- `boolean` - Maps to NDC scalar type: `Boolean`
+- `bigint` - Maps to NDC scalar type: `BigInt` (represented as a string in JSON)
+- `Date` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```ts
+/**
+ * Example of basic scalar types
+ * @readonly
+ */
+export function calculateAge(birthDate: Date, currentYear: number): number {
+  return currentYear - birthDate.getFullYear();
+}
 ```
 
-You should see a default `hello` command being `AVAILABLE` which means that it’s not yet added to the supergraph.
+### Object types and interfaces
 
-### Step 3. Call an external API
+You can define custom object types and interfaces:
+
+```ts
+type User = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+interface Response {
+  success: boolean;
+  data: string;
+}
+
+/**
+ * Example using custom types
+ * @readonly
+ */
+export function processUser(user: User): Response {
+  return {
+    success: true,
+    data: `User ${user.name} is ${user.age} years old`,
+  };
+}
+```
+
+### Arrays
+
+Arrays of a single type are supported:
+
+```ts
+/**
+ * Example using array types
+ * @readonly
+ */
+export function sumNumbers(numbers: number[]): number {
+  return numbers.reduce((sum, num) => sum + num, 0);
+}
+```
+
+### Null, undefined, and optional properties
+
+You can use null, undefined, or make properties optional:
+
+```ts
+/**
+ * Example with optional and nullable parameters
+ * @readonly
+ */
+export function formatName(firstName: string, lastName?: string, title: string | null = null): string {
+  const formattedTitle = title ? `${title} ` : "";
+  const formattedLastName = lastName ? ` ${lastName}` : "";
+  return `${formattedTitle}${firstName}${formattedLastName}`;
+}
+```
+
+### Arbitrary JSON
+
+You can import `JSONValue` from the SDK to accept and return arbitrary JSON:
+
+```ts
+import * as sdk from "@hasura/ndc-lambda-sdk";
+
+/**
+ * Example using JSONValue for arbitrary JSON
+ * @readonly
+ */
+export function transformData(data: sdk.JSONValue): sdk.JSONValue {
+  // Process the JSON data
+  return new sdk.JSONValue({ processed: true, original: data.value });
+}
+```
+
+### Error handling
+
+You can throw custom errors for better error handling:
+
+```ts
+import * as sdk from "@hasura/ndc-lambda-sdk";
+
+/**
+ * Example with error handling
+ * @readonly
+ */
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new sdk.UnprocessableContent("Cannot divide by zero", { a, b });
+  }
+  return a / b;
+}
+```
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+</TabItem>
+
+</Tabs>
+
+## Retrieve information
+
+We can use lambda connectors to allow PromptQL to query any API endpoint directly.
+
+### Step 1. Call an external API
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
 
 Open the `app/connector/typescript/functions.ts` file.
 
 ```ts title="Replace the contents with the following:"
 /**
- * This is an API to say hello from httpbin for a given name
+ * Calls httpbin.org API to create a personalized greeting for the given name. Takes an optional name parameter and returns a friendly greeting string.
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {Promise<{ greeting?: string }>} A Promise resolving to an object containing the optional greeting message
  * @readonly
  */
 export async function helloFromHttpBin(name?: string): Promise<{ greeting?: string }> {
@@ -118,15 +268,30 @@ export async function helloFromHttpBin(name?: string): Promise<{ greeting?: stri
 }
 ```
 
-### Step 4. Add the metadata
+</TabItem>
+<TabItem value="Python" label="Python">
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+</TabItem>
+
+</Tabs>
+
+### Step 2. Add the metadata
 
 ```ddn
-ddn connector introspect typescript
-ddn commands list typescript
-ddn commands add typescript helloFromHttpBin
+ddn connector introspect <connector-name>
+ddn commands list <connector-name>
 ```
 
-### Step 5. Create and run a new build
+You should see the command being `AVAILABLE` which means that it's not yet added to the supergraph.
+
+```ddn
+ddn commands add <connector-name> <command-name>
+```
+
+### Step 3. Create and run a new build and test the function
 
 ```ddn title="Create a new local build:"
 ddn supergraph build local
@@ -143,87 +308,20 @@ ddn console --local
 Head over to the PromptQL Playground and see if the AI assistant is able to call your API integration.
 
 ```plaintext
-say hello from httpBin for everyone
+say hello to everyone from httpBin
 ```
 
+## Take action
 
+You can use lambda connectors to add custom business logic to your application that takes action on behalf of a user.
 
-
-
-# Take Action on Behalf of a User
-
-## Introduction
-
-In this tutorial, you'll use a lambda connector to add custom business logic to your application that takes action on
-behalf of a user.
-
-This tutorial should take about five minutes.
-
-## Step 1. Initialize a new local DDN project
-
-```ddn title="Create a new project using the DDN CLI:"
-ddn supergraph init lambda-tutorial --with-promptql
-```
-
-## Step 2. Initialize the lambda connector
+### Step 1. Add custom logic
 
 <Tabs groupId="source-preference" className="api-tabs">
 
 <TabItem value="TypeScript" label="TypeScript">
 
-```ddn title="Run the following command:"
-ddn connector init my_ts -i
-```
-
-- Select `hasura/nodejs` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_ts` directory, you'll see the `functions.ts` file generated by the CLI; this will be
-the entrypoint for your connector.
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```ddn title="Run the following command:"
-ddn connector init my_python -i
-```
-
-- Select `hasura/python` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_python` directory, you'll see the `functions.py` file generated by the CLI; this will
-be the entrypoint for your connector.
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```ddn title="Run the following command:"
-ddn connector init my_go -i
-```
-
-- Select `hasura/go` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_go` directory, you'll see Go files in the `functions` folder; these will serve as the
-entrypoint for your connector.
-
-</TabItem>
-
-</Tabs>
-
-## Step 3. Add custom logic
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```bash title="From the connector directory, install the necessary packages:"
-cd app/connector/my_ts && npm install
-```
-
-```typescript title="Then, replace the contents of functions.ts with the following:"
+```typescript title="Replace the contents of functions.ts with the following:"
 /*
  * This interface defines the structure of the response object returned by the
  * function that acts on behalf of a user. It includes a success status and a message.
@@ -243,7 +341,8 @@ interface UserActionResponse {
  * @returns {UserActionResponse} - The response object containing success status and message
  */
 export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
-  // In a real application, you'd replace this with your custom business logic
+  // In a real application, you'd replace this with your custom business logic.
+  // You could update data in a database or use an API to update another service.
   console.log(`Taking action on behalf of user`);
   return {
     success: true,
@@ -275,6 +374,7 @@ class UserActionResponse(BaseModel):
 @connector.register_mutation
 def take_action_on_behalf_of_user(args: UserActionArguments) -> UserActionResponse:
     # In a real application, you'd replace this with business logic
+    # You could update data in a database or use an API to update another service.
     print("Taking action on behalf of user")
     return UserActionResponse(
         success=True,
@@ -317,6 +417,7 @@ func ProcedureTakeActionOnBehalfOfUser(
 	args *TakeActionArguments,
 ) (*TakeActionResponse, error) {
 	// In a real application, you'd replace this with your custom business logic
+  // You could update data in a database or use an API to update another service.
 	fmt.Println("Taking action on behalf of user")
 
 	return &TakeActionResponse{
@@ -330,7 +431,7 @@ func ProcedureTakeActionOnBehalfOfUser(
 
 </Tabs>
 
-## Step 4. Introspect the source file(s)
+### Step 2. Introspect the source file(s)
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -387,7 +488,7 @@ function does and how it should be used in the application, you'll get better re
 
 :::
 
-## Step 5. Create a new build and test
+### Step 3. Create a new build and test
 
 ```ddn title="Create a new build:"
 ddn supergraph build local
@@ -401,7 +502,7 @@ ddn run docker-start
 ddn console --local
 ```
 
-You can now navigate to the PromptQL Playground and use your custom business logic.
+You can now navigate to the PromptQL Playground and use your custom business logic with natural language.
 
 <Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
 
@@ -414,7 +515,11 @@ with your data, but you can always improve its understanding by creating a
 
 ---
 
-Notes:
+---
+
+---
+
+### Notes:
 
 Retrieve:
 
@@ -428,7 +533,7 @@ need to do custom transformations of the data before its returned to your applic
 
 :::
 
-## Guide
+### Guide
 
 You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
 
@@ -438,3 +543,73 @@ useful or a convenient way to test your API integration.
 However, if you expect to run into API rate limits, or need more flexible access to data that would require filtering
 data in ways that the API doesn't natively allow for, consider
 [bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
+
+:::info Customization
+
+You can customize which subgraph this connector is added to by
+[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
+in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
+
+:::
+
+---
+
+Take Action setup:
+
+### Step 1. Initialize a new local DDN project
+
+```ddn title="Create a new project using the DDN CLI:"
+ddn supergraph init lambda-tutorial --with-promptql
+```
+
+### Step 2. Initialize the lambda connector
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```ddn title="Run the following command:"
+ddn connector init my_ts -i
+```
+
+- Select `hasura/nodejs` from the list of connectors.
+- Choose a port (press enter to accept the default recommended by the CLI).
+
+If you open the `app/connector/my_ts` directory, you'll see the `functions.ts` file generated by the CLI; this will be
+the entrypoint for your connector.
+
+```bash title="From the connector directory, install the necessary packages:"
+cd app/connector/my_ts && npm install
+```
+
+</TabItem>
+
+<TabItem value="Python" label="Python">
+
+```ddn title="Run the following command:"
+ddn connector init my_python -i
+```
+
+- Select `hasura/python` from the list of connectors.
+- Choose a port (press enter to accept the default recommended by the CLI).
+
+If you open the `app/connector/my_python` directory, you'll see the `functions.py` file generated by the CLI; this will
+be the entrypoint for your connector.
+
+</TabItem>
+
+<TabItem value="Go" label="Go">
+
+```ddn title="Run the following command:"
+ddn connector init my_go -i
+```
+
+- Select `hasura/go` from the list of connectors.
+- Choose a port (press enter to accept the default recommended by the CLI).
+
+If you open the `app/connector/my_go` directory, you'll see Go files in the `functions` folder; these will serve as the
+entrypoint for your connector.
+
+</TabItem>
+
+</Tabs>
