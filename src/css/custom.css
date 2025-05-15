@@ -1188,7 +1188,7 @@ table td {
 
 /* Code Block Lines */
 [class^='codeBlockLines_'] {
-  background-color: var(--primary-neutral-900) !important;
+  background-color: black !important;
   padding: 0.5rem 1rem !important;
 }
 
