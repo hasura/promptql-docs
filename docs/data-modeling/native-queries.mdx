@@ -1,0 +1,347 @@
+---
+sidebar_position: 3
+sidebar_label: "Native Queries"
+description: "Native Queries allow you to run custom SQL queries on your data sources, enabling complex operations not supported by the engine."
+keywords:
+  - native queries
+  - SQL
+  - data modeling
+  - PromptQL
+  - custom queries
+toc_max_heading_level: 4
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Native Queries Extend Your Data Capabilities
+
+## Introduction
+
+Native Queries allow you to run custom SQL queries on your data sources. They en
+able operations that may not be supported by Hasura's standard GraphQL engine an
+d function as virtual tables in your data model.
+
+With Native Queries, you can implement complex business logic, perform specializ
+ed aggregations, and execute custom joins across your data—all while making these
+operations available in your supergraph.
+
+## Lifecycle
+
+Creating Native Queries for your supergraph involves the following steps:
+
+1. Identify the complex query or business logic you need to implement
+2. Create a SQL file with your custom query in the appropriate connector directory
+3. Register the query using the DDN CLI to add it to your connector configuration
+4. Update your metadata to track the new native query
+5. Add the native query as a model to your supergraph
+6. Build and serve your supergraph with the updated native query
+7. Access your custom query through GraphQL or interact with it using PromptQL
+
+## Create a Native Query
+
+To create a new Native Query, you'll need to have a data connector already set up and introspected.
+
+### Create the directory structure
+
+First, create a directory structure under your connector configuration:
+
+```sh
+mkdir -p my_subgraph/connector/<connector-name>/native_operations/queries/
+```
+
+It would be a good idea to add the folder that's created to the version control,
+to manage the native queries easily.
+
+
+### Create your SQL file
+
+Create a new SQL file with your custom query. For example, create `my_subgraph/connector/<connector-name>/native_operations/queries/my_custom_query.sql`:
+
+<Tabs groupId="data-connectors">
+<TabItem value="postgresql" label="PostgreSQL">
+
+```sql
+SELECT
+  users.id,
+  users.name,
+  COUNT(orders.id) as order_count
+FROM
+  users
+LEFT JOIN
+  orders ON users.id = orders.user_id
+WHERE
+  users.active = true
+  AND users.name LIKE :name_pattern
+GROUP BY
+  users.id, users.name
+HAVING
+  COUNT(orders.id) > :min_orders
+ORDER BY
+  order_count DESC
+```
+
+</TabItem>
+<TabItem value="oracle" label="Oracle">
+
+```sql
+SELECT
+  "User"."Id",
+  "User"."Name",
+  COUNT("Order"."Id") as order_count
+FROM
+  "User"
+LEFT JOIN
+  "Order" ON "User"."Id" = "Order"."UserId"
+WHERE
+  "User"."Active" = 1
+  AND "User"."Name" LIKE {{name_pattern}}
+GROUP BY
+  "User"."Id", "User"."Name"
+HAVING
+  COUNT("Order"."Id") > {{min_orders}}
+ORDER BY
+  order_count DESC
+```
+
+</TabItem>
+<TabItem value="mysql" label="MySQL">
+
+```sql
+SELECT
+  users.id,
+  users.name,
+  COUNT(orders.id) as order_count
+FROM
+  users
+LEFT JOIN
+  orders ON users.id = orders.user_id
+WHERE
+  users.active = true
+  AND users.name LIKE :name_pattern
+GROUP BY
+  users.id, users.name
+HAVING
+  COUNT(orders.id) > :min_orders
+ORDER BY
+  order_count DESC
+```
+
+</TabItem>
+</Tabs>
+
+### Parameter formats
+
+Native Queries can accept parameters that make your queries dynamic and reusable. Depending on the database connector, Native Queries support one of two parameter formats:
+
+1. **Colon-prefixed parameters**: `:parameter_name`
+   - Example: `WHERE user_email = :email`
+   - This format is commonly used in prepared statements
+   - Used by MySQL, Snowflake, Athena and PostgreSQL connectors
+
+2. **Handlebars format**: `{{parameter_name}}`
+   - Example: `WHERE age > {{min_age}}`
+   - Uses double curly braces to denote parameters
+   - Used by Oracle
+
+Each database connector supports only one of these formats, not both simultaneously. Be sure to check your specific connector's documentation to determine which parameter format to use.
+
+### Register the Native Query
+
+Use the DDN CLI to register your native query with your connector:
+
+```sh
+ddn connector plugin --connector my_subgraph/connector/<connector-name>/connector.yaml -- \
+  native-queries create --operation-path native_operations/queries/my_custom_query.sql --name active_users_with_orders
+```
+
+The above command will first validate your SQL query that's present at the specified `operation_path`
+and try to infer the schema of the query.
+
+Note that not all data sources have good support of inferring the schema from the SQL statement
+
+When successful, the command will output information about the parameters and return columns of your query:
+
+```
+
+=== SQL found in the file: ===
+SELECT *
+  FROM albums
+ WHERE Title LIKE :title AND AlbumId < :albumid
+
+================================
+
+Query has 2 parameters:
+|----------|-------------------|----------|----------|-------------------|--------------------------|
+| Param #  | Parameter Name    | SQL Type | Nullable | Type Name         |   Class Name             |
+|----------|-------------------|----------|----------|-------------------|--------------------------|
+| 1        | title             | varchar  | true     | VARCHAR           | java.lang.String         |
+| 2        | albumid           | bigint   | true     | BIGINT            | java.lang.Long           |
+|----------|-------------------|----------|----------|-------------------|--------------------------|
+Query returns the following 3 columns:
+|--------------------|-------------------|----------|----------|--------------------|
+| Column Name        | Type Name         | SQL Type | Nullable | Class name         |
+|--------------------|-------------------|----------|----------|--------------------|
+| AlbumId            | INT64             | bigint   | true     | java.lang.Long     |
+| Title              | STRING            | varchar  | true     | java.lang.String   |
+| ArtistId           | INT64             | bigint   | true     | java.lang.Long     |
+|--------------------|-------------------|----------|----------|--------------------|
+```
+
+
+This output provides a clear view of:
+
+- The SQL query being registered
+- Parameters required by the query, including their names and types
+- Columns returned by the query, including their names and types
+
+This information is valuable for understanding how to use the query in your GraphQL API and for creating relationships to other models based on the returned columns.
+
+#### Reviewing and Customizing Data Types
+
+When creating native queries, it's important to review the data types that are automatically inferred for your parameters and returned columns.
+
+The system will attempt to map SQL types to appropriate GraphQL types, but you may want to customize these mappings for your specific use case.
+To modify the type definitions, you can edit the configuration.json file in your connector's directory.
+
+For example:
+
+```json
+{
+  "native_queries": {
+      "albums_by_title": {
+         "sqlFile": "native_queries/album_by_title.sql",
+         "columns": {
+             "AlbumId": {
+                "name": "AlbumId",
+                "type": {
+                    "type": "scalar_type",
+                    "value": "bigint"
+                },
+                "nullable": true,
+                "description": null
+             },
+             "Title": {
+                "name": "Title",
+                "type": {
+                    "type": "scalar_type",
+                    "value": "varchar"
+                },
+                "nullable": true,
+                "description": null
+             },
+             "ArtistId": {
+                "name": "ArtistId",
+                "type": {
+                    "type": "scalar_type",
+                    "value": "bigint"
+                },
+                "nullable": true,
+                "description": null
+             }
+         },
+         "arguments": {
+             "title": {
+                "type": {
+                   "type": "scalar_type",
+                   "value": "varchar"
+                },
+                "nullable": true,
+                "position": 1,
+                "description": null
+             },
+             "albumid": {
+                "type": {
+                    "type": "scalar_type",
+                    "value": "bigint"
+                },
+                "nullable": true,
+                "position": 2,
+                "description": null
+             }
+         },
+         "description": null
+        }
+    }
+}
+
+
+Common type modifications include:
+
+- Changing a nullable field to non-nullable when you're confident the field should always have a value, so when the query is being run, it will throw a validation error for the missing non-nullable arguments.
+- Converting numeric types to more appropriate precision (e.g., Float to Int or vice versa)
+- Specifying more specialized types for certain data (e.g., UUID, JSON, etc.)
+
+After modifying the types in the configuration file, run the introspect command again to apply your changes:
+
+```sh
+ddn connector introspect <connector_link_name>
+```
+
+Proper type mapping ensures that your native query model integrates seamlessly with the type system and provides the expected behavior in your API.
+
+### Update your metadata
+
+If your data connector is running, update your metadata to track the new native query:
+
+```sh
+ddn connector-link update <connector_link_name> --add-all-resources
+```
+
+If your data connector is not running, you can:
+
+```sh
+# Start the connector and introspect your DB
+ddn connector introspect <connector_link_name>
+
+# Add the native query as a model
+ddn model add <connector_link_name> "active_users_with_orders"
+```
+
+## Update a Native Query
+
+To update an existing Native Query:
+
+1. Modify the SQL file with your updated query
+2. Use the `create` command with the `--overwrite` option:
+
+```sh
+ddn connector plugin --connector my_subgraph/connector/<connector-name>/connector.yaml -- \
+  native-queries create --name active_users_with_orders --operation-path native_operations/queries/my_custom_query.sql --overwrite
+```
+
+3. Update your metadata:
+
+```sh
+ddn connector introspect <connector_link_name>
+ddn model update <connector_link_name> "active_users_with_orders"
+```
+
+
+## Extend a Native Query
+
+Native Queries can be extended with relationships to other models, enabling PromptQL to navigate between your custom query results and related data.
+
+For example, you can create a relationship from your `active_users_with_orders` native query to the `orders` table, allowing PromptQL to fetch specific order details for users returned by your query.
+
+Read more about [creating relationships here](/data-modeling/relationship.mdx).
+
+## Delete a Native Query
+
+To remove a Native Query:
+
+```sh
+# Remove the model from your metadata
+ddn model remove active_users_with_orders
+```
+
+You can remove the native query from the connector configuration manually.
+
+## Best Practices
+
+- Use Native Queries for complex operations that can't be expressed through standard GraphQL operations
+- Keep your queries efficient and optimized to prevent performance issues
+- Use parameters to make your queries dynamic and reusable
+- Document the purpose and parameters of your Native Queries for future reference
+- Create meaningful relationships between Native Queries and other models to enhance PromptQL's understanding
