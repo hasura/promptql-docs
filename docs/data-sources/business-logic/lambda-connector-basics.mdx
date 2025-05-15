@@ -125,6 +125,48 @@ instead.
 </TabItem>
 <TabItem value="Go" label="Go">
 
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello.go"
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloArguments defines the input parameters
+type HelloArguments struct {
+	Name *string `json:"name"` // Pointer makes it optional
+}
+
+// HelloResult defines the return type
+type HelloResult struct {
+	Greeting string `json:"greeting"`
+}
+
+// FunctionHello takes an optional name parameter and returns a friendly greeting string
+// Function is an operation type of query, so it will be treated as read-only
+func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments) (*HelloResult, error) {
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	return &HelloResult{
+		Greeting: fmt.Sprintf("hello %s", name),
+	}, nil
+}
+```
+
+Function names are important as they determine how the function will be exposed in the API:
+
+- Functions starting with `Function` (like `FunctionHello`) are treated as queries (read-only)
+- Functions starting with `Procedure` (like `ProcedureCreateUser`) are treated as mutations (data modifications)
+
+The function documentation is highly recommended to help PromptQL understand the function's purpose and parameters and
+will be added to the function's metadata.
+
 </TabItem>
 
 </Tabs>
@@ -408,6 +450,217 @@ async def with_tracing(name: str) -> str:
 </TabItem>
 <TabItem value="Go" label="Go">
 
+When creating Go lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `int`, `int32`, `int64` - Maps to NDC scalar type: `Int`
+- `float32`, `float64` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `time.Time` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```go
+package functions
+
+import (
+	"context"
+	"time"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type CalculateAgeArguments struct {
+	BirthYear   int `json:"birthYear"`
+	CurrentYear int `json:"currentYear"`
+}
+
+type CalculateAgeResult struct {
+	Age int `json:"age"`
+}
+
+// FunctionCalculateAge calculates a person's age
+func FunctionCalculateAge(ctx context.Context, state *types.State, args *CalculateAgeArguments) (*CalculateAgeResult, error) {
+	return &CalculateAgeResult{
+		Age: args.CurrentYear - args.BirthYear,
+	}, nil
+}
+```
+
+### Object types and structs
+
+You can define custom struct types:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+type ProcessUserArguments struct {
+	User User `json:"user"`
+}
+
+type ProcessUserResponse struct {
+	Success bool   `json:"success"`
+	Data    string `json:"data"`
+}
+
+// FunctionProcessUser demonstrates using custom struct types
+func FunctionProcessUser(ctx context.Context, state *types.State, args *ProcessUserArguments) (*ProcessUserResponse, error) {
+	return &ProcessUserResponse{
+		Success: true,
+		Data:    fmt.Sprintf("User %s is %d years old", args.User.Name, args.User.Age),
+	}, nil
+}
+```
+
+### Slices (Arrays)
+
+Slices of a single type are supported:
+
+```go
+package functions
+
+import (
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type SumNumbersArguments struct {
+	Numbers []int `json:"numbers"`
+}
+
+type SumNumbersResult struct {
+	Sum int `json:"sum"`
+}
+
+// FunctionSumNumbers demonstrates using slice/array types
+func FunctionSumNumbers(ctx context.Context, state *types.State, args *SumNumbersArguments) (*SumNumbersResult, error) {
+	sum := 0
+	for _, num := range args.Numbers {
+		sum += num
+	}
+	return &SumNumbersResult{Sum: sum}, nil
+}
+```
+
+### Nullable and optional properties
+
+You can use pointers to make properties optional:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type FormatNameArguments struct {
+	FirstName string  `json:"firstName"`
+	LastName  *string `json:"lastName"`   // Optional
+	Title     *string `json:"title"`      // Optional
+}
+
+type FormatNameResult struct {
+	FormattedName string `json:"formattedName"`
+}
+
+// FunctionFormatName demonstrates using optional parameters
+func FunctionFormatName(ctx context.Context, state *types.State, args *FormatNameArguments) (*FormatNameResult, error) {
+	formattedTitle := ""
+	if args.Title != nil {
+		formattedTitle = *args.Title + " "
+	}
+
+	formattedLastName := ""
+	if args.LastName != nil {
+		formattedLastName = " " + *args.LastName
+	}
+
+	return &FormatNameResult{
+		FormattedName: fmt.Sprintf("%s%s%s", formattedTitle, args.FirstName, formattedLastName),
+	}, nil
+}
+```
+
+### Generic JSON
+
+You can use `map[string]interface{}` or the `any` type for arbitrary JSON:
+
+```go
+package functions
+
+import (
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type TransformDataArguments struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type TransformDataResult struct {
+	Processed bool                   `json:"processed"`
+	Original  map[string]interface{} `json:"original"`
+}
+
+// FunctionTransformData demonstrates handling arbitrary JSON
+func FunctionTransformData(ctx context.Context, state *types.State, args *TransformDataArguments) (*TransformDataResult, error) {
+	return &TransformDataResult{
+		Processed: true,
+		Original:  args.Data,
+	}, nil
+}
+```
+
+### Error handling
+
+You can return custom errors for better error handling:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type DivideArguments struct {
+	A float64 `json:"a"`
+	B float64 `json:"b"`
+}
+
+type DivideResult struct {
+	Result float64 `json:"result"`
+}
+
+// FunctionDivide demonstrates error handling
+func FunctionDivide(ctx context.Context, state *types.State, args *DivideArguments) (*DivideResult, error) {
+	if args.B == 0 {
+		return nil, fmt.Errorf("cannot divide by zero")
+	}
+	return &DivideResult{Result: args.A / args.B}, nil
+}
+```
+
 </TabItem>
 
 </Tabs>
@@ -479,6 +732,81 @@ if __name__ == "__main__":
 
 </TabItem>
 <TabItem value="Go" label="Go">
+
+Open a new file in the functions directory:
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello_from_http_bin.go"
+package functions
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloFromHttpBinArguments defines the input parameters
+type HelloFromHttpBinArguments struct {
+	Name *string `json:"name"` // Optional name parameter
+}
+
+// HelloFromHttpBinResponse defines the return type
+type HelloFromHttpBinResponse struct {
+	Greeting *string `json:"greeting"` // Optional greeting response
+}
+
+// HTTPBinResponse represents the response from httpbin.org
+type HTTPBinResponse struct {
+	JSON struct {
+		Greeting string `json:"greeting"`
+	} `json:"json"`
+}
+
+// FunctionHelloFromHttpBin calls httpbin.org API to create a personalized greeting
+func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *HelloFromHttpBinArguments) (*HelloFromHttpBinResponse, error) {
+	// Prepare the name to use
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	// Create the request payload
+	payload, err := json.Marshal(map[string]string{
+		"greeting": fmt.Sprintf("Hello %s!", name),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request payload: %w", err)
+	}
+
+	// Send the POST request to httpbin
+	resp, err := http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read and parse the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var httpBinResp HTTPBinResponse
+	if err := json.Unmarshal(body, &httpBinResp); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	// Extract the greeting from the response
+	greeting := httpBinResp.JSON.Greeting
+	return &HelloFromHttpBinResponse{
+		Greeting: &greeting,
+	}, nil
+}
+```
 
 </TabItem>
 
