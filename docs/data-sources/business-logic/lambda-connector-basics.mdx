@@ -68,7 +68,8 @@ As this is a Go project, you can easily add any dependencies you desire by addin
 
 ## Basic lambda functions
 
-The following examples show how to create basic lambda functions in each language.
+The following examples show how to create basic lambda functions in each language. You can replace the contents of the
+`functions.ts`, `functions.py`, or `functions.go` file with the following examples.
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -95,6 +96,31 @@ for functions that are not marked as `@readonly`.
 
 </TabItem>
 <TabItem value="Python" label="Python">
+
+```python title="<subgraph-name>/connector/<connector-name>/functions.py"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from typing import Annotated
+
+connector = FunctionConnector()
+
+@connector.register_query
+def hello(name: str | None = None) -> str:
+    """
+    Takes an optional name parameter and returns a friendly greeting string
+    """
+    return f"hello {name or 'world'}"
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+The docstring comments are optional, but they're highly recommended to help PromptQL understand the function's purpose
+and parameters and will be added to the function's metadata.
+
+The `register_query` decorator indicates that the function does not modify any data, and PromptQL will be able to call
+this without asking for confirmation. To create functions that modify data, use the `register_mutation` decorator
+instead.
 
 </TabItem>
 <TabItem value="Go" label="Go">
@@ -226,6 +252,159 @@ export function divide(a: number, b: number): number {
 </TabItem>
 <TabItem value="Python" label="Python">
 
+When creating Python lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `str` - Maps to NDC scalar type: `String`
+- `int` - Maps to NDC scalar type: `Int`
+- `float` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `datetime` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```python
+from datetime import datetime
+
+@connector.register_query
+def calculate_rough_age(birth_year: int, current_year: int) -> int:
+    """
+    Example of basic scalar types
+    """
+    return current_year - birth_year
+```
+
+### Object types with Pydantic
+
+You can define custom object types using Pydantic models with field descriptions:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Annotated
+
+class User(BaseModel):
+    id: str = Field(..., description="Unique identifier for the user")
+    name: Annotated[str, "User's full name"]
+    age: int
+
+class Response(BaseModel):
+    success: bool
+    data: str
+
+@connector.register_query
+def process_user(user: User) -> Response:
+    """Example using custom types"""
+    return Response(
+        success=True,
+        data=f"User {user.name} is {user.age} years old"
+    )
+```
+
+### Lists and nested types
+
+Lists and nested types are supported:
+
+```python
+from pydantic import BaseModel
+
+class Pet(BaseModel):
+    name: str
+
+class Person(BaseModel):
+    name: str
+    pets: list[Pet] | None = None
+
+@connector.register_query
+def greet_person(person: Person) -> str:
+    greeting = f"Hello {person.name}!"
+    if person.pets is not None:
+        for pet in person.pets:
+            greeting += f" And hello to {pet.name}."
+    else:
+        greeting += f" I see you don't have any pets."
+    return greeting
+```
+
+### Union types and optional properties
+
+You can use union types to indicate multiple possible types:
+
+```python
+@connector.register_query
+def format_name(first_name: str, last_name: str | None = None, title: str | None = None) -> str:
+    """Example with optional and nullable parameters"""
+    formatted_title = f"{title} " if title else ""
+    formatted_last_name = f" {last_name}" if last_name else ""
+    return f"{formatted_title}{first_name}{formatted_last_name}"
+```
+
+### Arbitrary JSON
+
+You can use untyped parameters for arbitrary JSON:
+
+```python
+@connector.register_mutation
+def transform_data(data) -> dict:
+    """Example using untyped parameter for arbitrary JSON"""
+    # Process the JSON data
+    return {"processed": True, "original": data}
+```
+
+### Parallel execution
+
+You can configure functions to run in parallel:
+
+```python
+import asyncio
+
+@connector.register_query(parallel_degree=5)
+async def parallel_query(name: str) -> str:
+    """
+    This function will be executed in parallel in batches of 5
+    when joined in a query
+    """
+    await asyncio.sleep(1)
+    return f"Hello {name}"
+```
+
+### Error handling
+
+You can raise custom errors for better error handling:
+
+```python
+from hasura_ndc.errors import UnprocessableContent
+
+@connector.register_query
+def divide(a: float, b: float) -> float:
+    """Example with error handling"""
+    if b == 0:
+        raise UnprocessableContent(message="Cannot divide by zero", details={"a": a, "b": b})
+    return a / b
+```
+
+### Tracing support
+
+Add additional OpenTelemetry tracing spans to your functions:
+
+```python
+from hasura_ndc.instrumentation import with_active_span
+from opentelemetry.trace import get_tracer
+
+tracer = get_tracer("ndc-sdk-python.server")
+
+@connector.register_query
+async def with_tracing(name: str) -> str:
+    async def do_some_work(_span):
+        # This could be an async network call or other operation
+        return f"Hello {name}, tracing is active!"
+
+    return await with_active_span(
+        tracer,
+        "Root Span",
+        do_some_work,
+        {"tracing-attr": "This attribute is added to the trace"}
+    )
+```
+
 </TabItem>
 <TabItem value="Go" label="Go">
 
@@ -270,6 +449,33 @@ export async function helloFromHttpBin(name?: string): Promise<{ greeting?: stri
 
 </TabItem>
 <TabItem value="Python" label="Python">
+
+Open the `app/connector/python/functions.py` file.
+
+```python title="Replace the contents with the following:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+import requests
+
+connector = FunctionConnector()
+
+@connector.register_query
+async def hello_from_http_bin(name: str | None = None) -> dict:
+    """
+    Calls httpbin.org API to create a personalized greeting for the given name.
+    Takes an optional name parameter and returns a friendly greeting string.
+    """
+    response = requests.post(
+        "https://httpbin.org/post",
+        json={"greeting": f"Hello {name}!"}
+    )
+
+    data = response.json()
+    return {"greeting": data.get("json", {}).get("greeting")}
+
+if __name__ == "__main__":
+    start(connector)
+```
 
 </TabItem>
 <TabItem value="Go" label="Go">
@@ -513,104 +719,3 @@ While not wholly necessary, you can create explicit relationships between your c
 from other datasources. Typically, PromptQL can pick up on the context of how to use your business logic in conjunction
 with your data, but you can always improve its understanding by creating a
 [relationship object](/data-modeling/relationship.mdx).
-
----
-
----
-
----
-
-### Notes:
-
-Retrieve:
-
-:::info Should you use a native data connector instead?
-
-We've developed a set of native data connectors that make it easy to retrieve data from specific sources. You can learn
-more [here](/data-sources/overview.mdx).
-
-This guide is intended to illustrate use cases wherein a native data connector doesn't exist for your source, or you
-need to do custom transformations of the data before its returned to your application.
-
-:::
-
-### Guide
-
-You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
-
-Sometimes bulk loading data from API services might be overkill. In such cases, connecting to API endpoints directly is
-useful or a convenient way to test your API integration.
-
-However, if you expect to run into API rate limits, or need more flexible access to data that would require filtering
-data in ways that the API doesn't natively allow for, consider
-[bulk loading the data instead](/how-to-build-with-promptql/with-apis-with-bulk-data.mdx).
-
-:::info Customization
-
-You can customize which subgraph this connector is added to by
-[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
-in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
-
-:::
-
----
-
-Take Action setup:
-
-### Step 1. Initialize a new local DDN project
-
-```ddn title="Create a new project using the DDN CLI:"
-ddn supergraph init lambda-tutorial --with-promptql
-```
-
-### Step 2. Initialize the lambda connector
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```ddn title="Run the following command:"
-ddn connector init my_ts -i
-```
-
-- Select `hasura/nodejs` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_ts` directory, you'll see the `functions.ts` file generated by the CLI; this will be
-the entrypoint for your connector.
-
-```bash title="From the connector directory, install the necessary packages:"
-cd app/connector/my_ts && npm install
-```
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```ddn title="Run the following command:"
-ddn connector init my_python -i
-```
-
-- Select `hasura/python` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_python` directory, you'll see the `functions.py` file generated by the CLI; this will
-be the entrypoint for your connector.
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```ddn title="Run the following command:"
-ddn connector init my_go -i
-```
-
-- Select `hasura/go` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_go` directory, you'll see Go files in the `functions` folder; these will serve as the
-entrypoint for your connector.
-
-</TabItem>
-
-</Tabs>
