@@ -31,7 +31,7 @@ interacting with databases, API services, and whatever actions you want your app
 how the system should respond to user queries, apply business rules, or even call third-party APIs.
 
 This approach simplifies your architecture and unlocks a powerful new interaction model: **applications that respond,
-reason, and act**...not just fetch data.
+reason, and act** ...not just fetch data.
 
 :::info What about custom native operations?
 
@@ -47,7 +47,7 @@ In an existing supergraph project which has PromptQL enabled, you can add a new 
 following command to start the process in the DDN CLI in interactive mode:
 
 ```ddn title="Initialize a new connector in a project directory:"
-ddn connector init <your_name_for_the_connector> -i
+ddn connector init your_name_for_the_connector -i
 ```
 
 Choose the lambda connector to correspond with the language you'd like to use for your functions.
@@ -87,7 +87,8 @@ As this is a Go project, you can easily add any dependencies you desire by addin
 ## Basic lambda functions
 
 The following examples show how to create basic lambda functions in each language. You can replace the contents of the
-`functions.ts`, `functions.py`, or `functions.go` file with the following examples.
+`functions.ts`, `functions.py`, or any `.go` file in the `/functions` directory of the Go connector with the following
+examples.
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -187,6 +188,57 @@ will be added to the function's metadata.
 </TabItem>
 
 </Tabs>
+
+## Exposing your lambda functions {#exposing-your-lambda-functions}
+
+Once you've created your lambda functions, you need to expose them to PromptQL by adding the metadata to the supergraph
+in the normal way.
+
+### Step 1. Introspect the connector and add the metadata
+
+```ddn
+ddn connector introspect <connector-name>
+```
+
+```ddn title="List the commands discovered during introspection:"
+ddn connector show-resources <connector-name>
+```
+
+You should see the command being `AVAILABLE` which means that it's not yet added to the supergraph.
+
+```ddn
+ddn commands add <connector-name> <command-name>
+```
+
+:::info Add semantic metadata
+
+If you did not add comments to your function, we highly recommend adding a `description` to the command object added
+above.
+
+PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
+function does and how it should be called, you'll get better results and fewer errors.
+
+:::
+
+### Step 3. Create and run a new build and test the function
+
+```ddn title="Create a new local build:"
+ddn supergraph build local
+```
+
+```ddn title="Run your services:"
+ddn run docker-start
+```
+
+```ddn title="In a new terminal tab, open the devlopment console:"
+ddn console --local
+```
+
+Head over to the PromptQL Playground and ask PromptQL to call your lambda function.
+
+```plaintext
+say hello to everyone
+```
 
 ## Supported types
 
@@ -797,38 +849,8 @@ func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *Hel
 
 </Tabs>
 
-### Step 2. Introspect the connector and add the metadata
-
-```ddn
-ddn connector introspect <connector-name>
-ddn commands list <connector-name>
-```
-
-You should see the command being `AVAILABLE` which means that it's not yet added to the supergraph.
-
-```ddn
-ddn commands add <connector-name> <command-name>
-```
-
-### Step 3. Create and run a new build and test the function
-
-```ddn title="Create a new local build:"
-ddn supergraph build local
-```
-
-```ddn title="Run your services:"
-ddn run docker-start
-```
-
-```ddn title="In a new terminal tab, open the devlopment console:"
-ddn console --local
-```
-
-Head over to the PromptQL Playground and see if the AI assistant is able to call your API integration.
-
-```plaintext
-say hello to everyone from httpBin
-```
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
 
 ## Take action
 
@@ -951,79 +973,8 @@ func ProcedureTakeActionOnBehalfOfUser(
 
 </Tabs>
 
-### Step 2. Introspect the source file(s) and add the metadata
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_ts
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_ts "*" for bulk adds
-ddn command add my_ts take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_python
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_python "*" for bulk adds
-ddn command add my_python take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_go
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_go "*" for bulk adds
-ddn command add my_go take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-</Tabs>
-
-The command introspected your connector's entrypoint, identified functions with their argument and return types, and
-generated Hasura metadata for each. Look for `take_action_on_behalf_of_user.hml` to see the CLI-generated metadata.
-
-:::info Add semantic metadata
-
-If you did not add comments to your function, we highly recommend adding a `description` to the command object
-referenced above.
-
-PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
-function does and how it should be used in the application, you'll get better results.
-
-:::
-
-### Step 3. Create a new build and test
-
-```ddn title="Create a new build:"
-ddn supergraph build local
-```
-
-```ddn title="Start your services:"
-ddn run docker-start
-```
-
-```ddn title="Open your local console:"
-ddn console --local
-```
-
-You can now navigate to the PromptQL Playground and use your custom business logic with natural language.
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
 
 <Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
 

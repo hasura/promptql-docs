@@ -1188,8 +1188,13 @@ table td {
 
 /* Code Block Lines */
 [class^='codeBlockLines_'] {
-  background-color: black !important;
+  background-color: var(--primary-neutral-900) !important;
   padding: 0.5rem 1rem !important;
+}
+
+/* Code Block Lines within tabs */
+.tabs-container [class^='codeBlockLines_'] {
+  background-color: black !important;
 }
 
 /* Vendor Table */
