@@ -323,10 +323,8 @@ You can use lambda connectors to add custom business logic to your application t
 
 ```typescript title="Replace the contents of functions.ts with the following:"
 /*
- * This interface defines the structure of the response object returned by the
- * function that acts on behalf of a user. It includes a success status and a message.
- * The success status is a boolean indicating whether the operation was
- * successful or not.
+ * Interface for the response when taking action on behalf of a user.
+ * Contains success status and message.
  */
 interface UserActionResponse {
   success: boolean;
@@ -343,13 +341,16 @@ interface UserActionResponse {
 export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
   // In a real application, you'd replace this with your custom business logic.
   // You could update data in a database or use an API to update another service.
-  console.log(`Taking action on behalf of user`);
+  console.log(`Taking action on behalf of user: ${request}`);
   return {
     success: true,
     message: `Successfully took action on user's behalf: ${request}`,
   };
 }
 ```
+
+The absence of the `@readonly` tag indicates that this function will modify data. PromptQL will ask for confirmation
+before calling it.
 
 </TabItem>
 
