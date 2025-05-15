@@ -39,6 +39,10 @@ export function getSchemaMarkdown(metadataObject: JSONSchema7Definition): string
       return;
     }
 
+    if (metadataObject.type && Array.isArray(metadataObject.type)) {
+      return metadataObject.type.join(' / ');
+    }
+
     let typeDefinition = ``;
 
     const refTitle = getTitle(metadataObject);
