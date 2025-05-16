@@ -1,0 +1,482 @@
+---
+sidebar_position: 5
+sidebar_label: Lambda Connector Types
+description: "Learn about argument and return types for lambda connectors."
+keywords:
+  - hasura
+  - promptql
+  - business logic
+  - lambda connector
+  - types
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Lambda Connector Types
+
+Lambda connectors can be written in TypeScript, Python, or Go and can accept and return types in those languages which
+map to types in the NDC data model which powers PromptQL.
+
+For information about setting up your lambda connectors, see
+[Add a Lambda Connector](/business-logic/add-a-lambda-connector.mdx).
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+When creating TypeScript lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `number` - Maps to NDC scalar type: `Float`
+- `boolean` - Maps to NDC scalar type: `Boolean`
+- `bigint` - Maps to NDC scalar type: `BigInt` (represented as a string in JSON)
+- `Date` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```ts
+/**
+ * Example of basic scalar types
+ * @readonly
+ */
+export function calculateAge(birthDate: Date, currentYear: number): number {
+  return currentYear - birthDate.getFullYear();
+}
+```
+
+### Object types and interfaces
+
+You can define custom object types and interfaces:
+
+```ts
+type User = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+interface Response {
+  success: boolean;
+  data: string;
+}
+
+/**
+ * Example using custom types
+ * @readonly
+ */
+export function processUser(user: User): Response {
+  return {
+    success: true,
+    data: `User ${user.name} is ${user.age} years old`,
+  };
+}
+```
+
+### Arrays
+
+Arrays of a single type are supported:
+
+```ts
+/**
+ * Example using array types
+ * @readonly
+ */
+export function sumNumbers(numbers: number[]): number {
+  return numbers.reduce((sum, num) => sum + num, 0);
+}
+```
+
+### Null, undefined, and optional properties
+
+You can use null, undefined, or make properties optional:
+
+```ts
+/**
+ * Example with optional and nullable parameters
+ * @readonly
+ */
+export function formatName(firstName: string, lastName?: string, title: string | null = null): string {
+  const formattedTitle = title ? `${title} ` : "";
+  const formattedLastName = lastName ? ` ${lastName}` : "";
+  return `${formattedTitle}${firstName}${formattedLastName}`;
+}
+```
+
+### Arbitrary JSON
+
+You can import `JSONValue` from the SDK to accept and return arbitrary JSON:
+
+```ts
+import * as sdk from "@hasura/ndc-lambda-sdk";
+
+/**
+ * Example using JSONValue for arbitrary JSON
+ * @readonly
+ */
+export function transformData(data: sdk.JSONValue): sdk.JSONValue {
+  // Process the JSON data
+  return new sdk.JSONValue({ processed: true, original: data.value });
+}
+```
+
+### Error handling
+
+You can throw custom errors for better error handling:
+
+```ts
+import * as sdk from "@hasura/ndc-lambda-sdk";
+
+/**
+ * Example with error handling
+ * @readonly
+ */
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new sdk.UnprocessableContent("Cannot divide by zero", { a, b });
+  }
+  return a / b;
+}
+```
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+When creating Python lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `str` - Maps to NDC scalar type: `String`
+- `int` - Maps to NDC scalar type: `Int`
+- `float` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `datetime` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```python
+from datetime import datetime
+
+@connector.register_query
+def calculate_rough_age(birth_year: int, current_year: int) -> int:
+    """
+    Example of basic scalar types
+    """
+    return current_year - birth_year
+```
+
+### Object types with Pydantic
+
+You can define custom object types using Pydantic models with field descriptions:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Annotated
+
+class User(BaseModel):
+    id: str = Field(..., description="Unique identifier for the user")
+    name: Annotated[str, "User's full name"]
+    age: int
+
+class Response(BaseModel):
+    success: bool
+    data: str
+
+@connector.register_query
+def process_user(user: User) -> Response:
+    """Example using custom types"""
+    return Response(
+        success=True,
+        data=f"User {user.name} is {user.age} years old"
+    )
+```
+
+### Lists and nested types
+
+Lists and nested types are supported:
+
+```python
+from pydantic import BaseModel
+
+class Pet(BaseModel):
+    name: str
+
+class Person(BaseModel):
+    name: str
+    pets: list[Pet] | None = None
+
+@connector.register_query
+def greet_person(person: Person) -> str:
+    greeting = f"Hello {person.name}!"
+    if person.pets is not None:
+        for pet in person.pets:
+            greeting += f" And hello to {pet.name}."
+    else:
+        greeting += f" I see you don't have any pets."
+    return greeting
+```
+
+### Union types and optional properties
+
+You can use union types to indicate multiple possible types:
+
+```python
+@connector.register_query
+def format_name(first_name: str, last_name: str | None = None, title: str | None = None) -> str:
+    """Example with optional and nullable parameters"""
+    formatted_title = f"{title} " if title else ""
+    formatted_last_name = f" {last_name}" if last_name else ""
+    return f"{formatted_title}{first_name}{formatted_last_name}"
+```
+
+### Arbitrary JSON
+
+You can use untyped parameters for arbitrary JSON:
+
+```python
+@connector.register_mutation
+def transform_data(data) -> dict:
+    """Example using untyped parameter for arbitrary JSON"""
+    # Process the JSON data
+    return {"processed": True, "original": data}
+```
+
+### Parallel execution
+
+You can configure functions to run in parallel:
+
+```python
+import asyncio
+
+@connector.register_query(parallel_degree=5)
+async def parallel_query(name: str) -> str:
+    """
+    This function will be executed in parallel in batches of 5
+    when joined in a query
+    """
+    await asyncio.sleep(1)
+    return f"Hello {name}"
+```
+
+### Error handling
+
+You can raise custom errors for better error handling:
+
+```python
+from hasura_ndc.errors import UnprocessableContent
+
+@connector.register_query
+def divide(a: float, b: float) -> float:
+    """Example with error handling"""
+    if b == 0:
+        raise UnprocessableContent(message="Cannot divide by zero", details={"a": a, "b": b})
+    return a / b
+```
+
+### Tracing support
+
+Add additional OpenTelemetry tracing spans to your functions:
+
+```python
+from hasura_ndc.instrumentation import with_active_span
+from opentelemetry.trace import get_tracer
+
+tracer = get_tracer("ndc-sdk-python.server")
+
+@connector.register_query
+async def with_tracing(name: str) -> str:
+    async def do_some_work(_span):
+        # This could be an async network call or other operation
+        return f"Hello {name}, tracing is active!"
+
+    return await with_active_span(
+        tracer,
+        "Root Span",
+        do_some_work,
+        {"tracing-attr": "This attribute is added to the trace"}
+    )
+```
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+When creating Go lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `int`, `int32`, `int64` - Maps to NDC scalar type: `Int`
+- `float32`, `float64` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `time.Time` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```go
+package functions
+
+import (
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type CalculateAgeArguments struct {
+	BirthYear   int `json:"birthYear"`
+	CurrentYear int `json:"currentYear"`
+}
+
+type CalculateAgeResult struct {
+	Age int `json:"age"`
+}
+
+// FunctionCalculateAge calculates a person's age
+func FunctionCalculateAge(ctx context.Context, state *types.State, args *CalculateAgeArguments) (*CalculateAgeResult, error) {
+	return &CalculateAgeResult{
+		Age: args.CurrentYear - args.BirthYear,
+	}, nil
+}
+```
+
+### Object types and structs
+
+You can define custom struct types:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+type ProcessUserArguments struct {
+	User User `json:"user"`
+}
+
+type ProcessUserResponse struct {
+	Success bool   `json:"success"`
+	Data    string `json:"data"`
+}
+
+// FunctionProcessUser demonstrates using custom struct types
+func FunctionProcessUser(ctx context.Context, state *types.State, args *ProcessUserArguments) (*ProcessUserResponse, error) {
+	return &ProcessUserResponse{
+		Success: true,
+		Data:    fmt.Sprintf("User %s is %d years old", args.User.Name, args.User.Age),
+	}, nil
+}
+```
+
+### Nullable and optional properties
+
+You can use pointers to make properties optional:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type FormatNameArguments struct {
+	FirstName string  `json:"firstName"`
+	LastName  *string `json:"lastName"`   // Optional
+	Title     *string `json:"title"`      // Optional
+}
+
+type FormatNameResult struct {
+	FormattedName string `json:"formattedName"`
+}
+
+// FunctionFormatName demonstrates using optional parameters
+func FunctionFormatName(ctx context.Context, state *types.State, args *FormatNameArguments) (*FormatNameResult, error) {
+	formattedTitle := ""
+	if args.Title != nil {
+		formattedTitle = *args.Title + " "
+	}
+
+	formattedLastName := ""
+	if args.LastName != nil {
+		formattedLastName = " " + *args.LastName
+	}
+
+	return &FormatNameResult{
+		FormattedName: fmt.Sprintf("%s%s%s", formattedTitle, args.FirstName, formattedLastName),
+	}, nil
+}
+```
+
+### Generic JSON
+
+You can use `map[string]interface{}` or the `any` type for arbitrary JSON:
+
+```go
+package functions
+
+import (
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type TransformDataArguments struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type TransformDataResult struct {
+	Processed bool                   `json:"processed"`
+	Original  map[string]interface{} `json:"original"`
+}
+
+// FunctionTransformData demonstrates handling arbitrary JSON
+func FunctionTransformData(ctx context.Context, state *types.State, args *TransformDataArguments) (*TransformDataResult, error) {
+	return &TransformDataResult{
+		Processed: true,
+		Original:  args.Data,
+	}, nil
+}
+```
+
+### Error handling
+
+You can return custom errors for better error handling:
+
+```go
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type DivideArguments struct {
+	A float64 `json:"a"`
+	B float64 `json:"b"`
+}
+
+type DivideResult struct {
+	Result float64 `json:"result"`
+}
+
+// FunctionDivide demonstrates error handling
+func FunctionDivide(ctx context.Context, state *types.State, args *DivideArguments) (*DivideResult, error) {
+	if args.B == 0 {
+		return nil, fmt.Errorf("cannot divide by zero")
+	}
+	return &DivideResult{Result: args.A / args.B}, nil
+}
+```
+
+</TabItem>
+
+</Tabs>
