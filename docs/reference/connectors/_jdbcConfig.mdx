@@ -1,8 +1,14 @@
 ## Introduction
 
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly.
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -132,3 +138,19 @@ Example:
   ]
 }
 ```
+
+## Versioning & upgrading
+
+TODO: Brandon Martin
+
+## Native queries {#native-queries}
+
+You can use the query syntax of the underlying data source to create a **native query** and expose it as a model in your
+application. This is useful if there's a custom function, stored procedure, or complex query that you want to leverage
+directly in your application.
+
+### Add a new native operation
+
+TODO: Brandon Martin
+
+- On specific pages where this component is imported, you can then add source-specific caveats below.
