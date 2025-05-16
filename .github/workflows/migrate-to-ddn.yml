@@ -209,10 +209,10 @@ jobs:
 
             try {
               const result = await github.rest.pulls.create({
-                owner: 'seanparkross',
+                owner: 'hasura',
                 repo: 'ddn-docs',
                 title: '[Sync] ${{ github.event.pull_request.title }}',
-                head: 'seanparkross:${{ steps.setup-git.outputs.branch_name }}',
+                head: 'hasura:${{ steps.setup-git.outputs.branch_name }}',
                 base: 'main',
                 body: prBody,
                 draft: true
@@ -221,7 +221,7 @@ jobs:
               if (result.data) {
                 // Add labels
                 await github.rest.issues.addLabels({
-                  owner: 'seanparkross',
+                  owner: 'hasura',
                   repo: 'ddn-docs',
                   issue_number: result.data.number,
                   labels: ['sync-from-promptql']
@@ -256,7 +256,7 @@ jobs:
             Please manually apply these changes as needed.`;
 
             await github.rest.issues.createComment({
-              owner: 'seanparkross',
+              owner: 'hasura',
               repo: 'ddn-docs',
               issue_number: parseInt(process.env.PR_NUMBER),
               body: commentBody
@@ -287,7 +287,7 @@ jobs:
 
             // Update PR description with final status
             const { data: pr } = await github.rest.pulls.get({
-              owner: 'seanparkross',
+              owner: 'hasura',
               repo: 'ddn-docs',
               pull_number: prNumber
             });
@@ -299,7 +299,7 @@ jobs:
 
             // Update PR description and un-draft
             await github.rest.pulls.update({
-              owner: 'seanparkross',
+              owner: 'hasura',
               repo: 'ddn-docs',
               pull_number: prNumber,
               body: updatedBody,
@@ -308,7 +308,7 @@ jobs:
 
             // Assign PR to original author instead of requesting review
             await github.rest.issues.update({
-              owner: 'seanparkross',
+              owner: 'hasura',
               repo: 'ddn-docs',
               issue_number: prNumber,
               assignees: [process.env.PR_AUTHOR]
