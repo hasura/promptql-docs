@@ -99,6 +99,10 @@ export function generateScalarMarkdown(
  * This function allows us to identify and isolate a particular metadata object based on its title.
  */
 export function findSchemaDefinitionByTitle(schema: JSONSchema7Definition, objectTitle: string): JSONSchema7Definition {
+  // Had to normalize strings...made all the difference in the world
+  const normalizedSchemaTitle = schema.title ? String(schema.title).trim() : '';
+  const normalizedObjectTitle = String(objectTitle).trim();
+
   if (!schema) {
     return;
   }
@@ -108,7 +112,7 @@ export function findSchemaDefinitionByTitle(schema: JSONSchema7Definition, objec
     schema = handleRef(schema);
   }
 
-  if (schema.title === objectTitle) {
+  if (normalizedSchemaTitle === normalizedObjectTitle) {
     return schema;
   }
 
