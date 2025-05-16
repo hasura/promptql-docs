@@ -92,6 +92,6 @@ jobs:
           base: master
           title: 'Redirects: DDN Docs PR#${{ github.event.pull_request.number }}'
           body: |
-            This PR adds _templated_ redirects for the merged docs PR hasura/ddn-docs#${{ github.event.pull_request.number }}.
+            This PR adds _templated_ redirects for the merged docs PR hasura/promptql-docs#${{ github.event.pull_request.number }}.
 
             Modify, review, and merge as needed.
