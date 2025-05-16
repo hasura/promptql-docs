@@ -1192,6 +1192,11 @@ table td {
   padding: 0.5rem 1rem !important;
 }
 
+/* Code Block Lines within tabs */
+.tabs-container [class^='codeBlockLines_'] {
+  background-color: black !important;
+}
+
 /* Vendor Table */
 .vendor-table {
   display: grid;

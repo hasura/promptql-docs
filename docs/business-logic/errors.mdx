@@ -19,8 +19,9 @@ import TabItem from "@theme/TabItem";
 ## Introduction
 
 When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
-error itself. By default for security reasons, lambda connectors return a generic `internal error` message when exceptions occur, while the
-full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that request.
+error itself. By default for security reasons, lambda connectors return a generic `internal error` message when
+exceptions occur, while the full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that
+request.
 
 This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
 deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes

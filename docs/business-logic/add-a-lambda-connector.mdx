@@ -1,29 +1,42 @@
 ---
-sidebar_position: 3
-sidebar_label: Add a lambda connector
+sidebar_position: 2
+sidebar_label: Lambda Connector Basics
 description:
   "Learn how to add a lambda connector to empower PromptQL with custom business logic that can be used to act on a
   user's behalf."
+toc_max_heading_level: 2
 keywords:
   - hasura
   - promptql
   - business logic
+  - lambda connector
 ---
 
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
+import Thumbnail from "@site/src/components/Thumbnail";
+import Prereqs from "@site/docs/_prereqs.mdx";
 
-# Add a Lambda Connector
+# Lambda Connector Basics
 
 ## Introduction
 
-You can add a lambda connector just like any other [data source](/data-sources/overview.mdx).
+You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user. We can
+add a lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and expose functions to PromptQL
+as tools it can use. This means PromptQL isn't limited to querying data — it can **trigger logic**, **run workflows**,
+or **transform inputs into actions**, all within a secure and consistent API environment.
 
-## Add a connector
+By treating logic like a first-class data source, PromptQL ensures your application has a unified surface for
+interacting with databases, API services, and whatever actions you want your application to be able to take. You define
+how the system should respond to user queries, apply business rules, or even call third-party APIs.
+
+## Initialize a lambda connector
 
 ```ddn title="Initialize a new connector in a project directory:"
-ddn connector init <your_name_for_the_connector> -i
+ddn connector init your_name_for_the_connector -i
 ```
+
+Choose the lambda connector to correspond with the language you'd like to use for your functions.
 
 <Tabs groupId="source-preference" className="api-tabs">
 
@@ -57,16 +70,454 @@ As this is a Go project, you can easily add any dependencies you desire by addin
 
 </Tabs>
 
-:::info Customization
+## Write a function
 
-You can customize which subgraph this connector is added to by
-[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
-in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
+There are two types of lambdas you can write, functions and procedures.
+
+- Functions are read-only. Queries without side effects. PromptQL will not ask for confirmation before calling them.
+- Procedures can mutate data and have side effects. PromptQL will ask for confirmation before calling them.
+
+### Examples
+
+The following examples show how to create basic lambda functions in each language. You can replace the contents of the
+`functions.ts`, `functions.py`, or any `.go` file in the `/functions` directory of the Go connector with the following
+examples.
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```ts title="<subgraph-name>/connector/<connector-name>/functions.ts"
+/**
+ * Takes an optional name parameter and returns a friendly greeting string
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {string} A greeting in the format "hello {name}" or "hello world" if no name provided
+ * @readonly
+ */
+export function hello(name?: string) {
+  return `hello ${name ?? "world"}`;
+}
+```
+
+The JSDoc comments are optional, but the first general comment is highly recommended to help PromptQL understand the
+function's purpose and parameters and will be added to the function's metadata.
+
+The `@readonly` tag indicates that the function does not modify any data, and PromptQL will be able to call this without
+asking for confirmation. Under the hood, DDN will create an NDC function for `@readonly` lambdas and an NDC procedure
+for functions that are not marked as `@readonly`.
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+```python title="<subgraph-name>/connector/<connector-name>/functions.py"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from typing import Annotated
+
+connector = FunctionConnector()
+
+@connector.register_query
+def hello(name: str | None = None) -> str:
+    """
+    Takes an optional name parameter and returns a friendly greeting string
+    """
+    return f"hello {name or 'world'}"
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+The docstring comments are optional, but they're highly recommended to help PromptQL understand the function's purpose
+and parameters and will be added to the function's metadata.
+
+The `register_query` decorator indicates that the function does not modify any data, and PromptQL will be able to call
+this without asking for confirmation. To create functions that modify data, use the `register_mutation` decorator
+instead.
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello.go"
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloArguments defines the input parameters
+type HelloArguments struct {
+	Name *string `json:"name"` // Pointer makes it optional
+}
+
+// HelloResult defines the return type
+type HelloResult struct {
+	Greeting string `json:"greeting"`
+}
+
+// FunctionHello takes an optional name parameter and returns a friendly greeting string
+func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments) (*HelloResult, error) {
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	return &HelloResult{
+		Greeting: fmt.Sprintf("hello %s", name),
+	}, nil
+}
+```
+
+Function names are important as they determine how the function will be exposed in the API:
+
+- Functions starting with `Function` (like `FunctionHello`) are treated as queries (read-only)
+- Functions starting with `Procedure` (like `ProcedureCreateUser`) are treated as mutations (data modifications)
+
+The function documentation is highly recommended to help PromptQL understand the function's purpose and parameters and
+will be added to the function's metadata.
+
+</TabItem>
+
+</Tabs>
+
+## Exposing your lambda functions {#exposing-your-lambda-functions}
+
+Once you've created your lambda functions, you need to expose them to PromptQL by generating metadata for them.
+
+### Step 1. Introspect the connector and add the metadata
+
+```ddn
+ddn connector introspect <connector-name>
+```
+
+```ddn title="List the commands discovered during introspection:"
+ddn connector show-resources <connector-name>
+```
+
+You should see the command being `AVAILABLE` which means that there's not yet metadata representing it.
+
+```ddn
+ddn commands add <connector-name> <command-name>
+```
+
+:::info Add semantic metadata
+
+If you did not add comments to your function, we highly recommend adding a `description` to the command object added
+above.
+
+PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
+function does and how it should be called, you'll get better results and fewer errors.
 
 :::
 
-## Next steps
+### Step 2. Create and run a new build and test the function
 
-After adding a connector, learn
-[how to add custom business logic](/business-logic/tutorials/1-take-action-for-a-user.mdx) written in your language of
-choice and expose it via your API.
+```ddn title="Create a new local build:"
+ddn supergraph build local
+```
+
+```ddn title="Run your services:"
+ddn run docker-start
+```
+
+```ddn title="In a new terminal tab, open the devlopment console:"
+ddn console --local
+```
+
+Head over to the PromptQL Playground and ask PromptQL to call your lambda function.
+
+```plaintext
+say hello to everyone
+```
+
+## Retrieve information
+
+You can add a lambda function which reaches out to external APIs to retrieve data which PromptQL can use.
+
+### Step 1. Call an external API
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+Open the `app/connector/typescript/functions.ts` file.
+
+```ts title="Replace the contents with the following:"
+/**
+ * Calls httpbin.org API to create a personalized greeting for the given name. Takes an optional name parameter and returns a friendly greeting string.
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {Promise<{ greeting?: string }>} A Promise resolving to an object containing the optional greeting message
+ * @readonly
+ */
+export async function helloFromHttpBin(name?: string): Promise<{ greeting?: string }> {
+  const greeting = { greeting: name };
+
+  const response = await fetch("https://httpbin.org/post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ greeting: `Hello ${name}!` }),
+  });
+
+  const data: any = await response.json();
+  return { greeting: data?.json?.greeting };
+}
+```
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+Open the `app/connector/python/functions.py` file.
+
+```python title="Replace the contents with the following:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+import requests
+
+connector = FunctionConnector()
+
+@connector.register_query
+async def hello_from_http_bin(name: str | None = None) -> dict:
+    """
+    Calls httpbin.org API to create a personalized greeting for the given name.
+    Takes an optional name parameter and returns a friendly greeting string.
+    """
+    response = requests.post(
+        "https://httpbin.org/post",
+        json={"greeting": f"Hello {name}!"}
+    )
+
+    data = response.json()
+    return {"greeting": data.get("json", {}).get("greeting")}
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+Open a new file in the functions directory:
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello_from_http_bin.go"
+package functions
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloFromHttpBinArguments defines the input parameters
+type HelloFromHttpBinArguments struct {
+	Name *string `json:"name"` // Optional name parameter
+}
+
+// HelloFromHttpBinResponse defines the return type
+type HelloFromHttpBinResponse struct {
+	Greeting *string `json:"greeting"` // Optional greeting response
+}
+
+// HTTPBinResponse represents the response from httpbin.org
+type HTTPBinResponse struct {
+	JSON struct {
+		Greeting string `json:"greeting"`
+	} `json:"json"`
+}
+
+// FunctionHelloFromHttpBin calls httpbin.org API to create a personalized greeting
+func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *HelloFromHttpBinArguments) (*HelloFromHttpBinResponse, error) {
+	// Prepare the name to use
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	// Create the request payload
+	payload, err := json.Marshal(map[string]string{
+		"greeting": fmt.Sprintf("Hello %s!", name),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request payload: %w", err)
+	}
+
+	// Send the POST request to httpbin
+	resp, err := http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read and parse the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var httpBinResp HTTPBinResponse
+	if err := json.Unmarshal(body, &httpBinResp); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	// Extract the greeting from the response
+	greeting := httpBinResp.JSON.Greeting
+	return &HelloFromHttpBinResponse{
+		Greeting: &greeting,
+	}, nil
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
+
+## Take action
+
+You can use lambda connectors to add custom business logic to your application that takes action on behalf of a user.
+
+### Step 1. Add custom logic
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```typescript title="Replace the contents of functions.ts with the following:"
+/*
+ * Interface for the response when taking action on behalf of a user.
+ * Contains success status and message.
+ */
+interface UserActionResponse {
+  success: boolean;
+  message: string;
+}
+
+/*
+ * This function simulates taking an action on behalf of a user. It logs the request made by the user
+ * and returns a response object indicating the success status and a message.
+ *
+ * @param {string} request - What the user wants to do
+ * @returns {UserActionResponse} - The response object containing success status and message
+ */
+export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
+  // In a real application, you'd replace this with your custom business logic.
+  // You could update data in a database or use an API to update another service.
+  console.log(`Taking action on behalf of user: ${request}`);
+  return {
+    success: true,
+    message: `Successfully took action on user's behalf: ${request}`,
+  };
+}
+```
+
+The absence of the `@readonly` tag indicates that this function will modify data. PromptQL will ask for confirmation
+before calling it.
+
+</TabItem>
+
+<TabItem value="Python" label="Python">
+
+```python title="Replace the contents of functions.py with the following:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from pydantic import BaseModel, Field
+from hasura_ndc.errors import UnprocessableContent
+from typing import Annotated
+
+connector = FunctionConnector()
+
+class UserActionArguments(BaseModel):
+    request: Annotated[str, Field(description="What the user wants to do")]
+
+class UserActionResponse(BaseModel):
+    success: bool
+    message: str
+
+@connector.register_mutation
+def take_action_on_behalf_of_user(args: UserActionArguments) -> UserActionResponse:
+    # In a real application, you'd replace this with business logic
+    # You could update data in a database or use an API to update another service.
+    print("Taking action on behalf of user")
+    return UserActionResponse(
+        success=True,
+        message=f"Successfully took action on user's behalf: {args.request}"
+    )
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+The addition of the `@connector.register_mutation` decorator indicates that the function will modify data, and PromptQL
+will ask for confirmation before calling it.
+
+</TabItem>
+
+<TabItem value="Go" label="Go">
+
+```go title="Add the following to a new file called app/connector/my_go/functions/take_action_on_behalf_of_user.go:"
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// TakeActionArguments represents the input arguments for a user action.
+type TakeActionArguments struct {
+	Request string `json:"request"`
+}
+
+// TakeActionResponse represents the response after performing a user action.
+type TakeActionResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+// ProcedureTakeActionOnBehalfOfUser simulates taking an action for the user.
+func ProcedureTakeActionOnBehalfOfUser(
+	ctx context.Context,
+	state *types.State,
+	args *TakeActionArguments,
+) (*TakeActionResponse, error) {
+	// In a real application, you'd replace this with your custom business logic
+  // You could update data in a database or use an API to update another service.
+	fmt.Println("Taking action on behalf of user")
+
+	return &TakeActionResponse{
+		Success: true,
+		Message: fmt.Sprintf("Successfully took action on user's behalf: %s", args.Request),
+	}, nil
+}
+```
+
+By prefixing the function name with `Procedure`, we indicate that the function will modify data, and PromptQL will ask
+for confirmation before calling it.
+
+</TabItem>
+
+</Tabs>
+
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
+
+<Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
+
+:::info What about custom native operations?
+
+Many complex reads and writes to your data sources can be accomplished with custom native queries and mutations. Check
+out the [connector-specific reference docs](/reference/connectors/index.mdx) for generating queries and mutations using
+the native capabilities of your data source.
+
+:::
