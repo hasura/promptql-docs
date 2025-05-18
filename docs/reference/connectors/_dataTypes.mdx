@@ -1,10 +1,112 @@
-## Introduction
+## Data Type Mapping in Database Connectors
 
-TODO: Brandon Martin; notes below:
+Database connectors face the challenge of bridging three different type systems:
 
-## Data types
+1. **SQL data types** (which vary across database vendors)
+2. **Java/JDBC data types** (which provide a common interface but have limitations)
+3. **NDC specification scalar types** (which define the contract with API consumers)
 
-- General information on how data types map from SQL `<>` NDC spec, regardless of which underlying data source this page
-  appears on.
-- This can be a list, headings, paragraphs, whatever you wish.
-- On specific pages where this component is imported, you can then add source-specific caveats.
+## The Type System Challenge
+
+There is always a mismatch between SQL data types and Java data types for two primary reasons:
+
+1. **SQL data types are insufficiently covered by the JDBC API**
+   - SQL has evolved with more specialized types than JDBC can represent
+   - Different database vendors implement SQL types with subtle variations
+   - Some SQL types have no direct equivalent in Java
+
+2. **Java data types are often less expressive than SQL data types**
+   - Precision and scale information can be lost
+   - Range limitations exist in Java primitives
+   - Temporal types have different semantics
+   - Vendor-specific types require special handling
+
+## Bridging the Gap with jOOQ
+
+The JDBC connector uses jOOQ as an intermediate layer to address these challenges. jOOQ provides:
+
+1. A more comprehensive type system than raw JDBC
+2. Consistent handling across different database systems
+3. Type safety and conversion capabilities
+4. Support for vendor-specific types
+
+## Type Conversion Flow
+
+When working with database types, the connector follows this conversion flow:
+
+```
+Database-specific SQL types → jOOQ SQLDataType → NDC scalar types → JSON representation
+```
+
+This multi-step conversion ensures that:
+- Type information is preserved as accurately as possible
+- Values are properly serialized according to the NDC specification
+- Type handling is consistent across different database systems
+
+## SQL to NDC Type Mapping
+
+The following table shows how common SQL types map to NDC specification scalar types:
+
+| SQL Type Category | NDC Spec Type | JSON Representation |
+|-------------------|---------------|---------------------|
+| Boolean types | `boolean` | Boolean |
+| Character/string types | `string` | String |
+| Small integer types | `int8`, `int16` | Number |
+| Integer types | `int32` | Number |
+| Big integer types | `int64` | String |
+| Single-precision float types | `float32` | Number |
+| Double-precision float types | `float64` | Number |
+| Decimal/numeric types | `bigdecimal` | String |
+| UUID types | `uuid` | String (8-4-4-4-12 format) |
+| Date types | `date` | String (ISO 8601) |
+| Time types | `timestamp` | String (ISO 8601) |
+| Timestamp types | `timestamp` | String (ISO 8601) |
+| Timestamp with timezone types | `timestamptz` | String (ISO 8601) |
+| Binary data types | `bytes` | String (Base64-encoded) |
+| JSON data types | `json` | JSON |
+| Spatial data types | `geography`, `geometry` | JSON (GeoJSON) |
+
+## NDC Scalar Type Representations
+
+The NDC specification defines the following scalar type representations:
+
+| NDC Type | Description | JSON Representation |
+|----------|-------------|---------------------|
+| `boolean` | Boolean | Boolean |
+| `string` | String | String |
+| `int8` | 8-bit signed integer (-2^7 to 2^7-1) | Number |
+| `int16` | 16-bit signed integer (-2^15 to 2^15-1) | Number |
+| `int32` | 32-bit signed integer (-2^31 to 2^31-1) | Number |
+| `int64` | 64-bit signed integer (-2^63 to 2^63-1) | String |
+| `float32` | IEEE-754 single-precision float | Number |
+| `float64` | IEEE-754 double-precision float | Number |
+| `biginteger` | Arbitrary-precision integer | String |
+| `bigdecimal` | Arbitrary-precision decimal | String |
+| `uuid` | UUID string (8-4-4-4-12 format) | String |
+| `date` | ISO 8601 date | String |
+| `timestamp` | ISO 8601 timestamp | String |
+| `timestamptz` | ISO 8601 timestamp with timezone | String |
+| `geography` | GeoJSON, per RFC 7946 | JSON |
+| `geometry` | GeoJSON Geometry object, per RFC 7946 | JSON |
+| `bytes` | Base64-encoded bytes | String |
+| `json` | Arbitrary JSON | JSON |
+
+## Special Type Considerations
+
+### Numeric Types
+- Large integers (`int64`) and arbitrary precision numbers (`bigdecimal`, `biginteger`) are represented as strings in JSON to prevent precision loss
+- Different databases have different precision limits for numeric types
+
+### Temporal Types
+- Date/time handling varies significantly across databases
+- Timezone information may be preserved or lost depending on the database type
+- All temporal types are normalized to ISO 8601 strings in the JSON representation
+
+### Binary Data
+- Binary data is Base64-encoded as strings in the JSON representation
+- This can significantly increase payload size for large binary objects
+
+### Vendor-Specific Types
+- Database-specific types are mapped to the closest NDC scalar type
+- Some information may be lost in this conversion
+- Custom type handling may be required for specialized use cases

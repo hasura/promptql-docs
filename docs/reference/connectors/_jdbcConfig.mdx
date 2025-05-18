@@ -141,16 +141,167 @@ Example:
 
 ## Versioning & upgrading
 
-TODO: Brandon Martin
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2",
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing data source connections and schema information. This versioning system allows for future schema evolution while maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema information while enabling access to new features and improved type handling.
 
 ## Native queries {#native-queries}
 
-You can use the query syntax of the underlying data source to create a **native query** and expose it as a model in your
-application. This is useful if there's a custom function, stored procedure, or complex query that you want to leverage
-directly in your application.
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want to leverage directly in your API.
 
-### Add a new native operation
+### Native query structure
 
-TODO: Brandon Martin
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two methods for defining native queries:
 
-- On specific pages where this component is imported, you can then add source-specific caveats below.
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = {{region}}
+   AND sales > {{min_sales}}
+   ```
+
+3. Register the query using the CLI:
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports two parameter syntaxes:
+
+1. **Colon prefix syntax**: `:parameter` (used in configuration-based approach)
+2. **Double curly braces syntax**: `{{parameter}}` (used in file-based approach)
+
+Both syntaxes are translated to parameterized queries, which helps prevent SQL injection attacks.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `{{name}}` not `'{{name}}'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || {{search}} || '%'`)
+5. **No "hasura_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+### Using native queries in GraphQL
+
+Once defined, native queries are exposed in your GraphQL API as fields on the Query or Mutation type:
+
+```graphql
+query {
+  get_customers_by_region(args: {region: "North", min_sales: 1000}) {
+    customer_id
+    name
+    sales
+  }
+}
+```
