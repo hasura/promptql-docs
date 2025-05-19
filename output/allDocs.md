@@ -29222,6 +29222,7 @@ with Amazon Athena and Hasura DDN as quickly as possible, check out our
 ## Amazon Athena docs
 
 - [Connector configuration](/reference/connectors/athena/configuration.mdx)
+- [Troubleshooting](/reference/connectors/athena/troubleshooting.mdx)
 
 ==============================
 
@@ -29231,9 +29232,15 @@ URL: https://hasura.io/docs/promptql/reference/connectors/athena/configuration
 
 ## Introduction
 
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly.
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -29363,6 +29370,187 @@ Example:
   ]
 }
 ```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/athena/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
 
 ==============================
 
@@ -29391,6 +29579,7 @@ with Amazon Redshift and Hasura DDN as quickly as possible, check out our
 ## Amazon Redshift docs
 
 - [Connector configuration](/reference/connectors/redshift/configuration.mdx)
+- [Troubleshooting](/reference/connectors/redshift/troubleshooting.mdx)
 
 ==============================
 
@@ -29400,9 +29589,15 @@ URL: https://hasura.io/docs/promptql/reference/connectors/redshift/configuration
 
 ## Introduction
 
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly.
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -29532,6 +29727,187 @@ Example:
   ]
 }
 ```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/redshift/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
 
 ==============================
 
@@ -29560,6 +29936,7 @@ with BigQuery and Hasura DDN as quickly as possible, check out our
 ## BigQuery docs
 
 - [Connector configuration](/reference/connectors/bigquery/configuration.mdx)
+- [Troubleshooting](/reference/connectors/bigquery/troubleshooting.mdx)
 
 ==============================
 
@@ -29569,9 +29946,15 @@ URL: https://hasura.io/docs/promptql/reference/connectors/bigquery/configuration
 
 ## Introduction
 
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly.
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -29701,6 +30084,187 @@ Example:
   ]
 }
 ```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/bigquery/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
 
 ==============================
 
@@ -29729,6 +30293,7 @@ with Databricks and Hasura DDN as quickly as possible, check out our
 ## Databricks docs
 
 - [Connector configuration](/reference/connectors/databricks/configuration.mdx)
+- [Troubleshooting](/reference/connectors/databricks/troubleshooting.mdx)
 
 ==============================
 
@@ -29738,334 +30303,18 @@ URL: https://hasura.io/docs/promptql/reference/connectors/databricks/configurati
 
 # Configuration Reference
 
-## Introduction
-
-The configuration is a metadata object that describes the schema of your Databricks workspace, including tables,
-columns, and the connection details. This configuration is static — changes in your Databricks schema will require
-updating and reapplying the configuration file. See [updating with introspection](#updating-with-introspection) for more
-details.
-
-## Structure
-
-The configuration object is a JSON object with the following fields:
-
-```json
-{
-  "connection_uri": {
-    "variable": "JDBC_URL"
-  },
-  "tables": [],
-  "primary_keys": [],
-  "foreign_keys": {}
-}
-```
-
-### Property: connection_uri
-
-This field defines the environment variable that contains the JDBC connection URI to connect to your Databricks
-instance.
-
-### Property: tables
-
-This is an array of table definitions that describe the structure of the available data in your Databricks workspace.
-
-Each table includes:
-
-- Fully-qualified name (including schema and catalog)
-- List of columns and their types
-- Primary key and foreign key metadata (if available)
-
-## Updating with introspection
-
-If your Databricks schema changes, you should re-introspect to update the configuration accordingly.
-
-Running `update` in a configuration directory will:
-
-- Connect to the Databricks workspace using the `JDBC_URL`
-- Scan available tables and columns
-- Generate an updated configuration file reflecting the current schema
-
-==============================
-
-# MySQL
-
-URL: https://hasura.io/docs/promptql/reference/connectors/mysql/
-
-# MySQL
 
 ## Introduction
 
-Hasura DDN includes a Native Data Connector for MySQL, providing integration with MySQL databases. This connector allows
-you to leverage MySQL’s powerful relational database capabilities while taking advantage of Hasura’s metadata-driven
-approach. Here, we’ll explore the key features of the MySQL connector and walk through the configuration process within
-a Hasura DDN project.
-
-:::tip Looking to get started?
-
-If you've ended up here and aren't concerned about tweaking your configuration, and rather are looking to get started
-with MySQL and Hasura DDN as quickly as possible, check out our
-[MySQL tutorial](/how-to-build-with-promptql/with-mysql.mdx) or
-[learn how to connect](/data-sources/connect-to-a-source.mdx) to a MySQL instance.
-
-:::
-
-## MySQL docs
-
-- [Connector configuration](/reference/connectors/mysql/configuration.mdx)
-
-==============================
-
-# configuration.mdx
-
-URL: https://hasura.io/docs/promptql/reference/connectors/mysql/configuration
-
-# Configuration Reference
-
-## Introduction
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
 
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly, see
-[updating with introspection](#updating-with-introspection).
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
 
-## Structure
-
-The configuration object is a JSON object with the following fields:
-
-```json
-{
-  "jdbcUrl": "",
-  "jdbcProperties": {},
-  "schemas": [],
-  "tables": [],
-  "functions": [],
-  "nativeQueries": {}
-}
-```
-
-### Property: JDBC URL
-
-The JDBC connection URL to connect to the MySQL database. This is a required field.
-
-The value can either be a literal string, or a reference to an environment variable:
-
-```json
-{
-  "jdbcUrl": "jdbc:MySQL:thin:@//localhost:1521/xe?user=foo&password=bar",
-  "jdbcUrl": { "variable": "MYSQL_JDBC_URL" }
-}
-```
-
-### Property: JDBC Properties
-
-This is a JSON object containing key-value pairs of additional properties to be passed to the JDBC driver. For example,
-with MySQL to enable running multiple statements in a given query:
-
-```json
-{
-  "jdbcProperties": { "allowMultiQueries": "true" }
-}
-```
-
-### Property: Schemas
-
-This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
-included.
-
-Example:
-
-```json
-{
-  "schemas": ["public", "other_schema"]
-}
-```
-
-### Property: Tables
-
-This is an array of table definitions, generated automatically during introspection.
-
-Example:
-
-```json
-{
-  "tableName": "Album",
-  "tableType": "TABLE",
-  "description": "",
-  "columns": [
-    {
-      "name": "AlbumId",
-      "description": "",
-      "type": "int",
-      "numeric_scale": 0,
-      "nullable": false,
-      "auto_increment": true,
-      "is_primarykey": true
-    },
-    {
-      "name": "Title",
-      "description": "",
-      "type": "varchar",
-      "numeric_scale": null,
-      "nullable": false,
-      "auto_increment": false,
-      "is_primarykey": false
-    },
-    {
-      "name": "ArtistId",
-      "description": "",
-      "type": "int",
-      "numeric_scale": 0,
-      "nullable": false,
-      "auto_increment": false,
-      "is_primarykey": false
-    }
-  ],
-  "pks": ["AlbumId"],
-  "fks": {
-    "FK_AlbumArtistId": {
-      "foreign_collection": "Artist",
-      "column_mapping": {
-        "ArtistId": "ArtistId"
-      }
-    }
-  }
-}
-```
-
-### Property: Functions
-
-This is an array of function definitions.
-
-Example:
-
-```json
-{
-  "function_catalog": "public",
-  "function_schema": "public",
-  "function_name": "add",
-  "argument_signature": "(N NUMBER, M NUMBER)",
-  "data_type": "TABLE (N NUMBER, M NUMBER)",
-  "comment": "Adds two numbers"
-}
-```
-
-### Property: Native Queries
-
-This is a JSON object containing key-value pairs of Native Queries to be used in the data connector.
-
-Two types of Native Queries are supported: **Inline** and **Parameterized**.
-
-Example:
-
-```json
-{
-  "native_query_inline": {
-    "sql": {
-      "parts": [
-        {
-          "type": "text",
-          "value": "SELECT 1 AS result FROM DUAL"
-        }
-      ]
-    },
-    "columns": {
-      "result": {
-        "type": "named",
-        "name": "INT"
-      }
-    },
-    "arguments": {},
-    "description": ""
-  },
-  "ArtistById_parameterized": {
-    "sql": {
-      "parts": [
-        {
-          "type": "text",
-          "value": "SELECT * FROM CHINOOK.ARTIST WHERE ARTISTID = "
-        },
-        {
-          "type": "parameter",
-          "value": "ARTISTID"
-        }
-      ]
-    },
-    "columns": {
-      "ARTISTID": {
-        "type": "named",
-        "name": "INT"
-      },
-      "NAME": {
-        "type": "nullable",
-        "underlying_type": {
-          "type": "named",
-          "name": "STRING"
-        }
-      }
-    },
-    "arguments": {
-      "ARTISTID": {
-        "description": null,
-        "type": {
-          "type": "named",
-          "name": "INT"
-        }
-      }
-    },
-    "description": null,
-    "isProcedure": false
-  }
-```
-
-## Updating with introspection
-
-Whenever the schema of your database changes you will need to update your data connector configuration accordingly to
-reflect those changes.
-
-Running `update` in a configuration directory will do the following:
-
-- Connect to the database with the specified `jdbcUrl`, and then overwrite all data in the `tables` field
-
-- Fill in default values for any fields absent from the configuration
-
-==============================
-
-# PostgreSQL
-
-URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/
-
-# PostgreSQL for PromptQL
-
-## Introduction
-
-The Native Data Connector for PostgreSQL is our flagship connector for PromptQL. In the sections below, we'll try to
-give an overview of the features of the PostgreSQL connector for PromptQL and how to configure it in a Hasura DDN
-project.
-
-:::tip Looking to get started?
-
-If you've ended up here and aren't concerned about tweaking your configuration, and rather are looking to get started
-with PostgreSQL and Hasura DDN as quickly as possible, check out our
-[PostgreSQL tutorial](/how-to-build-with-promptql/with-postgresql.mdx) or
-[learn how to connect](/data-sources/connect-to-a-source.mdx) to a PostgreSQL instance.
-
-:::
-
-## PostgreSQL docs
-
-- [Connector configuration](/reference/connectors/postgresql/configuration.mdx)
-
-==============================
-
-# Configuration
-
-URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/configuration
-
-## Introduction
-
-The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly.
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -30195,6 +30444,916 @@ Example:
   ]
 }
 ```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/databricks/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
+
+==============================
+
+
+
+# MySQL
+
+URL: https://hasura.io/docs/promptql/reference/connectors/mysql/
+
+# MySQL
+
+## Introduction
+
+Hasura DDN includes a Native Data Connector for MySQL, providing integration with MySQL databases. This connector allows
+you to leverage MySQL’s powerful relational database capabilities while taking advantage of Hasura’s metadata-driven
+approach. Here, we’ll explore the key features of the MySQL connector and walk through the configuration process within
+a Hasura DDN project.
+
+:::tip Looking to get started?
+
+If you've ended up here and aren't concerned about tweaking your configuration, and rather are looking to get started
+with MySQL and Hasura DDN as quickly as possible, check out our
+[MySQL tutorial](/how-to-build-with-promptql/with-mysql.mdx) or
+[learn how to connect](/data-sources/connect-to-a-source.mdx) to a MySQL instance.
+
+:::
+
+## MySQL docs
+
+- [Connector configuration](/reference/connectors/mysql/configuration.mdx)
+- [Troubleshooting](/reference/connectors/mysql/troubleshooting.mdx)
+
+
+
+==============================
+
+
+
+# configuration.mdx
+
+URL: https://hasura.io/docs/promptql/reference/connectors/mysql/configuration
+
+# Configuration Reference
+
+
+## Introduction
+
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
+
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/mysql/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
+
+==============================
+
+
+
+# PostgreSQL
+
+URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/
+
+# PostgreSQL for PromptQL
+
+## Introduction
+
+The Native Data Connector for PostgreSQL is our flagship connector for PromptQL. In the sections below, we'll try to
+give an overview of the features of the PostgreSQL connector for PromptQL and how to configure it in a Hasura DDN
+project.
+
+:::tip Looking to get started?
+
+If you've ended up here and aren't concerned about tweaking your configuration, and rather are looking to get started
+with PostgreSQL and Hasura DDN as quickly as possible, check out our
+[PostgreSQL tutorial](/how-to-build-with-promptql/with-postgresql.mdx) or
+[learn how to connect](/data-sources/connect-to-a-source.mdx) to a PostgreSQL instance.
+
+:::
+
+## PostgreSQL docs
+
+- [Connector configuration](/reference/connectors/postgresql/configuration.mdx)
+- [Troubleshooting](/reference/connectors/postgresql/troubleshooting.mdx)
+
+
+
+==============================
+
+
+
+# Configuration
+
+URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/configuration
+
+
+## Introduction
+
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
+The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
+
+## Structure
+
+The configuration object is a JSON object with the following fields:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [],
+}
+```
+
+### Property: connection_uri
+
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
+}
+```
+
+:::info JDBC Syntax
+
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
+
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
+
+This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
+included. **Any schema passed in the JDBC URL will take precedence.**
+
+Example:
+
+```json
+{
+  "schemas": ["schema1", "schema2"]
+}
+```
+
+### Property: tables
+
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
+
+Example:
+
+```json
+{
+  "tables": [
+    {
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
+        {
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
+        },
+        {
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
+        }
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
+        }
+      }
+    }
+  ]
+}
+```
+
+## Versioning & upgrading
+
+The JDBC connector configuration uses a version field to indicate its schema version:
+
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
+
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
+
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/postgresql/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
+
+
 
 ==============================
 
@@ -30227,6 +31386,7 @@ processing.**
 ## Snowflake docs
 
 - [Connector configuration](/reference/connectors/snowflake/configuration.mdx)
+- [Troubleshooting](/reference/connectors/snowflake/troubleshooting.mdx)
 
 ==============================
 
@@ -30236,12 +31396,18 @@ URL: https://hasura.io/docs/promptql/reference/connectors/snowflake/configuratio
 
 # Configuration Reference
 
+
 ## Introduction
 
+The `configuration.json` file is generated whenever you introspect a new connector. The file is located in the
+`<connector_name>/connector` sub-directory of its parent subgraph.
+
 The configuration is a metadata object that lists all the database entities — such as tables — that the data connector
-has to know about in order to serve queries. It never changes during the lifetime of the data connector service
-instance. When your database schema changes you will have to update the configuration accordingly, see
-[updating with introspection](#updating-with-introspection).
+has to know about in order to serve queries. When your database schema changes you will have to update the configuration
+accordingly.
+
+While the `configuration.json` file is generated and populated for you, you can hand-edit sections (such as
+[native queries](#native-queries)) to manipulate what resources are available to your application.
 
 ## Structure
 
@@ -30249,33 +31415,48 @@ The configuration object is a JSON object with the following fields:
 
 ```json
 {
-  "jdbcUrl": "",
-  "jdbcProperties": {},
-  "schemas": [],
-  "tables": [],
+  "version": "v2",
+  "connection_uri": {
+    "value": "...",
+    "variable": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
   "functions": [],
-  "nativeQueries": {}
 }
 ```
 
-### Property: JDBC URL
+### Property: connection_uri
 
-The JDBC connection URL to connect to the Snowflake instance. This is a required field.
-
-The value can either be a literal string, or a reference to an environment variable:
+The connection URI for the datasource. This is a required field that can be specified either as a direct string value or
+as a reference to an environment variable:
 
 ```json
 {
-  "jdbcUrl": "jdbc:snowflake://<account-identifier.<region>.snowflakecomputing.com?user=YOUR_USERNAME&&password=YOUR_PASSWORD&db=YOUR_DATABASE&warehouse=YOUR_WAREHOUSE&schema=YOUR_SCHEMA&role=YOUR_ROLE",
-  "jdbcUrl": { "variable": "SNOWFLAKE_JDBC_URL" }
+  "connection_uri": {
+    "value": "<connection_uri>"
+  }
 }
 ```
 
-### Property: JDBC Properties
+:::info JDBC Syntax
 
-This is a JSON object containing key-value pairs of additional properties to be passed to the JDBC driver.
+This construction differs from source to source. Check out [these docs](/data-sources/connect-to-a-source.mdx) for
+examples of connection strings for this and other sources.
 
-### Property: Schemas
+:::
+
+Or using an environment variable:
+
+```json
+{
+  "connection_uri": {
+    "variable": "JDBC_URL"
+  }
+}
+```
+
+### Property: schemas
 
 This is an optional array of schema names to include in the introspection process. If not provided, all schemas will be
 included. **Any schema passed in the JDBC URL will take precedence.**
@@ -30284,154 +31465,257 @@ Example:
 
 ```json
 {
-  "schemas": ["PUBLIC", "OTHER_SCHEMA"]
+  "schemas": ["schema1", "schema2"]
 }
 ```
 
-### Property: Tables
+### Property: tables
 
-This is an array of table definitions, generated automatically during introspection.
+An array of table definitions generated automatically during introspection. Each table definition includes metadata
+about the table structure, columns, primary keys, and foreign keys.
 
 Example:
 
 ```json
 {
-  "tableName": "DOCS.PUBLIC.USERS",
-  "tableType": "TABLE",
-  "description": null,
-  "columns": [
+  "tables": [
     {
-      "name": "AGE",
-      "description": null,
-      "type": "NUMBER",
-      "numeric_precision": 38,
-      "numeric_scale": 0,
-      "nullable": false,
-      "auto_increment": false,
-      "is_primarykey": null
-    },
-    {
-      "name": "NAME",
-      "description": null,
-      "type": "TEXT",
-      "numeric_precision": null,
-      "numeric_scale": null,
-      "nullable": false,
-      "auto_increment": false,
-      "is_primarykey": null
-    },
-    {
-      "name": "ID",
-      "description": null,
-      "type": "NUMBER",
-      "numeric_precision": 38,
-      "numeric_scale": 0,
-      "nullable": false,
-      "auto_increment": true,
-      "is_primarykey": null
-    }
-  ],
-  "pks": [],
-  "fks": null
-}
-```
-
-### Property: Functions
-
-This is an array of function definitions.
-
-Example:
-
-```json
-{
-  "function_catalog": "PUBLIC",
-  "function_schema": "PUBLIC",
-  "function_name": "add",
-  "argument_signature": "(N NUMBER, M NUMBER)",
-  "data_type": "TABLE (N NUMBER, M NUMBER)",
-  "comment": "Adds two numbers"
-}
-```
-
-### Property: Native Queries
-
-This is a JSON object containing key-value pairs of Native Queries to be used in the data connector.
-
-Two types of Native Queries are supported: **Inline** and **Parameterized**.
-
-Example:
-
-```json
-{
-  "native_query_inline": {
-    "sql": {
-      "parts": [
+      "name": "public.customers",
+      "description": "Customer information table",
+      "category": "TABLE",
+      "columns": [
         {
-          "type": "text",
-          "value": "SELECT 1 AS result FROM DUAL"
-        }
-      ]
-    },
-    "columns": {
-      "result": {
-        "type": "named",
-        "name": "INT"
-      }
-    },
-    "arguments": {},
-    "description": ""
-  },
-  "ArtistById_parameterized": {
-    "sql": {
-      "parts": [
-        {
-          "type": "text",
-          "value": "SELECT * FROM CHINOOK.ARTIST WHERE ARTISTID = "
+          "name": "customer_id",
+          "description": "Unique customer identifier",
+          "type": {
+            "scalar_type": "INT64"
+          },
+          "nullable": false,
+          "auto_increment": false,
+          "is_primarykey": true
         },
         {
-          "type": "parameter",
-          "value": "ARTISTID"
+          "name": "name",
+          "description": "Customer name",
+          "type": {
+            "scalar_type": "STRING"
+          },
+          "nullable": false,
+          "auto_increment": false
+        },
+        {
+          "name": "location",
+          "description": "Geographic location",
+          "type": {
+            "scalar_type": "GEOGRAPHY"
+          },
+          "nullable": true,
+          "auto_increment": false
+        },
+        {
+          "name": "tags",
+          "description": "Customer tags",
+          "type": {
+            "array_type": {
+              "scalar_type": "STRING"
+            }
+          },
+          "nullable": true,
+          "auto_increment": false
         }
-      ]
-    },
-    "columns": {
-      "ARTISTID": {
-        "type": "named",
-        "name": "INT"
-      },
-      "NAME": {
-        "type": "nullable",
-        "underlying_type": {
-          "type": "named",
-          "name": "STRING"
+      ],
+      "primary_keys": ["customer_id"],
+      "foreign_keys": {
+        "fk_customer_order": {
+          "column_mapping": {
+            "customer_id": "customer_id"
+          },
+          "foreign_collection": "public.orders"
         }
       }
-    },
-    "arguments": {
-      "ARTISTID": {
-        "description": null,
-        "type": {
-          "type": "named",
-          "name": "INT"
-        }
-      }
-    },
-    "description": null,
-    "isProcedure": false
-  }
+    }
+  ]
 }
 ```
 
-## Updating with introspection
+## Versioning & upgrading
 
-Whenever the schema of your database changes you will need to update your data connector configuration accordingly to
-reflect those changes.
+The JDBC connector configuration uses a version field to indicate its schema version:
 
-Running `update` in a configuration directory will do the following:
+```json
+{
+  "version": "v2"
+  // other configuration properties
+}
+```
 
-- Connect to the database with the specified `jdbcUrl`, and then overwrite all data in the `tables` field
+This version field helps the connector understand how to interpret the rest of the configuration. As the connector
+evolves, new configuration versions may be introduced to support new features or changes in behavior.
 
-- Fill in default values for any fields absent from the configuration
+### Configuration versions
+
+The JDBC connector configuration has gone through the following versions:
+
+- **v1**: Initial configuration format that provides the foundation for JDBC connector configuration
+- **v2**: Current configuration format that uses jooq SQLDataType for all sources, providing better type handling and
+  compatibility across different database systems
+
+### Upgrading configuration
+
+When a new configuration version is available, you can upgrade your existing configuration using the Hasura CLI plugin
+command:
+
+```bash
+# Upgrade the configuration to the latest version
+ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml upgrade --config-file /current/config/file/path --outfile /new/config/file/path
+```
+
+The upgrade process will automatically convert your configuration to the latest format while preserving your existing
+data source connections and schema information. This versioning system allows for future schema evolution while
+maintaining backward compatibility.
+
+### What changes during an upgrade
+
+When upgrading your configuration from v1 to v2:
+
+1. Column type handling is improved with jooq SQLDataType for better cross-database compatibility
+2. Configuration structure is refactored for better organization of versioned code
+3. Type parameters are properly handled for more robust configuration parsing
+
+The upgrade process is designed to be non-destructive, preserving all your existing data source connections and schema
+information while enabling access to new features and improved type handling.
+
+## Native queries {#native-queries}
+
+Native queries allow you to use the SQL syntax of the underlying data source to create custom operations and expose them
+as models in your application. This is useful for complex queries, stored procedures, or custom functions that you want
+to leverage directly in your API.
+
+### Native query structure
+
+A native query is a single SQL statement that returns results and can take arguments. The JDBC connector supports two
+methods for defining native queries:
+
+1. **File-based approach** (recommended): Store SQL queries in separate files
+2. **Configuration-based approach**: Define queries directly in the `configuration.json` file
+
+### File-based native queries
+
+To create a file-based native query:
+
+1. Create a directory structure for your native operations:
+
+   ```bash
+   mkdir -p <subgraph>/connector/<connector>/native_operations/queries/
+   ```
+
+2. Create a SQL file with your query, using `{{parameter}}` syntax for parameters:
+
+   ```sql
+   -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
+   SELECT * FROM customers
+   WHERE region = :region
+   AND sales > :min_sales
+   ```
+
+3. Register the query using the CLI:
+
+   ```bash
+   ddn connector plugin --connector <subgraph>/connector/<connector>/connector.yaml -- \
+     native-queries create --operation-path native_operations/queries/get_customers_by_region.sql --name get_customers_by_region
+   ```
+
+4. Update your metadata to track the new native query:
+   ```bash
+   ddn connector-link update <connector_name> --add-all-resources
+   ```
+
+### Configuration-based native queries
+
+You can also define native queries directly in the `configuration.json` file:
+
+```json
+{
+  "version": "v2",
+  "connection_uri": {
+    "value": "..."
+  },
+  "schemas": ["public"],
+  "tables": [...],
+  "functions": [
+    {
+      "name": "get_customers_by_region",
+      "description": "Get customers filtered by region",
+      "sql": "SELECT * FROM customers WHERE region = :region AND sales > :min_sales",
+      "parameters": [
+        {
+          "name": "region",
+          "description": "Region to filter by",
+          "type": {
+            "scalar_type": "STRING"
+          }
+        },
+        {
+          "name": "min_sales",
+          "description": "Minimum sales amount",
+          "type": {
+            "scalar_type": "INT64"
+          }
+        }
+      ],
+      "result_type": {
+        "type": "array",
+        "element_type": {
+          "type": "named",
+          "name": "public.customers"
+        }
+      }
+    }
+  ]
+}
+```
+
+### Parameter syntax
+
+The JDBC connector supports colon prefix syntax to specify parameters. This syntax is translated to parameterized
+queries, which helps prevent SQL injection.
+
+### Important syntax rules
+
+When writing native queries, follow these rules:
+
+1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column
+   names, or other SQL parts
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
+3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
+5. **No "hasura\_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
+
+### Result types
+
+The `result_type` field defines the structure of data returned by the native query:
+
+- **Scalar value**: A single value (string, number, boolean, etc.)
+- **Array of values**: A list of scalar values or objects
+- **Named type**: References an existing table structure
+- **Custom object type**: A custom structure defined for the query result
+
+Once defined, native queries are exposed in your application and made available to PromptQL.
+
+
+
+==============================
+
+
+
+# Troubleshooting
+
+URL: https://hasura.io/docs/promptql/reference/connectors/snowflake/troubleshooting
+
+
+## Introduction
+
+For general troubleshooting help, please see these [docs](/data-sources/troubleshooting.mdx).
 
 ==============================
 
