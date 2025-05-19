@@ -35,7 +35,6 @@ jobs:
           - Then list the most important changes clearly as bullet points.
           - Group minor changes together where appropriate.
           - If a commit references a PR number it's imperative to include it (e.g., (#123)) and format the link as <https://github.com/hasura/promptql-docs/pull/123|#123>.
-          - If there is no PR number, use the commit hash instead (e.g., (<https://github.com/hasura/promptql-docs/commit/abc123|abc123>)).
 
           **Output format: Strict JSON**
 
