@@ -195,3 +195,14 @@ accurate interactions with your data over time.
 Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
 improvements can be made to enhance accuracy.
+
+### Response-size limitations
+
+Lambda connectors have a response-size limit, which may vary depending on the SDK and should be considered when
+developing your application's business logic functions.
+
+| Connector       | Limit   | Configurable |
+| --------------- | ------- | ------------ |
+| `hasura/nodejs` | `30` MB | false        |
+| `hasura/python` | `30` MB | false        |
+| `hasura/go`     | `30` MB | false        |
