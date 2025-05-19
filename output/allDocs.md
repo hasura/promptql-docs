@@ -4565,6 +4565,17 @@ Traces — complete with your custom error messages — are available for each r
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
 improvements can be made to enhance accuracy.
 
+### Response-size limitations
+
+Lambda connectors have a response-size limit, which may vary depending on the SDK and should be considered when
+developing your application's business logic functions.
+
+| Connector       | Limit   | Configurable |
+| --------------- | ------- | ------------ |
+| `hasura/nodejs` | `30` MB | false        |
+| `hasura/python` | `30` MB | false        |
+| `hasura/go`     | `30` MB | false        |
+
 
 
 ==============================
@@ -6888,6 +6899,29 @@ func (c *Client) ExecuteProgram(ctx context.Context, body api.ExecuteRequest) (*
 
 
 
+# Recipes
+
+URL: https://hasura.io/docs/promptql/recipes/overview
+
+
+# Recipes
+
+## Introduction
+
+There's loads of ways you can build an application with PromptQL. Whether you're connecting to a single data source,
+want to connect to a variety of existing API endpoints, or want to bring API data over en masse to avoid issues like
+rate-limiting and throttling, you can do it with PromptQL.
+
+## Find out more
+
+For now, check out our [tutorials section](/recipes/tutorials/index.mdx) with cloneable repos to get you started!
+
+
+
+==============================
+
+
+
 # playground-auth.mdx
 
 URL: https://hasura.io/docs/promptql/auth/playground-auth
@@ -7014,24 +7048,6 @@ The `Authorization` tab shows the current authorization mode, current user role,
 variables if there are any set.
 
 <Thumbnail src="/img/auth/piql-configure-headers-authorization.png" alt="Authentication using JWT" />
-
-==============================
-
-# Recipes
-
-URL: https://hasura.io/docs/promptql/recipes/overview
-
-# Recipes
-
-## Introduction
-
-There's loads of ways you can build an application with PromptQL. Whether you're connecting to a single data source,
-want to connect to a variety of existing API endpoints, or want to bring API data over en masse to avoid issues like
-rate-limiting and throttling, you can do it with PromptQL.
-
-## Find out more
-
-For now, check out our [tutorials section](/recipes/tutorials/index.mdx) with cloneable repos to get you started!
 
 ==============================
 
@@ -12048,109 +12064,6 @@ subgraph can be added to an existing or private team repository. Learn more
 
 
 
-# remove-subgraph.mdx
-
-URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
-
-# Remove a subgraph
-
-## Introduction
-
-In this recipe, you'll learn how to remove a subgraph from your local project directory.
-
-:::info Prerequisites
-
-Before continuing, ensure you have:
-
-- A [local Hasura project](/quickstart.mdx).
-- Stopped any running docker services related to the project.
-
-:::
-
-## Recipe
-
-### Step 1. Delete subgraph directory
-
-Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
-directory is typically located at `<subgraph-name>`.
-
-### Step 2. Update supergraph config files
-
-Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
-
-```yaml title="supergraph.yaml"
-kind: Supergraph
-version: v2
-definition:
-  subgraphs:
-    - globals/subgraph.yaml
-    #highlight-start
-    - <subgraph-name>/subgraph.yaml
-    #highlight-end
-    ...
-```
-
-### Step 3. Update engine compose file
-
-Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
-compose file is typically located at `<project-root>/compose.yaml`.
-
-```yaml title="<project-root>/compose.yaml"
-include:
-  #highlight-start
-  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
-  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
-  #highlight-end
-  ...
-services:
-  engine: ...
-```
-
-### Step 4. Remove subgraph config file from context
-
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
-the `subgraph` key if set as the deleted subgraph config file.
-
-```yaml title=".hasura/context.yaml"
-kind: Context
-version: v3
-definition:
-  current: default
-  contexts:
-    default:
-      supergraph: ../supergraph.yaml
-      #highlight-start
-      subgraph: ../<subgraph-name>/subgraph.yaml
-      #highlight-end
-      ...
-```
-
-### Step 5. (Optional) Remove subgraph relevant environment variables
-
-You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
-CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
-
-```.env title="For example, .env"
-...
-#highlight-start
-<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
-#highlight-end
-...
-```
-
-## Learn more
-
-- [Project configuration](/project-configuration/overview.mdx)
-
-
-
-==============================
-
-
-
 # work-with-multiple-repositories.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-repositories
@@ -12664,6 +12577,109 @@ CLI-generated environment variables for a subgraph typically start with the `<SU
 - [Project configuration](/project-configuration/overview.mdx)
 
 ==============================
+
+# remove-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
+
+
+
+==============================
+
+
 
 # rename-subgraph.mdx
 
@@ -13228,6 +13244,49 @@ visualizations from your data through natural conversations, enabling you to tak
 
 ==============================
 
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/
+
+# Subgraphs
+
+## Introduction
+
+A subgraph is a focused component of your overall supergraph, typically organized around specific data domains or
+business functions.
+
+Subgraphs are often team-specific, aligning with the responsibilities and expertise of individual teams. This structure
+not only enables efficient development but also makes it easier to onboard new teams as your unified supergraph evolves.
+By defining clear boundaries and responsibilities, subgraphs allow new teams to integrate seamlessly without impacting
+existing functionality, fostering a scalable and collaborative development environment.
+
+## Organization
+
+Subgraphs provide flexibility and modularity in your data access strategy. A single project can include one or more
+subgraphs, depending on its complexity and the distribution of responsibilities among teams. Subgraphs are designed to
+be iterated on and developed independently, allowing teams to work at their own pace and with their own preferred tools
+and languages while ensuring PromptQL maintains a consistent and accurate understanding of your entire data ecosystem.
+
+In setups with multiple repositories, subgraphs also enhance governance by limiting access. Individual developers or
+teams are only granted permissions to their specific subgraph, ensuring they cannot modify or disrupt other parts of the
+data structure. This separation not only protects the integrity of the overall system but also enables streamlined
+collaboration across teams by maintaining a well-defined scope of access, which is crucial for building a reliable
+foundation for PromptQL's data interactions.
+
+## Next steps
+
+- [Learn how to create a subgraph](/project-configuration/subgraphs/create-a-subgraph.mdx)
+- [Learn how to establish relationships across subgraphs to unify your data for PromptQL access](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
+- [Learn how to split subgraphs across repositories to enable decentralized development](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
+
+
+
+==============================
+
+
+
 # create-a-subgraph.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/create-a-subgraph
@@ -13291,42 +13350,7 @@ on the cloud project.
 
 ==============================
 
-# index.mdx
 
-URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/
-
-# Subgraphs
-
-## Introduction
-
-A subgraph is a focused component of your overall supergraph, typically organized around specific data domains or
-business functions.
-
-Subgraphs are often team-specific, aligning with the responsibilities and expertise of individual teams. This structure
-not only enables efficient development but also makes it easier to onboard new teams as your unified supergraph evolves.
-By defining clear boundaries and responsibilities, subgraphs allow new teams to integrate seamlessly without impacting
-existing functionality, fostering a scalable and collaborative development environment.
-
-## Organization
-
-Subgraphs provide flexibility and modularity in your data access strategy. A single project can include one or more
-subgraphs, depending on its complexity and the distribution of responsibilities among teams. Subgraphs are designed to
-be iterated on and developed independently, allowing teams to work at their own pace and with their own preferred tools
-and languages while ensuring PromptQL maintains a consistent and accurate understanding of your entire data ecosystem.
-
-In setups with multiple repositories, subgraphs also enhance governance by limiting access. Individual developers or
-teams are only granted permissions to their specific subgraph, ensuring they cannot modify or disrupt other parts of the
-data structure. This separation not only protects the integrity of the overall system but also enables streamlined
-collaboration across teams by maintaining a well-defined scope of access, which is crucial for building a reliable
-foundation for PromptQL's data interactions.
-
-## Next steps
-
-- [Learn how to create a subgraph](/project-configuration/subgraphs/create-a-subgraph.mdx)
-- [Learn how to establish relationships across subgraphs to unify your data for PromptQL access](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
-- [Learn how to split subgraphs across repositories to enable decentralized development](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
-
-==============================
 
 # working-with-multiple-subgraphs.mdx
 
@@ -13871,6 +13895,36 @@ ddn codemod rename-graphql-prefixes --subgraph app/subgraph.yaml --from-graphql-
 
 ==============================
 
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/
+
+# Project Management
+
+## Introduction
+
+Broadly, projects can be managed using two tools: context and collaborators.
+
+**Context** allows you to swap out local and cloud configuration files and values. This makes it easier to execute
+commands via the CLI, switch between environments when testing your API, and executing automated CI/CD scripts.
+
+**Collaborators** can be added to any [Hasura DDN Base or Hasura DDN Advanced project](https://hasura.io/pricing).
+Depending on the project's plan, you can add collaborators with read-only access all the way to granular access,
+enabling them to only contribute to certain [subgraphs](/project-configuration/subgraphs/index.mdx).
+
+## Next steps
+
+- [Learn how to manage context](/project-configuration/project-management/manage-contexts.mdx)
+- [Learn how to invite collaborators](/project-configuration/project-management/manage-collaborators.mdx)
+
+
+
+==============================
+
+
+
 # manage-contexts.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/project-management/manage-contexts
@@ -14029,29 +14083,7 @@ collaborators and defining their roles.
 
 ==============================
 
-# index.mdx
 
-URL: https://hasura.io/docs/promptql/project-configuration/project-management/
-
-# Project Management
-
-## Introduction
-
-Broadly, projects can be managed using two tools: context and collaborators.
-
-**Context** allows you to swap out local and cloud configuration files and values. This makes it easier to execute
-commands via the CLI, switch between environments when testing your API, and executing automated CI/CD scripts.
-
-**Collaborators** can be added to any [Hasura DDN Base or Hasura DDN Advanced project](https://hasura.io/pricing).
-Depending on the project's plan, you can add collaborators with read-only access all the way to granular access,
-enabling them to only contribute to certain [subgraphs](/project-configuration/subgraphs/index.mdx).
-
-## Next steps
-
-- [Learn how to manage context](/project-configuration/project-management/manage-contexts.mdx)
-- [Learn how to invite collaborators](/project-configuration/project-management/manage-collaborators.mdx)
-
-==============================
 
 # manage-collaborators.mdx
 
@@ -14561,6 +14593,8 @@ detailed steps depending on your specific connector.
 
 ==============================
 
+
+
 # incremental-builds.mdx
 
 URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/incremental-builds
@@ -14762,6 +14796,75 @@ There are many more options and configurations available for deploying your proj
 the simplest and most common flow here.
 
 ==============================
+
+# deploy-to-ddn.mdx
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/deploy-to-ddn
+
+# Deploying your project to Hasura DDN
+
+Deploying your project to Hasura DDN is a simple process and can be done in two steps.
+
+## Deployment flow
+
+1. Create a supergraph build on Hasura DDN.
+2. Apply the supergraph build to your project on Hasura DDN.
+
+To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
+information on how to get started.
+
+:::info Hasura DDN Cloud projects
+
+When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
+that's paired with your local project.
+
+:::
+
+### Step 1. Create a supergraph build on Hasura DDN
+
+```ddn title="The following will use the project name in your .hasura/context.yaml file:"
+ddn supergraph build create
+```
+
+This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
+independently but this command will create them all.
+
+The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
+the build on the console.
+
+You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
+command.
+
+The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
+applied at a time as the "official" API.
+
+### Step 2. Apply the build
+
+```ddn
+# E.g., ddn supergraph build apply 85b0961544
+ddn supergraph build apply <build-version>
+```
+
+This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
+command, via the console, or any client accessing via the API URL.
+
+:::tip Simplify your deployment
+
+For a more efficient deployment process, you can create and apply the supergraph build in a single command using
+`ddn supergraph build create --apply`
+
+:::
+
+## Summary
+
+There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
+the simplest and most common flow here.
+
+
+
+==============================
+
+
 
 # CI/CD
 
@@ -23031,6 +23134,8 @@ Try using the DDN CLI with auto-completion by typing part of a command and press
 
 ==============================
 
+
+
 # index.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/
@@ -23184,6 +23289,71 @@ ddn [flags]
 ```
 
 ==============================
+
+# ddn.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn
+
+# DDN CLI: ddn
+
+DDN Command Line Interface.
+
+## Synopsis
+
+```
+
+       
+
+DDDDDDD\   DDDDDDD\   NN\   NN\ 
+DD  __DD\  DD  __DD\  NNN\  NN |
+DD |  DD | DD |  DD | NNNN\ NN |
+DD |  DD | DD |  DD | NN NN\NN |
+DD |  DD | DD |  DD | NN \NNNN |
+DD |  DD | DD |  DD | NN |\NNN |
+DDDDDDD  | DDDDDDD  | NN | \NN |
+\_______/  \_______/  \__|  \__|
+
+
+
+```
+
+```bash
+ddn [flags]
+```
+
+## Available operations
+
+- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
+- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
+- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
+- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
+- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
+- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
+- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
+- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
+- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
+- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
+- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
+- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
+- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
+- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
+- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
+
+## Options
+
+```sass
+-h, --help               help for ddn
+    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+    --no-prompt          Do not prompt for required but missing flags
+    --out string         Output format. Can be table, json or yaml. (default "table")
+    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+
+
+==============================
+
+
 
 # ddn_auth.mdx
 
@@ -27650,62 +27820,6 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 
 
-# ddn_update-cli.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
-
-# DDN CLI: ddn update-cli
-
-Update this CLI to the latest version or to a specific version.
-
-## Synopsis
-
-You can use this command to update the CLI to the latest version or a specific version.
-
-```bash
-ddn update-cli [flags]
-```
-
-## Examples
-
-```bash
-# Update CLI to latest version:
- ddn update-cli
-
-# Update CLI to a specific version (say v1.0.0):
- ddn update-cli --version v1.0.0
-
-# To disable the auto-update check on the CLI, set
-# "show_update_notification": false
-# in ~/.ddn/config.yaml
-```
-
-## Options
-
-```sass
--h, --help             help for update-cli
-    --version string   A specific version to install
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
-
-
-
-==============================
-
-
-
 # ddn_subgraph_delete.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_delete
@@ -27810,6 +27924,62 @@ ddn update-cli [flags]
 - [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
 ==============================
+
+# ddn_update-cli.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
+
+
+
+==============================
+
+
 
 # ddn_subgraph_init.mdx
 
