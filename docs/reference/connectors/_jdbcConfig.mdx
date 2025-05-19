@@ -274,9 +274,9 @@ This syntax is translated to parameterized queries, which helps prevent SQL inje
 When writing native queries, follow these rules:
 
 1. **Parameters as scalar values only**: Parameters can only be used in place of scalar values, not table names, column names, or other SQL parts
-2. **No quoting of string parameters**: Don't add quotes around parameters (use `{{name}}` not `'{{name}}'`)
+2. **No quoting of string parameters**: Don't add quotes around parameters (use `:name` not `':name'`)
 3. **Single statements only**: Each native query should be a single SQL statement without a semicolon at the end
-4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || {{search}} || '%'`)
+4. **String patterns with concatenation**: For LIKE patterns, use concatenation (e.g., `LIKE '%' || :search || '%'`)
 5. **No "hasura_" prefixed parameters**: Parameter names starting with `hasura_` are reserved
 
 ### Result types
