@@ -1,6 +1,6 @@
 {
-  "label": "Custom Business Logic",
-  "position": 8,
+  "label": "Business Logic",
+  "position": 3.5,
   "className": "logic-icon",
   "customProps": {
     "sidebar_pathname": "business-logic"

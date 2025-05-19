@@ -3394,6 +3394,1343 @@ Ping `@scriptnull` or `@codingkarthik` in the PR.
 
 
 
+# Business Logic
+
+URL: https://hasura.io/docs/promptql/business-logic/overview
+
+# Business Logic
+
+You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user. We can
+add a lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and expose functions to PromptQL
+as tools it can use. This means PromptQL isn't limited to querying data — it can **trigger logic**, **run workflows**,
+or **transform inputs into actions**.
+
+- [Lambda Connector Basics](/business-logic/add-a-lambda-connector.mdx)
+- [Add Custom Environment Variables](/business-logic/add-env-vars-to-a-lambda.mdx)
+- [Live Reloading](/business-logic/dev-mode.mdx)
+- [Debug and Handle Errors](/business-logic/errors.mdx)
+
+
+
+==============================
+
+
+
+# add-a-lambda-connector.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/add-a-lambda-connector
+
+
+# Lambda Connector Basics
+
+## Introduction
+
+You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user. We can
+add a lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and expose functions to PromptQL
+as tools it can use. This means PromptQL isn't limited to querying data — it can **trigger logic**, **run workflows**,
+or **transform inputs into actions**, all within a secure and consistent API environment.
+
+By treating logic like a first-class data source, PromptQL ensures your application has a unified surface for
+interacting with databases, API services, and whatever actions you want your application to be able to take. You define
+how the system should respond to user queries, apply business rules, or even call third-party APIs.
+
+## Initialize a lambda connector
+
+```ddn title="Initialize a new connector in a project directory:"
+ddn connector init your_name_for_the_connector -i
+```
+
+Choose the lambda connector to correspond with the language you'd like to use for your functions.
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+When you add the `hasura/nodejs` connector, the CLI will generate a Node.js package with a `functions.ts` file. This
+file is the entrypoint for your connector.
+
+As this is a Node.js project, you can easily add any dependencies you desire by running `npm i <package-name>` from this
+connector's directory.
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+When you add the `hasura/python` connector, the CLI will generate a Python application with a `functions.py` file. This
+file is the entrypoint for your connector.
+
+As this is a Python project, you can easily add any dependencies you desire by adding them to the `requirements.txt` in
+this connector's directory.
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+When you add the `hasura/go` connector, the CLI will generate a Go application with a `/functions` directory. The
+connector will use this directory — and any `*.go` file in it — as the entrypoint for your connector.
+
+As this is a Go project, you can easily add any dependencies you desire by adding them to the `go.mod` file and running
+`go mod tidy` from this connector's directory.
+
+</TabItem>
+
+</Tabs>
+
+## Write a function
+
+There are two types of lambdas you can write, functions and procedures.
+
+- Functions are read-only. Queries without side effects. PromptQL will not ask for confirmation before calling them.
+- Procedures can mutate data and have side effects. PromptQL will ask for confirmation before calling them.
+
+### Examples
+
+The following examples show how to create basic lambda functions in each language. You can replace the contents of the
+`functions.ts`, `functions.py`, or any `.go` file in the `/functions` directory of the Go connector with the following
+examples.
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```ts title="<subgraph-name>/connector/<connector-name>/functions.ts"
+/**
+ * Takes an optional name parameter and returns a friendly greeting string
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {string} A greeting in the format "hello {name}" or "hello world" if no name provided
+ * @readonly
+ */
+export function hello(name?: string) {
+  return `hello ${name ?? "world"}`;
+}
+```
+
+The JSDoc comments are optional, but the first general comment is highly recommended to help PromptQL understand the
+function's purpose and parameters and will be added to the function's metadata.
+
+The `@readonly` tag indicates that the function does not modify any data, and PromptQL will be able to call this without
+asking for confirmation. Under the hood, DDN will create an NDC function for `@readonly` lambdas and an NDC procedure
+for functions that are not marked as `@readonly`.
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+```python title="<subgraph-name>/connector/<connector-name>/functions.py"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from typing import Annotated
+
+connector = FunctionConnector()
+
+@connector.register_query
+def hello(name: str | None = None) -> str:
+    """
+    Takes an optional name parameter and returns a friendly greeting string
+    """
+    return f"hello {name or 'world'}"
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+The docstring comments are optional, but they're highly recommended to help PromptQL understand the function's purpose
+and parameters and will be added to the function's metadata.
+
+The `register_query` decorator indicates that the function does not modify any data, and PromptQL will be able to call
+this without asking for confirmation. To create functions that modify data, use the `register_mutation` decorator
+instead.
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello.go"
+package functions
+
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloArguments defines the input parameters
+type HelloArguments struct {
+	Name *string `json:"name"` // Pointer makes it optional
+}
+
+// HelloResult defines the return type
+type HelloResult struct {
+	Greeting string `json:"greeting"`
+}
+
+// FunctionHello takes an optional name parameter and returns a friendly greeting string
+func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments) (*HelloResult, error) {
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	return &HelloResult{
+		Greeting: fmt.Sprintf("hello %s", name),
+	}, nil
+}
+```
+
+Function names are important as they determine how the function will be exposed in the API:
+
+- Functions starting with `Function` (like `FunctionHello`) are treated as queries (read-only)
+- Functions starting with `Procedure` (like `ProcedureCreateUser`) are treated as mutations (data modifications)
+
+The function documentation is highly recommended to help PromptQL understand the function's purpose and parameters and
+will be added to the function's metadata.
+
+</TabItem>
+
+</Tabs>
+
+## Exposing your lambda functions {#exposing-your-lambda-functions}
+
+Once you've created your lambda functions, you need to expose them to PromptQL by generating metadata for them.
+
+### Step 1. Introspect the connector and add the metadata
+
+```ddn
+ddn connector introspect <connector-name>
+```
+
+```ddn title="List the commands discovered during introspection:"
+ddn connector show-resources <connector-name>
+```
+
+You should see the command being `AVAILABLE` which means that there's not yet metadata representing it.
+
+```ddn
+ddn commands add <connector-name> <command-name>
+```
+
+:::info Add semantic metadata
+
+If you did not add comments to your function, we highly recommend adding a `description` to the command object added
+above.
+
+PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
+function does and how it should be called, you'll get better results and fewer errors.
+
+:::
+
+### Step 2. Create and run a new build and test the function
+
+```ddn title="Create a new local build:"
+ddn supergraph build local
+```
+
+```ddn title="Run your services:"
+ddn run docker-start
+```
+
+```ddn title="In a new terminal tab, open the devlopment console:"
+ddn console --local
+```
+
+Head over to the PromptQL Playground and ask PromptQL to call your lambda function.
+
+```plaintext
+say hello to everyone
+```
+
+## Retrieve information
+
+You can add a lambda function which reaches out to external APIs to retrieve data which PromptQL can use.
+
+### Step 1. Call an external API
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+Open the `app/connector/typescript/functions.ts` file.
+
+```ts title="Replace the contents with the following:"
+/**
+ * Calls httpbin.org API to create a personalized greeting for the given name. Takes an optional name parameter and returns a friendly greeting string.
+ * @param {string} [name] - Optional name to personalize the greeting
+ * @returns {Promise<{ greeting?: string }>} A Promise resolving to an object containing the optional greeting message
+ * @readonly
+ */
+export async function helloFromHttpBin(name?: string): Promise<{ greeting?: string }> {
+  const greeting = { greeting: name };
+
+  const response = await fetch("https://httpbin.org/post", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ greeting: `Hello ${name}!` }),
+  });
+
+  const data: any = await response.json();
+  return { greeting: data?.json?.greeting };
+}
+```
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+Open the `app/connector/python/functions.py` file.
+
+```python title="Replace the contents with the following:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+
+connector = FunctionConnector()
+
+@connector.register_query
+async def hello_from_http_bin(name: str | None = None) -> dict:
+    """
+    Calls httpbin.org API to create a personalized greeting for the given name.
+    Takes an optional name parameter and returns a friendly greeting string.
+    """
+    response = requests.post(
+        "https://httpbin.org/post",
+        json={"greeting": f"Hello {name}!"}
+    )
+
+    data = response.json()
+    return {"greeting": data.get("json", {}).get("greeting")}
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+Open a new file in the functions directory:
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/hello_from_http_bin.go"
+package functions
+
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// HelloFromHttpBinArguments defines the input parameters
+type HelloFromHttpBinArguments struct {
+	Name *string `json:"name"` // Optional name parameter
+}
+
+// HelloFromHttpBinResponse defines the return type
+type HelloFromHttpBinResponse struct {
+	Greeting *string `json:"greeting"` // Optional greeting response
+}
+
+// HTTPBinResponse represents the response from httpbin.org
+type HTTPBinResponse struct {
+	JSON struct {
+		Greeting string `json:"greeting"`
+	} `json:"json"`
+}
+
+// FunctionHelloFromHttpBin calls httpbin.org API to create a personalized greeting
+func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *HelloFromHttpBinArguments) (*HelloFromHttpBinResponse, error) {
+	// Prepare the name to use
+	name := "world"
+	if args.Name != nil {
+		name = *args.Name
+	}
+
+	// Create the request payload
+	payload, err := json.Marshal(map[string]string{
+		"greeting": fmt.Sprintf("Hello %s!", name),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request payload: %w", err)
+	}
+
+	// Send the POST request to httpbin
+	resp, err := http.Post("https://httpbin.org/post", "application/json", bytes.NewBuffer(payload))
+	if err != nil {
+		return nil, fmt.Errorf("HTTP request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	// Read and parse the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	var httpBinResp HTTPBinResponse
+	if err := json.Unmarshal(body, &httpBinResp); err != nil {
+		return nil, fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	// Extract the greeting from the response
+	greeting := httpBinResp.JSON.Greeting
+	return &HelloFromHttpBinResponse{
+		Greeting: &greeting,
+	}, nil
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
+
+## Take action
+
+You can use lambda connectors to add custom business logic to your application that takes action on behalf of a user.
+
+### Step 1. Add custom logic
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```typescript title="Replace the contents of functions.ts with the following:"
+/*
+ * Interface for the response when taking action on behalf of a user.
+ * Contains success status and message.
+ */
+interface UserActionResponse {
+  success: boolean;
+  message: string;
+}
+
+/*
+ * This function simulates taking an action on behalf of a user. It logs the request made by the user
+ * and returns a response object indicating the success status and a message.
+ *
+ * @param {string} request - What the user wants to do
+ * @returns {UserActionResponse} - The response object containing success status and message
+ */
+export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
+  // In a real application, you'd replace this with your custom business logic.
+  // You could update data in a database or use an API to update another service.
+  console.log(`Taking action on behalf of user: ${request}`);
+  return {
+    success: true,
+    message: `Successfully took action on user's behalf: ${request}`,
+  };
+}
+```
+
+The absence of the `@readonly` tag indicates that this function will modify data. PromptQL will ask for confirmation
+before calling it.
+
+</TabItem>
+
+<TabItem value="Python" label="Python">
+
+```python title="Replace the contents of functions.py with the following:"
+from hasura_ndc import start
+from hasura_ndc.function_connector import FunctionConnector
+from pydantic import BaseModel, Field
+from hasura_ndc.errors import UnprocessableContent
+from typing import Annotated
+
+connector = FunctionConnector()
+
+class UserActionArguments(BaseModel):
+    request: Annotated[str, Field(description="What the user wants to do")]
+
+class UserActionResponse(BaseModel):
+    success: bool
+    message: str
+
+@connector.register_mutation
+def take_action_on_behalf_of_user(args: UserActionArguments) -> UserActionResponse:
+    # In a real application, you'd replace this with business logic
+    # You could update data in a database or use an API to update another service.
+    print("Taking action on behalf of user")
+    return UserActionResponse(
+        success=True,
+        message=f"Successfully took action on user's behalf: {args.request}"
+    )
+
+if __name__ == "__main__":
+    start(connector)
+```
+
+The addition of the `@connector.register_mutation` decorator indicates that the function will modify data, and PromptQL
+will ask for confirmation before calling it.
+
+</TabItem>
+
+<TabItem value="Go" label="Go">
+
+```go title="Add the following to a new file called app/connector/my_go/functions/take_action_on_behalf_of_user.go:"
+package functions
+
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// TakeActionArguments represents the input arguments for a user action.
+type TakeActionArguments struct {
+	Request string `json:"request"`
+}
+
+// TakeActionResponse represents the response after performing a user action.
+type TakeActionResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+
+// ProcedureTakeActionOnBehalfOfUser simulates taking an action for the user.
+func ProcedureTakeActionOnBehalfOfUser(
+	ctx context.Context,
+	state *types.State,
+	args *TakeActionArguments,
+) (*TakeActionResponse, error) {
+	// In a real application, you'd replace this with your custom business logic
+  // You could update data in a database or use an API to update another service.
+	fmt.Println("Taking action on behalf of user")
+
+	return &TakeActionResponse{
+		Success: true,
+		Message: fmt.Sprintf("Successfully took action on user's behalf: %s", args.Request),
+	}, nil
+}
+```
+
+By prefixing the function name with `Procedure`, we indicate that the function will modify data, and PromptQL will ask
+for confirmation before calling it.
+
+</TabItem>
+
+</Tabs>
+
+Remember to expose your lambda functions to PromptQL by following the steps in
+[Exposing your lambda functions](#exposing-your-lambda-functions).
+
+<Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
+
+:::info What about custom native operations?
+
+Many complex reads and writes to your data sources can be accomplished with custom native queries and mutations. Check
+out the [connector-specific reference docs](/reference/connectors/index.mdx) for generating queries and mutations using
+the native capabilities of your data source.
+
+:::
+
+
+
+==============================
+
+
+
+# add-env-vars-to-a-lambda.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/add-env-vars-to-a-lambda
+
+# Add Custom Environment Variables
+
+## Introduction
+
+Custom environment variables allow you to define configuration values specific to your deployment. These variables can
+be used to set API keys, connection strings, or other parameters that your application or connectors need. When you run
+the `ddn connector env add` command, it automatically updates multiple files to ensure the environment variables are
+available across your project:
+
+- **`.env`**: Adds the variable to the [current context's](/reference/cli/commands/ddn_context.mdx) environment
+  configuration file for easy access during development.
+- **`connector.yaml`**: Updates the connector's configuration to include the variable for deployment.
+- **`compose.yaml`**: Ensures the variable is included in the Docker Compose configuration for runtime.
+
+## Add an environment variable
+
+```ddn title="From a project directory, run:"
+ddn connector env add <connector_name> --env FOO=bar
+```
+
+Repeat these steps for each additional variable.
+
+## Use an environment variable
+
+After creating a new build and running your connector, you can access your environment variable(s) via whatever
+conventions your language of choice prefers. For detailed instructions, refer to the following resources:
+
+- **Node.js**: Using [dotenv](https://github.com/motdotla/dotenv#readme)
+- **Python**: Using [python-dotenv](https://pypi.org/project/python-dotenv/)
+- **Go**: Using [godotenv](https://github.com/joho/godotenv)
+
+
+
+==============================
+
+
+
+# lambda-connector-types.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/lambda-connector-types
+
+
+# Lambda Connector Types
+
+Lambda connectors written in TypeScript, Python, or Go can accept and return native types that map to NDC data model
+types. Below are examples of supported types in each language.
+
+For information about setting up your lambda connectors, see
+[Add a Lambda Connector](/business-logic/add-a-lambda-connector.mdx).
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+When creating TypeScript lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `number` - Maps to NDC scalar type: `Float`
+- `boolean` - Maps to NDC scalar type: `Boolean`
+- `bigint` - Maps to NDC scalar type: `BigInt` (represented as a string in JSON)
+- `Date` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```ts
+/**
+ * Example of basic scalar types
+ * @readonly
+ */
+export function calculateAge(birthDate: Date, currentYear: number): number {
+  return currentYear - birthDate.getFullYear();
+}
+```
+
+### Object types and interfaces
+
+You can define custom object types and interfaces:
+
+```ts
+type User = {
+  id: string;
+  name: string;
+  age: number;
+};
+
+interface Response {
+  success: boolean;
+  data: string;
+}
+
+/**
+ * Example using custom types
+ * @readonly
+ */
+export function processUser(user: User): Response {
+  return {
+    success: true,
+    data: `User ${user.name} is ${user.age} years old`,
+  };
+}
+```
+
+### Arrays
+
+Arrays of a single type are supported:
+
+```ts
+/**
+ * Example using array types
+ * @readonly
+ */
+export function sumNumbers(numbers: number[]): number {
+  return numbers.reduce((sum, num) => sum + num, 0);
+}
+```
+
+### Null, undefined, and optional properties
+
+You can use null, undefined, or make properties optional:
+
+```ts
+/**
+ * Example with optional and nullable parameters
+ * @readonly
+ */
+export function formatName(firstName: string, lastName?: string, title: string | null = null): string {
+  const formattedTitle = title ? `${title} ` : "";
+  const formattedLastName = lastName ? ` ${lastName}` : "";
+  return `${formattedTitle}${firstName}${formattedLastName}`;
+}
+```
+
+### Arbitrary JSON
+
+You can import `JSONValue` from the SDK to accept and return arbitrary JSON:
+
+```ts
+
+/**
+ * Example using JSONValue for arbitrary JSON
+ * @readonly
+ */
+export function transformData(data: sdk.JSONValue): sdk.JSONValue {
+  // Process the JSON data
+  return new sdk.JSONValue({ processed: true, original: data.value });
+}
+```
+
+### Error handling
+
+You can throw custom errors for better error handling:
+
+```ts
+
+/**
+ * Example with error handling
+ * @readonly
+ */
+export function divide(a: number, b: number): number {
+  if (b === 0) {
+    throw new sdk.UnprocessableContent("Cannot divide by zero", { a, b });
+  }
+  return a / b;
+}
+```
+
+</TabItem>
+<TabItem value="Python" label="Python">
+
+When creating Python lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `str` - Maps to NDC scalar type: `String`
+- `int` - Maps to NDC scalar type: `Int`
+- `float` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `datetime` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```python
+from datetime import datetime
+
+@connector.register_query
+def calculate_rough_age(birth_year: int, current_year: int) -> int:
+    """
+    Example of basic scalar types
+    """
+    return current_year - birth_year
+```
+
+### Object types with Pydantic
+
+You can define custom object types using Pydantic models with field descriptions:
+
+```python
+from pydantic import BaseModel, Field
+from typing import Annotated
+
+class User(BaseModel):
+    id: str = Field(..., description="Unique identifier for the user")
+    name: Annotated[str, "User's full name"]
+    age: int
+
+class Response(BaseModel):
+    success: bool
+    data: str
+
+@connector.register_query
+def process_user(user: User) -> Response:
+    """Example using custom types"""
+    return Response(
+        success=True,
+        data=f"User {user.name} is {user.age} years old"
+    )
+```
+
+### Lists and nested types
+
+Lists and nested types are supported:
+
+```python
+from pydantic import BaseModel
+
+class Pet(BaseModel):
+    name: str
+
+class Person(BaseModel):
+    name: str
+    pets: list[Pet] | None = None
+
+@connector.register_query
+def greet_person(person: Person) -> str:
+    greeting = f"Hello {person.name}!"
+    if person.pets is not None:
+        for pet in person.pets:
+            greeting += f" And hello to {pet.name}."
+    else:
+        greeting += f" I see you don't have any pets."
+    return greeting
+```
+
+### Union types and optional properties
+
+You can use union types to indicate multiple possible types:
+
+```python
+@connector.register_query
+def format_name(first_name: str, last_name: str | None = None, title: str | None = None) -> str:
+    """Example with optional and nullable parameters"""
+    formatted_title = f"{title} " if title else ""
+    formatted_last_name = f" {last_name}" if last_name else ""
+    return f"{formatted_title}{first_name}{formatted_last_name}"
+```
+
+### Arbitrary JSON
+
+You can use untyped parameters for arbitrary JSON:
+
+```python
+@connector.register_mutation
+def transform_data(data) -> dict:
+    """Example using untyped parameter for arbitrary JSON"""
+    # Process the JSON data
+    return {"processed": True, "original": data}
+```
+
+### Parallel execution
+
+You can configure functions to run in parallel:
+
+```python
+
+@connector.register_query(parallel_degree=5)
+async def parallel_query(name: str) -> str:
+    """
+    This function will be executed in parallel in batches of 5
+    when joined in a query
+    """
+    await asyncio.sleep(1)
+    return f"Hello {name}"
+```
+
+### Error handling
+
+You can raise custom errors for better error handling:
+
+```python
+from hasura_ndc.errors import UnprocessableContent
+
+@connector.register_query
+def divide(a: float, b: float) -> float:
+    """Example with error handling"""
+    if b == 0:
+        raise UnprocessableContent(message="Cannot divide by zero", details={"a": a, "b": b})
+    return a / b
+```
+
+### Tracing support
+
+Add additional OpenTelemetry tracing spans to your functions:
+
+```python
+from hasura_ndc.instrumentation import with_active_span
+from opentelemetry.trace import get_tracer
+
+tracer = get_tracer("ndc-sdk-python.server")
+
+@connector.register_query
+async def with_tracing(name: str) -> str:
+    async def do_some_work(_span):
+        # This could be an async network call or other operation
+        return f"Hello {name}, tracing is active!"
+
+    return await with_active_span(
+        tracer,
+        "Root Span",
+        do_some_work,
+        {"tracing-attr": "This attribute is added to the trace"}
+    )
+```
+
+</TabItem>
+<TabItem value="Go" label="Go">
+
+When creating Go lambda functions, you can use the following types for parameters and return values:
+
+### Basic scalar types
+
+- `string` - Maps to NDC scalar type: `String`
+- `int`, `int32`, `int64` - Maps to NDC scalar type: `Int`
+- `float32`, `float64` - Maps to NDC scalar type: `Float`
+- `bool` - Maps to NDC scalar type: `Boolean`
+- `time.Time` - Maps to NDC scalar type: `DateTime` (represented as an ISO formatted string in JSON)
+
+```go
+package functions
+
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type CalculateAgeArguments struct {
+	BirthYear   int `json:"birthYear"`
+	CurrentYear int `json:"currentYear"`
+}
+
+type CalculateAgeResult struct {
+	Age int `json:"age"`
+}
+
+// FunctionCalculateAge calculates a person's age
+func FunctionCalculateAge(ctx context.Context, state *types.State, args *CalculateAgeArguments) (*CalculateAgeResult, error) {
+	return &CalculateAgeResult{
+		Age: args.CurrentYear - args.BirthYear,
+	}, nil
+}
+```
+
+### Object types and structs
+
+You can define custom struct types:
+
+```go
+package functions
+
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type User struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+type ProcessUserArguments struct {
+	User User `json:"user"`
+}
+
+type ProcessUserResponse struct {
+	Success bool   `json:"success"`
+	Data    string `json:"data"`
+}
+
+// FunctionProcessUser demonstrates using custom struct types
+func FunctionProcessUser(ctx context.Context, state *types.State, args *ProcessUserArguments) (*ProcessUserResponse, error) {
+	return &ProcessUserResponse{
+		Success: true,
+		Data:    fmt.Sprintf("User %s is %d years old", args.User.Name, args.User.Age),
+	}, nil
+}
+```
+
+### Nullable and optional properties
+
+You can use pointers to make properties optional:
+
+```go
+package functions
+
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type FormatNameArguments struct {
+	FirstName string  `json:"firstName"`
+	LastName  *string `json:"lastName"`   // Optional
+	Title     *string `json:"title"`      // Optional
+}
+
+type FormatNameResult struct {
+	FormattedName string `json:"formattedName"`
+}
+
+// FunctionFormatName demonstrates using optional parameters
+func FunctionFormatName(ctx context.Context, state *types.State, args *FormatNameArguments) (*FormatNameResult, error) {
+	formattedTitle := ""
+	if args.Title != nil {
+		formattedTitle = *args.Title + " "
+	}
+
+	formattedLastName := ""
+	if args.LastName != nil {
+		formattedLastName = " " + *args.LastName
+	}
+
+	return &FormatNameResult{
+		FormattedName: fmt.Sprintf("%s%s%s", formattedTitle, args.FirstName, formattedLastName),
+	}, nil
+}
+```
+
+### Generic JSON
+
+You can use `map[string]interface{}` or the `any` type for arbitrary JSON:
+
+```go
+package functions
+
+	"context"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type TransformDataArguments struct {
+	Data map[string]interface{} `json:"data"`
+}
+
+type TransformDataResult struct {
+	Processed bool                   `json:"processed"`
+	Original  map[string]interface{} `json:"original"`
+}
+
+// FunctionTransformData demonstrates handling arbitrary JSON
+func FunctionTransformData(ctx context.Context, state *types.State, args *TransformDataArguments) (*TransformDataResult, error) {
+	return &TransformDataResult{
+		Processed: true,
+		Original:  args.Data,
+	}, nil
+}
+```
+
+### Error handling
+
+You can return custom errors for better error handling:
+
+```go
+package functions
+
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+type DivideArguments struct {
+	A float64 `json:"a"`
+	B float64 `json:"b"`
+}
+
+type DivideResult struct {
+	Result float64 `json:"result"`
+}
+
+// FunctionDivide demonstrates error handling
+func FunctionDivide(ctx context.Context, state *types.State, args *DivideArguments) (*DivideResult, error) {
+	if args.B == 0 {
+		return nil, fmt.Errorf("cannot divide by zero")
+	}
+	return &DivideResult{Result: args.A / args.B}, nil
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+
+
+==============================
+
+
+
+# dev-mode.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/dev-mode
+
+# Live Reloading with Compose Watch
+
+## Introduction
+
+When working with lambda connectors, you'll often want to make quick edits to your custom business logic and don't want
+to go through the hassle of bringing down all your services, rebuilding them all, and restarting them. Instead you can
+leverage [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) to listen for changes to your connector's
+entrypoint, and rebuild the connector on the fly.
+
+:::info Are you adding new functions or modifying the signature of existing functions?
+
+The workflow described in the guide below helps when you're making changes to your connector's internal logic without
+altering the exposed function interfaces or metadata.
+
+If you're adding new functions that will need to be exposed as [commands](/reference/metadata-reference/commands.mdx) in
+your application, or modifying existing functions' arguments or return types, you'll still need to regenerate your
+metadata and create a new build of your application.
+
+Follow the steps [here](/data-modeling/iterate.mdx) for more information.
+
+:::
+
+## Guide
+
+### Step 1. Update your start script
+
+Open your `.hasura/context.yaml` file and locate your `docker-start` script.
+
+```yaml title="Add the --watch flag to your start script:" {4,7}
+docker-start:
+  bash:
+    HASURA_DDN_PAT=$(ddn auth print-access-token) PROMPTQL_SECRET_KEY=$(ddn auth print-promptql-secret-key) docker
+    compose -f compose.yaml --env-file .env up --build --pull always --watch
+  powershell:
+    $Env:HASURA_DDN_PAT = ddn auth print-access-token; $Env:PROMPTQL_SECRET_KEY = ddn auth print-promptql-secret-key;
+    docker compose -f compose.yaml --env-file .env up --build --pull always --watch
+```
+
+By adding the `--watch` flag to the `docker compose up` command, you're telling Docker to monitor the files specified in
+your service's `develop` section for changes. When changes are detected, Docker automatically triggers the action you
+configured (in this case, we'll use `rebuild`) without requiring you to manually stop and restart your services. This
+creates a much faster feedback loop while developing.
+
+### Step 2. Update your connector's `compose.yaml`
+
+```yaml title="Add the following adjusting the path as necessary:" {14-17}
+services:
+  my_lambda_connector:
+    build:
+      context: .
+      dockerfile: .hasura-connector/Dockerfile
+    environment:
+      HASURA_SERVICE_TOKEN_SECRET: $MY_LAMBDA_CONNECTOR_HASURA_SERVICE_TOKEN_SECRET
+      OTEL_EXPORTER_OTLP_ENDPOINT: $MY_LAMBDA_CONNECTOR_OTEL_EXPORTER_OTLP_ENDPOINT
+      OTEL_SERVICE_NAME: $MY_LAMBDA_CONNECTOR_OTEL_SERVICE_NAME
+    extra_hosts:
+      - local.hasura.dev:host-gateway
+    ports:
+      - 8203:8080
+    develop:
+      watch:
+        - action: rebuild
+          path: .
+```
+
+The `develop` section with `watch` tells Docker Compose which files or directories to monitor during development.
+
+- `path: .` means "watch the entire context directory". You can narrow this down to the entrypoint file(s) if you want
+  finer control. For example, you can isolate on the `functions.ts` file for the TypeScript connector or the
+  `./functions` directory for the Go connector.
+
+- `action: rebuild` means that if any file changes within the watched path, Docker will automatically rebuild and
+  restart the container. This setup ensures that your lambda connector is instantly rebuilt whenever you modify its code
+  — speeding up iteration dramatically without manual intervention.
+
+You can verify this by running `ddn run docker-start` from the root of your project and then making a modification to
+your lambda connector's logic. In your Docker logs, you should see the container for your connector being rebuilt and
+the changes you've made instantly reflected in your API.
+
+
+
+==============================
+
+
+
+# errors.mdx
+
+URL: https://hasura.io/docs/promptql/business-logic/errors
+
+
+# Debug and Handle Errors with Lambda Connectors
+
+## Introduction
+
+When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
+error itself. By default for security reasons, lambda connectors return a generic `internal error` message when
+exceptions occur, while the full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that
+request.
+
+This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
+deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes
+to improve PromptQL's understanding and self-corrective capabilities.
+
+For a full list of supported status codes, refer to the
+[Native Data Connector error specification](https://hasura.github.io/ndc-spec/specification/error-handling.html).
+
+## Debugging
+
+### Local development
+
+As your connector is running inside a Docker container, any logs (i.e., `console.log()`, `print()`, or `fmt.Println()`)
+from your custom business logic will be visible in the container's logs.
+
+These logs are printed to your terminal when running the default `ddn run docker-start` command, can be viewed by
+running `docker logs <lambda_container_name>`, or via Docker Desktop.
+
+:::info Enable watch mode
+
+We recommend enabling Compose Watch on your lambda connectors to create a shorter feedback loop during development. See
+the guide [here](/business-logic/dev-mode.mdx).
+
+:::
+
+### Deployed connectors
+
+For deployed connectors, you can use the DDN CLI to locate the connector's build ID and then output the logs to your
+terminal.
+
+#### Step 1. List all builds for a connector
+
+Start by entering a project directory.
+
+```ddn title="For example, to get the list of builds for a connector named my_ts:"
+ddn connector build get --connector-name my_ts
+```
+
+```plaintext title="Which will return a list of all builds for my_ts:"
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+|    CREATION TIME    | SUBGRAPH |          CONNECTORBUILD ID           |   CONNECTOR   |                                   READ URL                                   |                                  WRITE URL                                   |     STATUS     |     HUBCONNECTOR      |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+| 13 Apr 25 19:07 PDT | app      | b336c2f5-de3a-4d11-9f88-52578f3d8d92 | my_ts         | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | deploy_success | hasura/nodejs:v1.13.0 |
++---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
+```
+
+#### Step 2. Fetch the logs for a build
+
+```ddn title="Then, use the CONNECTORBUILD ID to fetch the logs:"
+ddn connector build logs b336c2f5-de3a-4d11-9f88-52578f3d8d92
+```
+
+The [`ddn connector build logs` command](/reference/cli/commands/ddn_connector_build_logs.mdx) supports tailing logs
+along with other customizations.
+
+## Returning custom error messages
+
+Lambda connectors allow you to throw classes of errors with your own custom message and metadata to indicate specific
+error conditions. These classes are designed to provide clarity in error handling when PromptQL interacts with your data
+sources. To explore the available error classes, use your editor's autocomplete or documentation features to view all
+supported classes and their usage details.
+
+<Tabs groupId="source-preference" className="api-tabs">
+
+<TabItem value="TypeScript" label="TypeScript">
+
+```typescript title="TypeScript examples:" {1,6,14,22}
+
+/** @readonly */
+export function updateResource(userRole: string): void {
+  if (userRole !== "admin") {
+    throw new sdk.Forbidden("User does not have permission to update this resource", { role: userRole });
+  }
+  console.log("Resource updated successfully.");
+}
+
+/** @readonly */
+export function createResource(id: string, existingIds: string[]): void {
+  if (existingIds.includes(id)) {
+    throw new sdk.Conflict("Resource with this ID already exists", { existingId: id });
+  }
+  console.log("Resource created successfully.");
+}
+
+/** @readonly */
+export function divide(x: number, y: number): number {
+  if (y === 0) {
+    throw new sdk.UnprocessableContent("Cannot divide by zero", { myErrorMetadata: "stuff", x, y });
+  }
+  return x / y;
+}
+```
+
+</TabItem>
+
+<TabItem value="Python" label="Python">
+
+```python title="Python examples:" {4}
+# There are different error types including: BadRequest, Forbidden, Conflict, UnprocessableContent, InternalServerError, NotSupported, and BadGateway
+@connector.register_query
+def error():
+    raise UnprocessableContent(message="This is an error", details={"Error": "This is an error!"})
+```
+
+</TabItem>
+
+<TabItem value="Go" label="Go">
+
+```go title="Go examples:" {7,29-31}
+package functions
+
+	"context"
+	"fmt"
+
+	"github.com/hasura/ndc-sdk-go/schema"
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// A hello argument
+type HelloArguments struct {
+	Greeting string `json:"greeting"`
+	Count    *int   `json:"count"`
+}
+
+// A hello result
+type HelloResult struct {
+	Reply string `json:"reply"`
+	Count int    `json:"count"`
+}
+
+
+func FunctionHello(ctx context.Context, state *types.State, arguments *HelloArguments) (*HelloResult, error) {
+	count := 1
+	authorized := false // This is just an example
+
+	if !authorized {
+		return nil, schema.UnauthorizeError("User is not authorized to perform this operation", map[string]any{
+			"function": "hello",
+		})
+	}
+
+	if arguments.Count != nil {
+		count = *arguments.Count + 1
+	}
+	return &HelloResult{
+		Reply: fmt.Sprintf("Hi! %s", arguments.Greeting),
+		Count: count,
+	}, nil
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+:::info How detailed should error messages be?
+
+Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
+OpenTelemetry traces to access detailed stack trace information.
+
+That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
+understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
+accurate interactions with your data over time.
+
+:::
+
+### Access OpenTelemetry traces {#access-opentelemetry-traces}
+
+Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
+tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
+improvements can be made to enhance accuracy.
+
+### Response-size limitations
+
+Lambda connectors have a response-size limit, which may vary depending on the SDK and should be considered when
+developing your application's business logic functions.
+
+| Connector       | Limit   | Configurable |
+| --------------- | ------- | ------------ |
+| `hasura/nodejs` | `30` MB | false        |
+| `hasura/python` | `30` MB | false        |
+| `hasura/go`     | `30` MB | false        |
+
+
+
+==============================
+
+
+
 # overview.mdx
 
 URL: https://hasura.io/docs/promptql/data-modeling/overview
@@ -5728,765 +7065,22 @@ func (c *Client) ExecuteProgram(ctx context.Context, body api.ExecuteRequest) (*
 
 
 
-# overview.mdx
+# Recipes
 
-URL: https://hasura.io/docs/promptql/business-logic/overview
-
-# Basics of Business Logic
-
-## Introduction
-
-PromptQL can enable your application to act on a user's behalf by using **custom business logic** as a data source. This
-logic can be tailored to each user's context — making decisions, aggregating data, or performing side effects — just
-like a human assistant would.
-
-With a **lambda connector**, you can write this logic in your language of choice (TypeScript, Python, or Go) and make it
-available directly to PromptQL. That means PromptQL isn't limited to querying data — it can **trigger logic**, **run
-workflows**, or **transform inputs into actions**, all within a secure and consistent API environment.
-
-By treating logic like a first-class data source, PromptQL ensures your application has a unified surface for
-interacting with databases, services, and whatever actions you want your application to be able to take. You define how
-the system should respond to user queries, apply business rules, or even call third-party APIs.
-
-Custom logic functions can work independently or extend your [models](/reference/metadata-reference/models.mdx), adding
-intelligence or automation wherever it's needed.
-
-This approach simplifies your architecture and unlocks a powerful new interaction model: **applications that respond,
-reason, and act**...not just fetch data.
-
-:::info What languages are supported?
-
-You can write PromptQL-powered logic in TypeScript, Python, or Go. These functions can be hosted by Hasura or deployed
-on your own infrastructure using our lambda connectors.
-
-:::
-
-## Learn more
-
-- [Learn how to add a lambda connector](/business-logic/add-a-lambda-connector.mdx)
-- [Learn how to add independent custom logic to your application](/business-logic/tutorials/1-take-action-for-a-user.mdx)
-- [Learn how to return complex information](/business-logic/tutorials/2-query-complex-information.mdx)
-
-:::info What about custom native operations?
-
-If you're curious about native queries and mutations, check out the
-[connector-specific reference docs](/reference/connectors/index.mdx) for generating queries and mutations using the
-native capabilities of your data source.
-
-:::
+URL: https://hasura.io/docs/promptql/recipes/overview
 
 
-
-==============================
-
-
-
-# index.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/tutorials/
-
-# Business Logic Tutorials
-
-In this section, you'll find tutorials that walk you through implementing custom business logic with lambda connectors
-step-by-step. Initially, we recommend checking out common use cases:
-
-- [Take action for a user](/business-logic/tutorials/1-take-action-for-a-user.mdx)
-- [Return complex information](/business-logic/tutorials/2-query-complex-information.mdx)
-
-
-
-==============================
-
-
-
-# 1-take-action-for-a-user.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/tutorials/1-take-action-for-a-user
-
-
-# Take Action on Behalf of a User
+# Recipes
 
 ## Introduction
 
-In this tutorial, you'll use a lambda connector to add custom business logic to your application that takes action on
-behalf of a user.
+There's loads of ways you can build an application with PromptQL. Whether you're connecting to a single data source,
+want to connect to a variety of existing API endpoints, or want to bring API data over en masse to avoid issues like
+rate-limiting and throttling, you can do it with PromptQL.
 
-This tutorial should take about five minutes.
+## Find out more
 
-## Step 1. Initialize a new local DDN project
-
-```ddn title="Create a new project using the DDN CLI:"
-ddn supergraph init lambda-tutorial --with-promptql
-```
-
-## Step 2. Initialize the lambda connector
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```ddn title="Run the following command:"
-ddn connector init my_ts -i
-```
-
-- Select `hasura/nodejs` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_ts` directory, you'll see the `functions.ts` file generated by the CLI; this will be
-the entrypoint for your connector.
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```ddn title="Run the following command:"
-ddn connector init my_python -i
-```
-
-- Select `hasura/python` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_python` directory, you'll see the `functions.py` file generated by the CLI; this will
-be the entrypoint for your connector.
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```ddn title="Run the following command:"
-ddn connector init my_go -i
-```
-
-- Select `hasura/go` from the list of connectors.
-- Choose a port (press enter to accept the default recommended by the CLI).
-
-If you open the `app/connector/my_go` directory, you'll see Go files in the `functions` folder; these will serve as the
-entrypoint for your connector.
-
-</TabItem>
-
-</Tabs>
-
-## Step 3. Add custom logic
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```bash title="From the connector directory, install the necessary packages:"
-cd app/connector/my_ts && npm install
-```
-
-```typescript title="Then, replace the contents of functions.ts with the following:"
-/*
- * This interface defines the structure of the response object returned by the
- * function that acts on behalf of a user. It includes a success status and a message.
- * The success status is a boolean indicating whether the operation was
- * successful or not.
- */
-interface UserActionResponse {
-  success: boolean;
-  message: string;
-}
-
-/*
- * This function simulates taking an action on behalf of a user. It logs the request made by the user
- * and returns a response object indicating the success status and a message.
- *
- * @param {string} request - What the user wants to do
- * @returns {UserActionResponse} - The response object containing success status and message
- */
-export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
-  // In a real application, you'd replace this with your custom business logic
-  console.log(`Taking action on behalf of user`);
-  return {
-    success: true,
-    message: `Successfully took action on user's behalf: ${request}`,
-  };
-}
-```
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```python title="Replace the contents of functions.py with the following:"
-from hasura_ndc import start
-from hasura_ndc.function_connector import FunctionConnector
-from pydantic import BaseModel, Field
-from hasura_ndc.errors import UnprocessableContent
-from typing import Annotated
-
-connector = FunctionConnector()
-
-class UserActionArguments(BaseModel):
-    request: Annotated[str, Field(description="What the user wants to do")]
-
-class UserActionResponse(BaseModel):
-    success: bool
-    message: str
-
-@connector.register_mutation
-def take_action_on_behalf_of_user(args: UserActionArguments) -> UserActionResponse:
-    # In a real application, you'd replace this with business logic
-    print("Taking action on behalf of user")
-    return UserActionResponse(
-        success=True,
-        message=f"Successfully took action on user's behalf: {args.request}"
-    )
-
-if __name__ == "__main__":
-    start(connector)
-```
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```go title="Add the following to a new file called app/connector/my_go/functions/take_action_on_behalf_of_user.go:"
-package functions
-
-	"context"
-	"fmt"
-
-	"hasura-ndc.dev/ndc-go/types"
-)
-
-// TakeActionArguments represents the input arguments for a user action.
-type TakeActionArguments struct {
-	Request string `json:"request"`
-}
-
-// TakeActionResponse represents the response after performing a user action.
-type TakeActionResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// ProcedureTakeActionOnBehalfOfUser simulates taking an action for the user.
-func ProcedureTakeActionOnBehalfOfUser(
-	ctx context.Context,
-	state *types.State,
-	args *TakeActionArguments,
-) (*TakeActionResponse, error) {
-	// In a real application, you'd replace this with your custom business logic
-	fmt.Println("Taking action on behalf of user")
-
-	return &TakeActionResponse{
-		Success: true,
-		Message: fmt.Sprintf("Successfully took action on user's behalf: %s", args.Request),
-	}, nil
-}
-```
-
-</TabItem>
-
-</Tabs>
-
-## Step 4. Introspect the source file(s)
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_ts
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_ts "*" for bulk adds
-ddn command add my_ts take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_python
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_python "*" for bulk adds
-ddn command add my_python take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```ddn title="Introspect the connector:"
-ddn connector introspect my_go
-```
-
-```bash title="Then, we can generate a metadata file for each function using the following command:"
-# alternatively, use ddn command add my_go "*" for bulk adds
-ddn command add my_go take_action_on_behalf_of_user
-```
-
-</TabItem>
-
-</Tabs>
-
-The command introspected your connector's entrypoint, identified functions with their argument and return types, and
-generated Hasura metadata for each. Look for `take_action_on_behalf_of_user.hml` to see the CLI-generated metadata.
-
-:::info Add semantic metadata
-
-We highly recommend adding a `description` to the command object referenced above. Why?
-
-PromptQL's performance is improved by providing more context; if you guide its understanding of what a particular
-function does and how it should be used in the application, you'll get better results.
-
-:::
-
-## Step 5. Create a new build and test
-
-```ddn title="Create a new build:"
-ddn supergraph build local
-```
-
-```ddn title="Start your services:"
-ddn run docker-start
-```
-
-```ddn title="Open your local console:"
-ddn console --local
-```
-
-You can now navigate to the PromptQL Playground and use your custom business logic.
-
-<Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
-
-## Next steps
-
-While not wholly necessary, you can create explicit relationships between your custom business logic and existing types
-from other datasources. Typically, PromptQL can pick up on the context of how to use your business logic in conjunction
-with your data, but you can always improve its understanding by creating a
-[relationship object](/data-modeling/relationship.mdx).
-
-
-
-==============================
-
-
-
-# 2-query-complex-information.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/tutorials/2-query-complex-information
-
-
-# Return Complex Information
-
-## Introduction
-
-In this tutorial, you'll use a lambda connector to add custom business logic to your application and retrieve
-information.
-
-This tutorial should take about five minutes.
-
-:::info Should you use a native data connector instead?
-
-We've developed a set of native data connectors that make it easy to retrieve data from specific sources. You can learn
-more [here](/data-sources/overview.mdx).
-
-This guide is intended to illustrate use cases wherein a native data connector doesn't exist for your source, or you
-need to do custom transformations of the data before its returned to your application.
-
-:::
-
-## Guide
-
-You can access this tutorial [here](/how-to-build-with-promptql/with-api-endpoints.mdx).
-
-
-
-==============================
-
-
-
-# add-a-lambda-connector.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/add-a-lambda-connector
-
-
-# Add a Lambda Connector
-
-## Introduction
-
-You can add a lambda connector just like any other [data source](/data-sources/overview.mdx).
-
-## Add a connector
-
-```ddn title="Initialize a new connector in a project directory:"
-ddn connector init <your_name_for_the_connector> -i
-```
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-When you add the `hasura/nodejs` connector, the CLI will generate a Node.js package with a `functions.ts` file. This
-file is the entrypoint for your connector.
-
-As this is a Node.js project, you can easily add any dependencies you desire by running `npm i <package-name>` from this
-connector's directory.
-
-</TabItem>
-<TabItem value="Python" label="Python">
-
-When you add the `hasura/python` connector, the CLI will generate a Python application with a `functions.py` file. This
-file is the entrypoint for your connector.
-
-As this is a Python project, you can easily add any dependencies you desire by adding them to the `requirements.txt` in
-this connector's directory.
-
-</TabItem>
-<TabItem value="Go" label="Go">
-
-When you add the `hasura/go` connector, the CLI will generate a Go application with a `/functions` directory. The
-connector will use this directory — and any `*.go` file in it — as the entrypoint for your connector.
-
-As this is a Go project, you can easily add any dependencies you desire by adding them to the `go.mod` file and running
-`go mod tidy` from this connector's directory.
-
-</TabItem>
-
-</Tabs>
-
-:::info Customization
-
-You can customize which subgraph this connector is added to by
-[changing your project's context](/reference/cli/commands/ddn_context.mdx) or using flags. More information can be found
-in the [CLI docs](/reference/cli/commands/ddn_connector_init.mdx) for the `ddn connector init` command.
-
-:::
-
-## Next steps
-
-After adding a connector, learn
-[how to add custom business logic](/business-logic/tutorials/1-take-action-for-a-user.mdx) written in your language of
-choice and expose it via your API.
-
-
-
-==============================
-
-
-
-# add-env-vars-to-a-lambda.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/add-env-vars-to-a-lambda
-
-# Add Custom Environment Variables
-
-## Introduction
-
-Custom environment variables allow you to define configuration values specific to your deployment. These variables can
-be used to set API keys, connection strings, or other parameters that your application or connectors need. When you run
-the `ddn connector env add` command, it automatically updates multiple files to ensure the environment variables are
-available across your project:
-
-- **`.env`**: Adds the variable to the [current context's](/reference/cli/commands/ddn_context.mdx) environment
-  configuration file for easy access during development.
-- **`connector.yaml`**: Updates the connector's configuration to include the variable for deployment.
-- **`compose.yaml`**: Ensures the variable is included in the Docker Compose configuration for runtime.
-
-## Add an environment variable
-
-```ddn title="From a project directory, run:"
-ddn connector env add <connector_name> --env FOO=bar
-```
-
-Repeat these steps for each additional variable.
-
-## Use an environment variable
-
-After creating a new build and running your connector, you can access your environment variable(s) via whatever
-conventions your language of choice prefers. For detailed instructions, refer to the following resources:
-
-- **Node.js**: Using [dotenv](https://github.com/motdotla/dotenv#readme)
-- **Python**: Using [python-dotenv](https://pypi.org/project/python-dotenv/)
-- **Go**: Using [godotenv](https://github.com/joho/godotenv)
-
-
-
-==============================
-
-
-
-# dev-mode.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/dev-mode
-
-# Live Reloading with Compose Watch
-
-## Introduction
-
-When working with lambda connectors, you'll often want to make quick edits to your custom business logic and don't want
-to go through the hassle of bringing down all your services, rebuilding them all, and restarting them. Instead you can
-leverage [Compose Watch](https://docs.docker.com/compose/how-tos/file-watch/) to listen for changes to your connector's
-entrypoint, and rebuild the connector on the fly.
-
-:::info Are you adding new functions or modifying the signature of existing functions?
-
-The workflow described in the guide below helps when you're making changes to your connector's internal logic without
-altering the exposed function interfaces or metadata.
-
-If you're adding new functions that will need to be exposed as [commands](/reference/metadata-reference/commands.mdx) in
-your application, or modifying existing functions' arguments or return types, you'll still need to regenerate your
-metadata and create a new build of your application.
-
-Follow the steps [here](/data-modeling/iterate.mdx) for more information.
-
-:::
-
-## Guide
-
-### Step 1. Update your start script
-
-Open your `.hasura/context.yaml` file and locate your `docker-start` script.
-
-```yaml title="Add the --watch flag to your start script:" {4,7}
-docker-start:
-  bash:
-    HASURA_DDN_PAT=$(ddn auth print-access-token) PROMPTQL_SECRET_KEY=$(ddn auth print-promptql-secret-key) docker
-    compose -f compose.yaml --env-file .env up --build --pull always --watch
-  powershell:
-    $Env:HASURA_DDN_PAT = ddn auth print-access-token; $Env:PROMPTQL_SECRET_KEY = ddn auth print-promptql-secret-key;
-    docker compose -f compose.yaml --env-file .env up --build --pull always --watch
-```
-
-By adding the `--watch` flag to the `docker compose up` command, you're telling Docker to monitor the files specified in
-your service's `develop` section for changes. When changes are detected, Docker automatically triggers the action you
-configured (in this case, we'll use `rebuild`) without requiring you to manually stop and restart your services. This
-creates a much faster feedback loop while developing.
-
-### Step 2. Update your connector's `compose.yaml`
-
-```yaml title="Add the following adjusting the path as necessary:" {14-17}
-services:
-  my_lambda_connector:
-    build:
-      context: .
-      dockerfile: .hasura-connector/Dockerfile
-    environment:
-      HASURA_SERVICE_TOKEN_SECRET: $MY_LAMBDA_CONNECTOR_HASURA_SERVICE_TOKEN_SECRET
-      OTEL_EXPORTER_OTLP_ENDPOINT: $MY_LAMBDA_CONNECTOR_OTEL_EXPORTER_OTLP_ENDPOINT
-      OTEL_SERVICE_NAME: $MY_LAMBDA_CONNECTOR_OTEL_SERVICE_NAME
-    extra_hosts:
-      - local.hasura.dev:host-gateway
-    ports:
-      - 8203:8080
-    develop:
-      watch:
-        - action: rebuild
-          path: .
-```
-
-The `develop` section with `watch` tells Docker Compose which files or directories to monitor during development.
-
-- `path: .` means "watch the entire context directory". You can narrow this down to the entrypoint file(s) if you want
-  finer control. For example, you can isolate on the `functions.ts` file for the TypeScript connector or the
-  `./functions` directory for the Go connector.
-
-- `action: rebuild` means that if any file changes within the watched path, Docker will automatically rebuild and
-  restart the container. This setup ensures that your lambda connector is instantly rebuilt whenever you modify its code
-  — speeding up iteration dramatically without manual intervention.
-
-You can verify this by running `ddn run docker-start` from the root of your project and then making a modification to
-your lambda connector's logic. In your Docker logs, you should see the container for your connector being rebuilt and
-the changes you've made instantly reflected in your API.
-
-
-
-==============================
-
-
-
-# errors.mdx
-
-URL: https://hasura.io/docs/promptql/business-logic/errors
-
-
-# Debug and Handle Errors with Lambda Connectors
-
-## Introduction
-
-When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
-error itself. By default for security reasons, lambda connectors return a generic `internal error` message when exceptions occur, while the
-full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that request.
-
-This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
-deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes
-to improve PromptQL's understanding and self-corrective capabilities.
-
-For a full list of supported status codes, refer to the
-[Native Data Connector error specification](https://hasura.github.io/ndc-spec/specification/error-handling.html).
-
-## Debugging
-
-### Local development
-
-As your connector is running inside a Docker container, any logs (i.e., `console.log()`, `print()`, or `fmt.Println()`)
-from your custom business logic will be visible in the container's logs.
-
-These logs are printed to your terminal when running the default `ddn run docker-start` command, can be viewed by
-running `docker logs <lambda_container_name>`, or via Docker Desktop.
-
-:::info Enable watch mode
-
-We recommend enabling Compose Watch on your lambda connectors to create a shorter feedback loop during development. See
-the guide [here](/business-logic/dev-mode.mdx).
-
-:::
-
-### Deployed connectors
-
-For deployed connectors, you can use the DDN CLI to locate the connector's build ID and then output the logs to your
-terminal.
-
-#### Step 1. List all builds for a connector
-
-Start by entering a project directory.
-
-```ddn title="For example, to get the list of builds for a connector named my_ts:"
-ddn connector build get --connector-name my_ts
-```
-
-```plaintext title="Which will return a list of all builds for my_ts:"
-+---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
-|    CREATION TIME    | SUBGRAPH |          CONNECTORBUILD ID           |   CONNECTOR   |                                   READ URL                                   |                                  WRITE URL                                   |     STATUS     |     HUBCONNECTOR      |
-+---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
-| 13 Apr 25 19:07 PDT | app      | b336c2f5-de3a-4d11-9f88-52578f3d8d92 | my_ts         | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | https://service-b336c2f5-de3a-4d11-9f88-52578f3d8d92-<project-id>.a.run.app  | deploy_success | hasura/nodejs:v1.13.0 |
-+---------------------+----------+--------------------------------------+---------------+------------------------------------------------------------------------------+------------------------------------------------------------------------------+----------------+-----------------------+
-```
-
-#### Step 2. Fetch the logs for a build
-
-```ddn title="Then, use the CONNECTORBUILD ID to fetch the logs:"
-ddn connector build logs b336c2f5-de3a-4d11-9f88-52578f3d8d92
-```
-
-The [`ddn connector build logs` command](/reference/cli/commands/ddn_connector_build_logs.mdx) supports tailing logs
-along with other customizations.
-
-## Returning custom error messages
-
-Lambda connectors allow you to throw classes of errors with your own custom message and metadata to indicate specific
-error conditions. These classes are designed to provide clarity in error handling when PromptQL interacts with your data
-sources. To explore the available error classes, use your editor's autocomplete or documentation features to view all
-supported classes and their usage details.
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```typescript title="TypeScript examples:" {1,6,14,22}
-
-/** @readonly */
-export function updateResource(userRole: string): void {
-  if (userRole !== "admin") {
-    throw new sdk.Forbidden("User does not have permission to update this resource", { role: userRole });
-  }
-  console.log("Resource updated successfully.");
-}
-
-/** @readonly */
-export function createResource(id: string, existingIds: string[]): void {
-  if (existingIds.includes(id)) {
-    throw new sdk.Conflict("Resource with this ID already exists", { existingId: id });
-  }
-  console.log("Resource created successfully.");
-}
-
-/** @readonly */
-export function divide(x: number, y: number): number {
-  if (y === 0) {
-    throw new sdk.UnprocessableContent("Cannot divide by zero", { myErrorMetadata: "stuff", x, y });
-  }
-  return x / y;
-}
-```
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```python title="Python examples:" {4}
-# There are different error types including: BadRequest, Forbidden, Conflict, UnprocessableContent, InternalServerError, NotSupported, and BadGateway
-@connector.register_query
-def error():
-    raise UnprocessableContent(message="This is an error", details={"Error": "This is an error!"})
-```
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```go title="Go examples:" {7,29-31}
-package functions
-
-	"context"
-	"fmt"
-
-	"github.com/hasura/ndc-sdk-go/schema"
-	"hasura-ndc.dev/ndc-go/types"
-)
-
-// A hello argument
-type HelloArguments struct {
-	Greeting string `json:"greeting"`
-	Count    *int   `json:"count"`
-}
-
-// A hello result
-type HelloResult struct {
-	Reply string `json:"reply"`
-	Count int    `json:"count"`
-}
-
-
-func FunctionHello(ctx context.Context, state *types.State, arguments *HelloArguments) (*HelloResult, error) {
-	count := 1
-	authorized := false // This is just an example
-
-	if !authorized {
-		return nil, schema.UnauthorizeError("User is not authorized to perform this operation", map[string]any{
-			"function": "hello",
-		})
-	}
-
-	if arguments.Count != nil {
-		count = *arguments.Count + 1
-	}
-	return &HelloResult{
-		Reply: fmt.Sprintf("Hi! %s", arguments.Greeting),
-		Count: count,
-	}, nil
-}
-```
-
-</TabItem>
-
-</Tabs>
-
-:::info How detailed should error messages be?
-
-Exposing stack traces to end users is generally discouraged. Instead, administrators can review traces logged in the
-OpenTelemetry traces to access detailed stack trace information.
-
-That said, the more clarity provided in an error message, the better PromptQL can self-correct and improve its
-understanding of the function. Clear, descriptive error messages allow PromptQL to learn from errors and provide more
-accurate interactions with your data over time.
-
-:::
-
-### Access OpenTelemetry traces {#access-opentelemetry-traces}
-
-Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
-tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
-improvements can be made to enhance accuracy.
+For now, check out our [tutorials section](/recipes/tutorials/index.mdx) with cloneable repos to get you started!
 
 
 
@@ -6584,29 +7178,6 @@ webhook must return a valid `http` response with session variables in the body.
 No authentication is required for a specific role to access the data.
 
 [Read more](/auth/noauth-mode.mdx).
-
-
-
-==============================
-
-
-
-# Recipes
-
-URL: https://hasura.io/docs/promptql/recipes/overview
-
-
-# Recipes
-
-## Introduction
-
-There's loads of ways you can build an application with PromptQL. Whether you're connecting to a single data source,
-want to connect to a variety of existing API endpoints, or want to bring API data over en masse to avoid issues like
-rate-limiting and throttling, you can do it with PromptQL.
-
-## Find out more
-
-For now, check out our [tutorials section](/recipes/tutorials/index.mdx) with cloneable repos to get you started!
 
 
 
@@ -11795,109 +12366,6 @@ subgraph can be added to an existing or private team repository. Learn more
 
 
 
-# remove-subgraph.mdx
-
-URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
-
-# Remove a subgraph
-
-## Introduction
-
-In this recipe, you'll learn how to remove a subgraph from your local project directory.
-
-:::info Prerequisites
-
-Before continuing, ensure you have:
-
-- A [local Hasura project](/quickstart.mdx).
-- Stopped any running docker services related to the project.
-
-:::
-
-## Recipe
-
-### Step 1. Delete subgraph directory
-
-Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
-directory is typically located at `<subgraph-name>`.
-
-### Step 2. Update supergraph config files
-
-Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
-
-```yaml title="supergraph.yaml"
-kind: Supergraph
-version: v2
-definition:
-  subgraphs:
-    - globals/subgraph.yaml
-    #highlight-start
-    - <subgraph-name>/subgraph.yaml
-    #highlight-end
-    ...
-```
-
-### Step 3. Update engine compose file
-
-Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
-compose file is typically located at `<project-root>/compose.yaml`.
-
-```yaml title="<project-root>/compose.yaml"
-include:
-  #highlight-start
-  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
-  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
-  #highlight-end
-  ...
-services:
-  engine: ...
-```
-
-### Step 4. Remove subgraph config file from context
-
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
-the `subgraph` key if set as the deleted subgraph config file.
-
-```yaml title=".hasura/context.yaml"
-kind: Context
-version: v3
-definition:
-  current: default
-  contexts:
-    default:
-      supergraph: ../supergraph.yaml
-      #highlight-start
-      subgraph: ../<subgraph-name>/subgraph.yaml
-      #highlight-end
-      ...
-```
-
-### Step 5. (Optional) Remove subgraph relevant environment variables
-
-You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
-CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
-
-```.env title="For example, .env"
-...
-#highlight-start
-<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
-<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
-#highlight-end
-...
-```
-
-## Learn more
-
-- [Project configuration](/project-configuration/overview.mdx)
-
-
-
-==============================
-
-
-
 # work-with-multiple-repositories.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/tutorials/work-with-multiple-repositories
@@ -12310,6 +12778,109 @@ By organizing your project into multiple repositories, you can create a flexible
 development in Hasura. Starting with a parent project, you learned how to provision subgraphs, invite collaborators, and
 manage builds to integrate subgraph changes into a unified supergraph. This structure ensures teams can work
 independently while maintaining seamless integration and coordination across the entire application.
+
+
+
+==============================
+
+
+
+# remove-subgraph.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/tutorials/remove-subgraph
+
+# Remove a subgraph
+
+## Introduction
+
+In this recipe, you'll learn how to remove a subgraph from your local project directory.
+
+:::info Prerequisites
+
+Before continuing, ensure you have:
+
+- A [local Hasura project](/quickstart.mdx).
+- Stopped any running docker services related to the project.
+
+:::
+
+## Recipe
+
+### Step 1. Delete subgraph directory
+
+Delete the directory containing the subgraph related config files, connectors and metadata of the subgraph. The subgraph
+directory is typically located at `<subgraph-name>`.
+
+### Step 2. Update supergraph config files
+
+Remove the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
+located at the project root, i.e., `<project-root>/supergraph.yaml`.
+
+```yaml title="supergraph.yaml"
+kind: Supergraph
+version: v2
+definition:
+  subgraphs:
+    - globals/subgraph.yaml
+    #highlight-start
+    - <subgraph-name>/subgraph.yaml
+    #highlight-end
+    ...
+```
+
+### Step 3. Update engine compose file
+
+Remove references to any compose files of connectors in the deleted subgraph from the engine compose file. The engine
+compose file is typically located at `<project-root>/compose.yaml`.
+
+```yaml title="<project-root>/compose.yaml"
+include:
+  #highlight-start
+  - path: <subgraph-name>/connector/<connector-1>/compose.yaml
+  - path: <subgraph-name>/connector/<connector-2>/compose.yaml
+  #highlight-end
+  ...
+services:
+  engine: ...
+```
+
+### Step 4. Remove subgraph config file from context
+
+The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Remove
+the `subgraph` key if set as the deleted subgraph config file.
+
+```yaml title=".hasura/context.yaml"
+kind: Context
+version: v3
+definition:
+  current: default
+  contexts:
+    default:
+      supergraph: ../supergraph.yaml
+      #highlight-start
+      subgraph: ../<subgraph-name>/subgraph.yaml
+      #highlight-end
+      ...
+```
+
+### Step 5. (Optional) Remove subgraph relevant environment variables
+
+You can remove the environment variables that were defined for your subgraph from the env files that you might have. The
+CLI-generated environment variables for a subgraph typically start with the `<SUBGRAPH_NAME>_` prefix.
+
+```.env title="For example, .env"
+...
+#highlight-start
+<SUBGRAPH_NAME>_<CONNECTOR>_READ_URL="<connector-read-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_WRITE_URL="<connector-write-url>"
+<SUBGRAPH_NAME>_<CONNECTOR>_AUTHORIZATION_HEADER="Bearer <roken>"
+#highlight-end
+...
+```
+
+## Learn more
+
+- [Project configuration](/project-configuration/overview.mdx)
 
 
 
@@ -12914,6 +13485,47 @@ visualizations from your data through natural conversations, enabling you to tak
 
 
 
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/
+
+# Subgraphs
+
+## Introduction
+
+A subgraph is a focused component of your overall supergraph, typically organized around specific data domains or
+business functions.
+
+Subgraphs are often team-specific, aligning with the responsibilities and expertise of individual teams. This structure
+not only enables efficient development but also makes it easier to onboard new teams as your unified supergraph evolves.
+By defining clear boundaries and responsibilities, subgraphs allow new teams to integrate seamlessly without impacting
+existing functionality, fostering a scalable and collaborative development environment.
+
+## Organization
+
+Subgraphs provide flexibility and modularity in your data access strategy. A single project can include one or more
+subgraphs, depending on its complexity and the distribution of responsibilities among teams. Subgraphs are designed to
+be iterated on and developed independently, allowing teams to work at their own pace and with their own preferred tools
+and languages while ensuring PromptQL maintains a consistent and accurate understanding of your entire data ecosystem.
+
+In setups with multiple repositories, subgraphs also enhance governance by limiting access. Individual developers or
+teams are only granted permissions to their specific subgraph, ensuring they cannot modify or disrupt other parts of the
+data structure. This separation not only protects the integrity of the overall system but also enables streamlined
+collaboration across teams by maintaining a well-defined scope of access, which is crucial for building a reliable
+foundation for PromptQL's data interactions.
+
+## Next steps
+
+- [Learn how to create a subgraph](/project-configuration/subgraphs/create-a-subgraph.mdx)
+- [Learn how to establish relationships across subgraphs to unify your data for PromptQL access](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
+- [Learn how to split subgraphs across repositories to enable decentralized development](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
+
+
+
+==============================
+
+
+
 # create-a-subgraph.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/create-a-subgraph
@@ -12974,47 +13586,6 @@ on the cloud project.
 
 - [Check out an end-to-end tutorial for working with multiple subgraphs](/project-configuration/tutorials/work-with-multiple-subgraphs.mdx)
 - [Learn how to work with multiple subgraphs in a project](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
-
-
-
-==============================
-
-
-
-# index.mdx
-
-URL: https://hasura.io/docs/promptql/project-configuration/subgraphs/
-
-# Subgraphs
-
-## Introduction
-
-A subgraph is a focused component of your overall supergraph, typically organized around specific data domains or
-business functions.
-
-Subgraphs are often team-specific, aligning with the responsibilities and expertise of individual teams. This structure
-not only enables efficient development but also makes it easier to onboard new teams as your unified supergraph evolves.
-By defining clear boundaries and responsibilities, subgraphs allow new teams to integrate seamlessly without impacting
-existing functionality, fostering a scalable and collaborative development environment.
-
-## Organization
-
-Subgraphs provide flexibility and modularity in your data access strategy. A single project can include one or more
-subgraphs, depending on its complexity and the distribution of responsibilities among teams. Subgraphs are designed to
-be iterated on and developed independently, allowing teams to work at their own pace and with their own preferred tools
-and languages while ensuring PromptQL maintains a consistent and accurate understanding of your entire data ecosystem.
-
-In setups with multiple repositories, subgraphs also enhance governance by limiting access. Individual developers or
-teams are only granted permissions to their specific subgraph, ensuring they cannot modify or disrupt other parts of the
-data structure. This separation not only protects the integrity of the overall system but also enables streamlined
-collaboration across teams by maintaining a well-defined scope of access, which is crucial for building a reliable
-foundation for PromptQL's data interactions.
-
-## Next steps
-
-- [Learn how to create a subgraph](/project-configuration/subgraphs/create-a-subgraph.mdx)
-- [Learn how to establish relationships across subgraphs to unify your data for PromptQL access](/project-configuration/subgraphs/working-with-multiple-subgraphs.mdx)
-- [Learn how to split subgraphs across repositories to enable decentralized development](/project-configuration/subgraphs/working-with-multiple-repositories.mdx)
 
 
 
@@ -13580,6 +14151,34 @@ ddn codemod rename-graphql-prefixes --subgraph app/subgraph.yaml --from-graphql-
 
 
 
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/project-configuration/project-management/
+
+# Project Management
+
+## Introduction
+
+Broadly, projects can be managed using two tools: context and collaborators.
+
+**Context** allows you to swap out local and cloud configuration files and values. This makes it easier to execute
+commands via the CLI, switch between environments when testing your API, and executing automated CI/CD scripts.
+
+**Collaborators** can be added to any [Hasura DDN Base or Hasura DDN Advanced project](https://hasura.io/pricing).
+Depending on the project's plan, you can add collaborators with read-only access all the way to granular access,
+enabling them to only contribute to certain [subgraphs](/project-configuration/subgraphs/index.mdx).
+
+## Next steps
+
+- [Learn how to manage context](/project-configuration/project-management/manage-contexts.mdx)
+- [Learn how to invite collaborators](/project-configuration/project-management/manage-collaborators.mdx)
+
+
+
+==============================
+
+
+
 # manage-contexts.mdx
 
 URL: https://hasura.io/docs/promptql/project-configuration/project-management/manage-contexts
@@ -13735,34 +14334,6 @@ context **before** initializing a new cloud project to avoid any deployment issu
 Now that you have a better idea of configuring your project for various contexts,
 [learn how to collaborate with others](/project-configuration/project-management/manage-collaborators.mdx) by adding
 collaborators and defining their roles.
-
-
-
-==============================
-
-
-
-# index.mdx
-
-URL: https://hasura.io/docs/promptql/project-configuration/project-management/
-
-# Project Management
-
-## Introduction
-
-Broadly, projects can be managed using two tools: context and collaborators.
-
-**Context** allows you to swap out local and cloud configuration files and values. This makes it easier to execute
-commands via the CLI, switch between environments when testing your API, and executing automated CI/CD scripts.
-
-**Collaborators** can be added to any [Hasura DDN Base or Hasura DDN Advanced project](https://hasura.io/pricing).
-Depending on the project's plan, you can add collaborators with read-only access all the way to granular access,
-enabling them to only contribute to certain [subgraphs](/project-configuration/subgraphs/index.mdx).
-
-## Next steps
-
-- [Learn how to manage context](/project-configuration/project-management/manage-contexts.mdx)
-- [Learn how to invite collaborators](/project-configuration/project-management/manage-collaborators.mdx)
 
 
 
@@ -14445,75 +15016,6 @@ detailed steps depending on your specific connector.
 
 
 
-# deploy-to-ddn.mdx
-
-URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/deploy-to-ddn
-
-# Deploying your project to Hasura DDN
-
-Deploying your project to Hasura DDN is a simple process and can be done in two steps.
-
-## Deployment flow
-
-1. Create a supergraph build on Hasura DDN.
-2. Apply the supergraph build to your project on Hasura DDN.
-
-To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
-information on how to get started.
-
-:::info Hasura DDN Cloud projects
-
-When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
-that's paired with your local project.
-
-:::
-
-### Step 1. Create a supergraph build on Hasura DDN
-
-```ddn title="The following will use the project name in your .hasura/context.yaml file:"
-ddn supergraph build create
-```
-
-This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
-independently but this command will create them all.
-
-The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
-the build on the console.
-
-You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
-command.
-
-The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
-applied at a time as the "official" API.
-
-### Step 2. Apply the build
-
-```ddn
-# E.g., ddn supergraph build apply 85b0961544
-ddn supergraph build apply <build-version>
-```
-
-This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
-command, via the console, or any client accessing via the API URL.
-
-:::tip Simplify your deployment
-
-For a more efficient deployment process, you can create and apply the supergraph build in a single command using
-`ddn supergraph build create --apply`
-
-:::
-
-## Summary
-
-There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
-the simplest and most common flow here.
-
-
-
-==============================
-
-
-
 # incremental-builds.mdx
 
 URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/incremental-builds
@@ -14648,6 +15150,75 @@ ddn subgraph build apply <build-version>
 
 You have full control over the composition of your supergraph and can build and deploy subgraphs and connectors
 incrementally and independently to compose your supergraph.
+
+
+
+==============================
+
+
+
+# deploy-to-ddn.mdx
+
+URL: https://hasura.io/docs/promptql/deployment/hasura-ddn/deploy-to-ddn
+
+# Deploying your project to Hasura DDN
+
+Deploying your project to Hasura DDN is a simple process and can be done in two steps.
+
+## Deployment flow
+
+1. Create a supergraph build on Hasura DDN.
+2. Apply the supergraph build to your project on Hasura DDN.
+
+To begin this guide you will need to have a local project set up. Check out the [quickstart](/quickstart.mdx) for more
+information on how to get started.
+
+:::info Hasura DDN Cloud projects
+
+When you initialize a new project — like in the quickstart — we automatically provision a Hasura DDN Cloud project
+that's paired with your local project.
+
+:::
+
+### Step 1. Create a supergraph build on Hasura DDN
+
+```ddn title="The following will use the project name in your .hasura/context.yaml file:"
+ddn supergraph build create
+```
+
+This command will create builds for each connector, subgraph, and the supergraph. Each of these can be built
+independently but this command will create them all.
+
+The CLI will respond with the build version, the Console URL, the PromptQL URL, the Project Name, and a hint to browse
+the build on the console.
+
+You can now use the PromptQL playground to test your build by running `ddn console --build-version <build-version>`
+command.
+
+The build is not yet the "official" applied API for the project. A project can have multiple builds, but only one
+applied at a time as the "official" API.
+
+### Step 2. Apply the build
+
+```ddn
+# E.g., ddn supergraph build apply 85b0961544
+ddn supergraph build apply <build-version>
+```
+
+This build is now the "official" applied API for the project and is accessible via the API URL in the output of the
+command, via the console, or any client accessing via the API URL.
+
+:::tip Simplify your deployment
+
+For a more efficient deployment process, you can create and apply the supergraph build in a single command using
+`ddn supergraph build create --apply`
+
+:::
+
+## Summary
+
+There are many more options and configurations available for deploying your project to Hasura DDN and we have detailed
+the simplest and most common flow here.
 
 
 
@@ -17904,7 +18475,7 @@ Definition of a user-defined Open DD object type.
 |-----|-----|-----|-----|
 | `name` | [CustomTypeName](#objecttype-customtypename) | true | The name to give this object type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph. |
 | `fields` | [[ObjectFieldDefinition](#objecttype-objectfielddefinition)] | true | The list of fields defined for this object type. |
-| `globalIdFields` | [[FieldName](#objecttype-fieldname)] / null | false | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
+| `globalIdFields` | array / null | false | The subset of fields that uniquely identify this object in the domain. Setting this property will automatically implement the GraphQL Relay Node interface for this object type and add an `id` global ID field. If setting this property, there must not be a field named `id` already present. |
 | `graphql` | [ObjectTypeGraphQLConfiguration](#objecttype-objecttypegraphqlconfiguration) / null | false | Configuration for how this object type should appear in the GraphQL schema. |
 | `description` | string / null | false | The description of the object. Gets added to the description of the object's definition in the graphql schema. |
 | `dataConnectorTypeMapping` | [[DataConnectorTypeMapping](#objecttype-dataconnectortypemapping)] | false | Mapping of this object type to corresponding object types in various data connectors. |
@@ -18735,18 +19306,18 @@ query {
 
 ## Metadata structure
 
-
 ### Command {#command-command}
 
-The definition of a command. A command is a user-defined operation which can take arguments and returns an output. The semantics of a command are opaque to the Open DD specification.
+The definition of a command. A command is a user-defined operation which can take arguments and returns an output. The
+semantics of a command are opaque to the Open DD specification.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `kind` | `Command` | true |  |
-| `version` | `v1` | true |  |
-| `definition` | [CommandV1](#command-commandv1) | true | Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD. |
+| Key          | Value                           | Required | Description                                                                                                                                                  |
+| ------------ | ------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `kind`       | `Command`                       | true     |                                                                                                                                                              |
+| `version`    | `v1`                            | true     |                                                                                                                                                              |
+| `definition` | [CommandV1](#command-commandv1) | true     | Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD. |
 
- **Example:**
+**Example:**
 
 ```yaml
 kind: Command
@@ -18766,77 +19337,69 @@ definition:
   description: Get the latest article
 ```
 
-
 #### CommandV1 {#command-commandv1}
 
-Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The semantics of a command are opaque to OpenDD.
+Definition of an OpenDD Command, which is a custom operation that can take arguments and returns an output. The
+semantics of a command are opaque to OpenDD.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [CommandName](#command-commandname) | true | The name of the command. |
-| `outputType` | [TypeReference](#command-typereference) | true | The return type of the command. |
-| `arguments` | [[ArgumentDefinition](#command-argumentdefinition)] | false | The list of arguments accepted by this command. Defaults to no arguments. |
-| `source` | [CommandSource](#command-commandsource) / null | false | The source configuration for this command. |
-| `graphql` | [CommandGraphQlDefinition](#command-commandgraphqldefinition) / null | false | Configuration for how this command should appear in the GraphQL schema. |
-| `description` | string / null | false | The description of the command. Gets added to the description of the command's root field in the GraphQL schema. |
-
-
+| Key           | Value                                                                | Required | Description                                                                                                      |
+| ------------- | -------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `name`        | [CommandName](#command-commandname)                                  | true     | The name of the command.                                                                                         |
+| `outputType`  | [TypeReference](#command-typereference)                              | true     | The return type of the command.                                                                                  |
+| `arguments`   | [[ArgumentDefinition](#command-argumentdefinition)]                  | false    | The list of arguments accepted by this command. Defaults to no arguments.                                        |
+| `source`      | [CommandSource](#command-commandsource) / null                       | false    | The source configuration for this command.                                                                       |
+| `graphql`     | [CommandGraphQlDefinition](#command-commandgraphqldefinition) / null | false    | Configuration for how this command should appear in the GraphQL schema.                                          |
+| `description` | string / null                                                        | false    | The description of the command. Gets added to the description of the command's root field in the GraphQL schema. |
 
 #### CommandGraphQlDefinition {#command-commandgraphqldefinition}
 
 The definition of how a command should appear in the GraphQL API.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `rootFieldName` | [GraphQlFieldName](#command-graphqlfieldname) | true | The name of the graphql root field to use for this command. |
-| `rootFieldKind` | [GraphQlRootFieldKind](#command-graphqlrootfieldkind) | true | Whether to put this command in the Query or Mutation root of the GraphQL API. |
-| `deprecated` | [Deprecated](#command-deprecated) / null | false | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
+| Key             | Value                                                 | Required | Description                                                                                                            |
+| --------------- | ----------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `rootFieldName` | [GraphQlFieldName](#command-graphqlfieldname)         | true     | The name of the graphql root field to use for this command.                                                            |
+| `rootFieldKind` | [GraphQlRootFieldKind](#command-graphqlrootfieldkind) | true     | Whether to put this command in the Query or Mutation root of the GraphQL API.                                          |
+| `deprecated`    | [Deprecated](#command-deprecated) / null              | false    | Whether this command root field is deprecated. If set, this will be added to the graphql schema as a deprecated field. |
 
- **Example:**
+**Example:**
 
 ```yaml
 rootFieldName: getLatestArticle
 rootFieldKind: Query
 ```
 
-
 #### Deprecated {#command-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
+deprecated.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `reason` | string / null | false | The reason for deprecation. |
-
-
+| Key      | Value         | Required | Description                 |
+| -------- | ------------- | -------- | --------------------------- |
+| `reason` | string / null | false    | The reason for deprecation. |
 
 #### GraphQlRootFieldKind {#command-graphqlrootfieldkind}
 
 Whether to put this command in the Query or Mutation root of the GraphQL API.
 
-
 **Value:** `Query` / `Mutation`
-
 
 #### GraphQlFieldName {#command-graphqlfieldname}
 
 The name of a GraphQL object field.
 
-
 **Value:** string
-
 
 #### CommandSource {#command-commandsource}
 
 Description of how a command maps to a particular data connector
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `dataConnectorName` | [DataConnectorName](#command-dataconnectorname) | true | The name of the data connector backing this command. |
-| `dataConnectorCommand` | [DataConnectorCommand](#command-dataconnectorcommand) | true | The function/procedure in the data connector that backs this command. |
-| `argumentMapping` | [ArgumentMapping](#command-argumentmapping) | false | Mapping from command argument names to data connector function or procedure argument names. |
+| Key                    | Value                                                 | Required | Description                                                                                 |
+| ---------------------- | ----------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------- |
+| `dataConnectorName`    | [DataConnectorName](#command-dataconnectorname)       | true     | The name of the data connector backing this command.                                        |
+| `dataConnectorCommand` | [DataConnectorCommand](#command-dataconnectorcommand) | true     | The function/procedure in the data connector that backs this command.                       |
+| `argumentMapping`      | [ArgumentMapping](#command-argumentmapping)           | false    | Mapping from command argument names to data connector function or procedure argument names. |
 
- **Example:**
+**Example:**
 
 ```yaml
 dataConnectorName: data_connector
@@ -18845,97 +19408,77 @@ dataConnectorCommand:
 argumentMapping: {}
 ```
 
-
 #### ArgumentMapping {#command-argumentmapping}
 
-Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of this object is the argument name used in the command or model and the value is the argument name used in the data connector.
+Mapping of a comand or model argument name to the corresponding argument name used in the data connector. The key of
+this object is the argument name used in the command or model and the value is the argument name used in the data
+connector.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `<customKey>` | [DataConnectorArgumentName](#command-dataconnectorargumentname) | false |  |
-
-
+| Key           | Value                                                           | Required | Description |
+| ------------- | --------------------------------------------------------------- | -------- | ----------- |
+| `<customKey>` | [DataConnectorArgumentName](#command-dataconnectorargumentname) | false    |             |
 
 #### DataConnectorArgumentName {#command-dataconnectorargumentname}
 
 The name of an argument as defined by a data connector.
 
-
 **Value:** string
-
 
 #### DataConnectorCommand {#command-dataconnectorcommand}
 
 The function/procedure in the data connector that backs this command.
 
-
 **Must have exactly one of the following fields:**
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `function` | [FunctionName](#command-functionname) | false | The name of a function backing the command. |
-| `procedure` | [ProcedureName](#command-procedurename) | false | The name of a procedure backing the command. |
-
-
+| Key         | Value                                   | Required | Description                                  |
+| ----------- | --------------------------------------- | -------- | -------------------------------------------- |
+| `function`  | [FunctionName](#command-functionname)   | false    | The name of a function backing the command.  |
+| `procedure` | [ProcedureName](#command-procedurename) | false    | The name of a procedure backing the command. |
 
 #### ProcedureName {#command-procedurename}
 
 The name of a procedure backing the command.
 
-
 **Value:** string
-
 
 #### FunctionName {#command-functionname}
 
 The name of a function backing the command.
 
-
 **Value:** string
-
 
 #### DataConnectorName {#command-dataconnectorname}
 
 The name of a data connector.
 
-
 **Value:** string
-
 
 #### ArgumentDefinition {#command-argumentdefinition}
 
 The definition of an argument for a field, command, or model.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `name` | [ArgumentName](#command-argumentname) | true | The name of an argument. |
-| `type` | [TypeReference](#command-typereference) | true |  |
-| `description` | string / null | false |  |
-
-
+| Key           | Value                                   | Required | Description              |
+| ------------- | --------------------------------------- | -------- | ------------------------ |
+| `name`        | [ArgumentName](#command-argumentname)   | true     | The name of an argument. |
+| `type`        | [TypeReference](#command-typereference) | true     |                          |
+| `description` | string / null                           | false    |                          |
 
 #### ArgumentName {#command-argumentname}
 
 The name of an argument.
 
-
 **Value:** string
-
 
 #### TypeReference {#command-typereference}
 
-A reference to an Open DD type including nullable values and arrays.
-Suffix '!' to indicate a non-nullable reference, and wrap in '[]' to indicate an array.
-Eg: '[String!]!' is a non-nullable array of non-nullable strings.
-
+A reference to an Open DD type including nullable values and arrays. Suffix '!' to indicate a non-nullable reference,
+and wrap in '[]' to indicate an array. Eg: '[String!]!' is a non-nullable array of non-nullable strings.
 
 **Value:** string
-
 
 #### CommandName {#command-commandname}
 
 The name of a command.
-
 
 **Value:** string
 
@@ -20505,17 +21048,18 @@ The CLI also works to automatically track your relationships for you whenever yo
 
 ## Metadata structure
 
+
 ### Relationship {#relationship-relationship}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key          | Value                                          | Required | Description                                                                                                    |
-| ------------ | ---------------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
-| `kind`       | `Relationship`                                 | true     |                                                                                                                |
-| `version`    | `v1`                                           | true     |                                                                                                                |
-| `definition` | [RelationshipV1](#relationship-relationshipv1) | true     | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `kind` | `Relationship` | true |  |
+| `version` | `v1` | true |  |
+| `definition` | [RelationshipV1](#relationship-relationshipv1) | true | Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 kind: Relationship
@@ -20538,47 +21082,53 @@ definition:
   description: Articles written by an author
 ```
 
+
 #### RelationshipV1 {#relationship-relationshipv1}
 
 Definition of a relationship on an OpenDD type which allows it to be extended with related models or commands.
 
-| Key           | Value                                                                               | Required | Description                                                                                                                  |
-| ------------- | ----------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `name`        | [RelationshipName](#relationship-relationshipname)                                  | true     | The name of the relationship.                                                                                                |
-| `sourceType`  | [CustomTypeName](#relationship-customtypename)                                      | true     | The source type of the relationship.                                                                                         |
-| `target`      | [RelationshipTarget](#relationship-relationshiptarget)                              | true     | The target of the relationship.                                                                                              |
-| `mapping`     | [[RelationshipMapping](#relationship-relationshipmapping)]                          | true     | The mapping configuration of source to target for the relationship.                                                          |
-| `description` | string / null                                                                       | false    | The description of the relationship. Gets added to the description of the relationship in the graphql schema.                |
-| `deprecated`  | [Deprecated](#relationship-deprecated) / null                                       | false    | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
-| `graphql`     | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false    | Configuration for how this relationship should appear in the GraphQL schema.                                                 |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [RelationshipName](#relationship-relationshipname) | true | The name of the relationship. |
+| `sourceType` | [CustomTypeName](#relationship-customtypename) | true | The source type of the relationship. |
+| `target` | [RelationshipTarget](#relationship-relationshiptarget) | true | The target of the relationship. |
+| `mapping` | [[RelationshipMapping](#relationship-relationshipmapping)] | true | The mapping configuration of source to target for the relationship. |
+| `description` | string / null | false | The description of the relationship. Gets added to the description of the relationship in the graphql schema. |
+| `deprecated` | [Deprecated](#relationship-deprecated) / null | false | Whether this relationship is deprecated. If set, the deprecation status is added to the relationship field's graphql schema. |
+| `graphql` | [RelationshipGraphQlDefinition](#relationship-relationshipgraphqldefinition) / null | false | Configuration for how this relationship should appear in the GraphQL schema. |
+
+
 
 #### RelationshipGraphQlDefinition {#relationship-relationshipgraphqldefinition}
 
 The definition of how a relationship appears in the GraphQL API
 
-| Key                  | Value                                       | Required | Description                                                                            |
-| -------------------- | ------------------------------------------- | -------- | -------------------------------------------------------------------------------------- |
-| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false    | The field name to use for the field that represents an aggregate over the relationship |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `aggregateFieldName` | [FieldName](#relationship-fieldname) / null | false | The field name to use for the field that represents an aggregate over the relationship |
+
+
 
 #### Deprecated {#relationship-deprecated}
 
-OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is
-deprecated.
+OpenDd configuration to indicate whether an object type field, relationship, model root field or command root field is deprecated.
 
-| Key      | Value         | Required | Description                 |
-| -------- | ------------- | -------- | --------------------------- |
-| `reason` | string / null | false    | The reason for deprecation. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `reason` | string / null | false | The reason for deprecation. |
+
+
 
 #### RelationshipMapping {#relationship-relationshipmapping}
 
 Definition of a how a particular field in the source maps to a target field or argument.
 
-| Key      | Value                                                                | Required | Description                                             |
-| -------- | -------------------------------------------------------------------- | -------- | ------------------------------------------------------- |
-| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true     | The source configuration for this relationship mapping. |
-| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true     | The target configuration for this relationship mapping. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `source` | [RelationshipMappingSource](#relationship-relationshipmappingsource) | true | The source configuration for this relationship mapping. |
+| `target` | [RelationshipMappingTarget](#relationship-relationshipmappingtarget) | true | The target configuration for this relationship mapping. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 source:
@@ -20589,86 +21139,107 @@ target:
     - fieldName: author_id
 ```
 
+
 #### RelationshipMappingTarget {#relationship-relationshipmappingtarget}
 
 The target configuration for a relationship mapping.
 
+
 **Must have exactly one of the following fields:**
 
-| Key          | Value                                                                          | Required | Description                                    |
-| ------------ | ------------------------------------------------------------------------------ | -------- | ---------------------------------------------- |
-| `argument`   | [ArgumentMappingTarget](#relationship-argumentmappingtarget)                   | false    | An argument target for a relationship mapping. |
-| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `argument` | [ArgumentMappingTarget](#relationship-argumentmappingtarget) | false | An argument target for a relationship mapping. |
+| `modelField` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
+
+
 
 #### ArgumentMappingTarget {#relationship-argumentmappingtarget}
 
 An argument target for a relationship mapping.
 
-| Key            | Value                                      | Required | Description |
-| -------------- | ------------------------------------------ | -------- | ----------- |
-| `argumentName` | [ArgumentName](#relationship-argumentname) | true     |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `argumentName` | [ArgumentName](#relationship-argumentname) | true |  |
+
+
 
 #### ArgumentName {#relationship-argumentname}
 
 The name of an argument.
 
+
 **Value:** string
+
 
 #### RelationshipMappingSource {#relationship-relationshipmappingsource}
 
 The source configuration for a relationship mapping.
 
+
 **Must have exactly one of the following fields:**
 
-| Key         | Value                                                                          | Required | Description                                                                                   |
-| ----------- | ------------------------------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------- |
-| `value`     | [ValueExpression](#relationship-valueexpression)                               | false    | An expression which evaluates to a value that can be used in permissions and various presets. |
-| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false    |                                                                                               |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `value` | [ValueExpression](#relationship-valueexpression) | false | An expression which evaluates to a value that can be used in permissions and various presets. |
+| `fieldPath` | [[RelationshipSourceFieldAccess](#relationship-relationshipsourcefieldaccess)] | false |  |
+
+
 
 #### RelationshipSourceFieldAccess {#relationship-relationshipsourcefieldaccess}
 
 A field access in a relationship mapping.
 
-| Key         | Value                                | Required | Description |
-| ----------- | ------------------------------------ | -------- | ----------- |
-| `fieldName` | [FieldName](#relationship-fieldname) | true     |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#relationship-fieldname) | true |  |
+
+
 
 #### FieldName {#relationship-fieldname}
 
 The name of a field in a user-defined object type.
 
+
 **Value:** string
+
 
 #### ValueExpression {#relationship-valueexpression}
 
 An expression which evaluates to a value that can be used in permissions and various presets.
 
+
 **Must have exactly one of the following fields:**
 
-| Key               | Value                                                        | Required | Description |
-| ----------------- | ------------------------------------------------------------ | -------- | ----------- |
-| `literal`         |                                                              | false    |             |
-| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false    |             |
-| `valueFromEnv`    | string                                                       | false    |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `literal` |  | false |  |
+| `sessionVariable` | [OpenDdSessionVariable](#relationship-openddsessionvariable) | false |  |
+| `valueFromEnv` | string | false |  |
+
+
 
 #### OpenDdSessionVariable {#relationship-openddsessionvariable}
 
 Used to represent the name of a session variable, like "x-hasura-role".
 
+
 **Value:** string
+
 
 #### RelationshipTarget {#relationship-relationshiptarget}
 
 The target for a relationship.
 
+
 **Must have exactly one of the following fields:**
 
-| Key       | Value                                                                | Required | Description                            |
-| --------- | -------------------------------------------------------------------- | -------- | -------------------------------------- |
-| `model`   | [ModelRelationshipTarget](#relationship-modelrelationshiptarget)     | false    | The target model for a relationship.   |
-| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false    | The target command for a relationship. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `model` | [ModelRelationshipTarget](#relationship-modelrelationshiptarget) | false | The target model for a relationship. |
+| `command` | [CommandRelationshipTarget](#relationship-commandrelationshiptarget) | false | The target command for a relationship. |
 
-**Example:**
+ **Example:**
 
 ```yaml
 model:
@@ -20677,73 +21248,92 @@ model:
   relationshipType: Array
 ```
 
+
 #### CommandRelationshipTarget {#relationship-commandrelationshiptarget}
 
 The target command for a relationship.
 
-| Key        | Value                                    | Required | Description                                                           |
-| ---------- | ---------------------------------------- | -------- | --------------------------------------------------------------------- |
-| `name`     | [CommandName](#relationship-commandname) | true     | The name of the command.                                              |
-| `subgraph` | string / null                            | false    | The subgraph of the target command. Defaults to the current subgraph. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [CommandName](#relationship-commandname) | true | The name of the command. |
+| `subgraph` | string / null | false | The subgraph of the target command. Defaults to the current subgraph. |
+
+
 
 #### CommandName {#relationship-commandname}
 
 The name of a command.
 
+
 **Value:** string
+
 
 #### ModelRelationshipTarget {#relationship-modelrelationshiptarget}
 
 The target model for a relationship.
 
-| Key                | Value                                                                                     | Required | Description                                                                |
-| ------------------ | ----------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------- |
-| `name`             | [ModelName](#relationship-modelname)                                                      | true     | The name of the data model.                                                |
-| `subgraph`         | string / null                                                                             | false    | The subgraph of the target model. Defaults to the current subgraph.        |
-| `relationshipType` | [RelationshipType](#relationship-relationshiptype)                                        | true     | Type of the relationship - object or array.                                |
-| `aggregate`        | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false    | How to aggregate over the relationship. Only valid for array relationships |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `name` | [ModelName](#relationship-modelname) | true | The name of the data model. |
+| `subgraph` | string / null | false | The subgraph of the target model. Defaults to the current subgraph. |
+| `relationshipType` | [RelationshipType](#relationship-relationshiptype) | true | Type of the relationship - object or array. |
+| `aggregate` | [ModelRelationshipTargetAggregate](#relationship-modelrelationshiptargetaggregate) / null | false | How to aggregate over the relationship. Only valid for array relationships |
+
+
 
 #### ModelRelationshipTargetAggregate {#relationship-modelrelationshiptargetaggregate}
 
 Which aggregate expression to use to aggregate the array relationship.
 
-| Key                   | Value                                                            | Required | Description                                                                                                               |
-| --------------------- | ---------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true     | The name of the aggregate expression that defines how to aggregate across the relationship.                               |
-| `description`         | string / null                                                    | false    | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `aggregateExpression` | [AggregateExpressionName](#relationship-aggregateexpressionname) | true | The name of the aggregate expression that defines how to aggregate across the relationship. |
+| `description` | string / null | false | The description of the relationship aggregate. Gets added to the description of the aggregate field in the GraphQL schema |
+
+
 
 #### AggregateExpressionName {#relationship-aggregateexpressionname}
 
 The name of an aggregate expression.
 
+
 **Value:** string
+
 
 #### RelationshipType {#relationship-relationshiptype}
 
 Type of the relationship.
 
+
 **One of the following values:**
 
-| Value    | Description                                      |
-| -------- | ------------------------------------------------ |
-| `Object` | Select one related object from the target.       |
-| `Array`  | Select multiple related objects from the target. |
+| Value | Description |
+|-----|-----|
+| `Object` | Select one related object from the target. |
+| `Array` | Select multiple related objects from the target. |
+
+
 
 #### ModelName {#relationship-modelname}
 
 The name of data model.
 
+
 **Value:** string
+
 
 #### CustomTypeName {#relationship-customtypename}
 
 The name of a user-defined type.
 
+
 **Value:** string
+
 
 #### RelationshipName {#relationship-relationshipname}
 
 The name of the GraphQL relationship field.
+
 
 **Value:** string
 
@@ -21244,6 +21834,7 @@ A predicate that can be used to restrict the objects returned when querying a mo
 |-----|-----|-----|-----|
 | `fieldComparison` | [FieldComparisonPredicate](#modelpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
 | `fieldIsNull` | [FieldIsNullPredicate](#modelpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
+| `nestedField` | [NestedFieldPredicate](#modelpermissions-nestedfieldpredicate) | false | Nested field predicate filters objects of a source model based on a predicate on the nested field. |
 | `relationship` | [RelationshipPredicate](#modelpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
 | `and` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
 | `or` | [[ModelPredicate](#modelpermissions-modelpredicate)] | false |  |
@@ -21317,6 +21908,17 @@ The name of the GraphQL relationship field.
 
 
 **Value:** string
+
+
+#### NestedFieldPredicate {#modelpermissions-nestedfieldpredicate}
+
+Nested field predicate filters objects of a source model based on a predicate on the nested field.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#modelpermissions-fieldname) | true | The name of the field in the object type of the model to follow. |
+| `predicate` | [ModelPredicate](#modelpermissions-modelpredicate) | true | The predicate to apply on the related objects. |
+
 
 
 #### FieldIsNullPredicate {#modelpermissions-fieldisnullpredicate}
@@ -21490,6 +22092,7 @@ A predicate that can be used to restrict the objects returned when querying a mo
 |-----|-----|-----|-----|
 | `fieldComparison` | [FieldComparisonPredicate](#commandpermissions-fieldcomparisonpredicate) | false | Field comparison predicate filters objects based on a field value. |
 | `fieldIsNull` | [FieldIsNullPredicate](#commandpermissions-fieldisnullpredicate) | false | Predicate to check if the given field is null. |
+| `nestedField` | [NestedFieldPredicate](#commandpermissions-nestedfieldpredicate) | false | Nested field predicate filters objects of a source model based on a predicate on the nested field. |
 | `relationship` | [RelationshipPredicate](#commandpermissions-relationshippredicate) | false | Relationship predicate filters objects of a source model based on a predicate on the related model. |
 | `and` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
 | `or` | [[ModelPredicate](#commandpermissions-modelpredicate)] | false |  |
@@ -21563,6 +22166,17 @@ The name of the GraphQL relationship field.
 
 
 **Value:** string
+
+
+#### NestedFieldPredicate {#commandpermissions-nestedfieldpredicate}
+
+Nested field predicate filters objects of a source model based on a predicate on the nested field.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `fieldName` | [FieldName](#commandpermissions-fieldname) | true | The name of the field in the object type of the model to follow. |
+| `predicate` | [ModelPredicate](#commandpermissions-modelpredicate) | true | The predicate to apply on the related objects. |
+
 
 
 #### FieldIsNullPredicate {#commandpermissions-fieldisnullpredicate}
@@ -22415,7 +23029,7 @@ JWT config according to which the incoming JWT will be verified and decoded to e
 
 | Key | Value | Required | Description |
 |-----|-----|-----|-----|
-| `audience` | [string] / null | false | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
+| `audience` | array / null | false | Optional validation to check that the `aud` field is a member of the `audience` received, otherwise will throw error. |
 | `issuer` | string / null | false | Optional validation to check that the `iss` field is a member of the `iss` received, otherwise will throw error. |
 | `allowedSkew` | integer / null | false | Allowed leeway (in seconds) to the `exp` validation to account for clock skew. |
 | `claimsConfig` | [JWTClaimsConfig](#authconfig-jwtclaimsconfig) | true | Claims config. Either specified via `claims_mappings` or `claims_namespace_path` |
@@ -23154,7 +23768,7 @@ Any backwards incompatible changes made to Hasura DDN after this date won't impa
 
 | Value | Description |
 |-----|-----|
-| `2024-06-30` / `2024-09-03` / `2024-09-18` / `2024-09-26` / `2024-10-07` / `2024-10-16` / `2024-10-31` / `2024-11-13` / `2024-11-15` / `2024-11-18` / `2024-11-26` / `2024-12-05` / `2024-12-10` / `2024-12-18` / `2025-01-07` / `2025-01-25` / `2025-02-04` / `2025-02-08` / `2025-02-20` / `2025-02-27` / `2025-03-11` / `2025-03-12` / `2025-03-21` / `2025-03-26` | Known compatibility dates |
+| `2024-06-30` / `2024-09-03` / `2024-09-18` / `2024-09-26` / `2024-10-07` / `2024-10-16` / `2024-10-31` / `2024-11-13` / `2024-11-15` / `2024-11-18` / `2024-11-26` / `2024-12-05` / `2024-12-10` / `2024-12-18` / `2025-01-07` / `2025-01-25` / `2025-02-04` / `2025-02-08` / `2025-02-20` / `2025-02-27` / `2025-03-11` / `2025-03-12` / `2025-03-21` / `2025-03-26` / `2025-04-03` / `2025-04-24` | Known compatibility dates |
 | string | Any date |
 
 
@@ -23477,6 +24091,150 @@ Either a literal string or a reference to a Hasura secret
 
 
 
+# promptql-config.mdx
+
+URL: https://hasura.io/docs/promptql/reference/metadata-reference/promptql-config
+
+# PromptQL Configuration
+
+## Introduction
+
+Your PromptQlConfig is a metadata object that defines the configuration of PromptQL for your project. It includes the
+LLM to be used, the system instructions, and other settings.
+
+```yaml title="Example PromptQlConfig"
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: openai
+    model: o3-mini
+  ai_primitives_llm:
+    provider: openai
+    model: gpt-4o
+  system_instructions: |
+    You are a helpful AI Assistant.
+```
+
+## Metadata structure
+
+### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
+
+Definition of the configuration of PromptQL, v2
+
+| Key          | Value                                                  | Required | Description                                                 |
+| ------------ | ------------------------------------------------------ | -------- | ----------------------------------------------------------- |
+| `kind`       | `PromptQlConfig`                                       | true     |                                                             |
+| `version`    | `v2`                                                   | true     |                                                             |
+| `definition` | [PromptQlConfigV2](#promptqlconfigv2-promptqlconfigv2) | true     | Definition of the configuration of PromptQL for the project |
+
+#### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
+
+Definition of the configuration of PromptQL for the project
+
+| Key                  | Value                                           | Required | Description                                                                                                                              |
+| -------------------- | ----------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `systemInstructions` | string / null                                   | false    | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
+| `llm`                | [LlmConfig](#promptqlconfigv2-llmconfig)        | true     | Configuration of the LLM to be used for PromptQL                                                                                         |
+| `aiPrimitivesLlm`    | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false    | Configuration of the LLM to be used for AI primitives, such as classification, summarization etc                                         |
+| `featureFlags`       | object / null                                   | false    | Feature flags to be used for PromptQL                                                                                                    |
+
+#### LlmConfig {#promptqlconfigv2-llmconfig}
+
+Configuration of the LLM to be used for PromptQL
+
+**One of the following values:**
+
+| Value                                                      | Description                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------ |
+| [HasuraLlmConfig](#promptqlconfigv2-hasurallmconfig)       | Configuration settings for the Hasura-configured LLM   |
+| [OpenAiLlmConfig](#promptqlconfigv2-openaillmconfig)       | Configuration settings for an OpenAI LLM               |
+| [AnthropicLlmConfig](#promptqlconfigv2-anthropicllmconfig) | Configuration settings for an Anthropic LLM            |
+| [AzureLlmConfig](#promptqlconfigv2-azurellmconfig)         | Configuration settings for an Azure-provided LLM       |
+| [GeminiLlmConfig](#promptqlconfigv2-geminillmconfig)       | Configuration settings for a Gemini LLM                |
+| [BedrockLlmConfig](#promptqlconfigv2-bedrockllmconfig)     | Configuration settings for an AWS Bedrock-provided LLM |
+
+#### BedrockLlmConfig {#promptqlconfigv2-bedrockllmconfig}
+
+Configuration settings for an AWS Bedrock-provided LLM
+
+| Key                  | Value                                                  | Required | Description                                              |
+| -------------------- | ------------------------------------------------------ | -------- | -------------------------------------------------------- |
+| `provider`           | `bedrock`                                              | true     |                                                          |
+| `modelId`            | string                                                 | true     | The specific AWS Bedrock model to use.                   |
+| `regionName`         | string                                                 | true     | The specific AWS Bedrock region to use.                  |
+| `awsAccessKeyId`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS access key ID to use for the AWS Bedrock API     |
+| `awsSecretAccessKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS secret access key to use for the AWS Bedrock API |
+
+#### GeminiLlmConfig {#promptqlconfigv2-geminillmconfig}
+
+Configuration settings for a Gemini LLM
+
+| Key        | Value                                                  | Required | Description                                                                         |
+| ---------- | ------------------------------------------------------ | -------- | ----------------------------------------------------------------------------------- |
+| `provider` | `gemini`                                               | true     |                                                                                     |
+| `model`    | string / null                                          | false    | The specific Gemini model to use. If not specified, the default model will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Gemini API                                               |
+
+#### AzureLlmConfig {#promptqlconfigv2-azurellmconfig}
+
+Configuration settings for an Azure-provided LLM
+
+| Key          | Value                                                  | Required | Description                                                                                |
+| ------------ | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
+| `provider`   | `azure`                                                | true     |                                                                                            |
+| `apiVersion` | string / null                                          | false    | The specific Azure API version to use. If not specified, the default version will be used. |
+| `model`      | string / null                                          | false    | The specific Azure model to use. If not specified, the default model will be used.         |
+| `endpoint`   | string                                                 | true     | The endpoint to use for the Azure LLM API                                                  |
+| `apiKey`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Azure API                                                       |
+
+#### AnthropicLlmConfig {#promptqlconfigv2-anthropicllmconfig}
+
+Configuration settings for an Anthropic LLM
+
+| Key        | Value                                                  | Required | Description                                                                                |
+| ---------- | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
+| `provider` | `anthropic`                                            | true     |                                                                                            |
+| `model`    | string / null                                          | false    | The specific Anthropic model to use. If not specified, the default model will be used.     |
+| `baseUrl`  | string / null                                          | false    | The base URL to use for the Anthropic API. If not specified, the default URL will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Anthropic API                                                   |
+
+#### OpenAiLlmConfig {#promptqlconfigv2-openaillmconfig}
+
+Configuration settings for an OpenAI LLM
+
+| Key        | Value                                                  | Required | Description                                                                             |
+| ---------- | ------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------- |
+| `provider` | `openai`                                               | true     |                                                                                         |
+| `model`    | string / null                                          | false    | The specific OpenAI model to use. If not specified, the default model will be used.     |
+| `baseUrl`  | string / null                                          | false    | The base URL to use for the OpenAI API. If not specified, the default URL will be used. |
+| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the OpenAI API                                                   |
+
+#### EnvironmentValue {#promptqlconfigv2-environmentvalue}
+
+Either a literal string or a reference to a Hasura secret
+
+**Must have exactly one of the following fields:**
+
+| Key            | Value  | Required | Description |
+| -------------- | ------ | -------- | ----------- |
+| `value`        | string | false    |             |
+| `valueFromEnv` | string | false    |             |
+
+#### HasuraLlmConfig {#promptqlconfigv2-hasurallmconfig}
+
+Configuration settings for the Hasura-configured LLM
+
+| Key        | Value    | Required | Description |
+| ---------- | -------- | -------- | ----------- |
+| `provider` | `hasura` | true     |             |
+
+
+
+==============================
+
+
+
 # index.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/
@@ -23688,71 +24446,6 @@ Try using the DDN CLI with auto-completion by typing part of a command and press
 
 
 
-# ddn.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn
-
-# DDN CLI: ddn
-
-DDN Command Line Interface.
-
-## Synopsis
-
-```
-
-       
-
-DDDDDDD\   DDDDDDD\   NN\   NN\ 
-DD  __DD\  DD  __DD\  NNN\  NN |
-DD |  DD | DD |  DD | NNNN\ NN |
-DD |  DD | DD |  DD | NN NN\NN |
-DD |  DD | DD |  DD | NN \NNNN |
-DD |  DD | DD |  DD | NN |\NNN |
-DDDDDDD  | DDDDDDD  | NN | \NN |
-\_______/  \_______/  \__|  \__|
-
-
-
-```
-
-```bash
-ddn [flags]
-```
-
-## Available operations
-
-- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
-- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
-- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
-- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
-- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
-- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
-- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
-- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
-- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
-- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
-- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
-- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
-- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
-- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
-- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
-
-## Options
-
-```sass
--h, --help               help for ddn
-    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
-    --no-prompt          Do not prompt for required but missing flags
-    --out string         Output format. Can be table, json or yaml. (default "table")
-    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-
-
-==============================
-
-
-
 # index.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/
@@ -23840,6 +24533,71 @@ Flags:
 
 Use "ddn [command] --help" for more information about a command.
 
+```
+
+
+
+==============================
+
+
+
+# ddn.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn
+
+# DDN CLI: ddn
+
+DDN Command Line Interface.
+
+## Synopsis
+
+```
+
+       
+
+DDDDDDD\   DDDDDDD\   NN\   NN\ 
+DD  __DD\  DD  __DD\  NNN\  NN |
+DD |  DD | DD |  DD | NNNN\ NN |
+DD |  DD | DD |  DD | NN NN\NN |
+DD |  DD | DD |  DD | NN \NNNN |
+DD |  DD | DD |  DD | NN |\NNN |
+DDDDDDD  | DDDDDDD  | NN | \NN |
+\_______/  \_______/  \__|  \__|
+
+
+
+```
+
+```bash
+ddn [flags]
+```
+
+## Available operations
+
+- [ddn auth](/reference/cli/commands/ddn_auth) - Manage Hasura DDN CLI Auth
+- [ddn codemod](/reference/cli/commands/ddn_codemod) - Perform transformations on your Hasura project directory
+- [ddn command](/reference/cli/commands/ddn_command) - Perform Command-related operations
+- [ddn connector](/reference/cli/commands/ddn_connector) - Perform Connector related operations
+- [ddn connector-link](/reference/cli/commands/ddn_connector-link) - Perform DataConnectorLink related operations
+- [ddn console](/reference/cli/commands/ddn_console) - Open the DDN console
+- [ddn context](/reference/cli/commands/ddn_context) - Perform context operations
+- [ddn doctor](/reference/cli/commands/ddn_doctor) - Check if the dependencies of DDN CLI are present
+- [ddn model](/reference/cli/commands/ddn_model) - Perform Model-related operations
+- [ddn plugins](/reference/cli/commands/ddn_plugins) - Manage plugins for the CLI
+- [ddn project](/reference/cli/commands/ddn_project) - Manage Hasura DDN Project
+- [ddn relationship](/reference/cli/commands/ddn_relationship) - Perform Relationship related operations
+- [ddn run](/reference/cli/commands/ddn_run) - Run specific script from project's context config
+- [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
+- [ddn supergraph](/reference/cli/commands/ddn_supergraph) - Perform Supergraph-related operations
+
+## Options
+
+```sass
+-h, --help               help for ddn
+    --log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+    --no-prompt          Do not prompt for required but missing flags
+    --out string         Output format. Can be table, json or yaml. (default "table")
+    --timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
 ```
 
 
@@ -28653,62 +29411,6 @@ ddn subgraph build get [subgraph-build-version] [flags]
 
 
 
-# ddn_update-cli.mdx
-
-URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
-
-# DDN CLI: ddn update-cli
-
-Update this CLI to the latest version or to a specific version.
-
-## Synopsis
-
-You can use this command to update the CLI to the latest version or a specific version.
-
-```bash
-ddn update-cli [flags]
-```
-
-## Examples
-
-```bash
-# Update CLI to latest version:
- ddn update-cli
-
-# Update CLI to a specific version (say v1.0.0):
- ddn update-cli --version v1.0.0
-
-# To disable the auto-update check on the CLI, set
-# "show_update_notification": false
-# in ~/.ddn/config.yaml
-```
-
-## Options
-
-```sass
--h, --help             help for update-cli
-    --version string   A specific version to install
-```
-
-## Options inherited from parent operations
-
-```sass
---log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
---no-prompt          Do not prompt for required but missing flags
---out string         Output format. Can be table, json or yaml. (default "table")
---timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
-```
-
-## Parent operation
-
-- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
-
-
-
-==============================
-
-
-
 # ddn_subgraph_delete.mdx
 
 URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_subgraph_delete
@@ -28759,6 +29461,62 @@ ddn subgraph delete <subgraph-name> [flags]
 ## Parent operation
 
 - [ddn subgraph](/reference/cli/commands/ddn_subgraph) - Perform Subgraph-related operations
+
+
+
+==============================
+
+
+
+# ddn_update-cli.mdx
+
+URL: https://hasura.io/docs/promptql/reference/cli/commands/ddn_update-cli
+
+# DDN CLI: ddn update-cli
+
+Update this CLI to the latest version or to a specific version.
+
+## Synopsis
+
+You can use this command to update the CLI to the latest version or a specific version.
+
+```bash
+ddn update-cli [flags]
+```
+
+## Examples
+
+```bash
+# Update CLI to latest version:
+ ddn update-cli
+
+# Update CLI to a specific version (say v1.0.0):
+ ddn update-cli --version v1.0.0
+
+# To disable the auto-update check on the CLI, set
+# "show_update_notification": false
+# in ~/.ddn/config.yaml
+```
+
+## Options
+
+```sass
+-h, --help             help for update-cli
+    --version string   A specific version to install
+```
+
+## Options inherited from parent operations
+
+```sass
+--log-level string   Log level. Can be DEBUG, WARN, INFO, ERROR, or FATAL. (default "INFO")
+--no-prompt          Do not prompt for required but missing flags
+--out string         Output format. Can be table, json or yaml. (default "table")
+--timeout int        Request timeout in seconds [env: HASURA_DDN_TIMEOUT] (default 100)
+```
+
+## Parent operation
+
+- [ddn](/reference/cli/commands/ddn) - DDN Command Line Interface
 
 
 

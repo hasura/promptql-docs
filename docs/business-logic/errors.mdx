@@ -19,8 +19,9 @@ import TabItem from "@theme/TabItem";
 ## Introduction
 
 When developing with lambda connectors, understanding what went wrong — and why — is just as important as handling the
-error itself. By default for security reasons, lambda connectors return a generic `internal error` message when exceptions occur, while the
-full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that request.
+error itself. By default for security reasons, lambda connectors return a generic `internal error` message when
+exceptions occur, while the full details are logged in the [OpenTelemetry trace](#access-opentelemetry-traces) for that
+request.
 
 This page covers strategies for both **debugging issues** during development and **handling errors** effectively in
 deployed connectors. You'll learn how to inspect traces, return custom error messages, and use supported error classes
@@ -194,3 +195,14 @@ accurate interactions with your data over time.
 Traces — complete with your custom error messages — are available for each request. You can find these in the `Insights`
 tab of your project's console. These traces help you understand how PromptQL is interacting with your data and where
 improvements can be made to enhance accuracy.
+
+### Response-size limitations
+
+Lambda connectors have a response-size limit, which may vary depending on the SDK and should be considered when
+developing your application's business logic functions.
+
+| Connector       | Limit   | Configurable |
+| --------------- | ------- | ------------ |
+| `hasura/nodejs` | `30` MB | false        |
+| `hasura/python` | `30` MB | false        |
+| `hasura/go`     | `30` MB | false        |
