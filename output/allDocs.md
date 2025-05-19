@@ -30680,6 +30680,9 @@ If you're getting started with a connector and want to connect it to your data s
 
 ## Connector docs
 
+- [Amazon Athena](/reference/connectors/athena/index.mdx)
+- [Amazon Redshift](/reference/connectors/redshift/index.mdx)
+- [BigQuery](/reference/connectors/bigquery/index.mdx)
 - [Databricks](/reference/connectors/databricks/index.mdx)
 - [MySQL](/reference/connectors/mysql/index.mdx)
 - [PostgreSQL](/reference/connectors/postgresql/index.mdx)
