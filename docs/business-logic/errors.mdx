@@ -198,6 +198,11 @@ improvements can be made to enhance accuracy.
 
 ### Response-size limitations
 
-#### `hasura/nodejs` connector
+Lambda connectors have a response-size limit, which may vary depending on the SDK and should be considered when
+developing your application's business logic functions.
 
-The `hasura/nodejs` connector has a request body limit of `30`MB.
+| Connector       | Limit   | Configurable |
+| --------------- | ------- | ------------ |
+| `hasura/nodejs` | `30` MB | false        |
+| `hasura/python` | `30` MB | false        |
+| `hasura/go`     | `30` MB | false        |
