@@ -204,8 +204,8 @@ To create a file-based native query:
    ```sql
    -- <subgraph>/connector/<connector>/native_operations/queries/get_customers_by_region.sql
    SELECT * FROM customers
-   WHERE region = {{region}}
-   AND sales > {{min_sales}}
+   WHERE region = :region
+   AND sales > :min_sales
    ```
 
 3. Register the query using the CLI:
