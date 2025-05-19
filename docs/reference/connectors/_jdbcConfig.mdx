@@ -266,12 +266,8 @@ You can also define native queries directly in the `configuration.json` file:
 
 ### Parameter syntax
 
-The JDBC connector supports two parameter syntaxes:
-
-1. **Colon prefix syntax**: `:parameter` (used in configuration-based approach)
-2. **Double curly braces syntax**: `{{parameter}}` (used in file-based approach)
-
-Both syntaxes are translated to parameterized queries, which helps prevent SQL injection attacks.
+The JDBC connector supports colon prefix syntax to specify parameters. 
+This syntax is translated to parameterized queries, which helps prevent SQL injection.
 
 ### Important syntax rules
 
