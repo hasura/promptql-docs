@@ -206,7 +206,7 @@ const FRAMESQuestionTable = () => {
                       color: '#4b5563',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.claude === row.answer ? '#dcfce7' : '#fee2e2',
+                      backgroundColor: row.claude === row.answer ? '#c8e6c9' : '#ffcdd2',
                     }}
                   >
                     {row.claude}
@@ -238,7 +238,7 @@ const FRAMESQuestionTable = () => {
                       color: '#4b5563',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.promptql === row.answer ? '#dcfce7' : '#fee2e2',
+                      backgroundColor: row.promptql === row.answer ? '#c8e6c9' : '#ffcdd2',
                     }}
                   >
                     {row.promptql}
