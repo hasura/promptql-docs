@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface QuestionRow {
   question: string;
@@ -82,10 +82,21 @@ const questions: QuestionRow[] = [
 
 const FRAMESQuestionTable = () => {
   // Add state for expanded status
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   // Get visible questions
   const visibleQuestions = isExpanded ? questions : questions.slice(0, 1);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <div style={{ position: 'relative' }}>
@@ -94,6 +105,7 @@ const FRAMESQuestionTable = () => {
           width: '100%',
           border: '1px solid #e5e7eb',
           borderRadius: '0.5rem',
+          overflowX: 'auto',
         }}
       >
         {/* Header Row */}
@@ -102,13 +114,15 @@ const FRAMESQuestionTable = () => {
             display: 'flex',
             width: '100%',
             borderBottom: '1px solid #e5e7eb',
+            flexDirection: isSmallScreen ? 'column' : 'row',
           }}
         >
           <div
             style={{
-              width: '50%',
+              width: isSmallScreen ? '100%' : '50%',
               padding: '1rem',
-              borderRight: '1px solid #e5e7eb',
+              borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+              borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
@@ -118,7 +132,7 @@ const FRAMESQuestionTable = () => {
           </div>
           <div
             style={{
-              width: '50%',
+              width: isSmallScreen ? '100%' : '50%',
               padding: '1rem',
               color: '#4b5563',
               fontWeight: '500',
@@ -143,14 +157,16 @@ const FRAMESQuestionTable = () => {
                 display: 'flex',
                 width: '100%',
                 borderBottom: '1px solid #e5e7eb',
-                minHeight: '200px',
+                minHeight: isSmallScreen ? 'auto' : '200px',
+                flexDirection: isSmallScreen ? 'column' : 'row',
               }}
             >
               <div
                 style={{
-                  width: '50%',
+                  width: isSmallScreen ? '100%' : '50%',
                   padding: '1rem',
-                  borderRight: '1px solid #e5e7eb',
+                  borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                  borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                 }}
@@ -159,7 +175,7 @@ const FRAMESQuestionTable = () => {
               </div>
               <div
                 style={{
-                  width: '50%',
+                  width: isSmallScreen ? '100%' : '50%',
                   display: 'grid',
                   gridTemplateRows: 'repeat(3, auto)',
                 }}
@@ -168,13 +184,15 @@ const FRAMESQuestionTable = () => {
                   style={{
                     display: 'flex',
                     borderBottom: '1px solid #e5e7eb',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
                   }}
                 >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -183,7 +201,7 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
                       color: '#4b5563',
                       display: 'flex',
@@ -198,13 +216,15 @@ const FRAMESQuestionTable = () => {
                   style={{
                     display: 'flex',
                     borderBottom: '1px solid #e5e7eb',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
                   }}
                 >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -213,7 +233,7 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
                       color: '#4b5563',
                       display: 'flex',
@@ -224,12 +244,18 @@ const FRAMESQuestionTable = () => {
                     {row.promptql}
                   </div>
                 </div>
-                <div style={{ display: 'flex' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
+                  }}
+                >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -238,7 +264,7 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
                       display: 'flex',
                       alignItems: 'center',
