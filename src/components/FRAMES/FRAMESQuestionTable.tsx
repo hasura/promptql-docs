@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 interface QuestionRow {
   question: string;
@@ -82,10 +82,39 @@ const questions: QuestionRow[] = [
 
 const FRAMESQuestionTable = () => {
   // Add state for expanded status
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   // Get visible questions
   const visibleQuestions = isExpanded ? questions : questions.slice(0, 1);
+
+  React.useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const CORRECT_COLOR = '#1e7621';
+  const INCORRECT_COLOR = '#a31e1e';
+
+  const collapse_button_style = {
+    width: '100%',
+    padding: '1rem 0',
+    color: '#B6FC34',
+    background: 'transparent',
+    fontWeight: '800',
+    fontSize: '1.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    cursor: 'pointer',
+    border: 'none',
+  };
 
   return (
     <div style={{ position: 'relative' }}>
@@ -94,6 +123,7 @@ const FRAMESQuestionTable = () => {
           width: '100%',
           border: '1px solid #e5e7eb',
           borderRadius: '0.5rem',
+          overflowX: 'auto',
         }}
       >
         {/* Header Row */}
@@ -102,13 +132,15 @@ const FRAMESQuestionTable = () => {
             display: 'flex',
             width: '100%',
             borderBottom: '1px solid #e5e7eb',
+            flexDirection: isSmallScreen ? 'column' : 'row',
           }}
         >
           <div
             style={{
-              width: '50%',
+              width: isSmallScreen ? '100%' : '50%',
               padding: '1rem',
-              borderRight: '1px solid #e5e7eb',
+              borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+              borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
               fontWeight: '500',
               display: 'flex',
               alignItems: 'center',
@@ -118,7 +150,7 @@ const FRAMESQuestionTable = () => {
           </div>
           <div
             style={{
-              width: '50%',
+              width: isSmallScreen ? '100%' : '50%',
               padding: '1rem',
               color: '#4b5563',
               fontWeight: '500',
@@ -142,15 +174,17 @@ const FRAMESQuestionTable = () => {
               style={{
                 display: 'flex',
                 width: '100%',
-                borderBottom: '1px solid #e5e7eb',
-                minHeight: '200px',
+                borderBottom: '3px solid #e5e7eb',
+                minHeight: isSmallScreen ? 'auto' : '200px',
+                flexDirection: isSmallScreen ? 'column' : 'row',
               }}
             >
               <div
                 style={{
-                  width: '50%',
+                  width: isSmallScreen ? '100%' : '50%',
                   padding: '1rem',
-                  borderRight: '1px solid #e5e7eb',
+                  borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                  borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                   display: 'flex',
                   alignItems: 'center',
                 }}
@@ -159,7 +193,7 @@ const FRAMESQuestionTable = () => {
               </div>
               <div
                 style={{
-                  width: '50%',
+                  width: isSmallScreen ? '100%' : '50%',
                   display: 'grid',
                   gridTemplateRows: 'repeat(3, auto)',
                 }}
@@ -168,13 +202,15 @@ const FRAMESQuestionTable = () => {
                   style={{
                     display: 'flex',
                     borderBottom: '1px solid #e5e7eb',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
                   }}
                 >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -183,12 +219,12 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      color: '#4b5563',
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.claude === row.answer ? '#dcfce7' : '#fee2e2',
+                      backgroundColor: row.claude === row.answer ? CORRECT_COLOR : INCORRECT_COLOR,
                     }}
                   >
                     {row.claude}
@@ -198,13 +234,15 @@ const FRAMESQuestionTable = () => {
                   style={{
                     display: 'flex',
                     borderBottom: '1px solid #e5e7eb',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
                   }}
                 >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -213,23 +251,29 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      color: '#4b5563',
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.promptql === row.answer ? '#dcfce7' : '#fee2e2',
+                      backgroundColor: row.promptql === row.answer ? CORRECT_COLOR : INCORRECT_COLOR,
                     }}
                   >
                     {row.promptql}
                   </div>
                 </div>
-                <div style={{ display: 'flex' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: isSmallScreen ? 'column' : 'row',
+                  }}
+                >
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      borderRight: '1px solid #e5e7eb',
+                      borderRight: isSmallScreen ? 'none' : '1px solid #e5e7eb',
+                      borderBottom: isSmallScreen ? '1px solid #e5e7eb' : 'none',
                       display: 'flex',
                       alignItems: 'center',
                     }}
@@ -238,7 +282,7 @@ const FRAMESQuestionTable = () => {
                   </div>
                   <div
                     style={{
-                      width: '50%',
+                      width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
                       display: 'flex',
                       alignItems: 'center',
@@ -262,25 +306,10 @@ const FRAMESQuestionTable = () => {
               width: '100%',
               height: '8rem',
               bottom: '40px',
-              background: 'linear-gradient(to top, white 20%, transparent 100%)',
+              background: 'linear-gradient(to top, black 20%, transparent 100%)',
             }}
           />
-          <button
-            onClick={() => setIsExpanded(true)}
-            style={{
-              width: '100%',
-              padding: '1rem 0',
-              color: '#2563eb',
-              fontWeight: '500',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              position: 'relative',
-            }}
-            onMouseOver={e => (e.currentTarget.style.color = '#1e40af')}
-            onMouseOut={e => (e.currentTarget.style.color = '#2563eb')}
-          >
+          <button onClick={() => setIsExpanded(true)} style={{ ...collapse_button_style }}>
             Show all {questions.length} questions
             <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -291,21 +320,7 @@ const FRAMESQuestionTable = () => {
 
       {/* Collapse button - shown when expanded */}
       {isExpanded && (
-        <button
-          onClick={() => setIsExpanded(false)}
-          style={{
-            width: '100%',
-            padding: '1rem 0',
-            color: '#2563eb',
-            fontWeight: '500',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-          }}
-          onMouseOver={e => (e.currentTarget.style.color = '#1e40af')}
-          onMouseOut={e => (e.currentTarget.style.color = '#2563eb')}
-        >
+        <button onClick={() => setIsExpanded(false)} style={{ ...collapse_button_style }}>
           Show less
           <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
