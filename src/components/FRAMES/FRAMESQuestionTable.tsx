@@ -174,7 +174,7 @@ const FRAMESQuestionTable = () => {
               style={{
                 display: 'flex',
                 width: '100%',
-                borderBottom: '1px solid #e5e7eb',
+                borderBottom: '3px solid #e5e7eb',
                 minHeight: isSmallScreen ? 'auto' : '200px',
                 flexDirection: isSmallScreen ? 'column' : 'row',
               }}
