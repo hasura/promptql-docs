@@ -271,15 +271,16 @@ const FRAMESQuestionTable = () => {
               width: '100%',
               padding: '1rem 0',
               color: '#2563eb',
-              fontWeight: '500',
+              background: 'transparent',
+              fontWeight: '800',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
               position: 'relative',
+              cursor: 'pointer',
+              border: 'none',
             }}
-            onMouseOver={e => (e.currentTarget.style.color = '#1e40af')}
-            onMouseOut={e => (e.currentTarget.style.color = '#2563eb')}
           >
             Show all {questions.length} questions
             <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -297,14 +298,15 @@ const FRAMESQuestionTable = () => {
             width: '100%',
             padding: '1rem 0',
             color: '#2563eb',
-            fontWeight: '500',
+            background: 'transparent',
+            fontWeight: '800',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: '0.5rem',
+            cursor: 'pointer',
+            border: 'none',
           }}
-          onMouseOver={e => (e.currentTarget.style.color = '#1e40af')}
-          onMouseOut={e => (e.currentTarget.style.color = '#2563eb')}
         >
           Show less
           <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
