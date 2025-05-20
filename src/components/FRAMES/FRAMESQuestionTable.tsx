@@ -98,6 +98,24 @@ const FRAMESQuestionTable = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const CORRECT_COLOR = '#1e7621';
+  const INCORRECT_COLOR = '#a31e1e';
+
+  const collapse_button_style = {
+    width: '100%',
+    padding: '1rem 0',
+    color: '#B6FC34',
+    background: 'transparent',
+    fontWeight: '800',
+    fontSize: '1.25rem',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '0.5rem',
+    cursor: 'pointer',
+    border: 'none',
+  };
+
   return (
     <div style={{ position: 'relative' }}>
       <div
@@ -203,10 +221,10 @@ const FRAMESQuestionTable = () => {
                     style={{
                       width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      color: '#4b5563',
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.claude === row.answer ? '#c8e6c9' : '#ffcdd2',
+                      backgroundColor: row.claude === row.answer ? CORRECT_COLOR : INCORRECT_COLOR,
                     }}
                   >
                     {row.claude}
@@ -235,10 +253,10 @@ const FRAMESQuestionTable = () => {
                     style={{
                       width: isSmallScreen ? '100%' : '50%',
                       padding: '1rem',
-                      color: '#4b5563',
+                      color: 'white',
                       display: 'flex',
                       alignItems: 'center',
-                      backgroundColor: row.promptql === row.answer ? '#c8e6c9' : '#ffcdd2',
+                      backgroundColor: row.promptql === row.answer ? CORRECT_COLOR : INCORRECT_COLOR,
                     }}
                   >
                     {row.promptql}
@@ -288,26 +306,10 @@ const FRAMESQuestionTable = () => {
               width: '100%',
               height: '8rem',
               bottom: '40px',
-              background: 'linear-gradient(to top, white 20%, transparent 100%)',
+              background: 'linear-gradient(to top, black 20%, transparent 100%)',
             }}
           />
-          <button
-            onClick={() => setIsExpanded(true)}
-            style={{
-              width: '100%',
-              padding: '1rem 0',
-              color: '#2563eb',
-              background: 'transparent',
-              fontWeight: '800',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.5rem',
-              position: 'relative',
-              cursor: 'pointer',
-              border: 'none',
-            }}
-          >
+          <button onClick={() => setIsExpanded(true)} style={{ ...collapse_button_style }}>
             Show all {questions.length} questions
             <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -318,22 +320,7 @@ const FRAMESQuestionTable = () => {
 
       {/* Collapse button - shown when expanded */}
       {isExpanded && (
-        <button
-          onClick={() => setIsExpanded(false)}
-          style={{
-            width: '100%',
-            padding: '1rem 0',
-            color: '#2563eb',
-            background: 'transparent',
-            fontWeight: '800',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            cursor: 'pointer',
-            border: 'none',
-          }}
-        >
+        <button onClick={() => setIsExpanded(false)} style={{ ...collapse_button_style }}>
           Show less
           <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
