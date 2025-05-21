@@ -16390,6 +16390,399 @@ diving into advanced features.
 
 ==============================
 
+
+
+# index.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/private-endpoints/
+
+# Private Endpoints
+
+Private Endpoints provide secure, private connectivity between your infrastructure and Hasura's Data Planes without exposing traffic to the public internet. This feature is essential for enterprises with strict security and compliance requirements.
+
+## Supported Cloud Providers
+
+Private Endpoints are currently supported on:
+
+- **AWS**: Using AWS PrivateLink
+- **Azure**: Using Azure Private Link (coming soon)
+- **GCP**: Using Private Service Connect (coming soon)
+
+## Next Steps
+
+Ready to set up Private Endpoints? Choose your cloud provider:
+
+- [AWS](/private-ddn/private-endpoints/aws.mdx)
+
+
+
+==============================
+
+
+
+# aws.mdx
+
+URL: https://hasura.io/docs/promptql/private-ddn/private-endpoints/aws
+
+
+# AWS Private Endpoints
+
+## Overview
+
+AWS Private Endpoints leverage AWS PrivateLink technology to establish secure, private connectivity between your VPC and Hasura's Data Plane. This private connection ensures that your data traffic never traverses the public internet, significantly enhancing security and reducing exposure to potential threats.
+
+### How It Works
+
+AWS PrivateLink uses AWS's internal network to create private connections between services. The process works as follows:
+
+1. You create a VPC Endpoint Service in your AWS account, backed by a Network Load Balancer
+2. You provide Hasura with your VPC Endpoint Service name
+3. Hasura creates a VPC Endpoint in the Data Plane VPC that connects to your endpoint service
+4. AWS creates Elastic Network Interfaces (ENIs) in the Data Plane subnets
+5. The Data Plane connects to your services through these ENIs
+6. All traffic remains on the AWS private network
+
+## Prerequisites
+
+Before creating an AWS Private Endpoint, ensure you have the following:
+
+1. **A Private DDN Data Plane deployed in AWS**
+   - Your Data Plane must be deployed and in an active state
+   - The Data Plane region should match the region where you want to create the private endpoint
+
+2. **An AWS VPC Endpoint Service in your AWS account**
+   - Created and configured with a Network Load Balancer
+   - In the same region as your Data Plane
+   - - The "Acceptance Required" setting can be enabled or disabled based on your security requirements
+
+3. **Appropriate IAM permissions**
+   - Permissions to manage your VPC Endpoint Service
+   - Permissions to add allowed principals to your endpoint service
+   - Typically requires the `ec2:ModifyVpcEndpointServicePermissions` permission
+
+## Creating a Private Endpoint
+
+### Step 1: Service Principal Information
+
+1. Navigate to your Data Plane details page in the Hasura Console
+2. Click the "Create Private Endpoint" button
+3. In the modal, you'll see the **Hasura IAM Role ARN** that needs to be added to your endpoint service permissions
+   - Format: `arn:aws:iam::DATAPLANE_ACCOUNT_ID:role/ROLE_NAME`
+   - This is the AWS IAM role that Hasura's Data Plane will use to connect to your VPC Endpoint Service
+   - You must add this ARN to the allowed principals in your VPC Endpoint Service settings
+
+4. Add this ARN to your VPC Endpoint Service permissions in your AWS account:
+   - Go to the AWS Console > VPC > Endpoint Services
+   - Select your endpoint service
+   - Under "Allowed principals", click "Add allowed principals"
+   - Paste the Hasura IAM Role ARN and save
+
+5. Enter your VPC Endpoint Service name in the input field
+   - Format: `com.amazonaws.vpce.REGION.vpce-svc-XXXXXXXX`
+   - You can find this in your AWS Console under VPC > Endpoint Services > Service name
+
+6. Click "Validate" to proceed
+
+> **Note**: If validation fails, verify that you've correctly added the Hasura IAM Role ARN to your endpoint service's allowed principals list and that you've entered the correct service name.
+
+<Thumbnail src="/img/data-plane/validate-private-endpoint-form.png" alt="Validate Private Endpoint Form" />
+
+### Step 2: Select Availability Zones and Configure Options
+
+1. After successful validation, you'll be prompted to select availability zones
+
+2. Choose the availability zones where you want Hasura to create the endpoint
+   - It's recommended to select at least two zones for high availability
+   - Only zones that match with the availability of your VPC Endpoint Service will be available for selection
+   - Each selected zone will create an Elastic Network Interface (ENI) in the Data Plane VPC
+   - Select zones that align with where your VPC Endpoint Service is deployed
+
+3. Enter a name for your endpoint
+   - The name must be unique within your Data Plane
+   - Name must be between 2 and 20 characters
+   - Name must start with a lowercase letter
+   - Name can only contain lowercase letters and numbers
+   - This name will be used to identify the endpoint in the Hasura Console
+
+> **Best Practice**: Select availability zones where your application workloads run to minimize cross-AZ data transfer costs and latency.
+
+<Thumbnail src="/img/data-plane/endpoint-creation-form.png" alt="Endpoint Creation Form" />
+
+### Step 3: Create the Endpoint
+
+1. Review your selections and click "Create"
+2. The system will initiate the endpoint creation process, which typically takes 5-10 minutes
+3. You'll be returned to the Data Plane details page where you can monitor the endpoint status
+4. If you configured your VPC Endpoint Service to require acceptance, the endpoint will initially show a "Pending Acceptance" status
+5. In this case, you must accept the endpoint connection request in your AWS account:
+   - Go to the AWS Console > VPC > Endpoint Services
+   - Find your endpoint service
+   - Under the "Endpoint connections" tab, find the pending connection
+   - Select it and click "Accept endpoint connection"
+6. After acceptance (or immediately if acceptance is not required), the status will change to "In Progress" and then "Active" when ready
+
+<Thumbnail src="/img/data-plane/private-endpoint-table.png" alt="Private Endpoint Table" />
+
+## Updating a Private Endpoint
+
+You can modify your private endpoint settings after creation to adjust availability zones or enable private DNS. Note that only endpoints in the **Active** status can be updated.
+
+### Step 1: Access the Update Form
+
+1. Navigate to your Data Plane details page in the Hasura Console
+2. Locate the private endpoint you want to edit in the Private Endpoints table
+3. Click the edit (pencil) icon next to the endpoint
+
+### Step 2: Configure Update Options
+
+1. In the "Edit Endpoint" modal that appears, you can:
+   - Select additional availability zones from the dropdown menu
+     - Only zones that aren't already configured will be available
+     - You cannot remove existing zones, only add new ones
+     - Additional zones must be supported by your VPC Endpoint Service
+   - Toggle the "Enable Private DNS" option to use AWS private DNS names
+     - This option is only available during edit/update operations, not during initial creation
+     - Private DNS enablement allows you to use the service's private DNS name instead of the endpoint-specific DNS names
+     - Note that private DNS can only be enabled for AWS VPC endpoint services that provide a private DNS name
+
+### Step 3: Apply the Update
+
+1. Review your changes and click "Update" to apply them
+2. The endpoint will enter the "In Progress" state while changes are being applied
+3. Changes typically take 5-10 minutes to complete
+4. You'll be returned to the Data Plane details page where you can monitor the endpoint status
+
+<Thumbnail src="/img/data-plane/edit-private-endpoint.png" alt="Update Private Endpoint" />
+
+## Deleting a Private Endpoint
+
+When you no longer need a private endpoint, you can delete it from your Data Plane. This action cannot be undone and will remove the connection between your VPC and Hasura's Data Plane. Note that only endpoints in the **Active**, **Failed**, or **Rejected** status can be deleted.
+
+### Step 1: Initiate Deletion
+
+1. Navigate to your Data Plane details page in the Hasura Console
+2. Locate the private endpoint you want to delete in the Private Endpoints table
+3. Click the delete (trash) icon next to the endpoint
+
+### Step 2: Confirm Deletion
+
+1. In the confirmation modal that appears, review the endpoint name to confirm it's the correct endpoint
+2. The modal will display a warning message: "Are you sure you want to delete the private endpoint [endpoint-name]? This action cannot be undone."
+3. Click "Delete Endpoint" to confirm and proceed with deletion
+4. Click "Cancel" if you want to abort the deletion process
+
+### Step 3: Monitor Deletion Progress
+
+1. If confirmed, the endpoint will enter the "Deleting" state while being removed
+2. The deletion process typically takes 5-10 minutes to complete
+3. You'll be returned to the Data Plane details page where you can monitor the endpoint status
+
+<Thumbnail src="/img/data-plane/delete-private-endpoint.png" alt="Delete Private Endpoint" />
+
+## Endpoint Status Lifecycle
+
+AWS Private Endpoints go through several status states during their lifecycle:
+
+| Status | Description | Action Required | Available Operations |
+|--------|-------------|----------------|----------------------|
+| **Pending Acceptance** | The connection request has been sent to your AWS account and is waiting for acceptance | Accept the endpoint connection in AWS Console | None |
+| **In Progress** | The connection has been accepted and the endpoint is being created or modified | No action needed; wait for completion | None |
+| **Active** | The endpoint is active and ready for use | You can now use the endpoint DNS addresses | Update, Delete |
+| **Deleting** | The endpoint is in the process of being deleted | No action needed; wait for completion | None |
+| **Failed** | The endpoint creation failed | Contact Hasura support for assistance | Delete |
+| **Rejected** | The request was rejected by the service provider | Contact Hasura support for assistance | Delete |
+| **Expired** | The connection request expired | Contact Hasura support for assistance | None |
+
+## Using Private Endpoints
+
+Once your endpoint is in the "Active" status, you can use it to establish secure connectivity between Hasura's Data Plane and your data sources. Here's what you need to know:
+
+1. The endpoint DNS addresses will be displayed in the private endpoints table
+2. These DNS addresses represent the connection between Hasura's Data Plane and your VPC Endpoint Service
+3. For Hasura to connect to your data sources through this private connection, you must configure your data sources in Hasura using the appropriate DNS names
+
+### Connecting Your Data Sources
+
+The private endpoint enables secure connectivity between your VPC (where your data sources are) and Hasura's Data Plane. Here's how it works:
+
+1. Your data sources (databases, APIs, etc.) in your VPC are accessible through your VPC Endpoint Service
+2. Hasura's Data Plane connects to your VPC Endpoint Service through the VPC Endpoint
+3. This ensures that traffic between Hasura's Data Plane and your data sources remains on the private AWS network
+4. Example architecture:
+
+```
+Hasura Data Plane VPC <---> VPC Endpoint <---> Your VPC Endpoint Service <---> Your VPC with data sources
+```
+
+> **Important**: When configuring your data sources in Hasura, you must use the DNS names provided by your VPC Endpoint Service to ensure traffic flows through the private connection. These DNS names are typically in the format of your service's DNS name or the endpoint-specific DNS names if private DNS is not enabled.
+
+## Frequently Asked Questions
+
+### Does using private endpoints affect performance?
+Private endpoints typically provide more consistent performance compared to public internet connections since they use AWS's private network infrastructure and avoid internet congestion.
+
+### Can I use the same private endpoint for multiple applications?
+Yes, a single private endpoint can be used by multiple applications within the same VPC or connected VPCs (via VPC peering or Transit Gateway).
+
+### How are private endpoints billed?
+AWS charges for VPC endpoints based on hourly usage and data processing. Refer to the [AWS PrivateLink pricing page](https://aws.amazon.com/privatelink/pricing/) for current rates.
+
+### Can I connect to my VPC Endpoint Service from outside AWS?
+No, VPC Endpoint Services are only accessible from within AWS. To access from outside AWS, you would need to set up a VPN or Direct Connect to your AWS VPC.
+
+## Troubleshooting
+
+### Common Issues
+
+| Issue | Possible Causes | Resolution |
+|-------|----------------|------------|
+| **Endpoint stuck in "Pending Acceptance" status** | - Connection request not accepted<br/>- AWS Console permissions issue<br/>- Endpoint Service requires acceptance | - Accept the endpoint connection in AWS Console under VPC > Endpoint Services<br/>- Verify you have permissions to accept connections |
+| **Validation errors** | - Incorrect Hasura IAM Role ARN<br/>- ARN not added to allowed principals<br/>- Incorrect service name | - Verify the ARN is correctly added to your endpoint service permissions<br/>- Check for typos in the service name |
+| **Cannot connect to endpoint** | - Security group restrictions<br/>- Route table configuration<br/>- DNS resolution issues | - If your database is behind a load balancer, ensure that the **Enforce inbound rules on PrivateLink traffic** option (found under the Load Balancer’s Security tab) is **disabled**.  If your setup requires this option to remain enabled, make sure that your security group explicitly allows inbound access from Hasura's VPC CIDR over the appropriate database port (e.g., PostgreSQL port 5432).  For further troubleshooting, contact Hasura support for assistance |
+| **Failed to create endpoint** | - Service quota limits<br/>- Network configuration issues | - Contact Hasura support for assistance |
+
+### Before Contacting Support
+
+1. **Verify VPC Endpoint Service Status**:
+   - Check the status of your VPC Endpoint Service in AWS Console > VPC > Endpoint Services
+   - Ensure it's available and properly configured with your Network Load Balancer
+
+2. **Verify Allowed Principals**:
+   - Confirm that the Hasura IAM Role ARN has been added to the allowed principals list
+   - Check for any typos or formatting issues in the ARN
+
+3. **Check Service Name**:
+   - Verify that you've provided the correct VPC Endpoint Service name to Hasura
+   - The format should be `com.amazonaws.vpce.REGION.vpce-svc-XXXXXXXX`
+
+### Getting Help
+
+If you encounter issues with private endpoints, especially if you see Failed, Rejected, or Expired statuses, or if you cannot connect to an endpoint, contact Hasura support through your enterprise support channel. These issues often require investigation on Hasura's side to resolve.
+
+
+
+==============================
+
+
+
+# Connector Deployment Resources
+
+URL: https://hasura.io/docs/promptql/private-ddn/connector-deployment-resources
+
+# Connector Deployment Resources
+
+## Introduction
+
+Connectors in Hasura DDN can request specific resources for their deployment. These include memory and CPU allocation.
+Understanding these limits ensures optimized performance and cost efficiency.
+
+## Default Resource Allocation
+
+By default, connectors have the following resource allocations:
+
+- **CPU**: 100m (0.1 vCPU)
+- **Memory**: 256Mi
+
+> **Note:** For Public DDN, resource limits are fixed to 1 vCPU and 2GB RAM and cannot be modified.
+
+## Maximum Resource Limits
+
+Connectors can request resources within the following limits:
+
+- **Maximum CPU**: 4 vCPU
+- **Maximum Memory**: 32Gi
+
+These maximum limits can be increased upon request. Contact Hasura support if you need higher resource limits.
+
+## Memory and CPU Specifications
+
+Memory and CPU resources are specified using the same units as Kubernetes:
+
+- ### Memory Resource Units
+
+Limits and requests for memory are measured in bytes. Memory can be expressed as a plain integer or as a fixed-point
+number using one of the following quantity suffixes:
+
+- `E`, `P`, `T`, `G`, `M`, `k` (base-10 units)
+- `Ei`, `Pi`, `Ti`, `Gi`, `Mi`, `Ki` (power-of-two units)
+
+For example, the following values represent approximately the same amount of memory:
+
+- `128974848`, `129e6`, `129M`, `128974848000m`, `123Mi`
+
+> **Note:** Pay attention to the case of the suffixes. If you request `400m` of memory, this means `0.4` bytes, which is
+> likely a mistake. Instead, you might intend to specify `400Mi` (400 mebibytes) or `400M` (400 megabytes).
+
+- ### CPU Resource Units
+
+Limits and requests for CPU resources are measured in CPU units. In Hasura DDN, `1` CPU unit is equivalent to `1`
+physical CPU core or `1` virtual core, depending on whether the node is a physical host or a virtual machine.
+
+Fractional requests are allowed. When a connector specifies `cpu: 0.5`, it is requesting half as much CPU time compared
+to `1.0` CPU. For CPU resource units, the quantity `0.1` is equivalent to `100m`, which can be read as "one hundred
+millicpu." Some refer to this as "one hundred millicores," and it is understood to mean the same thing.
+
+CPU resources are always specified as an absolute amount, never as a relative amount. For example, `500m` CPU represents
+the same amount of computing power whether the connector runs on a single-core, dual-core, or multi-core machine.
+
+## Defining Resource Limits in `connector.yaml`
+
+Resource limits can be set at both the top level and per region.
+
+```yaml
+title: "Example connector.yaml configuration"
+kind: Connector
+version: v2
+definition:
+  name: my_connector
+  resources:
+    memory: 128M
+    cpu: 0.5
+  regionConfiguration:
+    - region: us-central1
+      resources:
+        memory: 128M
+        cpu: 2
+```
+
+### Resource Limit Overrides
+
+When resource limits are defined at both the top level and the region level, the region-specific values take precedence
+over the top-level values for that particular region.
+
+For example, if a connector is configured as follows:
+
+```yaml
+definition:
+  resources:
+    memory: 512M
+    cpu: 1
+  regionConfiguration:
+    - region: us-central1
+      resources:
+        memory: 128M
+        cpu: 2
+```
+
+- In `us-central1`, the connector will have **128MB memory and 2 vCPUs**, overriding the top-level `512MB` memory and
+  `1 vCPU` settings.
+- In any other region not explicitly defined, the top-level values (`512MB memory, 1 vCPU`) will apply.
+
+This allows for fine-grained control over resource allocation based on deployment needs.
+
+## Deployment Considerations
+
+- If no region is specified for a connector, it is deployed to a random region.
+
+By optimizing resource configurations, connectors can achieve optimal performance while maintaining cost efficiency in
+Hasura DDN.
+
+
+
+==============================
+
+
+
 # ddn-workspace.mdx
 
 URL: https://hasura.io/docs/promptql/private-ddn/ddn-workspace
@@ -31722,268 +32115,7 @@ For general troubleshooting help, please see these [docs](/data-sources/troubles
 
 ==============================
 
-# Specification
 
-URL: https://hasura.io/docs/promptql/reference/spec
-
-# PromptQL Spec
-
-## Introduction
-
-PromptQL is a novel agent approach to enable high-trust LLM interaction with business data & systems.
-
-Unlike traditional tool calling & RAG approaches that rely on in-context composition, PromptQL's planning engine
-generates and runs [programs](#promptql-programs) that compose tool calls and LLM tasks in a way that provides a high
-degree of **explainability**, **accuracy** and **repeatability** for arbitrarily complex tasks.
-
-<Thumbnail src="/img/get-started/promptql-agent.png" alt="A PromptQL agent chat instance" width="1000px" />
-
-**Compared to tool calling**
-
-- _~2x improvement in accuracy._
-- _Near-perfect repeatability as complexity of task & size of working set increases._
-- _Constant context size as data in working set increases._
-- _Lower token consumption for complex tasks._
-
-<Grid />
-
-<Charts />
-
-## Challenges with in-context tool chaining
-
-### Challenge #1
-
-Accuracy & repeatability deteriorate as the instruction complexity increases and/or the amount of data in-context
-increases.
-
-<Thumbnail src="/img/get-started/challenge-1.png" alt="The first challenge faced by LLMs" className="thumbnail-small" />
-
-### Challenge #2
-
-In-context approaches risk running into hard LLM limitations around input and output token limits. For example, if
-retrieved data from a data tool call needs to be passed to a code execution tool, the entire data has to be printed as a
-variable into the source code of the program. Or, the response of a data retrieval tool call might result in crossing
-the size of the context window.
-
-<Thumbnail
-  src="/img/get-started/challenge-2.png"
-  alt="The second challenge faced by LLMs"
-  className="thumbnail-small"
-/>
-
-## Introducing PromptQL
-
-PromptQL's goal is to ensure that AI connected to data and systems can realistically be introduced into business
-operations & workflows. This requires a high degree of accuracy and repeatability.
-
-To do this, PromptQL separates the creation of a query plan that describes the interaction with the business data, from
-the execution of the query plan.
-
-PromptQL uses the LLM to first create a program to compose the different tool calls. PromptQL has programmatic
-primitives for LLM tasks. This allows retrieval, computational and "cognitive" tasks to be arbitrarily composed.
-
-Once the program is created, it is executed in code.
-
-This approach has a few important implications:
-
-It removes input and output data generated during the execution of the plan from the current context. Programmatic
-execution of the desired plan makes it deterministic and repeatable. It allows the user to steer the generation of the
-plan.
-
-**There are three key components of PromptQL:**
-
-1. [PromptQL programs](#promptql-programs) are Python programs that read & write data via python functions. PromptQL
-   programs are generated by LLMs.
-2. [PromptQL primitives](#promptql-primitives) are LLM primitives that are available as python functions in the PromptQL
-   program to perform common "AI" tasks on data.
-3. [PromptQL artifacts](#promptql-artifacts) are stores of data and can be referenced from PromptQL programs. PromptQL
-   programs can create artifacts.
-
-A PromptQL **agent** creates and runs PromptQL programs.
-
-### PromptQL Programs
-
-A PromptQL program is a concrete representation of the user's intended interaction with the business data.
-
-```python title="PromptQL program that fetches the last 10 unread emails:"
-# Fetch last 10 unread emails
-emails = fetch_emails(limit=10, unread=True)
-
-# Calculate average
-average = sum(emails) / len(emails)
-```
-
-PromptQL programs can read/write data, or search through data by invoking Python functions.
-
-These _tools_ are implemented outside of PromptQL and should simply be provided as dependencies to the PromptQL program.
-
-#### Examples of Tools
-
-1. Search (vector, attribute, keyword, etc.)
-2. Reading and writing data from a database
-3. Interacting with an API
-
-The most important factors that determine the effectiveness of PromptQL are:
-
-1. The quality of the tools provided to PromptQL.
-2. The ability of the PromptQL agent to consistently generate high-quality PromptQL programs.
-
-### PromptQL Primitives
-
-PromptQL primitives are AI functions that are available as python functions in the PromptQL program to perform common AI
-tasks on data. These primitives can create structured information from unstructured and structured data and allow the
-composition of "cognitive" tasks with "computational" tasks.
-
-For example, a simple search-based RAG system can be represented as a PromptQL program with a retrieval function
-followed by a PromptQL primitive that then generates the result.
-
-These are the four basic PromptQL primitives:
-
-- Classify
-- Summarize
-- Extract
-- Visualize
-
-```python title="Example PromptQL program with primitives:"
-# A PromptQL program that uses AI to analyze an email
-
-email_text = """From: prince.nigeria@royalfamily.ng
-Date: Thu, 14 Mar 2024 15:23:47 +0000
-To: recipient@email.com
-Subject: URGENT: Your Assistance Required - $25M Inheritance
-
-Dear Beloved Friend,
-
-I am Prince Mohammed Ibrahim, the son of late King Ibrahim of Nigeria. I am writing to request your urgent assistance in transferring the sum of $25,000,000 (Twenty-Five Million United States Dollars) from my father's account to your account.
-
-As the sole heir to the throne and my father's fortune, I need a trusted foreign partner to help move these funds out of the country due to political instability. In return for your assistance, I am prepared to offer you 25% of the total sum.
-
-To proceed, I only require:
-1. Your full name
-2. Bank account details
-3. A small processing fee of $1,000
-
-Please treat this matter with utmost confidentiality and respond urgently.
-
-Best regards,
-Prince Mohammed Ibrahim
-Royal Family of Nigeria
-Tel: +234 801 234 5678
-"""
-
-# Extract the sender's email using the extract primitive
-json_schema = {
-    "type": "object",
-    "properties": {
-        "sender_email": {
-            "type": "string",
-            "description": "The email address of the sender"
-        }
-    }
-}
-
-#highlight-start
-extracted_info = primitives_extract(
-#highlight-end
-    json_schema=json_schema,
-    instructions="Extract the sender's email address from the email header (From: field)",
-    input=email_text
-)
-
-# Classify if it's spam
-#highlight-start
-classification = primitives_classify(
-#highlight-end
-    instructions="Determine if this email is likely to be spam/scam based on its content, tone, and characteristics",
-    inputs_to_classify=[email_text],
-    categories=['Likely Spam', 'Legitimate Email'],
-    allow_multiple=False
-)
-
-# Store results in an artifact
-result = [{
-    'email_content': email_text,
-    'extracted_sender': extracted_info.get('sender_email'),
-    'spam_classification': classification[0]
-}]
-
-print(result)
-```
-
-### PromptQL Artifacts
-
-PromptQL artifacts are stores of data and can be referenced from PromptQL programs. PromptQL programs can create
-artifacts. These are the two necessary artifacts for PromptQL:
-
-- Text artifacts
-- Table artifacts
-- Visualization artifacts
-
-```python title="Example PromptQL program that fetches the last 10 unread emails and stores them in an artifact:"
-# Fetch last 10 unread emails
-emails = fetch_emails(limit=10, unread=True)
-
-# Create a list with one dictionary containing the emails
-result = []
-for email in emails:
-    result.append({
-        'email': email
-    })
-
-# Store as an artifact
-#highlight-start
-store_table_artifact(
-#highlight-end
-    'emails',
-    'Last 10 unread emails',
-    'table',
-    result
-)
-```
-
-PromptQL programs can load previously generated artifacts, and this creates a form of _structured memory_ for PromptQL
-programs, allowing them to surpass limitations introduced by passing data in context.
-
-```python title="Example PromptQL program with artifacts:"
-# Create a function to extract the sender's email address from an email
-def get_sender_email(email):
-  extracted_info = primitives_extract(
-      json_schema=json_schema,
-      instructions="Extract the sender's email address from the email header (From: field)",
-      input=email
-  )
-  return extracted_info.get('sender_email')
-
-# Create a function to classify an email as spam/scam
-def classify_email(email):
-  classification = primitives_classify(
-    instructions="Determine if this email is likely to be spam/scam based on its content, tone, and characteristics",
-    inputs_to_classify=[email],
-    categories=['Likely Spam', 'Legitimate Email'],
-    allow_multiple=False
-  )
-  return classification[0]
-
-#highlight-start
-emails = get_table_artifact('emails')
-#highlight-end
-
-# For each email, extract the sender's email address and classify if it's spam
-result = []
-for email in emails:
-    result.append({
-        'email': email,
-        'sender_email': get_sender_email(email),
-        'spam_classification': classify_email(email)
-    })
-
-# Run an action to mark the email as spam
-for email in result:
-    if email['spam_classification'] == 'Likely Spam':
-        mark_email_as_spam(email['email'])
-```
-
-==============================
 
 # Benchmark
 
@@ -32003,8 +32135,6 @@ This case-study will gradually be formalized as a benchmark as we open-source mo
 
 In contrast to traditional "in-context" approaches to connect LLMs to data, PromptQL takes a programmatic approach. A
 PromptQL agent creates a query plan on the fly to compose retrieval, tool calling and generative tasks.
-
-[Read the PromptQL Specification →](/reference/spec.mdx)
 
 In this post, we compare PromptQL with [Claude.ai + MCP](https://www.anthropic.com/news/model-context-protocol),
 connected to the same set of tools.
@@ -32391,7 +32521,6 @@ the answer for one of the questions.
 
 [View shared thread](https://promptql.console.hasura.io/share/a1e707cc-ece4-42f4-8c3d-925514d75d9b)
 
-- Read more about PromptQL's design [here](/reference/spec.mdx).
 - Add PromptQL to your existing RAG set up [here](/recipes/tutorials/add-vector-search-to-postgresql.mdx).
 
 ## Code
