@@ -5707,7 +5707,7 @@ publicly.
 - [Learn more about threads](/promptql-playground/threads/index.mdx).
 - [Learn what types of artifacts are available](/promptql-playground/artifacts.mdx).
 - [Learn how to make your project public](/promptql-playground/public-projects.mdx).
-- [Learn about project READMEs](/promptql-playground/readme.mdx).
+- [Learn about project READMEs](/promptql-playground/project-readme.mdx).
 - [Learn how to use saved prompts](/promptql-playground/saved-prompts.mdx).
 - [Learn how to deal with the most common issues](/promptql-playground/troubleshooting.mdx).
 
@@ -5976,8 +5976,9 @@ access granting is required, making it truly public in nature.
 
 ## Custom Project README
 
-When a project is set to public mode, project administrators or collaborators can create a custom README in Markdown format. This README
-is visible to all users who access the project's public URL, providing essential context and information.
+When a project is set to public mode, project administrators or collaborators can create a custom README in Markdown
+format. This README is visible to all users who access the project's public URL, providing essential context and
+information.
 
 To add a custom README:
 
@@ -5999,7 +6000,8 @@ The custom README feature allows you to:
 By utilizing this feature effectively, you can enhance the user experience and facilitate better understanding of your
 public PromptQL project.
 
-For more detailed information about project READMEs, including best practices and formatting tips, see the [Project READMEs](/promptql-playground/readme.mdx) documentation.
+For more detailed information about project READMEs, including best practices and formatting tips, see the
+[Project READMEs](/promptql-playground/project-readme.mdx) documentation.
 
 :::info Token Usage and Billing
 
@@ -6016,18 +6018,22 @@ plans and options.
 
 
 
-# readme.mdx
+# project-readme.mdx
 
-URL: https://hasura.io/docs/promptql/promptql-playground/readme
+URL: https://hasura.io/docs/promptql/promptql-playground/project-readme
 
 
 # Project READMEs
 
 ## Introduction
 
-Project READMEs serve as the central documentation hub for your PromptQL projects. Similar to GitHub READMEs, they provide essential information about your project, guiding users on how to effectively interact with your PromptQL implementation.
+Project READMEs serve as the central documentation hub for your PromptQL projects. Similar to GitHub READMEs, they
+provide essential information about your project, guiding users on how to effectively interact with your PromptQL
+implementation.
 
-READMEs are especially valuable for public projects, as they're the first thing users see when accessing your project through a shared URL. They help set expectations, provide context, and offer guidance on how to get the most out of your PromptQL project.
+READMEs are especially valuable for public projects, as they're the first thing users see when accessing your project
+through a shared URL. They help set expectations, provide context, and offer guidance on how to get the most out of your
+PromptQL project.
 
 ## Purpose and benefits
 
@@ -6047,7 +6053,8 @@ Access to edit project READMEs is restricted to:
 - **Project Administrators**: Users with administrative privileges for the project
 - **Project Collaborators**: Team members who have been granted collaborator access
 
-This restricted access ensures that only authorized users can modify the project's documentation, maintaining quality and accuracy.
+This restricted access ensures that only authorized users can modify the project's documentation, maintaining quality
+and accuracy.
 
 ## Creating and editing a README
 
@@ -6061,14 +6068,14 @@ The README editor supports Markdown formatting, allowing you to create rich, wel
 
 - Use headings (`#`, `##`, `###`) to organize your content
 - Create lists with bullet points (`-`) or numbers (`1.`, `2.`, etc.)
-- Add emphasis with **bold** or *italic* text
+- Add emphasis with **bold** or _italic_ text
 - Include code blocks with triple backticks (```)
 - Add links to external resources with `[text](url)`
 
 ### Step 3. Save your changes
 
-After editing your README, click the "Save" button to publish your changes. Your README will immediately be visible to all users with access to your project.
-
+After editing your README, click the "Save" button to publish your changes. Your README will immediately be visible to
+all users with access to your project.
 
 ## Best Practices
 
@@ -6083,17 +6090,19 @@ To create an effective README for your PromptQL project:
 
 ## Viewing READMEs
 
-For public projects, the README is prominently displayed when users access your project through its public URL. For private projects, the README is visible to all project members and collaborators.
+For public projects, the README is prominently displayed when users access your project through its public URL. For
+private projects, the README is visible to all project members and collaborators.
 
-The README serves as the landing page for your project, making it the ideal place to provide a comprehensive overview and guide for users.
+The README serves as the landing page for your project, making it the ideal place to provide a comprehensive overview
+and guide for users.
 
-:::tip Think of your README as your project's homepage
-It's often the first impression users will have of your project, so invest time in making it informative and engaging.
-:::
+:::tip Think of your README as your project's homepage It's often the first impression users will have of your project,
+so invest time in making it informative and engaging. :::
 
 ## Related Resources
 
-- [Public Projects](/promptql-playground/public-projects.mdx): Learn how to make your project accessible to anyone with a unique URL
+- [Public Projects](/promptql-playground/public-projects.mdx): Learn how to make your project accessible to anyone with
+  a unique URL
 - [Saved Prompts](/promptql-playground/saved-prompts.mdx): Discover how to save and share prompts with other users
 
 
