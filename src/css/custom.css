@@ -1460,7 +1460,6 @@ table td {
 .docs-doc-id-index .homepage-demo-grid .demo-icon {
   width: 48px;
   height: 48px;
-  fill: var(--ifm-color-primary);
   filter: drop-shadow(0 0 8px var(--ifm-color-primary));
 }
 

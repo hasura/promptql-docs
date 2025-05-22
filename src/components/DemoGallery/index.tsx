@@ -5,6 +5,9 @@ import CellTower from '@site/static/icons/general/cell-tower.svg';
 import Handshake from '@site/static/icons/general/handshake.svg';
 import Banking from '@site/static/icons/general/banking.svg';
 import Healthcare from '@site/static/icons/general/healthcare.svg';
+import Truck from '@site/static/icons/general/truck.svg';
+import Calculator from '@site/static/icons/general/calculator.svg';
+import Box from '@site/static/icons/general/box.svg';
 
 const DEMOS: DemoCardProps[] = [
   {
@@ -34,6 +37,27 @@ const DEMOS: DemoCardProps[] = [
     description:
       'Take a look at the global network of a telecommunications provider and see how customers, call logs, service requests, devices, and support ticketing are all orchestrated into a single, capable agent.',
     IconComponent: CellTower,
+  },
+  {
+    title: 'SCO',
+    href: 'https://promptql.console.hasura.io/public/sandbox-supplychain/readme',
+    description:
+      'Learn how supply chain organizations use PromptQL to optimize inventory management, track shipments across multiple vendors, and enhance operational visibility throughout complex logistics networks.',
+    IconComponent: Truck,
+  },
+  {
+    title: 'Diligence',
+    href: 'https://promptql.console.hasura.io/public/sandbox-diligence/readme',
+    description:
+      'See how investment firms and M&A teams leverage PromptQL to streamline due diligence processes by analyzing financial data, assessing risks, and accelerating deal evaluation workflows.',
+    IconComponent: Calculator,
+  },
+  {
+    title: 'CPG',
+    href: 'https://promptql.console.hasura.io/public/sandbox-cpg/readme',
+    description:
+      'Discover how consumer packaged goods companies use PromptQL to analyze market trends, optimize product performance, and make data-driven decisions across retail channels and consumer touchpoints.',
+    IconComponent: Box,
   },
 ];
 
