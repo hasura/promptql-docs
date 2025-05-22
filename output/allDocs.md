@@ -5729,6 +5729,7 @@ Initially, we recommend checking out common use cases:
 
 - [Share a thread](/promptql-playground/threads/1-shared-threads.mdx)
 - [Check threads history across all users (as an admin)](/promptql-playground/threads/2-thread-history.mdx)
+- [Edit thread titles](/promptql-playground/threads/3-edit-thread-titles.mdx)
 
 
 
@@ -5833,6 +5834,41 @@ To share a thread publicly, simply click the `Share` button in the thread.
 Sharing a thread doesn't reveal any identifiable information about your project. Only the content of the thread itself
 is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
 conversation intact.
+
+
+
+==============================
+
+
+
+# 3-edit-thread-titles.mdx
+
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/3-edit-thread-titles
+
+
+# Editing Thread Titles
+
+## Introduction
+
+The PromptQL Playground allows you to customize your thread titles for better organization and clarity. This feature
+helps you rename threads to better reflect their content or purpose and quickly identify specific threads when
+revisiting them later.
+
+## Accessing the Edit Title feature
+
+You can edit a thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to the thread
+title.
+
+<Thumbnail src="/img/promptql-playground/edit-thread-title-1.png" alt="Edit Thread Title Button" />
+
+## Edit a thread title
+
+When you click the edit icon, a dialog box will appear allowing you to modify the thread title:
+
+<Thumbnail src="/img/promptql-playground/edit-thread-title-2.png" alt="Edit Thread Dialog Box" />
+
+1. Enter your new title in the text field
+2. Click `Save` to apply the changes
 
 
 
@@ -10560,7 +10596,9 @@ keys to suit your application's [roles](/reference/metadata-reference/permission
 :::tip Custom claims
 
 You can create any custom keys you wish and reference them in your permissions using session variables. Above,
-`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura DDN Engine. :::
+`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura DDN Engine.
+
+:::
 
 ### Step 2. Update your AuthConfig
 
@@ -10641,7 +10679,7 @@ app.post('/login', async (req, res) => {
         email,
         password,
         returnSecureToken: true,
-      }
+      },
     );
 
     const { idToken } = response.data;
