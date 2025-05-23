@@ -12,12 +12,14 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          clean: true
 
       - name: Generate Git Log
         id: get_gitlog
         run: |
-          git fetch --prune
-          git log --pretty=format:'%h %s%n  %an, %ar%n%n%b' --graph --since='1 week ago' --stat > gitlog.txt
+          git log --pretty=format:'%h %s%n  %an, %ar%n%n%b' --graph --since='1 week ago' --stat --grep='^chore' --invert-grep -i > gitlog.txt
 
       - name: Summarize Git Log with OpenAI
         id: summarize
