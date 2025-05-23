@@ -17,12 +17,12 @@ jobs:
       - name: Grab all the renamed or deleted files
         id: grab-renamed
         run: |
-          if git diff --name-status ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- docs/ | grep -E 'R|D'; then
+          if git diff --name-status ${{ github.event.pull_request.base.sha }} HEAD -- docs/ | grep -E 'R|D'; then
           # output variable to pass to the next step that sets the diff-status to true
           echo "diff-status=true" >> "$GITHUB_OUTPUT"
 
           # diff work and parsing the paths to get them in the right shape
-          diff_files=$(git diff --name-status ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} -- docs/ | grep -E 'R|D')
+          diff_files=$(git diff --name-status ${{ github.event.pull_request.base.sha }} HEAD -- docs/ | grep -E 'R|D')
           diff_files=$(echo "$diff_files" | sed 's|.mdx|/|g')
           diff_files=$(echo "$diff_files" | sed 's|docs/||g')
           # print the diff so each line is a new line in diff_files.txt
@@ -87,10 +87,10 @@ jobs:
           path: hasura.io
           token: ${{ secrets.DOCS_GITHUB_TOKEN }}
           author: hasura-bot <build@hasura.io>
-          commit-message: 'Redirects: DDN DOCS PR#${{ github.event.pull_request.number }}'
+          commit-message: 'Redirects: PromptQL DOCS PR#${{ github.event.pull_request.number }}'
           branch: docs-redirects-${{ github.event.pull_request.number }}
           base: master
-          title: 'Redirects: DDN Docs PR#${{ github.event.pull_request.number }}'
+          title: 'Redirects: PromptQL Docs PR#${{ github.event.pull_request.number }}'
           body: |
             This PR adds _templated_ redirects for the merged docs PR hasura/promptql-docs#${{ github.event.pull_request.number }}.
 
