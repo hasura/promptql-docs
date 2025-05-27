@@ -30,7 +30,8 @@ export const createLinearTicket = async ({ prTitle, prUrl, assignedReviewer }: P
     stateId: process.env.LINEAR_TODO_COLUMN_ID!,
     assigneeId: assignedReviewer.linear_id,
     cycleId: await getCurrentCycle(),
-    labelIds: ['docs-review', 'promptql'],
+    // 'docs-review' and 'promptql'
+    labelIds: ['01eec583-7a16-40a7-99fd-c2347f205ef9', 'c952327b-7c8d-46c7-9bde-17017ff6b95a'],
   });
 };
 
