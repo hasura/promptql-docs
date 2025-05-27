@@ -1358,7 +1358,7 @@ table td {
 }
 
 .docs-doc-id-index .homepage-demo-container:not(.expanded) .homepage-demo-grid {
-  max-height: 300px;
+  max-height: 500px;
   overflow: hidden;
 }
 
