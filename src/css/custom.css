@@ -22,14 +22,22 @@
   --primary-neutral-1000: #000000;
 
   /* Theme Colors */
-  --main-bg-color: #000000;
-  --sidebar-bg-color: #131313;
+  --main-bg-color: #ffffff;
+  --sidebar-bg-color: #f9fafb;
+  --sidebar-bg-color-hover: #f1f5f9;
+  --heading-color: #1f2937;
+  --body-text-color: #374151;
+  --dropdown-background-color: #f3f4f6;
+  --button-text: #4b5563;
+  --button-drop-shadow: #1c263f1a;
+  --body-link-color: #319170;
+
   --primary-dark: #181818;
-  --border-color: #181818;
+  --border-color: #e5e7eb;
   --header-border-bottom: #181818;
   --next-prev-bg-color: #181818;
-  --next-prev-border-color: #232323;
-  --search-dark-bg-color: #181818;
+  --next-prev-border-color: #e5e7eb;
+  --search-bg-color: #1c263f1a;
 
   /* Infima Overrides */
   --ifm-code-border-radius: 0.75rem;
@@ -131,6 +139,7 @@ textarea {
   margin-bottom: 1.25rem;
   font-size: 0.9375rem;
   line-height: 1.625rem;
+  color: var(--body-text-color);
 }
 
 b {
@@ -199,7 +208,7 @@ h3,
 h4,
 h5,
 h6 {
-  color: var(--primary-neutral-200);
+  color: var(--heading-color);
 }
 
 p,
@@ -207,15 +216,11 @@ span,
 textarea,
 ul li,
 ol li {
-  color: var(--primary-neutral-300);
+  color: var(--heading-color);
 }
 
 a {
-  color: var(--ifm-color-primary);
-}
-
-a:hover {
-  color: var(--ifm-color-primary-darkest);
+  color: var(--body-link-color);
 }
 
 p code,
@@ -236,7 +241,7 @@ p code {
 }
 
 #hasura-promptql-docs-main-button {
-  color: var(--primary-neutral-1000);
+  color: var(--heading-color);
 }
 
 /* -------------- LAYOUT & CONTAINERS -------------- */
@@ -359,11 +364,13 @@ iframe {
   border-radius: 9999px;
   display: flex;
   align-items: center;
-  background-color: var(--primary-neutral-700);
+  background-color: var(--dropdown-background-color);
   padding: 4px 8px 4px 16px;
-  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
   width: 120px;
-  color: var(--primary-neutral-200);
+  color: var(--button-text);
 }
 
 .navbar__item.dropdown.dropdown--hoverable:hover .navbar__link {
@@ -388,18 +395,20 @@ iframe {
   top: calc(100% - var(--ifm-navbar-item-padding-vertical) + 0.6rem);
   width: 120px;
   min-width: 120px;
-  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
   margin-top: -6px;
-  background-color: var(--primary-neutral-700);
+  background-color: var(--dropdown-background-color);
 }
 
 .dropdown__menu li .dropdown__link {
   display: flex;
   align-items: center;
   font-size: 1rem;
-  color: var(--primary-neutral-200);
+  color: var(--button-text);
   padding: 10px 22px;
-  border-bottom: 1px solid var(--primary-neutral-600);
+  border-bottom: 1px solid var(--next-prev-border-color);
   border-radius: 0;
   margin-top: 0;
 }
@@ -409,7 +418,6 @@ iframe {
 }
 
 .dropdown__menu li .dropdown__link--active {
-  color: var(--ifm-color-primary);
 }
 
 .dropdown__link--active,
@@ -463,9 +471,11 @@ iframe {
   max-width: 370px;
   width: 100%;
   padding: 8px 20px 8px 16px;
-  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900);
-  background-color: var(--search-dark-bg-color);
-  border: 1px solid var(--primary-neutral-600);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
+  background-color: var(--search-bg-color);
+  border: 1px solid var(--next-prev-border-color);
 }
 
 div:has(> .DocSearch.DocSearch-Button) {
@@ -473,14 +483,15 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .DocSearch.DocSearch-Button:hover .DocSearch-Button-Placeholder {
-  color: var(--primary-neutral-0);
+  color: var(--body-text-color);
 }
 
 .DocSearch-Button:active,
 .DocSearch-Button:focus,
 .DocSearch-Button:hover {
-  border: 1px solid var(--primary-neutral-0);
-  box-shadow: 0px 1px 2px 0px var(--primary-neutral-800), 0px 1px 3px 0px var(--primary-neutral-900) !important;
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow) !important;
 }
 
 .DocSearch-Button-Keys {
@@ -497,13 +508,13 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .DocSearch-Button .DocSearch-Search-Icon {
-  color: var(--primary-neutral-500) !important;
+  color: var(--heading-color) !important;
 }
 
 .DocSearch-Modal,
 .DocSearch-Modal .DocSearch-Hit-source,
 .DocSearch-Modal .DocSearch-Footer {
-  background-color: var(--primary-neutral-900) !important;
+  background-color: var(--main-bg-color) !important;
 }
 
 .DocSearch-Hit a:hover .DocSearch-Hit-Container .DocSearch-Hit-content-wrapper span,
@@ -515,6 +526,19 @@ div:has(> .DocSearch.DocSearch-Button) {
 .DocSearch-Hit[aria-selected='true'] a .DocSearch-Hit-Container .DocSearch-Hit-icon svg path,
 .DocSearch-Hit[aria-selected='true'] a .DocSearch-Hit-Container .DocSearch-Hit-Tree {
   color: black !important;
+}
+
+/*
+ * TODO: Confirm whether we need these...spent quite a while diving down this rabbit-hole before realizing this is probably
+ * controlled via the Algolia UI.
+ * 
+ *link--active/
+.DocSearch-Hit-source {
+  color: var(--heading-color) !important;
+}
+
+.DocSearch-Hit[aria-selected='true'] a {
+  background-color: transparent !important;
 }
 
 /* Breadcrumbs */
@@ -565,7 +589,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .breadcrumbs__link:any-link:hover {
   background: none;
-  color: var(--ifm-color-primary);
 }
 
 .theme-doc-version-badge.badge.badge--secondary {
@@ -589,7 +612,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .menu__link {
-  color: var(--primary-neutral-400);
+  color: var(--heading-color);
   text-transform: uppercase;
   font-weight: bold;
   font-size: 0.7rem;
@@ -606,28 +629,20 @@ div:has(> .DocSearch.DocSearch-Button) {
 .menu__caret:hover,
 .menu__link--active:not(.menu__link--sublist),
 .menu__list-item-collapsible--active,
-.menu__link:hover,
 .menu__list-item-collapsible:hover {
-  background-color: transparent;
-  color: var(--ifm-color-primary);
+  background: transparent;
 }
 
 .menu__list .theme-doc-sidebar-item-category .menu__list .menu__list-item .menu__link {
   font-size: 0.8rem;
   font-weight: 500;
   text-transform: none;
-  color: var(--primary-neutral-500);
   margin-bottom: -0.05rem;
 }
 
 .menu__link--active,
 .menu__list .theme-doc-sidebar-item-category .menu__list .menu__list-item .menu__link.menu__link--active {
-  color: var(--ifm-color-primary);
-  background-color: transparent;
-}
-
-.menu__link--active:hover {
-  color: var(--ifm-color-primary);
+  font-weight: 800;
 }
 
 .menu__list-item:not(:first-child) {
@@ -670,11 +685,10 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .theme-doc-sidebar-menu .theme-doc-sidebar-item-link:hover,
 .theme-doc-sidebar-menu .theme-doc-sidebar-item-category:hover {
-  background-color: transparent !important;
+  background-color: var(--sidebar-bg-color-hover);
 }
 
 .theme-doc-sidebar-menu .theme-doc-sidebar-item-link:has(.menu__link--active) {
-  background-color: var(--main-bg-color);
 }
 
 .theme-doc-sidebar-menu .menu__list .theme-doc-sidebar-item-link:has(.menu__link--active) {
@@ -733,14 +747,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .table-of-contents__link {
-  color: var(--primary-neutral-400);
-}
-
-.table-of-contents__link:hover,
-.table-of-contents__link:hover code,
-.table-of-contents__link--active,
-.table-of-contents__link--active code {
-  color: var(--primary-neutral-0);
+  color: var(--heading-color);
 }
 
 .table-of-contents {
@@ -755,17 +762,29 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .table-of-contents .table-of-contents__link {
-  border-left: 0.125rem solid transparent;
+  border-left: 4px solid transparent;
   font-size: 0.875rem;
   font-weight: 500;
   padding-left: 1.5rem;
 }
 
 .table-of-contents .table-of-contents__link--active {
-  border-left: 0.125rem solid var(--ifm-color-primary);
+  border-left: 4px solid var(--ifm-color-primary);
   margin-left: 0rem;
   padding-left: 1.5rem;
   font-weight: 600;
+}
+
+.table-of-contents .table-of-contents__link:hover {
+  color: var(--heading-color);
+}
+
+.table-of-contents .table-of-contents__link code {
+  color: var(--main-bg-color);
+}
+
+.table-of-contents .table-of-contents__link--active code {
+  color: var(--main-bg-color);
 }
 
 /* -------------- PAGINATION -------------- */
@@ -1408,10 +1427,6 @@ table td {
   background-color: var(--ifm-color-primary-darker);
 }
 
-.docs-doc-id-index .quickstart-button {
-  color: var(--ifm-color-primary) !important;
-}
-
 .docs-doc-id-index .cta-button-demos {
   display: inline-block;
   background-color: var(--ifm-color-primary);
@@ -1435,7 +1450,7 @@ table td {
 }
 
 .sidebar-divider-bottom {
-  border-bottom: 2px solid var(--ifm-color-primary-fade) !important;
+  border-bottom: 2px solid var(--button-drop-shadow) !important;
   padding-bottom: 0.5rem !important;
   margin-bottom: 0.5rem;
 }
@@ -1457,7 +1472,6 @@ table td {
 .menu__link:hover .sidebar-icon svg line,
 .menu__link:hover .sidebar-icon svg circle,
 .menu__link:hover .sidebar-icon svg rect {
-  stroke: var(--ifm-color-primary) !important;
 }
 
 /* Style for icons in active menu items */
@@ -1465,23 +1479,20 @@ table td {
 .menu__link--active .sidebar-icon svg line,
 .menu__link--active .sidebar-icon svg circle,
 .menu__link--active .sidebar-icon svg rect {
-  stroke: var(--ifm-color-primary) !important;
 }
 
 /* For GraphQL logo which uses fill instead of stroke */
-.menu__link:hover .sidebar-icon .graphql-icon path,
-.menu__link--active .sidebar-icon .graphql-icon path {
-  fill: var(--ifm-color-primary) !important;
-}
+/* .menu__link:hover .sidebar-icon .graphql-icon path, */
+/* .menu__link--active .sidebar-icon .graphql-icon path { */
+/*   fill: var(--ifm-color-primary) !important; */
+/* } */
 
 /* Make sure text color changes on hover and active states */
 .menu__link:hover .menu-label,
 .menu__link--active .menu-label {
-  color: var(--ifm-color-primary) !important;
 }
 
 /* Restore correct text weight */
 .menu-label {
   font-weight: inherit;
-  color: inherit;
 }
