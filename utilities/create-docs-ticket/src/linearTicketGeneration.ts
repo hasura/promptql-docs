@@ -25,11 +25,13 @@ const getCurrentCycle = async (): Promise<string> => {
 export const createLinearTicket = async ({ prTitle, prUrl, assignedReviewer }: PRInfo) => {
   return await linearClient.createIssue({
     teamId: process.env.LINEAR_TEAM_ID!,
-    title: `PromptQL PR Review: ${prTitle}`,
+    title: `PR Review: PromptQL Docs - ${prTitle}`,
     description: `Link to PR: ${prUrl}`,
     stateId: process.env.LINEAR_TODO_COLUMN_ID!,
     assigneeId: assignedReviewer.linear_id,
     cycleId: await getCurrentCycle(),
+    // 'docs-review' and 'promptql'
+    labelIds: ['01eec583-7a16-40a7-99fd-c2347f205ef9', 'c952327b-7c8d-46c7-9bde-17017ff6b95a'],
   });
 };
 
