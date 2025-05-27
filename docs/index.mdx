@@ -30,12 +30,9 @@ import GraphQLAPI from "@site/static/icons/graphql-logo.svg";
 import ChevronRight from "@site/static/icons/chevron-right.svg";
 import Quickstart from "@site/static/icons/cloud-lightning.svg";
 import Introduction from "@site/static/icons/award-02.svg";
-import CellTower from "@site/static/icons/general/cell-tower.svg";
-import Handshake from "@site/static/icons/general/handshake.svg";
-import Banking from "@site/static/icons/general/banking.svg";
-import Healthcare from "@site/static/icons/general/healthcare.svg";
 import { OverviewIconCard } from "@site/src/components/OverviewIconCard";
 import Link from "@docusaurus/Link";
+import DemoGallery from "@site/src/components/DemoGallery";
 
 # Hasura PromptQL Documentation
 
@@ -71,44 +68,4 @@ import Link from "@docusaurus/Link";
 
 ## Demos
 
-Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
-connected data sources and will suggest some ways of interacting with the application.
-
-<div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Handshake className="demo-icon" />
-  </div>
-  <h3>GTM</h3>
-  <p>
-    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
-    drive strategic business decisions.
-  </p>
-  <div class="demo-cta-button">Explore the GTM demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Healthcare className="demo-icon" />
-  </div>
-  <h3>Healthcare</h3>
-  <p>
-    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
-    operational efficiency while maintaining compliance.
-  </p>
-  <div class="demo-cta-button">Explore the Healthcare demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Banking className="demo-icon" />
-  </div>
-  <h3>AML</h3>
-  <p>
-    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
-    transaction data, uncovering suspicious patterns, and enhancing compliance.
-  </p>
-  <div class="demo-cta-button">Explore the AML demo</div>
-</a>
-
-</div>
+<DemoGallery />
