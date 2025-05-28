@@ -35,7 +35,7 @@ function copyJsonSchema() {
           const sourcePath = path.join(searchPath, jsonFile);
           const targetPath = path.join(__dirname, 'build/docs-schema.json');
           fs.copyFileSync(sourcePath, targetPath);
-          return;
+          return true; // Indicate success
         }
       } catch (err) {
         console.warn(`\x1b[33mWarning: Error reading directory ${searchPath}:\x1b[0m`, err?.message || err);
@@ -46,6 +46,7 @@ function copyJsonSchema() {
   // If we get here, we couldn't find the file
   console.warn('\x1b[33mWarning: Could not find the docs JSON file in any of the expected locations\x1b[0m');
   console.warn('\x1b[33mThis may affect some console functionality but the build will continue\x1b[0m');
+  return false; // Indicate failure
 }
 
 function generateLlmBundle() {
@@ -80,8 +81,10 @@ try {
 
 // Finally try to copy the JSON schema
 try {
-  copyJsonSchema();
-  console.log('\x1b[32m\nSuccessfully copied the docs JSON schema file to build assets!\n\x1b[0m');
+  const success = copyJsonSchema();
+  if (success) {
+    console.log('\x1b[32m\nSuccessfully copied the docs JSON schema file to build assets!\n\x1b[0m');
+  }
 } catch (e) {
   console.warn('\x1b[33mWarning: Could not copy the docs JSON schema file to build assets:\x1b[0m', e.message);
   console.warn('\x1b[33mThis may affect some console functionality but continuing the build...\x1b[0m');
