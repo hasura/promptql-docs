@@ -1,0 +1,66 @@
+---
+sidebar_position: 4
+sidebar_label: Thread Titles
+description: "Learn about thread title functionality in the PromptQL Playground - automatic generation and manual editing"
+keywords:
+  - hasura
+  - promptql
+  - threads
+  - thread titles
+  - edit title
+  - auto generation
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Thread Titles
+
+## Introduction
+
+Thread titles in the PromptQL Playground help you organize and identify your conversations with data. The system provides both automatic title generation and manual editing capabilities to ensure your threads are properly labeled and easy to find.
+
+## Automatic Title Generation
+
+### How It Works
+
+When you start a new conversation, the PromptQL Playground automatically generates meaningful titles using large language models. This happens after the first exchange between you and the assistant, replacing the initial default title (which is a truncated version of your first message).
+
+### Generation Process
+
+The automatic title generation:
+
+1. **Analyzes your conversation context** including:
+   - Your initial user message
+   - The assistant's response
+   - The query plan (execution steps the agent will perform)
+
+2. **Creates concise, descriptive titles** (maximum 7 words) that accurately summarize:
+   - The core data request or analysis goal
+   - Key entities like datasets, columns, or metrics
+   - Primary data operations being performed
+
+3. **Occurs automatically** after the first assistant action in a new thread
+
+## Edit Thread Titles
+
+### Accessing the Edit Feature
+
+You can manually edit any thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to the thread title.
+
+<Thumbnail src="/img/promptql-playground/edit-thread-title-1.png" alt="Edit Thread Title Button" />
+
+### Editing a Thread Title
+
+When you click the edit icon, a dialog box will appear allowing you to modify the thread title:
+
+<Thumbnail src="/img/promptql-playground/edit-thread-title-2.png" alt="Edit Thread Dialog Box" />
+
+1. Enter your new title in the text field
+2. Click `Save` to apply the changes
+
+### Title Requirements
+
+When editing titles manually, keep in mind:
+
+- **Titles cannot be empty** - you must provide some text
+- **Maximum length is 100 characters** - keep titles concise and descriptive
