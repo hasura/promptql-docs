@@ -153,7 +153,7 @@ const config: Config = {
         alt: 'PromptQL Logo',
         src: 'img/pql-logo-large.svg',
         href: '/index',
-        srcDark: '/img/pql-logo-large.svg',
+        srcDark: '/img/pql-logo-large-dark-mode.svg',
       },
       items: [
         {

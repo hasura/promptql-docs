@@ -60,6 +60,7 @@ export default function Chart() {
               x="50%"
               y={30}
               textAnchor="middle"
+              fill="var(--body-text-color)"
               style={{
                 fontSize: '16px',
                 fontWeight: 500,
