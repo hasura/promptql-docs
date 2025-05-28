@@ -26,11 +26,43 @@
   --sidebar-bg-color: #f9fafb;
   --sidebar-bg-color-hover: #f1f5f9;
   --heading-color: #1f2937;
+  --heading-color-hover: #0f172a;
   --body-text-color: #374151;
   --dropdown-background-color: #f3f4f6;
   --button-text: #4b5563;
   --button-drop-shadow: #1c263f1a;
   --body-link-color: #319170;
+  --body-link-color-hover: #3cbf95;
+  --inline-code-bg: #f3f4f6;
+  --inline-code-border: #e5e7eb;
+  --blockquote-margin: #aceb94;
+
+  /* Admonition Colors */
+  --admonition-text-color: #4b5563;
+
+  --note-bg: #f3f4f6;
+  --note-border: #e5e7eb;
+  --note-code-border: #d1d5db;
+
+  --tip-bg: #e2f8dd;
+  --tip-border: #c1f1b2;
+  --tip-code-border: #aceb94;
+
+  --info-bg: #e0f3ff;
+  --info-border: #b8e2ff;
+  --info-code-border: #a4daff;
+
+  --caution-bg: #fefac8;
+  --caution-border: #ffef61;
+  --caution-code-bg: #fdf39b;
+  --caution-code-border: #ffef61;
+
+  --danger-bg: #fae1e4;
+  --danger-border: #f5c2c2;
+  --danger-code-border: #ed9191;
+
+  --font-normal: 400;
+  --font-medium: 600;
 
   --primary-dark: #181818;
   --border-color: #e5e7eb;
@@ -38,6 +70,15 @@
   --next-prev-bg-color: #181818;
   --next-prev-border-color: #e5e7eb;
   --search-bg-color: #1c263f1a;
+
+  /* Code block and steps colors */
+  --codeblock-bg: #111827;
+  --codeblock-highlight: #1f2937;
+  --codeblock-border: #1f2937;
+  --codeblock-title-color: #6accab;
+
+  /* Table headers */
+  --table-header-bg: #e5e7eb;
 
   /* Infima Overrides */
   --ifm-code-border-radius: 0.75rem;
@@ -50,9 +91,13 @@
   --ifm-color-primary-lighter: #c6fd61;
   --ifm-color-primary-lightest: #d6fd8e;
   --ifm-code-font-size: 95%;
+  --ifm-heading-font-weight: 600;
+  --ifm-code-background: var(--codeblock-bg);
+  --prism-background-color: var(--codeblock-bg);
+  --docsearch-primary-color: var(--heading-color) !important;
 
   /* Custom Colors */
-  --docusaurus-highlighted-code-line-bg: var(--main-bg-color);
+  --docusaurus-highlighted-code-line-bg: var(--codeblock-highlight);
   --ifm-color-primary-fade: #b6fc3499;
 
   /* Custom Colors for heatmaps */
@@ -187,7 +232,9 @@ li code {
   font-size: 0.875rem;
   border-radius: 3px;
   padding: 2px 3px;
-  border: 1px solid;
+  border: 1px solid var(--inline-code-border) !important;
+  color: var(--body-text-color) !important;
+  background-color: var(--inline-code-bg) !important;
 }
 
 h1 code,
@@ -198,6 +245,13 @@ h5 code,
 h6 code {
   border-radius: 6px;
   padding: 3px 6px;
+  border: 1px solid var(--inline-code-border) !important;
+  color: var(--heading-color) !important;
+  background-color: var(--inline-code-bg) !important;
+}
+
+blockquote {
+  border-left: solid 2px var(--blockquote-margin);
 }
 
 /* -------------- TYPOGRAPHY COLORS -------------- */
@@ -212,7 +266,6 @@ h6 {
 }
 
 p,
-span,
 textarea,
 ul li,
 ol li {
@@ -223,11 +276,15 @@ a {
   color: var(--body-link-color);
 }
 
+a:hover {
+  color: var(--body-link-color-hover);
+}
+
 p code,
 td code,
 li code {
-  border-color: var(--primary-neutral-700);
-  background: var(--primary-neutral-800);
+  background-color: var(--codeblock-bg);
+  border: 1px solid var(--codeblock-border);
 }
 
 hr {
@@ -236,8 +293,8 @@ hr {
 
 pre code,
 p code {
-  background: var(--primary-neutral-900);
-  border: 1px solid var(--primary-neutral-900);
+  background-color: var(--codeblock-bg);
+  border: 1px solid var(--codeblock-border);
 }
 
 #hasura-promptql-docs-main-button {
@@ -445,6 +502,10 @@ iframe {
   z-index: 1;
 }
 
+[class^='navbarSearchContainer_Bca1'] {
+  border-radius: 0px !important;
+}
+
 @media (max-width: 996px) {
   [class^='navbarSearchContainer_'] {
     position: absolute;
@@ -515,6 +576,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 .DocSearch-Modal .DocSearch-Hit-source,
 .DocSearch-Modal .DocSearch-Footer {
   background-color: var(--main-bg-color) !important;
+  border-radius: 0px !important;
 }
 
 .DocSearch-Hit a:hover .DocSearch-Hit-Container .DocSearch-Hit-content-wrapper span,
@@ -528,11 +590,6 @@ div:has(> .DocSearch.DocSearch-Button) {
   color: black !important;
 }
 
-/*
- * TODO: Confirm whether we need these...spent quite a while diving down this rabbit-hole before realizing this is probably
- * controlled via the Algolia UI.
- * 
- *link--active/
 .DocSearch-Hit-source {
   color: var(--heading-color) !important;
 }
@@ -645,6 +702,10 @@ div:has(> .DocSearch.DocSearch-Button) {
   font-weight: 800;
 }
 
+.menu__link--active:hover {
+  color: inherit;
+}
+
 .menu__list-item:not(:first-child) {
   margin-top: 0;
 }
@@ -748,6 +809,11 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .table-of-contents__link {
   color: var(--heading-color);
+  font-weight: var(--font-normal) !important;
+}
+
+.table-of-contents__link:hover {
+  color: var(--heading-color-hover) !important;
 }
 
 .table-of-contents {
@@ -772,7 +838,7 @@ div:has(> .DocSearch.DocSearch-Button) {
   border-left: 4px solid var(--ifm-color-primary);
   margin-left: 0rem;
   padding-left: 1.5rem;
-  font-weight: 600;
+  font-weight: var(--font-medium) !important;
 }
 
 .table-of-contents .table-of-contents__link:hover {
@@ -800,7 +866,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 .pagination-nav__link {
   border-radius: 1.5rem;
   border: 1px solid var(--border-color);
-  background-color: var(--next-prev-bg-color);
 }
 
 .pagination-nav__link--prev {
@@ -809,10 +874,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .pagination-nav__link--next {
   padding: 12px 16px 12px 24px;
-}
-
-.pagination-nav__link:hover {
-  border-color: var(--ifm-color-primary);
 }
 
 .pagination-nav__link.pagination-nav__link--prev:hover .pagination-nav__label::before {
@@ -871,7 +932,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 .tabs__item:hover {
-  background-color: var(--primary-neutral-200);
+  background-color: var(--ifm-color-primary-darkest);
   color: var(--primary-neutral-600);
 }
 
@@ -886,6 +947,10 @@ div:has(> .DocSearch.DocSearch-Button) {
 /* Alerts & Admonitions */
 .alert {
   margin-bottom: 1.25rem !important;
+}
+
+.alert a {
+  text-decoration: none;
 }
 
 .theme-admonition,
@@ -914,61 +979,76 @@ div:has(> .DocSearch.DocSearch-Button) {
 }
 
 /* Admonition Types */
-.theme-admonition-note,
-.alert--secondary {
-  border: 1px solid #2d3956;
-  background-color: #1e2538;
+.theme-admonition p {
+  color: var(--admonition-text-color);
 }
 
-.theme-admonition-note code,
-.alert--secondary code {
-  background-color: #c4d3fc;
+.theme-code-block pre code {
+  background-color: var(--codeblock-bg) !important;
+}
+
+.theme-admonition-note,
+.alert--secondary {
+  border: 1px solid var(--note-border);
+  background-color: var(--note-bg);
+}
+
+.theme-admonition-secondary code:not(pre code),
+.alert--secondary code:not(pre code) {
+  background-color: var(--note-border) !important;
+  border: 1px solid var(--note-code-border) !important;
 }
 
 .theme-admonition-tip,
 .alert--success {
-  border: 1px solid #2f7f85;
-  background-color: #133e41;
+  border: 1px solid var(--tip-border);
+  background-color: var(--tip-bg);
 }
 
-.theme-admonition-tip code,
-.alert--success code {
-  background-color: #448470;
-  color: #e5e7eb;
+.theme-admonition-tip code:not(pre code),
+.alert--success code:not(pre code) {
+  background-color: var(--tip-border) !important;
+  border: 1px solid var(--tip-code-border) !important;
 }
 
 .theme-admonition-info,
 .alert--info {
-  border: 1px solid #5370b6;
-  background-color: #000000;
+  border: 1px solid var(--info-border);
+  background-color: var(--info-bg);
 }
 
-.theme-admonition-info code,
-.alert--info code {
-  color: var(--primary-neutral-0);
-  background-color: var(--primary-neutral-900);
+.theme-admonition-info code:not(pre code),
+.alert--info code:not(pre code) {
+  background-color: var(--info-border) !important;
+  border: 1px solid var(--info-code-border) !important;
 }
 
 .theme-admonition-caution,
 .alert--warning {
-  border: 1px solid #ffce70;
-  background-color: #6a533d;
+  background-color: var(--caution-bg);
+  border: 1px solid var(--caution-border);
 }
 
-.theme-admonition-caution code,
-.alert--warning code {
-  background-color: #ffce70;
+.theme-admonition-caution code:not(pre code),
+.alert--caution code:not(pre code) {
+  background-color: var(--caution-code-bg) !important;
+  border: 1px solid var(--caution-code-border) !important;
 }
 
 .theme-admonition-danger,
 .alert--danger {
-  border: 1px solid #f77173;
-  background-color: #5b3537;
+  background-color: var(--danger-bg);
+  border: 1px solid var(--danger-border);
 }
 
-.theme-admonition-danger code,
-.alert--danger code {
-  background-color: #fba5a6;
+.theme-admonition-danger code:not(pre code),
+.alert--danger code:not(pre code) {
+  background-color: var(--danger-border) !important;
+  border: 1px solid var(--danger-code-border) !important;
+}
+
+[class^='admonitionHeading'] {
+  text-transform: none !important;
 }
 
 .admonition-icon path {
@@ -985,7 +1065,7 @@ table {
 }
 
 table thead {
-  background-color: var(--next-prev-border-color);
+  background-color: var(--table-header-bg);
 }
 
 table thead tr {
@@ -998,6 +1078,10 @@ table tr:nth-child(2n) {
 
 table tr {
   border-top: 0;
+}
+
+table th {
+  color: var(--heading-color) !important;
 }
 
 table thead tr th,
@@ -1190,30 +1274,40 @@ table td {
   padding: 1rem;
   padding-bottom: 1rem;
   border-radius: 0.5rem;
-  border: solid 1px var(--ifm-color-primary);
-  box-shadow: var(--ifm-global-shadow-md);
-  background: var(--primary-neutral-900);
 }
 
 .tabs-container code {
-  background: var(--primary-neutral-800);
+  background-color: var(--codeblock-bg);
 }
 
 /* Code Block Titles */
 [class^='codeBlockTitle_'] {
-  background-color: var(--primary-neutral-800) !important;
-  border-bottom: none !important;
+  background-color: var(--codeblock-bg) !important;
+  color: var(--codeblock-title-color);
+  font-family: 'Fira Code', monospace;
+  border: solid 1px var(--codeblock-border) !important;
 }
 
 /* Code Block Lines */
 [class^='codeBlockLines_'] {
-  background-color: var(--primary-neutral-900) !important;
+  background-color: var(--codeblock-bg);
+  border: solid 1px var(--codeblock-border) !important;
+  border-top: none !important;
+  border-radius: 0px;
   padding: 0.5rem 1rem !important;
+}
+
+pre[class*='language-'] code {
+  color: inherit;
+}
+
+pre[class*='language-'] code span.token {
+  color: unset;
 }
 
 /* Code Block Lines within tabs */
 .tabs-container [class^='codeBlockLines_'] {
-  background-color: black !important;
+  background-color: var(--codeblock-bg) !important;
 }
 
 /* Vendor Table */
