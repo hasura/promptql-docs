@@ -5702,7 +5702,7 @@ Initially, we recommend checking out common use cases:
 
 - [Share a thread](/promptql-playground/threads/1-shared-threads.mdx)
 - [Check threads history across all users (as an admin)](/promptql-playground/threads/2-thread-history.mdx)
-- [Edit thread titles](/promptql-playground/threads/3-edit-thread-titles.mdx)
+- [Thread titles](/promptql-playground/threads/3-thread-titles.mdx)
 
 
 
@@ -5814,27 +5814,52 @@ conversation intact.
 
 
 
-# 3-edit-thread-titles.mdx
+# 3-thread-titles.mdx
 
-URL: https://hasura.io/docs/promptql/promptql-playground/threads/3-edit-thread-titles
+URL: https://hasura.io/docs/promptql/promptql-playground/threads/3-thread-titles
 
 
-# Editing Thread Titles
+# Thread Titles
 
 ## Introduction
 
-The PromptQL Playground allows you to customize your thread titles for better organization and clarity. This feature
-helps you rename threads to better reflect their content or purpose and quickly identify specific threads when
-revisiting them later.
+Thread titles in the PromptQL Playground help you organize and identify your conversations with data. The system
+provides both automatic title generation and manual editing capabilities to ensure your threads are properly labeled and
+easy to find.
 
-## Accessing the Edit Title feature
+## Titles are automatically generated
 
-You can edit a thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to the thread
-title.
+
+When you start a new conversation, the PromptQL Playground automatically generates meaningful titles using large
+language models. This happens after the first exchange between you and the assistant, replacing the initial default
+title (which is a truncated version of your first message).
+
+### Generation process
+
+The automatic title generation:
+
+1. **Analyzes your conversation context** including:
+
+   - Your initial user message
+   - The assistant's response
+   - The query plan (execution steps the agent will perform)
+
+2. **Creates concise, descriptive titles** (maximum 7 words) that accurately summarize:
+
+   - The core data request or analysis goal
+   - Key entities like datasets, columns, or metrics
+   - Primary data operations being performed
+
+3. **Occurs automatically** after the first assistant action in a new thread
+
+## Edit titles
+
+
+You can manually edit any thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to
+the thread title.
 
 <Thumbnail src="/img/promptql-playground/edit-thread-title-1.png" alt="Edit Thread Title Button" />
 
-## Edit a thread title
 
 When you click the edit icon, a dialog box will appear allowing you to modify the thread title:
 
@@ -5842,6 +5867,13 @@ When you click the edit icon, a dialog box will appear allowing you to modify th
 
 1. Enter your new title in the text field
 2. Click `Save` to apply the changes
+
+:::into Keep in mind
+
+- **Titles cannot be empty** - you must provide some text
+- **Maximum length is 100 characters** - keep titles concise and descriptive
+
+:::
 
 
 
