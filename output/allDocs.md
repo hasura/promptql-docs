@@ -37,47 +37,7 @@ URL: https://hasura.io/docs/promptql/
 
 ## Demos
 
-Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining the
-connected data sources and will suggest some ways of interacting with the application.
-
-<div className="homepage-demo-grid">
-  <a href="https://promptql.console.hasura.io/public/sandbox-gtm/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Handshake className="demo-icon" />
-  </div>
-  <h3>GTM</h3>
-  <p>
-    See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and
-    drive strategic business decisions.
-  </p>
-  <div class="demo-cta-button">Explore the GTM demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-healthcare/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Healthcare className="demo-icon" />
-  </div>
-  <h3>Healthcare</h3>
-  <p>
-    Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve
-    operational efficiency while maintaining compliance.
-  </p>
-  <div class="demo-cta-button">Explore the Healthcare demo</div>
-</a>
-
-<a href="https://promptql.console.hasura.io/public/sandbox-aml/readme" className="demo-box" target="_blank">
-  <div className="icon-wrapper">
-    <Banking className="demo-icon" />
-  </div>
-  <h3>AML</h3>
-  <p>
-    Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing
-    transaction data, uncovering suspicious patterns, and enhancing compliance.
-  </p>
-  <div class="demo-cta-button">Explore the AML demo</div>
-</a>
-
-</div>
+<DemoGallery />
 
 
 
