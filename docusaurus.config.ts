@@ -184,6 +184,14 @@ const config: Config = {
     },
     stylesheets: [
       {
+        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+        rel: 'stylesheet',
+      },
+      {
+        href: 'https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&display=swap',
+        rel: 'stylesheet',
+      },
+      {
         href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
         type: 'text/css',
         integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',

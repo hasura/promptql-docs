@@ -113,6 +113,8 @@
 
   --color-mcpScore: #6b8cae;
   --color-promptQLScore: #b6fc34;
+
+  font-family: 'Inter', sans-serif;
 }
 
 html[data-theme='dark'] {
@@ -329,6 +331,8 @@ h4,
 h5,
 h6 {
   color: var(--heading-color);
+  font-family: 'Archivo', sans-serif;
+  font-weight: 500;
 }
 
 p,
@@ -735,7 +739,6 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .menu__link {
   color: var(--heading-color);
-  text-transform: uppercase;
   font-weight: bold;
   font-size: 0.7rem;
 }
