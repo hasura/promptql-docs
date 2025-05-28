@@ -1,7 +1,8 @@
 ---
 sidebar_position: 4
 sidebar_label: Thread Titles
-description: "Learn about thread title functionality in the PromptQL Playground - automatic generation and manual editing"
+description:
+  "Learn about thread title functionality in the PromptQL Playground - automatic generation and manual editing"
 keywords:
   - hasura
   - promptql
@@ -17,24 +18,30 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-Thread titles in the PromptQL Playground help you organize and identify your conversations with data. The system provides both automatic title generation and manual editing capabilities to ensure your threads are properly labeled and easy to find.
+Thread titles in the PromptQL Playground help you organize and identify your conversations with data. The system
+provides both automatic title generation and manual editing capabilities to ensure your threads are properly labeled and
+easy to find.
 
 ## Automatic Title Generation
 
 ### How It Works
 
-When you start a new conversation, the PromptQL Playground automatically generates meaningful titles using large language models. This happens after the first exchange between you and the assistant, replacing the initial default title (which is a truncated version of your first message).
+When you start a new conversation, the PromptQL Playground automatically generates meaningful titles using large
+language models. This happens after the first exchange between you and the assistant, replacing the initial default
+title (which is a truncated version of your first message).
 
 ### Generation Process
 
 The automatic title generation:
 
 1. **Analyzes your conversation context** including:
+
    - Your initial user message
    - The assistant's response
    - The query plan (execution steps the agent will perform)
 
 2. **Creates concise, descriptive titles** (maximum 7 words) that accurately summarize:
+
    - The core data request or analysis goal
    - Key entities like datasets, columns, or metrics
    - Primary data operations being performed
@@ -45,7 +52,8 @@ The automatic title generation:
 
 ### Accessing the Edit Feature
 
-You can manually edit any thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to the thread title.
+You can manually edit any thread title directly from the thread history sidebar. Look for the edit icon (pencil) next to
+the thread title.
 
 <Thumbnail src="/img/promptql-playground/edit-thread-title-1.png" alt="Edit Thread Title Button" />
 
