@@ -87,7 +87,11 @@ async function expandPartials(content: string, docPath: string, rootDir: string,
   return expandedContent;
 }
 
-export async function writeMarkdown(docs: DocsFile[], outputFilename: string = 'llms-full.txt'): Promise<string> {
+export async function writeMarkdown(
+  docs: DocsFile[],
+  outputFilename: string = 'llms-full.txt',
+  silent: boolean = false
+): Promise<string> {
   // __dirname is not available in ES modules. Derive the directory of the current module.
   const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../');
   const outputPath = join(projectRoot, 'build', outputFilename);
@@ -113,12 +117,14 @@ export async function writeMarkdown(docs: DocsFile[], outputFilename: string = '
   // Ensure the build directory exists
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, finalOutput, 'utf-8');
-  console.log(`✅ ${outputFilename} written!`);
+  if (!silent) {
+    console.log(`✅ ${outputFilename} written!`);
+  }
 
   return outputPath;
 }
 
-export async function cleanUpImports(pathToMarkdown: string): Promise<void> {
+export async function cleanUpImports(pathToMarkdown: string, silent: boolean = false): Promise<void> {
   const content = await readFile(pathToMarkdown, 'utf-8');
 
   const cleaned = content
@@ -131,5 +137,7 @@ export async function cleanUpImports(pathToMarkdown: string): Promise<void> {
     .join('\n');
 
   await writeFile(pathToMarkdown, cleaned, 'utf-8');
-  console.log(`🧹 Imports cleaned up`);
+  if (!silent) {
+    console.log(`🧹 Imports cleaned up`);
+  }
 }

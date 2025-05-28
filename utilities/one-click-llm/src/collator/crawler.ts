@@ -105,14 +105,16 @@ export async function getDocsFilesAndSubDirectories(docsDir: string): Promise<st
   return files;
 }
 
-export async function getDocsDirectory(targetName: string): Promise<string> {
+export async function getDocsDirectory(targetName: string, silent: boolean = false): Promise<string> {
   let currentDir = dirname(fileURLToPath(import.meta.url));
 
   while (true) {
     const entries = await readdir(currentDir);
 
     if (entries.includes(targetName)) {
-      console.log(`🔍 Found the docs dir`);
+      if (!silent) {
+        console.log(`🔍 Found the docs dir`);
+      }
       return resolve(currentDir, targetName);
     }
 

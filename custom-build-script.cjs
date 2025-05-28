@@ -10,7 +10,7 @@ const path = require('path');
 const fs = require('fs');
 const { execSync } = require('child_process');
 
-const rootDir = path.join(__dirname, '..');
+const rootDir = path.join(__dirname, '.');
 
 function run(command, options = {}) {
   execSync(command, { stdio: 'inherit', ...options });
@@ -26,7 +26,7 @@ function generateLlmBundle() {
   const utilDir = path.join(rootDir, 'utilities', 'one-click-llm');
 
   try {
-    run('npm run start', { cwd: utilDir });
+    run('npm run start -- --silent', { cwd: utilDir });
   } catch (err) {
     console.warn('Error details:', err?.message || err);
   }
@@ -34,7 +34,7 @@ function generateLlmBundle() {
 
 function copyJsonSchema() {
   console.log('\n\x1b[36mCopying docs-schema.json for Console...\x1b[0m');
-  const docsDir = path.join(__dirname, '../.docusaurus/docusaurus-plugin-content-docs/default/p');
+  const docsDir = path.join(__dirname, '.docusaurus/docusaurus-plugin-content-docs/default/p');
 
   if (!fs.existsSync(docsDir)) {
     throw new Error(`Docs directory not found: ${docsDir}`);
@@ -47,7 +47,7 @@ function copyJsonSchema() {
   }
 
   const sourcePath = path.join(docsDir, docsFile);
-  const targetPath = path.join(__dirname, '../build/docs-schema.json');
+  const targetPath = path.join(__dirname, './build/docs-schema.json');
 
   fs.copyFileSync(sourcePath, targetPath);
 }
