@@ -6,7 +6,7 @@ export default function CopyLLM() {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fileUrl = 'https://raw.githubusercontent.com/hasura/promptql-docs/refs/heads/release-prod/output/allDocs.md';
+  const fileUrl = 'https://raw.githubusercontent.com/hasura/promptql-docs/refs/heads/release-prod/build/llms-full.txt';
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -64,7 +64,7 @@ export default function CopyLLM() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'promptql-docs.md';
+      a.download = 'promptql-docs.txt';
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
@@ -90,10 +90,10 @@ export default function CopyLLM() {
             {status === 'loading'
               ? 'Copying...'
               : status === 'success'
-                ? '✅ Copied!'
-                : status === 'error'
-                  ? 'Failed to copy'
-                  : 'Copy all docs content to clipboard for use in LLM prompts'}
+              ? '✅ Copied!'
+              : status === 'error'
+              ? 'Failed to copy'
+              : 'Copy all docs content to clipboard for use in LLM prompts'}
           </button>
           <button className={styles.dropdownItem} onClick={handleDownload}>
             Download docs content

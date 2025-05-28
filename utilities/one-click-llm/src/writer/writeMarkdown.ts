@@ -1,6 +1,7 @@
 import type { DocsFile } from '../types';
-import { join, dirname, relative, resolve } from 'path';
-import { readFile } from 'fs/promises';
+import { join, dirname, resolve } from 'path';
+import { readFile, writeFile, mkdir } from 'fs/promises';
+import { fileURLToPath } from 'node:url';
 
 const BASE_URL = 'https://hasura.io/docs/promptql';
 
@@ -87,8 +88,10 @@ async function expandPartials(content: string, docPath: string, rootDir: string,
 }
 
 export async function writeMarkdown(docs: DocsFile[]): Promise<string> {
-  const outputPath = join(dirname(dirname(dirname(dirname(import.meta.dir)))), 'output', 'allDocs.md');
-  const rootDir = dirname(dirname(dirname(dirname(import.meta.dir))));
+  // __dirname is not available in ES modules. Derive the directory of the current module.
+  const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../');
+  const outputPath = join(projectRoot, 'build', 'llms-full.txt');
+  const rootDir = projectRoot;
 
   const markdownOutput = await Promise.all(
     docs.map(async doc => {
@@ -107,15 +110,16 @@ export async function writeMarkdown(docs: DocsFile[]): Promise<string> {
   );
 
   const finalOutput = markdownOutput.join('');
-  await Bun.write(outputPath, finalOutput);
-  console.log('✅ allDocs.md written!');
+  // Ensure the build directory exists
+  await mkdir(dirname(outputPath), { recursive: true });
+  await writeFile(outputPath, finalOutput, 'utf-8');
+  console.log('✅ llms-full.txt written!');
 
   return outputPath;
 }
 
 export async function cleanUpImports(pathToMarkdown: string): Promise<void> {
-  const file = Bun.file(pathToMarkdown);
-  const content = await file.text();
+  const content = await readFile(pathToMarkdown, 'utf-8');
 
   const cleaned = content
     .split('\n')
@@ -126,6 +130,6 @@ export async function cleanUpImports(pathToMarkdown: string): Promise<void> {
     })
     .join('\n');
 
-  await Bun.write(pathToMarkdown, cleaned);
+  await writeFile(pathToMarkdown, cleaned, 'utf-8');
   console.log(`🧹 Imports cleaned up`);
 }

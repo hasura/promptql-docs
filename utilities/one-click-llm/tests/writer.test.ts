@@ -1,4 +1,4 @@
-import { expect, test } from 'bun:test';
+// Jest provides expect & test globals, no import needed
 import { mkdir, readFile, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';

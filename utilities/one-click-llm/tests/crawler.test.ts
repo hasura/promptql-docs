@@ -1,4 +1,3 @@
-import { expect, test } from 'bun:test';
 import { mkdir, writeFile } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
@@ -31,14 +30,14 @@ test('Extract the files in a docs directory', async () => {
   const docsDirectory = await getDocsDirectory('docs');
   const pageFiles = await extractFiles(docsDirectory);
 
-  expect(pageFiles).toBeArray();
+  expect(Array.isArray(pageFiles)).toBe(true);
 });
 
 test('Extract subdirectories in a docs directory', async () => {
   const docsDirectory = await getDocsDirectory('docs');
   const subdirs = await extractSubdirectories(docsDirectory);
 
-  expect(subdirs).toBeArray();
+  expect(Array.isArray(subdirs)).toBe(true);
 });
 
 test('Returns position from valid _category_.json', async () => {
@@ -54,9 +53,9 @@ test('Returns position from valid _category_.json', async () => {
 
 test('Order a set of DocFiles', async () => {
   const unsorted: DocsFile[] = [
-    { position: [3], content: 'Third' },
-    { position: [1], content: 'First' },
-    { position: [2], content: 'Second' },
+    { position: [3], content: 'Third', path: '' },
+    { position: [1], content: 'First', path: '' },
+    { position: [2], content: 'Second', path: '' },
   ];
 
   const sorted = orderDocFileArray(unsorted);

@@ -1,6 +1,7 @@
 import { Dirent } from 'node:fs';
 import { readdir, readFile } from 'node:fs/promises';
 import { resolve, dirname, join } from 'path';
+import { fileURLToPath } from 'node:url';
 import type { DocsFile } from '../types';
 import matter from 'gray-matter';
 
@@ -71,6 +72,7 @@ export async function getPositionAndContent(filename: string): Promise<DocsFile 
     title: parsed.data.title ?? filename,
     position: [position],
     content: parsed.content,
+    path: filename,
   };
 }
 
@@ -104,7 +106,7 @@ export async function getDocsFilesAndSubDirectories(docsDir: string): Promise<st
 }
 
 export async function getDocsDirectory(targetName: string): Promise<string> {
-  let currentDir = import.meta.dir;
+  let currentDir = dirname(fileURLToPath(import.meta.url));
 
   while (true) {
     const entries = await readdir(currentDir);

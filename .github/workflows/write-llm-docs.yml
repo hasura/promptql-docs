@@ -51,9 +51,9 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           token: ${{ secrets.DOCS_GITHUB_TOKEN }}
-          commit-message: 'Chore: update LLM markdown'
-          title: 'Chore: update LLM markdown'
-          body: 'This PR updates the LLM-generated markdown.'
+          commit-message: 'Chore: update LLM prompt text bundle'
+          title: 'Chore: update LLM prompt text bundle'
+          body: 'This PR updates the LLM-generated text bundle (llms-full.txt).'
           branch: update-llm-docs
           base: main
           delete-branch: false
