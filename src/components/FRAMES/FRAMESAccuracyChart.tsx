@@ -62,7 +62,6 @@ export default function Chart() {
               textAnchor="middle"
               style={{
                 fontSize: '16px',
-                fill: '#ffffff',
                 fontWeight: 500,
               }}
             >
@@ -85,21 +84,21 @@ export default function Chart() {
               fill="var(--color-naiveScore)"
               radius={4}
               maxBarSize={60}
-              label={{ position: 'top', fill: '#ffffff', fontSize: 12 }}
+              label={{ position: 'top', fontSize: 12 }}
             />
             <Bar
               dataKey="ragScore"
               fill="var(--color-ragScore)"
               radius={4}
               maxBarSize={60}
-              label={{ position: 'top', fill: '#ffffff', fontSize: 12 }}
+              label={{ position: 'top', fontSize: 12 }}
             />
             <Bar
               dataKey="promptQLScore"
               fill="var(--color-promptQLScore)"
               radius={4}
               maxBarSize={60}
-              label={{ position: 'top', fill: '#ffffff', fontSize: 12 }}
+              label={{ position: 'top', fontSize: 12 }}
             />
           </BarChart>
         </ResponsiveContainer>
