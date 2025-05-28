@@ -37,6 +37,12 @@ function generateLlmBundle() {
   const utilDir = path.join(rootDir, 'utilities', 'one-click-llm');
 
   try {
+    // First install dependencies
+    console.log('\x1b[36mInstalling one-click-llm dependencies...\x1b[0m');
+    execSync('npm install', { cwd: utilDir, stdio: 'inherit' });
+
+    // Then run the start script
+    console.log('\x1b[36mGenerating LLM bundle...\x1b[0m');
     execSync('npm run start -- --silent', { cwd: utilDir, stdio: 'inherit' });
     console.log('\x1b[32mSuccessfully generated LLM bundle!\x1b[0m');
   } catch (err) {
