@@ -1,12 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './styles.module.css';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export default function CopyLLM() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const fileUrl = 'https://raw.githubusercontent.com/hasura/promptql-docs/refs/heads/release-prod/build/llms-full.txt';
+  const FILE_NAME = 'llms-full.txt';
+
+  const fileUrl = useBaseUrl(`/${FILE_NAME}`);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -64,7 +67,7 @@ export default function CopyLLM() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'promptql-docs.txt';
+      a.download = FILE_NAME;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
