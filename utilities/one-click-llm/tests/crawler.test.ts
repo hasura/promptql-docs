@@ -64,10 +64,19 @@ test('Order a set of DocFiles', async () => {
 });
 
 test('Get sidebar position and content from a file', async () => {
-  const docsDirectory = await getDocsDirectory('docs');
-  const pageFiles = await extractFiles(docsDirectory);
-  const quickstartFile = pageFiles[1];
-  const docFile = await getPositionAndContent(`${quickstartFile?.path}/${quickstartFile?.name}`);
+  const testDir = join(tmpdir(), `test-docs-${Date.now()}`);
+  await mkdir(testDir, { recursive: true });
+
+  const testFile = join(testDir, 'test.md');
+  const content = `---
+sidebar_position: 1
+title: Test Doc
+---
+
+Test content`;
+  await writeFile(testFile, content, 'utf-8');
+
+  const docFile = await getPositionAndContent(testFile);
 
   expect(Array.isArray(docFile?.position)).toBe(true);
   expect(typeof docFile?.position[0]).toBe('number');

@@ -87,10 +87,10 @@ async function expandPartials(content: string, docPath: string, rootDir: string,
   return expandedContent;
 }
 
-export async function writeMarkdown(docs: DocsFile[]): Promise<string> {
+export async function writeMarkdown(docs: DocsFile[], outputFilename: string = 'llms-full.txt'): Promise<string> {
   // __dirname is not available in ES modules. Derive the directory of the current module.
   const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../../../');
-  const outputPath = join(projectRoot, 'build', 'llms-full.txt');
+  const outputPath = join(projectRoot, 'build', outputFilename);
   const rootDir = projectRoot;
 
   const markdownOutput = await Promise.all(
@@ -113,7 +113,7 @@ export async function writeMarkdown(docs: DocsFile[]): Promise<string> {
   // Ensure the build directory exists
   await mkdir(dirname(outputPath), { recursive: true });
   await writeFile(outputPath, finalOutput, 'utf-8');
-  console.log('✅ llms-full.txt written!');
+  console.log(`✅ ${outputFilename} written!`);
 
   return outputPath;
 }
