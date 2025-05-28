@@ -423,7 +423,9 @@ iframe {
   align-items: center;
   background-color: var(--dropdown-background-color);
   padding: 4px 8px 4px 16px;
-  box-shadow: 0px 1px 2px 0px var(--button-drop-shadow), 0px 1px 3px 0px var(--button-drop-shadow);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
   width: 120px;
   color: var(--button-text);
 }
@@ -450,7 +452,9 @@ iframe {
   top: calc(100% - var(--ifm-navbar-item-padding-vertical) + 0.6rem);
   width: 120px;
   min-width: 120px;
-  box-shadow: 0px 1px 2px 0px var(--button-drop-shadow), 0px 1px 3px 0px var(--button-drop-shadow);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
   margin-top: -6px;
   background-color: var(--dropdown-background-color);
 }
@@ -528,7 +532,9 @@ iframe {
   max-width: 370px;
   width: 100%;
   padding: 8px 20px 8px 16px;
-  box-shadow: 0px 1px 2px 0px var(--button-drop-shadow), 0px 1px 3px 0px var(--button-drop-shadow);
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow);
   background-color: var(--search-bg-color);
   border: 1px solid var(--next-prev-border-color);
 }
@@ -544,7 +550,9 @@ div:has(> .DocSearch.DocSearch-Button) {
 .DocSearch-Button:active,
 .DocSearch-Button:focus,
 .DocSearch-Button:hover {
-  box-shadow: 0px 1px 2px 0px var(--button-drop-shadow), 0px 1px 3px 0px var(--button-drop-shadow) !important;
+  box-shadow:
+    0px 1px 2px 0px var(--button-drop-shadow),
+    0px 1px 3px 0px var(--button-drop-shadow) !important;
 }
 
 .DocSearch-Button-Keys {
@@ -1456,6 +1464,7 @@ pre[class*='language-'] code span.token {
 
 .docs-doc-id-index .homepage-demo-container:not(.expanded) .homepage-demo-grid {
   max-height: 500px;
+  padding-top: 25px;
   overflow: hidden;
 }
 
@@ -1465,7 +1474,7 @@ pre[class*='language-'] code span.token {
   left: 0;
   right: 0;
   height: 120px;
-  background: linear-gradient(transparent, var(--ifm-background-color));
+  background: linear-gradient(transparent, var(--main-bg-color));
   pointer-events: none;
   z-index: 1;
 }
@@ -1477,8 +1486,8 @@ pre[class*='language-'] code span.token {
 }
 
 .docs-doc-id-index .demo-expand-button {
-  background: var(--primary-neutral-800);
-  border: 1px solid var(--primary-neutral-700);
+  border: 1px solid var(--heading-color);
+  background: transparent;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -1487,12 +1496,10 @@ pre[class*='language-'] code span.token {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--primary-neutral-400);
+  color: var(--heading-color);
 }
 
 .docs-doc-id-index .demo-expand-button:hover {
-  background: var(--primary-neutral-700);
-  color: var(--primary-neutral-200);
   transform: translateY(-2px);
 }
 
@@ -1533,13 +1540,12 @@ pre[class*='language-'] code span.token {
 .docs-doc-id-index .homepage-demo-grid .demo-box {
   display: flex;
   flex-direction: column;
-  background: var(--primary-neutral-800);
+  /* background: var(--primary-neutral-800); */
   border: 1px solid var(--primary-neutral-700);
   border-radius: 12px;
   padding: 2rem;
   text-align: center;
   transition: transform 0.2s;
-  cursor: pointer;
   text-decoration: none;
   height: 100%;
 }
@@ -1557,35 +1563,32 @@ pre[class*='language-'] code span.token {
 .docs-doc-id-index .homepage-demo-grid .demo-icon {
   width: 48px;
   height: 48px;
-  filter: drop-shadow(0 0 8px var(--ifm-color-primary));
 }
 
 .docs-doc-id-index .homepage-demo-grid .demo-box h3 {
   margin: 0;
-  color: var(--primary-neutral-200);
 }
 
 .docs-doc-id-index .homepage-demo-grid .demo-box p {
   margin-top: 0.75rem;
-  color: var(--primary-neutral-400);
   font-size: 0.9rem;
 }
 
 .docs-doc-id-index .homepage-demo-grid .demo-box .demo-cta-button {
   display: inline-block;
-  background-color: var(--ifm-color-primary);
+  border: solid 1px var(--heading-color);
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  color: #000000 !important;
+  color: var(--heading-color) !important;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.8rem;
   margin-top: auto;
-  transition: background-color 0.2s;
+  transition: background-color 0.5s;
 }
 
-.docs-doc-id-index .homepage-demo-grid .demo-box:hover .demo-cta-button {
-  background-color: var(--ifm-color-primary-darker);
+.docs-doc-id-index .homepage-demo-grid .demo-box .demo-cta-button:hover {
+  border: solid 1px var(--ifm-color-primary);
 }
 
 .docs-doc-id-index .cta-button-demos {
