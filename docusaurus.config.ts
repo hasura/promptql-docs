@@ -150,10 +150,10 @@ const config: Config = {
       title: '',
       hideOnScroll: true,
       logo: {
-        alt: 'Hasura Logo',
-        src: 'img/prompt-ql-beta@2x.png',
+        alt: 'PromptQL Logo',
+        src: 'img/pql-logo-large.svg',
         href: '/index',
-        srcDark: '/img/prompt-ql-beta@2x.png',
+        srcDark: '/img/pql-logo-large.svg',
       },
       items: [
         {
