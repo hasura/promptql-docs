@@ -5688,79 +5688,9 @@ In this section, you'll find tutorials that walk you through some common use cas
 Initially, we recommend checking out common use cases:
 
 - [Share a thread](/promptql-playground/threads/1-shared-threads.mdx)
-- [Check threads history across all users (as an admin)](/promptql-playground/threads/2-thread-history.mdx)
 - [Thread titles](/promptql-playground/threads/3-thread-titles.mdx)
 
-
-
-==============================
-
-
-
-# 2-thread-history.mdx
-
-URL: https://hasura.io/docs/promptql/promptql-playground/threads/2-thread-history
-
-
-# Thread History
-
-## Introduction
-
-As an admin user, you can access the complete history of all threads created within your project. This powerful feature
-allows you to monitor conversations, review interactions, and gain insights into how users are engaging with your data.
-
-- View all threads from every user in your project
-- Access complete conversation history in read-only mode
-- Filter and search through threads to find specific interactions
-- Analyze usage patterns and identify common queries
-
-## Accessing Thread History
-
-Navigate to the **Insights** tab in your project dashboard, then select the **Thread History** section to view all
-threads.
-
-<Thumbnail src="/img/get-started/thread-history-1.png" alt="Thread History Location" />
-
-## Select date range
-
-The Thread History interface allows you to select a date range to filter the threads.
-
-<Thumbnail src="/img/get-started/thread-history-2.png" alt="Thread History List" />
-
-## Viewing Threads
-
-The Thread History interface displays all conversations in a chronological list. Each entry shows:
-
-- Thread ID
-- Thread title
-- User who created the thread
-- Creation date and time
-
-<Thumbnail src="/img/get-started/thread-history-3.png" alt="Thread History List" />
-
-## Thread Details
-
-Click on any thread ID to view its complete contents. The detailed view provides:
-
-- Full conversation history
-- All queries executed within the thread
-- Any visualizations or results generated
-- Timestamps for each interaction
-
-<Thumbnail src="/img/get-started/thread-history-4.png" alt="Thread History Detail View" />
-
-## Admin Capabilities
-
-This feature is only available to users with the `admin` role. As an admin, you can view threads in read-only mode. This
-ensures that the original conversations remain intact while still providing complete visibility into how users are
-interacting with your data.
-
-This feature is particularly valuable for:
-
-- Troubleshooting user issues
-- Identifying common usage patterns
-- Improving data models based on user queries
-- Monitoring for potential misuse or security concerns
+For admin features like playground thread history, see the [Observability section](/observability/playground-history).
 
 
 
@@ -5777,23 +5707,99 @@ URL: https://hasura.io/docs/promptql/promptql-playground/threads/1-shared-thread
 
 ## Introduction
 
-You can extend the functionality of the Public PromptQL Playground and share a thread publicly.
+You can share a thread from the PromptQL Playground. Threads can be shared in two modes: secure mode (recommended) and
+public mode (not recommended). Sharing a thread doesn't reveal any identifiable information about your project.
 
-- You can share specific chat threads with anyone — quickly and effortlessly.
-- Users can view a shared thread without logging in.
-- Your shared thread is accessible via a public link, with no sign-up or login required for viewers. Allowing you to
-  share your insights with the world, whether it's an interesting conversation or an impressive query result with
-  artifacts.
+- Only the current thread and its memory artifacts will be shared
+- Your name and project details remain private
+- Any messages added after sharing will not be visible in the shared link
+- Anyone with the link will be able to access this thread through a publicly accessible URL; if shared in secure mode, a
+  password will be required.
 
-## Share
+:::info Protect your thread
 
-To share a thread publicly, simply click the `Share` button in the thread.
+It's recommended to use secure mode with a password **and expiration date** to protect your thread.
 
-<Thumbnail src="/img/get-started/shared-threads.jpeg" alt="Shared Threads" />
+:::
 
-Sharing a thread doesn't reveal any identifiable information about your project. Only the content of the thread itself
-is visible. Plus, any messages added after sharing won't appear in the public link, keeping the snapshot of your
-conversation intact.
+## Secure sharing (recommended)
+
+Secure sharing is the recommended way to share threads. In this mode, the thread is accessible only with a password. The
+password is auto-generated and can be copied from the share dialog. You can optionally give a password expiry time,
+beyond which the thread will no longer be accessible.
+
+### Step 1. Share the thread
+
+First click the `Share` button in the thread.
+
+<Thumbnail src="/img/get-started/share-thread-secure-1.png" alt="Shared Threads" />
+
+### Step 2. Click `Create Link With Password` button
+
+<Thumbnail src="/img/get-started/share-thread-secure-2.png" alt="Shared Threads" />
+
+### Step 3. Select password expiry
+
+You can optionally select a password expiry date. The default is no-expiry. You can see the following options in the
+dialog:
+
+- Never (don't expire password, **not recommended**)
+- 1 Day
+- 1 Week
+- Custom
+
+<Thumbnail src="/img/get-started/share-thread-secure-3.png" alt="Shared Threads" />
+
+Custom expiry let's you choose the date when the password will expire.
+
+<Thumbnail src="/img/get-started/share-thread-secure-4.png" alt="Shared Threads" />
+
+### Step 4. Copy the password
+
+Once you click on `Create Link` button, your thread will be shared securely. You will see another dialog to copy the
+thread link and the password. **Note**: Copy and keep the password safe as you won't be able to see it again.
+
+<Thumbnail src="/img/get-started/share-thread-secure-5.png" alt="Shared Threads" />
+
+### Step 5. Access the shared thread
+
+Users can access the thread by going to the autogenerated link. They will be prompted to enter the password.
+
+<Thumbnail src="/img/get-started/share-thread-secure-6.png" alt="Shared Threads" />
+
+### Step 6. View the shared thread
+
+Once the correct password is entered by the user, they will be able to view the thread.
+
+<Thumbnail src="/img/get-started/share-thread-view.png" alt="Shared Threads" />
+
+## Public sharing
+
+Public sharing is not recommended as it doesn't have any password protection. Any one with the link can access the
+thread.
+
+### Step 1. Share the thread
+
+First click the `Share` button in the thread.
+
+<Thumbnail src="/img/get-started/share-thread-secure-1.png" alt="Shared Threads" />
+
+### Step 2. Click `Create Public Link` button
+
+<Thumbnail src="/img/get-started/share-thread-public-1.png" alt="Shared Threads" />
+
+### Step 3. Copy the link
+
+Once you click on `Create Public Link` button, your thread will be shared publicly. You will see another dialog to copy
+the thread link.
+
+<Thumbnail src="/img/get-started/share-thread-public-2.png" alt="Shared Threads" />
+
+### Step 4. Access the shared thread
+
+Anyone can access the thread by going to the autogenerated link.
+
+<Thumbnail src="/img/get-started/share-thread-view.png" alt="Shared Threads" />
 
 
 
@@ -6310,6 +6316,10 @@ flexible endpoints make it easy to create interactive, dynamic, and intelligent 
 
 Each API is backed by Hasura DDN, meaning you can connect your own project, pass context via artifacts, and control
 behavior using system instructions and customizations.
+
+For admin features like API thread history, see the [Observability section](/observability/api-history).
+
+
 
 ==============================
 
@@ -7020,6 +7030,319 @@ if len(result.AssistantActions) > 0 {
 ```go title="Or, the Exceute Program API:"
 func (c *Client) ExecuteProgram(ctx context.Context, body api.ExecuteRequest) (*api.PromptQlExecutionResult, error)
 ```
+
+
+
+==============================
+
+
+
+# overview.mdx
+
+URL: https://hasura.io/docs/promptql/observability/overview
+
+# Observability
+
+Observability in Hasura DDN provides deep insights into your application's performance, user interactions, and system
+health. These features help you understand how your applications are being used, identify performance bottlenecks, and
+troubleshoot issues effectively.
+
+Navigate to the **Insights** tab in your project dashboard to access all observability features. The available tabs
+depend on your project configuration and user permissions.
+
+## Next steps
+
+- [Learn about PromptQL Traces](/observability/promptql-traces)
+- [Learn about Playground History](/observability/playground-history)
+- [Learn about API History](/observability/api-history)
+- [Learn about Monitoring](/observability/monitoring)
+
+
+
+==============================
+
+
+
+# promptql-traces.mdx
+
+URL: https://hasura.io/docs/promptql/observability/promptql-traces
+
+
+# PromptQL Traces
+
+## Introduction
+
+PromptQL traces provide detailed execution monitoring for your PromptQL API operations using OpenTelemetry format. Track
+thread interactions, API requests, and performance metrics to debug issues and optimize your AI-powered applications.
+
+PromptQL traces capture:
+
+- Thread operations (start, continue)
+- API requests (natural language queries, program execution)
+- Request duration and status
+- Thread and trace relationships
+
+## Accessing traces
+
+Navigate to the **Insights** tab in your project dashboard, then select **PromptQL Traces**.
+
+<Thumbnail src="/img/observability/promptql-traces-observability.png" alt="PromptQL Traces Table" width="1000px" />
+
+The traces table displays the following columns:
+
+- **Trace ID** - Unique identifier for the trace (clickable to view details)
+- **Thread ID** - Associated thread identifier or operation type for API requests
+- **Operation** - The specific PromptQL operation performed:
+  - `Start thread` - New thread creation
+  - `Continue thread` - Thread continuation
+  - `Execute Program` - Program execution API call
+  - `Natural Language Query` - Query API call
+- **Duration** - Execution time in seconds
+- **Start Time** - When the operation occurred (local timezone)
+- **Status** - Success (green checkmark) or Error (red warning)
+
+:::info Filtering & Search
+
+Filter traces by request type (Requests/Errors), search by Thread ID or Trace ID, and select custom date ranges.
+
+:::
+
+## Trace details
+
+Click on any Trace ID to view detailed trace information:
+
+<Thumbnail
+  src="/img/observability/promptql-trace-detail-observability.png"
+  alt="PromptQL Trace Details"
+  width="1000px"
+/>
+
+### Overview section
+
+The overview section includes general information, such as the thread's ID, its start time, and the duration.
+
+### Execution waterfall
+
+The execution section shows:
+
+- **Span hierarchy** - Visual representation of trace spans
+- **Timing information** - Duration and timing for each span
+- **Error details** - Stack traces and error messages for failed operations
+- **Performance metrics** - Detailed timing breakdown
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Valid project FQDN required for trace collection
+- Traces are retained based on your data retention policy
+
+
+
+==============================
+
+
+
+# playground-history.mdx
+
+URL: https://hasura.io/docs/promptql/observability/playground-history
+
+
+# Playground History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads created within your project via the **PromptQL
+Playground**. This powerful feature allows you to monitor conversations, review interactions, and gain insights into how
+users are engaging with your data.
+
+- View all threads from every user in your project
+- Access complete conversation history in read-only mode
+- Filter and search through threads to find specific interactions
+- Analyze usage patterns and identify common queries
+
+## Access history
+
+Navigate to the **Insights** tab in your project dashboard, then select the **Thread History** section to view all
+threads.
+
+<Thumbnail src="/img/observability/thread-history-1.png" alt="Thread History Location" />
+
+## Select date range
+
+The Thread History interface allows you to select a date range to filter the threads.
+
+<Thumbnail src="/img/observability/thread-history-2.png" alt="Thread History List" />
+
+## View threads
+
+The Thread History interface displays all conversations in a chronological list. Each entry shows:
+
+- Thread ID
+- Thread title
+- User who created the thread
+- Creation date and time
+
+<Thumbnail src="/img/observability/thread-history-3.png" alt="Thread History List" />
+
+## Thread details
+
+Click on any thread ID to view its complete contents. The detailed view provides:
+
+- Full conversation history
+- All queries executed within the thread
+- Any visualizations or results generated
+- Timestamps for each interaction
+- Thread ID displayed with copy functionality
+- Breadcrumb navigation back to thread history
+
+<Thumbnail src="/img/observability/thread-history-4.png" alt="Thread History Detail View" />
+
+## Admin capabilities
+
+This feature is only available to users with the `admin` role. As an admin, you can view threads in read-only mode. This
+ensures that the original conversations remain intact while still providing complete visibility into how users are
+interacting with your data.
+
+This feature is particularly valuable for:
+
+- Troubleshooting user issues
+- Identifying common usage patterns
+- Improving data models based on user queries
+- Monitoring for potential misuse or security concerns
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Admin privileges required
+- Threads retained based on your data retention policy
+
+
+
+==============================
+
+
+
+# api-history.mdx
+
+URL: https://hasura.io/docs/promptql/observability/api-history
+
+
+# API History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads created via PromptQL
+**[Natural Language API](/promptql-apis/natural-language-api.mdx)** calls to your project.
+
+- View all threads created through Natural Language API calls
+- Access complete conversation history in read-only mode
+- Filter and search through threads to find specific interactions
+- Analyze usage patterns and identify common queries
+
+## Access API history
+
+Navigate to the **Insights** tab in your project dashboard, then select **API History**.
+
+<Thumbnail src="/img/observability/api-history-observability.png" alt="API History" />
+
+## View threads
+
+The API history table displays:
+
+- **Thread ID** - Click to view complete thread details
+- **Thread Name** - Name of the conversation thread
+- **Created At** - When the thread was created
+
+## Date range
+
+Select a date range to filter threads by creation time.
+
+<Thumbnail src="/img/observability/api-history-date-picker-observability.png" alt="API History Date Picker" />
+
+## Search and filter
+
+Search for specific threads using the search functionality to find threads by ID or title.
+
+<Thumbnail src="/img/observability/api-history-search-observability.png" alt="API History Search" />
+
+## Thread details
+
+Click on any Thread ID to view the complete conversation history for that thread. The detail page shows:
+
+- Full conversation with all messages and artifacts (in read-only mode)
+- Thread ID displayed with copy functionality
+- Breadcrumb navigation back to api history
+
+<Thumbnail src="/img/observability/api-history-detail.png" alt="API History Thread Detail" />
+
+## Admin capabilities
+
+This feature is only available to users with the `admin` role. Monitor PromptQL API usage to:
+
+- Track threads created through PromptQL Natural Language API calls
+- Analyze conversation patterns and user interactions
+- Monitor PromptQL API usage across your project
+- Debug issues with PromptQL integrations
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Admin privileges required
+- API calls retained based on your data retention policy
+
+
+
+==============================
+
+
+
+# monitoring.mdx
+
+URL: https://hasura.io/docs/promptql/observability/monitoring
+
+
+# Monitoring
+
+## Introduction
+
+Access integrated Grafana dashboards to monitor your application performance and system health.
+
+- View Grafana dashboards directly within the console
+- Monitor application metrics and system performance
+- Set up custom dashboards and alerts
+- Track resource utilization and business metrics
+- Metrics data retained for 7 days
+
+## Access monitoring
+
+Navigate to the **Insights** tab in your project dashboard, then select **Monitoring**.
+
+<Thumbnail src="/img/observability/monitoring-observabilty.png" alt="Monitoring Dashboard" />
+
+## Grafana integration
+
+The monitoring page includes embedded Grafana dashboards that are fully hosted and managed for you. You don’t need to
+worry about setting up Grafana or handling authentication—it’s all managed automatically. These dashboards provide
+complete access to Grafana features and adjust responsively to your screen size, making it easy to explore performance
+metrics across any device.
+
+## Dashboard features
+
+Within the embedded Grafana interface, you can take full advantage of standard features. Choose custom time ranges to
+zoom in on specific performance windows, interact with panels to drill into metrics, use dashboard variables for
+filtering, and control how often data refreshes—whether manually or on a schedule.
+
+## Common metrics
+
+The dashboards help you track essential performance indicators. These include the rate of incoming requests per second,
+average and percentile-based response times, and the percentage of failed requests. You can also monitor system-level
+metrics like CPU load, memory usage, and storage consumption to keep tabs on infrastructure health.
+
+## Dashboard management
+
+Out of the box, dashboards are pre-configured and available as soon as monitoring is enabled—no setup required. If you
+need to go beyond the defaults, you can create and manage your own custom dashboards directly within the hosted Grafana
+environment.
 
 
 
