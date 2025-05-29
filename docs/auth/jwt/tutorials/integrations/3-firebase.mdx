@@ -19,10 +19,10 @@ seoFrontMatterUpdated: false
 ## Introduction
 
 In this tutorial, you'll learn how to configure an existing [Firebase project](https://console.firebase.google.com/) and
-generate a JWT which you can pass in the header of your requests to Hasura. After setting up your
+generate a JWT which you can pass in the header of your requests to the DDN engine. After setting up your
 [AuthConfig](/reference/metadata-reference/auth-config.mdx) object to use JWT mode, this will allow you to validate
 users' identities and create [permission rules](/reference/metadata-reference/permissions.mdx) which can limit access to
-underlying data served by Hasura DDN.
+underlying data served by the DDN engine.
 
 :::info Prerequisites
 
@@ -33,7 +33,7 @@ Before continuing, ensure you have:
   below.
 - A private key from the project's `Service Accounts` section via the
   [Firebase console](https://console.firebase.google.com/project/_/settings/serviceaccounts/adminsdk).
-- A local Hasura project.
+- A local PromptQL DDN project.
 
 :::
 
@@ -80,13 +80,13 @@ const customClaims = {
 await admin.auth().setCustomUserClaims(decodedToken.uid, customClaims);
 ```
 
-This will add the required Hasura namespace with the keys that Hasura expects when decoding a JWT. You can modify the
-keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
+This will add the required DDN namespace with the keys that the DDN engine expects when decoding a JWT. You can modify
+the keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
 
 :::tip Custom claims
 
 You can create any custom keys you wish and reference them in your permissions using session variables. Above,
-`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura DDN Engine.
+`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the DDN engine.
 
 :::
 
@@ -169,7 +169,7 @@ app.post("/login", async (req, res) => {
         email,
         password,
         returnSecureToken: true,
-      },
+      }
     );
 
     const { idToken } = response.data;
@@ -177,7 +177,7 @@ app.post("/login", async (req, res) => {
     // Verify the token using Firebase Admin SDK
     const decodedToken = await admin.auth().verifyIdToken(idToken);
 
-    // Here, you'll need to fetch the user's role from Hasura DDN using an admin-level authenticated request
+    // Here, you'll need to fetch the user's role from PromptQL DDN using an admin-level authenticated request
     // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
     // Below, we're hard-coding the value for now
     const user_role = "user"; // the role returned from your request ☝️
@@ -211,8 +211,8 @@ app.listen(4000, () => {
 
 ## Wrapping up
 
-In this guide, you learned how to integrate Firebase with Hasura DDN and PromptQL to create a secure and scalable
-identity management solution using JWTs. By leveraging custom claims in conjunction with
+In this guide, you learned how to integrate Firebase with DDN and PromptQL to create a secure and scalable identity
+management solution using JWTs. By leveraging custom claims in conjunction with
 [permissions](/reference/metadata-reference/permissions.mdx), you can define precise access-control rules, ensuring that
 your application remains secure and meets your users' needs.
 
