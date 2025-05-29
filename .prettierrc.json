@@ -22,5 +22,11 @@
         "parser": "graphql"
       }
     }
+    {
+      "files": "*.css",
+      "options": {
+        "printWidth": 80
+      }
+    }
   ]
 }
