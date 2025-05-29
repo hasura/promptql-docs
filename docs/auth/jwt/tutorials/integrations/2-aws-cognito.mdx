@@ -21,10 +21,10 @@ seoFrontMatterUpdated: false
 
 In this tutorial, you'll learn how to configure an existing
 [AWS Cognito user pool](https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html) and generate
-a JWT which you can pass in the header of your requests to the DDN engine. After setting up your
+a JWT which you can pass in the header of your requests to the engine. After setting up your
 [AuthConfig](/reference/metadata-reference/auth-config.mdx) object to use JWT mode, this will allow you to validate
 users' identities and create [permission rules](/reference/metadata-reference/permissions.mdx) which can limit access to
-underlying data served by the DDN engine.
+underlying data served by the engine.
 
 :::info Prerequisites
 
@@ -32,7 +32,7 @@ Before continuing, ensure you have:
 
 - An AWS Cognito [user pool](https://manage.auth0.com/dashboard) with a domain configured.
 - A local application that can integrate with Cognito for authentication.
-- A local PromptQL DDN project.
+- A local PromptQL project.
 
 :::
 
@@ -47,7 +47,7 @@ In the [AWS Lambda console](https://console.aws.amazon.com/lambda/home), create 
 `Author from scratch` option and provide a name, runtime, architecture, and any advanced settings you wish to configure.
 
 After your Lambda is created, you'll be redirected to an editor where you can modify the Lambda's handler. Add the
-following code to modify the Cognito JWT and inject the custom DDN namespace claims:
+following code to modify the Cognito JWT and inject the custom namespace claims:
 
 ```javascript
 export const handler = async (event) => {
@@ -71,15 +71,15 @@ export const handler = async (event) => {
 };
 ```
 
-This will add the required DDN namespace with the keys that the DDN engine expects when decoding a JWT. You can modify
-the keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
+This will add the required namespace with the keys that the engine expects when decoding a JWT. You can modify the keys
+to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
 
 Click `Deploy`.
 
 :::tip Custom claims
 
 You can create any custom keys you wish and reference them in your permissions using session variables. Above,
-`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the DDN engine.
+`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the engine.
 
 :::
 
