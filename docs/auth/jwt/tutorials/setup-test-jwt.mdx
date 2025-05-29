@@ -14,9 +14,9 @@ seoFrontMatterUpdated: true
 
 # Set up a JWT for Testing
 
-By default, your supergraph uses your PromptQL cloud authentication token, also known as a personal access token (PAT),
-for authentication. This is convenient for testing from the Playground, but should not be used in an application or
-shared with others.
+By default, PromptQL uses your PromptQL cloud authentication token, also known as a personal access token (PAT), for
+authentication. This is convenient for testing from the Playground, but should not be used in an application or shared
+with others.
 
 Instead, to test authentication you need to set up an
 [`AuthConfig` object](/reference/metadata-reference/auth-config.mdx) and then generate the corresponding token.
@@ -92,7 +92,7 @@ In the example above, we're setting the following values:
 - The default role as `admin`.
 - The allowed roles as `admin`.
 
-For more information about the claims PromptQL DDN expects, check out [this page](/auth/jwt/jwt-configuration.mdx).
+For more information about the claims the engine expects, check out [this page](/auth/jwt/jwt-configuration.mdx).
 
 ## Step 6: Test your AuthConfig
 

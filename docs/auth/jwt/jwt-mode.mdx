@@ -21,8 +21,8 @@ import Thumbnail from "@site/src/components/Thumbnail";
 JWT mode requires that the client making the request sends a valid JSON Web Token to application. This JWT is provided
 by an auth service such as Auth0, AWS Cognito, Firebase, Clerk, or your own custom solution.
 
-The PromptQL DDN engine then verifies and decodes the JWT to extract `x-hasura-*` session variable claim values from a
-defined namespace in the token.
+The engine then verifies and decodes the JWT to extract `x-hasura-*` session variable claim values from a defined
+namespace in the token.
 
 The `x-hasura-default-role` and `x-hasura-allowed-roles` session variables are required, and you will also most likely
 utilize the user id and any other information which you need to determine access to your data.
@@ -53,16 +53,16 @@ You can enable your application to use JWTs in just a few steps.
 
 ### Step 1. Update your AuthConfig
 
-PromptQL DDN utilizes an [AuthConfig](/reference/metadata-reference/auth-config.mdx) object that allows you to define
-the configuration for your authentication service. In a standard setup the `auth-config.hml` file can be found in your
+PromptQL utilizes an [AuthConfig](/reference/metadata-reference/auth-config.mdx) object that allows you to define the
+configuration for your authentication service. In a standard setup the `auth-config.hml` file can be found in your
 `globals` directory.
 
-:::tip PromptQL VS Code extension
+:::tip VS Code extension
 
-You can use [PromptQL's VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to
-scaffold out your `AuthConfig` object by typing `AuthConfig` and selecting this object from the list of available
-options. As you navigate through the skeleton, you can type `CTRL+SPACEBAR` at any point to reveal options for the
-different key-value pairs.
+You can use [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to scaffold out
+your `AuthConfig` object by typing `AuthConfig` and selecting this object from the list of available options. As you
+navigate through the skeleton, you can type `CTRL+SPACEBAR` at any point to reveal options for the different key-value
+pairs.
 
 :::
 
@@ -129,9 +129,9 @@ The signature secret to verify this token with the HS256 algorithm is `ultra-sec
 :::warning Setting audience check
 
 Certain JWT providers (like Firebase) share JWKs between multiple tenants. They use the `aud` claim of JWT to specify
-the intended tenant for the JWT. Setting the `audience` field in the PromptQL DDN JWT configuration will make sure that
-the `aud` claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other
-tenants to be valid as well.
+the intended tenant for the JWT. Setting the `audience` field in the JWT configuration will make sure that the `aud`
+claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other tenants to
+be valid as well.
 
 In these cases, you **MUST** set the `audience` field to appropriate value. **Failing to do so is a major security
 vulnerability**. Learn how to set this [here](reference/metadata-reference/auth-config.mdx#authconfig-jwtconfig).
@@ -234,9 +234,9 @@ ddn supergraph build local
 
 ### Step 5. Make an authenticated request
 
-In the example above, we're using the `BearerAuthorization` method. As such, as we can make a request to our PromptQL
-DDN instance by including a header with the key-value of `Authorization: Bearer <our-encoded-token>`. For testing, you
-can pass this value in via the [PromptQL Playground client](/auth/playground-auth.mdx).
+In the example above, we're using the `BearerAuthorization` method. As such, as we can make a request to our project by
+including a header with the key-value of `Authorization: Bearer <our-encoded-token>`. For testing, you can pass this
+value in via the [PromptQL Playground client](/auth/playground-auth.mdx).
 
 ## Next steps
 
