@@ -40,9 +40,9 @@ export default function ScoreCompareCharts() {
           x="50%"
           y={20}
           textAnchor="middle"
+          fill="var(--body-text-color)"
           style={{
             fontSize: '16px',
-            fill: '#ffffff',
             fontWeight: 500,
           }}
         >
