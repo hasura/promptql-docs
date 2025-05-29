@@ -134,10 +134,11 @@ const config: Config = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
-    sidebar: {
-      hideable: true,
+    docs: {
+      sidebar: {
+        hideable: true,
+      },
     },
-
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
@@ -177,28 +178,28 @@ const config: Config = {
         },
       ],
     },
-
     prism: {
       theme: prismThemes.dracula,
       additionalLanguages: ['json', 'typescript', 'bash', 'yaml'],
     },
-    stylesheets: [
-      {
-        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
-        rel: 'stylesheet',
-      },
-      {
-        href: 'https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700&display=swap',
-        rel: 'stylesheet',
-      },
-      {
-        href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-        type: 'text/css',
-        integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-        crossorigin: 'anonymous',
-      },
-    ],
+    
   } satisfies Preset.ThemeConfig,
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
+  ],
   markdown: {
     mermaid: true,
   },
