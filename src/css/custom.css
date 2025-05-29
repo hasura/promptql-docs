@@ -1381,6 +1381,11 @@ table td {
   padding: 1rem;
   padding-bottom: 1rem;
   border-radius: 0.5rem;
+  background-color: var(--dropdown-background-color);
+}
+
+[data-theme='dark'] .tabs-container {
+  background-color: #131d2c;
 }
 
 .tabs-container code {
