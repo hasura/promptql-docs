@@ -759,6 +759,7 @@ div:has(> .DocSearch.DocSearch-Button) {
 
 .menu-label {
   font-size: 0.875rem;
+  color: var(--sidebar-title-color);
 }
 
 
@@ -1378,14 +1379,8 @@ table td {
 
 /* Tabs Container */
 .tabs-container {
-  padding: 1rem;
-  padding-bottom: 1rem;
+  padding: 1rem 0;
   border-radius: 0.5rem;
-  background-color: var(--dropdown-background-color);
-}
-
-[data-theme='dark'] .tabs-container {
-  background-color: #131d2c;
 }
 
 .tabs-container code {
