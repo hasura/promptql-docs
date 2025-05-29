@@ -2,7 +2,7 @@
 title: Authentication and Authorization Overview
 sidebar_position: 1
 description:
-  "Learn about Hasura DDN's powerful authentication process. Understand its flexibility to use JWT, webhook, role
+  "Learn about PromptQL DDN's powerful authentication process. Understand its flexibility to use JWT, webhook, role
   emulation and your existing solutions. Control user access to data."
 sidebar_label: Basics
 keywords:
@@ -22,15 +22,15 @@ keywords:
 
 ## Introduction
 
-By default, PromptQL accesses your data through Hasura DDN in [NoAuth](/auth/noauth-mode.mdx) mode as an `admin` user.
-This means that by default on a new installation, it has full access to your data.
+By default, PromptQL accesses your data through DDN in [NoAuth](/auth/noauth-mode.mdx) mode as an `admin` user. This
+means that by default on a new installation, it has full access to your data.
 
 However, you can integrate many popular auth services or use your own custom solution to authenticate users.
 
 After the authentication step, session variables, including a user role, are passed via either a valid JWT or webhook
-response, to the Hasura Engine to be checked against the access control rules or "permissions" to determine what data
-the user can access. This ensures any PromptQL conversations are scoped to only return information that a particular
-user is permitted to access.
+response, to the DDN engine to be checked against the access control rules or "permissions" to determine what data the
+user can access. This ensures any PromptQL conversations are scoped to only return information that a particular user is
+permitted to access.
 
 As you will most often be using PromptQL in the console interface, you can check the auth which the client is using by
 clicing the "Auth" button on the left of the chat textbox.
@@ -46,7 +46,7 @@ Authentication can be set up in one of three modes. These modes and their config
 
 ### JWT mode
 
-Your authentication service must issue JWTs which contain session variables that are passed to the Hasura Engine by the
+Your authentication service must issue JWTs which contain session variables that are passed to the DDN engine by the
 PromptQL client on each request.
 
 [Read more](/auth/jwt/index.mdx).

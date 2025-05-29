@@ -73,7 +73,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzU5MTY3MTgsImV4cCI6MTc5NjkxNjY
 of this example JWT token. The signature secret to verify this token with the HS256 algorithm is
 `ultra-secret-very-secret-super-secret-key`.
 
-## Hasura JWT format
+## PromptQL DDN JWT format
 
 The `x-hasura-role` value can be sent as a plain **header** in the request to indicate the role which should be used.
 
@@ -88,7 +88,7 @@ AuthConfig. Using `claims.jwt.hasura.io` will match our examples.
 3.  Add any other optional `x-hasura-*` claim fields (required as per your defined permissions) to the custom namespace.
 
 To summarize, `x-hasura-allowed-roles` session variable contains a list of all the roles that the user can assume and
-the `x-hasura-role` header tells the Hasura Engine which role to use for the request, and if that is missing then the
+the `x-hasura-role` header tells the DDN engine which role to use for the request, and if that is missing then the
 `x-hasura-default-role` session variable will be used.
 
 This setup makes it more convenient for a JWT to only need to be issued once with a list of allowed roles for the user,
@@ -99,10 +99,10 @@ If, for example, your app will not need to switch user roles and the user only n
 can just issue a JWT with `x-hasura-default-role` set to `user` and `x-hasura-allowed-roles` set to `["user"]` and not
 send the `x-hasura-role` header in the request.
 
-This setup is designed so that there is one authoritative way to construct your JWT token for the Hasura Engine which
-can cover a wide range of use cases.
+This setup is designed so that there is one authoritative way to construct your JWT token for the DDN engine which can
+cover a wide range of use cases.
 
-## Hasura JWT Claim Description
+## PromptQL DDN JWT Claim Description
 
 ### x-hasura-default-role
 
@@ -114,7 +114,7 @@ the header of the request. Usually, this will be the role with the least privile
 
 The `x-hasura-allowed-roles` list can contain all the roles which a particular user can assume, eg:
 `[ "user", "manager", "owner" ]`. Usually, these will have varying degrees of access to your data as specified in
-Permissions and by specifying this list it lets the Hasura Engine know that this user can assume any of them.
+Permissions and by specifying this list it lets the DDN engine know that this user can assume any of them.
 
 ### x-hasura-\*
 
@@ -127,11 +127,11 @@ your auth provider.
 ## JWT Notes
 
 - JWT claim fields eg: `x-hasura-default-role` are case-insensitive.
-- Hasura Engine only has access to headers and JWT claims which are prefixed with `x-hasura-`.
-- Hasura Engine only has access to JWT claims in namespace defined in the `AuthConfig` object in metadata.
+- DDN engine only has access to headers and JWT claims which are prefixed with `x-hasura-`.
+- DDN engine only has access to JWT claims in namespace defined in the `AuthConfig` object in metadata.
 - All `x-hasura-*` values should be of type `String`, they will be converted to the right type automatically.
 
-## Hasura JWT configuration options
+## PromptQL DDN JWT configuration options
 
 ### claimsConfig
 
@@ -140,8 +140,8 @@ You can specify where the engine should look for the claims within the decoded t
 
 #### namespace {#jwt-claims-config-namespace}
 
-The `namespace` option is used when all of the Hasura claims are present in a single object within the decoded JWT. Our
-example uses `claims.jwt.hasura.io` in the [Example Decoded Payload](#example-decoded-payload).
+The `namespace` option is used when all of the PromptQL claims are present in a single object within the decoded JWT.
+Our example uses `claims.jwt.hasura.io` in the [Example Decoded Payload](#example-decoded-payload).
 
 ```yaml
 claimsConfig:
@@ -153,8 +153,8 @@ claimsConfig:
 The `location` field indicates the location of the namespace object that uses
 [RFC 6901 JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) string syntax.
 
-The `claimsFormat` field indicates whether the Hasura-specific claims are a regular JSON object or a stringified JSON.
-The following possible values are allowed: `Json`, `StringifiedJson`.
+The `claimsFormat` field indicates whether the PromptQL DDN-specific claims are a regular JSON object or a stringified
+JSON. The following possible values are allowed: `Json`, `StringifiedJson`.
 
 This is required because providers like AWS Cognito only allow strings in the JWT claims.
 [See #1176](https://github.com/hasura/graphql-engine/issues/1176).
@@ -193,8 +193,8 @@ If `claimsFormat` is `StringifiedJson` then the JWT claims should look like:
 
 #### locations {#jwt-claims-config-locations}
 
-This `locations` option can be used when Hasura claims are not all present in the single object, but individual claims
-are provided a JSON pointer within the decoded JWT. In this option, you can indicate:
+This `locations` option can be used when DDN claims are not all present in the single object, but individual claims are
+provided a JSON pointer within the decoded JWT. In this option, you can indicate:
 
 - a literal value.
 - or a JSON pointer path for individual claims and an optional default value if the claim doesn't exist.
@@ -309,7 +309,7 @@ The following are the possible values:
 
 #### BearerAuthorization
 
-In this mode, Hasura expects an `Authorization` header with a `Bearer` token.
+In this mode, the DDN engine expects an `Authorization` header with a `Bearer` token.
 
 ```yaml
 tokenLocation:
@@ -324,8 +324,8 @@ Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI...
 
 #### Cookie
 
-In the cookie mode, Hasura will try to parse the cookie header with the given cookie name. The value of the cookie
-should be the exact JWT.
+In the cookie mode, the DDN engine will try to parse the cookie header with the given cookie name. The value of the
+cookie should be the exact JWT.
 
 ```yaml
 tokenLocation:
@@ -341,7 +341,7 @@ Cookie: cookie_name=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWI...
 
 #### Header
 
-In the custom header mode, Hasura expects a `header_name` header with the exact JWT token value.
+In the custom header mode, the DDN engine expects a `header_name` header with the exact JWT token value.
 
 ```yaml
 tokenLocation:
@@ -402,7 +402,7 @@ key:
 The JWTs must be signed by the JWK published at the given URL. They can be signed by any algorithm that is compatible
 with the key (eg. `RS256`, `RS384`, `RS512` algorithms require a JWK with an RSA key).
 
-Hasura DDN does not currently support rotating JWKs.
+DDN does not currently support rotating JWKs.
 
 ### audience
 
@@ -440,8 +440,8 @@ definition:
 :::danger Audience Security Vulnerability
 
 Certain JWT providers share JWKs between multiple tenants. They use the `aud` claim of the JWT to specify the intended
-audience. Setting the `audience` field in the Hasura JWT configuration will make sure that the `aud` claim from the JWT
-is also checked during verification. Not doing this check will allow JWTs issued for other tenants to be valid as well.
+audience. Setting the `audience` field in the DDN JWT configuration will make sure that the `aud` claim from the JWT is
+also checked during verification. Not doing this check will allow JWTs issued for other tenants to be valid as well.
 
 In these cases, you **MUST** set the `audience` field to the appropriate value. Failing to do so is a **major security
 vulnerability**.
@@ -482,7 +482,7 @@ definition:
 `allowedSkew` is an optional field to provide some leeway (to account for clock skews) while comparing the JWT expiry
 time. This field expects an integer value which will be the number of seconds of the skew value.
 
-### Hasura JWT Config Examples
+### PromptQL DDN JWT Config Examples
 
 #### HMAC-SHA based
 
@@ -508,7 +508,7 @@ definition:
             value: 3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R
 ```
 
-The `key` is the actual shared secret, which is used by Hasura and the external auth server.
+The `key` is the actual shared secret, which is used by the DDN engine and the external auth server.
 
 #### RSA based
 
@@ -709,8 +709,8 @@ definition:
 ### Setting audience check
 
 Certain JWT providers share JWKs between multiple tenants (like Firebase). They use the `aud` claim of JWT to specify
-the intended tenant for the JWT. Setting the `audience` field in the Hasura JWT configuration will make sure that the
-`aud` claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other
+the intended tenant for the JWT. Setting the `audience` field in the PromptQL DDN JWT configuration will make sure that
+the `aud` claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other
 tenants to be valid as well.
 
 In these cases, you **MUST** set the `audience` field to appropriate value. **Failing to do so is a major security
@@ -719,7 +719,7 @@ vulnerability**.
 ## JWT with the WebSocket protocol
 
 When executing a subscription (or query or mutation) over the WebSocket protocol, the authentication step is executed on
-`connection_init` when the websocket is connected to Hasura Engine and is valid until the expiry of the JWT when in JWT
+`connection_init` when the websocket is connected to DDN engine and is valid until the expiry of the JWT when in JWT
 mode.
 
 Once authenticated, all operations are allowed without further check, until the authentication expires.
@@ -737,8 +737,8 @@ This is a known issue and is documented by AWS in
 > Standard libraries are not compatible with the padding that is included in the Application Load Balancer
 > authentication token in JWT format.
 
-Currently, there is no workaround possible in Hasura. Even if Hasura strips the additional padding the signature
-verification of the token would fail (as Hasura had to tamper the token).
+Currently, there is no workaround possible in DDN. Even if DDN strips the additional padding the signature verification
+of the token would fail (as DDN had to tamper the token).
 
 ### Firebase
 
@@ -746,7 +746,7 @@ Firebase publishes the JWKs at:
 
 [https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com](https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com)
 
-If you are using Firebase and Hasura, use this config:
+If you are using Firebase and PromptQL, use this config:
 
 ```yaml
 kind: AuthConfig
@@ -770,18 +770,18 @@ definition:
 ### Auth0 {#auth0-issues}
 
 Refer to the [Auth0 JWT tutorial](/auth/jwt/tutorials/integrations/1-auth0.mdx) for a detailed guide on integrating
-Auth0 with Hasura.
+Auth0 with PromptQL DDN.
 
 ### Clerk
 
-Clerk integrates with Hasura DDN using JWTs.
+Clerk integrates with PromptQL DDN using JWTs.
 
 Clerk publishes their JWK under: `https://<YOUR_CLERK_FRONTEND_API>/.well-known/jwks.json`
 
 Refer to the [Clerk JWT tutorial](/auth/jwt/tutorials/integrations/4-clerk.mdx) to set up authenticated requests to
-Hasura with Clerk.
+PromptQL DDN with Clerk.
 
 ### Keycloak
 
-By default, Keycloak uses the `RSA-OAEP` algorithm, which Hasura doesn't support. Remove the algorithm in the
+By default, Keycloak uses the `RSA-OAEP` algorithm, which PromptQL DDN doesn't support. Remove the algorithm in the
 `Realm Settings -> Keys -> Add Providers` tab.
