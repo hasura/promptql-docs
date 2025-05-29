@@ -1741,28 +1741,3 @@ pre[class*='language-'] code span.token {
 .sidebar-icon svg rect {
   transition: stroke 0.2s;
 }
-
-/* Style for icons in menu items on hover */
-.menu__link:hover .sidebar-icon svg path,
-.menu__link:hover .sidebar-icon svg line,
-.menu__link:hover .sidebar-icon svg circle,
-.menu__link:hover .sidebar-icon svg rect {
-}
-
-/* Style for icons in active menu items */
-.menu__link--active .sidebar-icon svg path,
-.menu__link--active .sidebar-icon svg line,
-.menu__link--active .sidebar-icon svg circle,
-.menu__link--active .sidebar-icon svg rect {
-}
-
-/* For GraphQL logo which uses fill instead of stroke */
-/* .menu__link:hover .sidebar-icon .graphql-icon path, */
-/* .menu__link--active .sidebar-icon .graphql-icon path { */
-/*   fill: var(--ifm-color-primary) !important; */
-/* } */
-
-/* Make sure text color changes on hover and active states */
-.menu__link:hover .menu-label,
-.menu__link--active .menu-label {
-}
