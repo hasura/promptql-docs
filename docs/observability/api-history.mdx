@@ -1,0 +1,73 @@
+---
+sidebar_position: 4
+sidebar_label: API History
+description: "Monitor and analyze API interactions, usage patterns, and performance metrics"
+keywords:
+  - hasura ddn
+  - api history
+  - observability
+  - promptql api
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# API History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads where PromptQL API calls were made to your project.
+
+- View all threads created through PromptQL API calls
+- Access complete conversation history for each thread
+- Filter threads by date range and search by thread ID
+- Monitor PromptQL API usage patterns and interactions
+
+## Accessing API History
+
+Navigate to the **Insights** tab in your project dashboard, then select **API History**.
+
+<Thumbnail src="/img/observability/api-history-observability.png" alt="API History" />
+
+## Viewing PromptQL API Threads
+
+The API history table displays:
+
+- **Thread ID** - Click to view complete thread details
+- **Thread Name** - Name of the conversation thread
+- **Created At** - When the thread was created
+
+## Date Range Selection
+
+Select a date range to filter threads by creation time. This feature is available on paid plans.
+
+<Thumbnail src="/img/observability/api-history-date-picker-observability.png" alt="API History Date Picker" />
+
+## Search and Filter
+
+Search for specific threads using the search functionality to find threads by ID or name.
+
+## Thread Details
+
+Click on any Thread ID to view the complete conversation history for that thread.
+
+<Thumbnail src="/img/observability/api-history-detail.png" alt="API History Thread Detail" />
+
+The detail page shows:
+- Full chat conversation with all messages
+- User queries and AI responses
+- Complete thread timeline
+- All interactions within that specific thread
+
+## Admin Capabilities
+
+This feature is only available to users with the `admin` role. Monitor PromptQL API usage to:
+- Track threads created through PromptQL API calls
+- Analyze conversation patterns and user interactions
+- Monitor PromptQL API usage across your project
+- Debug issues with PromptQL integrations
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Admin privileges required
+- API calls retained based on your data retention policy

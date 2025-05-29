@@ -1,0 +1,71 @@
+---
+sidebar_position: 3
+sidebar_label: Thread History
+description: "Track and analyze conversation threads and user interactions"
+keywords:
+  - hasura ddn
+  - thread history
+  - observability
+  - conversations
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Thread History
+
+## Introduction
+
+As an admin user, you can access the complete history of all threads created within your project.
+
+- View all threads from every user in your project
+- Access complete conversation history in read-only mode
+- Filter threads by date range and search by thread ID
+- Monitor user interactions and conversation patterns
+
+## Accessing Thread History
+
+Navigate to the **Insights** tab in your project dashboard, then select **Thread History**.
+
+<Thumbnail src="/img/observability/thread-history-observability.png" alt="Thread History" />
+
+## Viewing Threads
+
+The thread history table displays:
+
+- **Thread ID** - Click to view complete conversation
+- **Title** - Name of the thread
+- **Queried By** - User email or "Anonymous User"
+- **Created At** - When the thread was created
+
+## Date Range Selection
+
+Select a date range to filter threads by creation time. This feature is available on paid plans.
+
+<Thumbnail src="/img/observability/thread-history-date-picker-observability.png" alt="Thread History Date Picker" />
+
+## Thread Details
+
+Click on any Thread ID to view the complete conversation in the PromptQL chat interface:
+
+- Full conversation history with all messages
+- Interactive chat interface (read-only for admins)
+- Thread ID displayed with copy functionality
+- Breadcrumb navigation back to thread history
+
+<Thumbnail src="/img/observability/thread-history-detail-observability.png" alt="Thread History Detail" />
+
+## Admin Capabilities
+
+This feature is only available to users with the `admin` role. As an admin, you can view threads in read-only mode, ensuring original conversations remain intact while providing complete visibility.
+
+This feature is valuable for:
+- Troubleshooting user issues
+- Identifying common usage patterns
+- Improving data models based on user queries
+- Monitoring for potential security concerns
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Admin privileges required
+- Threads retained based on your data retention policy
