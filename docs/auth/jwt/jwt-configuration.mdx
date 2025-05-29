@@ -73,7 +73,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MzU5MTY3MTgsImV4cCI6MTc5NjkxNjY
 of this example JWT token. The signature secret to verify this token with the HS256 algorithm is
 `ultra-secret-very-secret-super-secret-key`.
 
-## PromptQL DDN JWT format
+## JWT format
 
 The `x-hasura-role` value can be sent as a plain **header** in the request to indicate the role which should be used.
 
@@ -88,7 +88,7 @@ AuthConfig. Using `claims.jwt.hasura.io` will match our examples.
 3.  Add any other optional `x-hasura-*` claim fields (required as per your defined permissions) to the custom namespace.
 
 To summarize, `x-hasura-allowed-roles` session variable contains a list of all the roles that the user can assume and
-the `x-hasura-role` header tells the DDN engine which role to use for the request, and if that is missing then the
+the `x-hasura-role` header tells the engine which role to use for the request, and if that is missing then the
 `x-hasura-default-role` session variable will be used.
 
 This setup makes it more convenient for a JWT to only need to be issued once with a list of allowed roles for the user,
@@ -99,10 +99,10 @@ If, for example, your app will not need to switch user roles and the user only n
 can just issue a JWT with `x-hasura-default-role` set to `user` and `x-hasura-allowed-roles` set to `["user"]` and not
 send the `x-hasura-role` header in the request.
 
-This setup is designed so that there is one authoritative way to construct your JWT token for the DDN engine which can
-cover a wide range of use cases.
+This setup is designed so that there is one authoritative way to construct your JWT token for the engine which can cover
+a wide range of use cases.
 
-## PromptQL DDN JWT Claim Description
+## JWT Claim Description
 
 ### x-hasura-default-role
 
@@ -114,7 +114,7 @@ the header of the request. Usually, this will be the role with the least privile
 
 The `x-hasura-allowed-roles` list can contain all the roles which a particular user can assume, eg:
 `[ "user", "manager", "owner" ]`. Usually, these will have varying degrees of access to your data as specified in
-Permissions and by specifying this list it lets the DDN engine know that this user can assume any of them.
+Permissions and by specifying this list it lets the engine know that this user can assume any of them.
 
 ### x-hasura-\*
 
@@ -127,11 +127,11 @@ your auth provider.
 ## JWT Notes
 
 - JWT claim fields eg: `x-hasura-default-role` are case-insensitive.
-- DDN engine only has access to headers and JWT claims which are prefixed with `x-hasura-`.
-- DDN engine only has access to JWT claims in namespace defined in the `AuthConfig` object in metadata.
+- The engine only has access to headers and JWT claims which are prefixed with `x-hasura-`.
+- The engine only has access to JWT claims in namespace defined in the `AuthConfig` object in metadata.
 - All `x-hasura-*` values should be of type `String`, they will be converted to the right type automatically.
 
-## PromptQL DDN JWT configuration options
+## JWT configuration options
 
 ### claimsConfig
 
@@ -153,8 +153,8 @@ claimsConfig:
 The `location` field indicates the location of the namespace object that uses
 [RFC 6901 JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) string syntax.
 
-The `claimsFormat` field indicates whether the PromptQL DDN-specific claims are a regular JSON object or a stringified
-JSON. The following possible values are allowed: `Json`, `StringifiedJson`.
+The `claimsFormat` field indicates whether the PromptQL-specific claims are a regular JSON object or a stringified JSON.
+The following possible values are allowed: `Json`, `StringifiedJson`.
 
 This is required because providers like AWS Cognito only allow strings in the JWT claims.
 [See #1176](https://github.com/hasura/graphql-engine/issues/1176).
@@ -309,7 +309,7 @@ The following are the possible values:
 
 #### BearerAuthorization
 
-In this mode, the DDN engine expects an `Authorization` header with a `Bearer` token.
+In this mode, the engine expects an `Authorization` header with a `Bearer` token.
 
 ```yaml
 tokenLocation:
@@ -402,7 +402,7 @@ key:
 The JWTs must be signed by the JWK published at the given URL. They can be signed by any algorithm that is compatible
 with the key (eg. `RS256`, `RS384`, `RS512` algorithms require a JWK with an RSA key).
 
-DDN does not currently support rotating JWKs.
+The engine does not currently support rotating JWKs.
 
 ### audience
 
@@ -482,7 +482,7 @@ definition:
 `allowedSkew` is an optional field to provide some leeway (to account for clock skews) while comparing the JWT expiry
 time. This field expects an integer value which will be the number of seconds of the skew value.
 
-### PromptQL DDN JWT Config Examples
+### JWT Config Examples
 
 #### HMAC-SHA based
 
@@ -508,7 +508,7 @@ definition:
             value: 3EK6FD+o0+c7tzBNVfjpMkNDi2yARAAKzQlk8O2IKoxQu4nF7EdAh8s3TwpHwrdWT6R
 ```
 
-The `key` is the actual shared secret, which is used by the DDN engine and the external auth server.
+The `key` is the actual shared secret, which is used by the engine and the external auth server.
 
 #### RSA based
 
@@ -709,9 +709,9 @@ definition:
 ### Setting audience check
 
 Certain JWT providers share JWKs between multiple tenants (like Firebase). They use the `aud` claim of JWT to specify
-the intended tenant for the JWT. Setting the `audience` field in the PromptQL DDN JWT configuration will make sure that
-the `aud` claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other
-tenants to be valid as well.
+the intended tenant for the JWT. Setting the `audience` field in the JWT configuration will make sure that the `aud`
+claim from the JWT is also checked during verification. Not doing this check will allow JWTs issued for other tenants to
+be valid as well.
 
 In these cases, you **MUST** set the `audience` field to appropriate value. **Failing to do so is a major security
 vulnerability**.
@@ -719,7 +719,7 @@ vulnerability**.
 ## JWT with the WebSocket protocol
 
 When executing a subscription (or query or mutation) over the WebSocket protocol, the authentication step is executed on
-`connection_init` when the websocket is connected to DDN engine and is valid until the expiry of the JWT when in JWT
+`connection_init` when the websocket is connected to the engine and is valid until the expiry of the JWT when in JWT
 mode.
 
 Once authenticated, all operations are allowed without further check, until the authentication expires.
@@ -737,8 +737,8 @@ This is a known issue and is documented by AWS in
 > Standard libraries are not compatible with the padding that is included in the Application Load Balancer
 > authentication token in JWT format.
 
-Currently, there is no workaround possible in DDN. Even if DDN strips the additional padding the signature verification
-of the token would fail (as DDN had to tamper the token).
+Currently, there is no workaround possible. Even if the engine strips the additional padding the signature verification
+of the token would fail (as we had to tamper the token).
 
 ### Firebase
 
@@ -770,18 +770,18 @@ definition:
 ### Auth0 {#auth0-issues}
 
 Refer to the [Auth0 JWT tutorial](/auth/jwt/tutorials/integrations/1-auth0.mdx) for a detailed guide on integrating
-Auth0 with PromptQL DDN.
+Auth0 with your project.
 
 ### Clerk
 
-Clerk integrates with PromptQL DDN using JWTs.
+Clerk integrates with your project using JWTs.
 
 Clerk publishes their JWK under: `https://<YOUR_CLERK_FRONTEND_API>/.well-known/jwks.json`
 
-Refer to the [Clerk JWT tutorial](/auth/jwt/tutorials/integrations/4-clerk.mdx) to set up authenticated requests to
-PromptQL DDN with Clerk.
+Refer to the [Clerk JWT tutorial](/auth/jwt/tutorials/integrations/4-clerk.mdx) to set up authenticated requests to your
+project with Clerk.
 
 ### Keycloak
 
-By default, Keycloak uses the `RSA-OAEP` algorithm, which PromptQL DDN doesn't support. Remove the algorithm in the
+By default, Keycloak uses the `RSA-OAEP` algorithm, which the engine doesn't support. Remove the algorithm in the
 `Realm Settings -> Keys -> Add Providers` tab.
