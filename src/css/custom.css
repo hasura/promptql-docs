@@ -37,7 +37,7 @@
   --inline-code-bg: #f3f4f6;
   --inline-code-border: #e5e7eb;
   --blockquote-margin: #aceb94;
-  --body-list-item-color: #6b7280;
+  --body-list-item-color: var(--heading-color);
   --sidebar-divider: var(--button-drop-shadow);
 
   /* Admonition Colors */
@@ -136,7 +136,7 @@ html[data-theme='dark'] {
   --blockquote-margin: #4ade80;
   --admonition-text-color: #d1d5db;
   --admonition-inline-text-color: #374151;
-  --body-list-item-color: #6b7280;
+  --body-list-item-color: var(--heading-color);
   --sidebar-divider: #1f2937;
 
   --note-bg: #1f2937;
