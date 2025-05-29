@@ -57,7 +57,7 @@ Enter a name for your Action such as `PromptQL JWT Claims` and paste the followi
 ```javascript
 exports.onExecutePostLogin = async (event, api) => {
   const namespace = "claims.jwt.hasura.io";
-  // Here, you'll need to fetch the user's role from PromptQL DDN using an admin-level authenticated request
+  // Here, you'll need to fetch the user's role from DDN using an admin-level authenticated request
   // Learn more here: https://hasura.io/docs/3.0/auth/authentication/jwt/special-roles
   // Below, we're hard-coding the value for now
   const user_role = "user"; // the role returned from your request ☝️
