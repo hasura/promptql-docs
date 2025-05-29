@@ -16,25 +16,21 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-PromptQL traces provide detailed execution monitoring for your PromptQL API operations using OpenTelemetry format. Track thread interactions, API requests, and performance metrics to debug issues and optimize your AI-powered applications.
+PromptQL traces provide detailed execution monitoring for your PromptQL API operations using OpenTelemetry format. Track
+thread interactions, API requests, and performance metrics to debug issues and optimize your AI-powered applications.
 
 PromptQL traces capture:
+
 - Thread operations (start, continue)
 - API requests (natural language queries, program execution)
 - Request duration and status
 - Thread and trace relationships
 
-## Accessing PromptQL Traces
+## Accessing traces
 
 Navigate to the **Insights** tab in your project dashboard, then select **PromptQL Traces**.
 
-## Traces Table
-
-<Thumbnail
-  src="/img/observability/promptql-traces-observability.png"
-  alt="PromptQL Traces Table"
-  width="1000px"
-/>
+<Thumbnail src="/img/observability/promptql-traces-observability.png" alt="PromptQL Traces Table" width="1000px" />
 
 The traces table displays the following columns:
 
@@ -49,11 +45,13 @@ The traces table displays the following columns:
 - **Start Time** - When the operation occurred (local timezone)
 - **Status** - Success (green checkmark) or Error (red warning)
 
-## Filtering and Search
+:::info Filtering & Search
 
-Filter traces by request type (Requests/Errors), search by Thread ID or Trace ID, and select custom date ranges (paid plans). Use the refresh button to reload data and reset filters.
+Filter traces by request type (Requests/Errors), search by Thread ID or Trace ID, and select custom date ranges.
 
-## Trace Details
+:::
+
+## Trace details
 
 Click on any Trace ID to view detailed trace information:
 
@@ -63,13 +61,14 @@ Click on any Trace ID to view detailed trace information:
   width="1000px"
 />
 
-### Overview Section
-- **Thread ID** - Associated thread (if applicable) with copy functionality
-- **Start Time** - When the trace began
-- **Duration** - Total execution time in milliseconds
+### Overview section
 
-### Execution Waterfall
+The overview section includes general information, such as the thread's ID, its start time, and the duration.
+
+### Execution waterfall
+
 The execution section shows:
+
 - **Span hierarchy** - Visual representation of trace spans
 - **Timing information** - Duration and timing for each span
 - **Error details** - Stack traces and error messages for failed operations
