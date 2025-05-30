@@ -41,12 +41,16 @@
   right: 0;
   top: 100%;
   margin-top: 8px;
-  background-color: var(--ifm-background-color);
+  background-color: #ffffff;
   border: 1px solid var(--ifm-color-emphasis-300);
   border-radius: 4px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   min-width: 200px;
   z-index: 1000;
+}
+
+[data-theme='dark'] .dropdown {
+  background-color: var(--ifm-background-color);
 }
 
 .dropdownItem {
