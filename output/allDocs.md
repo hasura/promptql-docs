@@ -6415,6 +6415,14 @@ Send messages to PromptQL and receive responses, optionally in a streaming forma
 
 `POST https://api.promptql.pro.hasura.io/query`
 
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change. Eg: For `my-private-ddn`:
+
+`https://promptql.my-private-ddn.private-ddn.hasura.app/api/query`
+
+:::
+
 **Headers**
 
 ```
@@ -6721,6 +6729,14 @@ Execute a PromptQL program with your data.
 ### Request
 
 `POST https://api.promptql.pro.hasura.io/execute_program`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change. Eg: For `my-private-ddn`:
+
+`https://promptql.my-private-ddn.private-ddn.hasura.app/api/execute_program`
+
+:::
 
 **Headers**
 
