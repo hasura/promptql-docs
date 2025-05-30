@@ -16,8 +16,8 @@ toc_max_heading_level: 3
 
 ## Introduction
 
-After you've created a DDN supergraph to use with PromptQL, you'll often need to iterate on your data model — whether
-you're adding a new table, refining a command, or evolving your business logic.
+After you've created a metadata to use with PromptQL, you'll often need to iterate on your data model — whether you're
+adding a new table, refining a command, or evolving your business logic.
 
 This guide explains when and why you need to run `ddn supergraph build local` to ensure your changes are reflected in
 your API.
@@ -43,8 +43,8 @@ rebuilding.
 
 Whether your metadata changes are generated via the CLI or you've hand-authored a change (using the
 [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura)), you'll need to create a new
-build of your application. This will ensure the JSON configuration files consumed by your Hasura Engine are updated with
-the latest changes.
+build of your application. This will ensure the JSON configuration files consumed by the engine are updated with the
+latest changes.
 
 ### You make changes to your underlying data model
 
@@ -95,11 +95,11 @@ context. See more about [semantic information here](/data-modeling/semantic-info
 ddn supergraph build local
 ```
 
-:::info Build for Hasura Cloud
+:::info Build for PromptQL Cloud
 
-You can also build a new supergraph for a project on Hasura Cloud:
+You can also build a new supergraph for a project on PromptQL Cloud:
 
-If you don't have a project on Hasura Cloud, you can create one by running:
+If you don't have a project on PromptQL Cloud, you can create one by running:
 
 ```ddn
 ddn project init

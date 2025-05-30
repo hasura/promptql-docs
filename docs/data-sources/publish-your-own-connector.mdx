@@ -2,7 +2,8 @@
 sidebar_position: 5
 sidebar_label: Publish a Data Connector
 description:
-  "Learn how to publish your own data connector to the Hasura Connector Hub, empowering the entire community to use it!"
+  "Learn how to publish your own data connector to the PromptQL Connector Hub, empowering the entire community to use
+  it!"
 keywords:
   - hasura ddn
   - data sources
@@ -15,16 +16,16 @@ keywords:
 ## Introduction
 
 This guide is for **connector authors** and details the automated process for publishing new connectors and updating
-existing versions on the [Hasura Connector Hub](https://hasura.io/connectors), which is powered by
+existing versions on the [Connector Hub](https://hasura.io/connectors), which is powered by
 [the `ndc-hub` repository](https://github.com/hasura/ndc-hub).
 
 The automated publication process simplifies and accelerates the deployment of NDC connectors by:
 
 - Managing documentation updates
 - Streamlining the approval workflow
-- Uploading connector packages to Hasura DDN
-- Updating the Hasura Hub Registry database so connectors can be deployed on DDN
-- Making a new connector/connector version available in the DDN ecosystem
+- Uploading connector packages to PromptQL Cloud
+- Updating the Hub Registry database so connectors can be deployed on PromptQL Cloud
+- Making a new connector/connector version available in the ecosystem
 
 :::info How do I build a connector?
 
@@ -162,21 +163,21 @@ The `metadata.json` file in your connector's folder contains crucial information
   - **latest_version**: The most recent version of your connector.
 
 - **author**: Information about the connector's author or organization.
-- **is_verified**: Set this to `false` as only connectors developed by Hasura can be tagged as verified.
-- **is_hosted_by_hasura**: Set this to `false` as connectors not developed by Hasura cannot be hosted by Hasura.
+- **is_verified**: Set this to `false` as only connectors developed by PromptQL can be tagged as verified.
+- **is_hosted_by_hasura**: Set this to `false` as connectors not developed by PromptQL cannot be hosted by PromptQL.
 
 ### Step 5. Submit for review
 
 1. Commit all your changes to a new branch.
 2. Create a pull request targeting the `main` branch of the `ndc-hub` repository.
 3. In the pull request description provide any additional context about your new connector.
-4. Wait for review and approval from the Hasura team.
+4. Wait for review and approval from the PromptQL team.
 
 #### Post-approval process
 
 Once your pull request is approved and merged:
 
-- The new connector will be added to the Hasura Hub Registry.
+- The new connector will be added to the Hub Registry.
 - It will become available in the staging environment for testing.
 - After successful testing, it will be published to the production environment.
 
@@ -212,7 +213,7 @@ registry/
 
 1. Commit your changes to a new branch.
 2. Create a pull request targeting the `main` branch of the `ndc-hub` repository.
-3. Wait for approval from a Hasura team member.
+3. Wait for approval from a PromptQL team member.
 
 #### Post-approval process
 
@@ -220,7 +221,7 @@ Once the pull request is approved, the GitHub workflow will automatically:
 
 - Run the registry automation program.
 - Upload connector packages.
-- Update the Hasura Hub Registry database.
+- Update the PromptQL Hub Registry database.
 
 ## Development workflow
 
@@ -249,7 +250,7 @@ For each commit:
 
 - The `registry-updates` workflow runs automatically.
 - It validates the changes in the registry folder, including the `connector-packaging.json` file.
-- If validation is successful, it updates the connector information on the `staging` Hasura DDN environment.
+- If validation is successful, it updates the connector information on the `staging` PromptQL environment.
 - Each new commit overwrites the previous version of that connector on the `staging` environment.
 
 ### Continuous updates
@@ -265,7 +266,7 @@ This process allows for continuous iteration and testing in the staging environm
 Once the pull request is approved and merged into the `main` branch:
 
 - The final version of the connector (based on the last commit in the PR) is automatically published to the `production`
-  Hasura DDN.
+  PromptQL Cloud.
 - This process ensures that only thoroughly reviewed and tested connector versions reach the `production` environment.
 
 ### Important Notes
