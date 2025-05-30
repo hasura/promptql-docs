@@ -1,0 +1,81 @@
+---
+sidebar_position: 3
+sidebar_label: Chat History
+description: "Track and analyze playground conversation chats and user interactions"
+keywords:
+  - hasura ddn
+  - chat history
+  - observability
+  - conversations
+  - PromptQL Playground
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Chat History
+
+## Introduction
+
+As an admin user, you can access the complete history of all chats created within your project via the **PromptQL
+Playground**. This powerful feature allows you to monitor conversations, review interactions, and gain insights into how
+users are engaging with your data.
+
+- View all chats from every user in your project
+- Access complete conversation history in read-only mode
+- Filter and search through chats to find specific interactions
+- Analyze usage patterns and identify common queries
+
+## Access Chat history
+
+Navigate to the **Insights** tab in your project dashboard, then select the **Chat History** section to view all chats.
+
+<Thumbnail src="/img/observability/thread-history-1.png" alt="Chat History Location" />
+
+## Select date range
+
+The Chat History interface allows you to select a date range to filter the chats.
+
+<Thumbnail src="/img/observability/thread-history-2.png" alt="Chat History List" />
+
+## View Chats
+
+The Chat History interface displays all conversations in a chronological list. Each entry shows:
+
+- Thread ID
+- Thread title
+- User who created the chat
+- Creation date and time
+
+<Thumbnail src="/img/observability/thread-history-3.png" alt="Chat History List" />
+
+## Chat details
+
+Click on any thread ID to view its complete contents. The detailed view provides:
+
+- Full conversation history
+- All queries executed within the chat
+- Any visualizations or results generated
+- Timestamps for each interaction
+- Thread ID displayed with copy functionality
+- Breadcrumb navigation back to Chat history
+
+<Thumbnail src="/img/observability/thread-history-4.png" alt="Chat History Detail View" />
+
+## Admin capabilities
+
+This feature is only available to users with the `admin` role. As an admin, you can view chats in read-only mode. This
+ensures that the original conversations remain intact while still providing complete visibility into how users are
+interacting with your data.
+
+This feature is particularly valuable for:
+
+- Troubleshooting user issues
+- Identifying common usage patterns
+- Improving data models based on user queries
+- Monitoring for potential misuse or security concerns
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Admin privileges required
+- Chats retained based on your data retention policy
