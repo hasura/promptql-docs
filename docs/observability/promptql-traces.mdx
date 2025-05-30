@@ -1,0 +1,81 @@
+---
+sidebar_position: 2
+sidebar_label: PromptQL Traces
+description: "Monitor and analyze PromptQL API execution with detailed OpenTelemetry tracing"
+keywords:
+  - hasura ddn
+  - promptql traces
+  - observability
+  - tracing
+  - opentelemetry
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# PromptQL Traces
+
+## Introduction
+
+PromptQL traces provide detailed execution monitoring for your PromptQL API operations using OpenTelemetry format. Track
+thread interactions, API requests, and performance metrics to debug issues and optimize your AI-powered applications.
+
+PromptQL traces capture:
+
+- Thread operations (start, continue)
+- API requests (natural language queries, program execution)
+- Request duration and status
+- Thread and trace relationships
+
+## Accessing traces
+
+Navigate to the **Insights** tab in your project dashboard, then select **PromptQL Traces**.
+
+<Thumbnail src="/img/observability/promptql-traces-observability.png" alt="PromptQL Traces Table" width="1000px" />
+
+The traces table displays the following columns:
+
+- **Trace ID** - Unique identifier for the trace (clickable to view details)
+- **Thread ID** - Associated thread identifier or operation type for API requests
+- **Operation** - The specific PromptQL operation performed:
+  - `Start thread` - New thread creation
+  - `Continue thread` - Thread continuation
+  - `Execute Program` - Program execution API call
+  - `Natural Language Query` - Query API call
+- **Duration** - Execution time in seconds
+- **Start Time** - When the operation occurred (local timezone)
+- **Status** - Success (green checkmark) or Error (red warning)
+
+:::info Filtering & Search
+
+Filter traces by request type (Requests/Errors), search by Thread ID or Trace ID, and select custom date ranges.
+
+:::
+
+## Trace details
+
+Click on any Trace ID to view detailed trace information:
+
+<Thumbnail
+  src="/img/observability/promptql-trace-detail-observability.png"
+  alt="PromptQL Trace Details"
+  width="1000px"
+/>
+
+### Overview section
+
+The overview section includes general information, such as the thread's ID, its start time, and the duration.
+
+### Execution waterfall
+
+The execution section shows:
+
+- **Span hierarchy** - Visual representation of trace spans
+- **Timing information** - Duration and timing for each span
+- **Error details** - Stack traces and error messages for failed operations
+- **Performance metrics** - Detailed timing breakdown
+
+## Requirements
+
+- PromptQL must be enabled for your project
+- Valid project FQDN required for trace collection
+- Traces are retained based on your data retention policy
