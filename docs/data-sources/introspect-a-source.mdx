@@ -15,7 +15,7 @@ keywords:
 ## Introduction
 
 This guide explains how to use a connector to introspect a data source. After introspection, you'll be ready to begin
-generating Hasura metadata that represents resources (such as tables or collections) in your data source.
+generating metadata that represents resources (such as tables or collections) in your data source.
 
 This metadata will act as the blueprint for your application and will empower PromptQL with the structure it needs to
 understand your data, generate accurate responses, and take meaningful action.
@@ -47,16 +47,16 @@ two files, both located in your connector's directory:
 
 :::info When to use this command
 
-This command will be used at least once with every connector; Hasura **must** introspect your data source in order to
+This command will be used at least once with every connector; you **must** introspect your data source in order to
 understand the resources that are present.
 
-**Additionally, any time you modify your source schema, you should re-run this command to ensure your Hasura metadata is
+**Additionally, any time you modify your source schema, you should re-run this command to ensure your metadata is
 up-to-date with your source schema.**
 
 :::
 
 ## Next steps
 
-With your source introspected and the configuration files populated, you can now start creating Hasura metadata that
-will represent your source's schema in your application. Check out the [Data Modeling](/data-modeling/overview.mdx)
-section to begin creating models, commands, and relationships for your data.
+With your source introspected and the configuration files populated, you can now start creating metadata that will
+represent your source's schema in your application. Check out the [Data Modeling](/data-modeling/overview.mdx) section
+to begin creating models, commands, and relationships for your data.

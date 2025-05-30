@@ -2,7 +2,7 @@
 sidebar_position: 1
 sidebar_label: Basics
 description:
-  "Data modeling with Hasura DDN is simultaneously simple and powerful. Learn how to model your data with Hasura DDN to
+  "Data modeling with PromptQL is simultaneously simple and powerful. Learn how to model your data with PromptQL DDN to
   get the best API performance on top of your data."
 keywords:
   - hasura ddn
@@ -19,22 +19,21 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 ## Introduction
 
-To power PromptQL, Hasura DDN defines your API schema declaratively. An approach that centralizes all your data
+To power PromptQL, we define your API schema declaratively using metadata. This approach centralizes all your data
 collections, operations, relationships, and permissions in one place. This makes it easy to organize, modify, secure,
 reason about, and grow the schema which represents your API which is is accessed via PromptQL.
 
 ## Lifecycle
 
-PromptQL uses Hasura DDN to define your API schema.
+PromptQL uses this metadata to define your API schema.
 
-Hasura DDN uses data connectors to connect to your data sources.
+The engine uses data connectors to connect to your data sources.
 
-Data connectors introspect the source to understand the source schema.
+These connectors introspect the source to understand the source schema.
 
 The DDN CLI uses the introspection results to generate the API schema metadata objects. This can also be done manually.
 
-The metadata is then "built" by the DDN CLI into a format which the Hasura engine can use to provide information to
-PromptQL.
+The metadata is then "built" by the CLI into a format which the engine can use to provide information to PromptQL.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
 
