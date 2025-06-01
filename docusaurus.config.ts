@@ -30,11 +30,11 @@ const config: Config = {
   favicon: 'img/favicon.png',
 
   // Set the production url of your site here
-  url: 'https://hasura.io',
+  url: 'https://promptql.io',
 
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: process.env.CF_PAGES === '1' ? '/' : '/docs/promptql',
+  baseUrl: process.env.CF_PAGES === '1' ? '/' : '/docs',
   trailingSlash: true,
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
