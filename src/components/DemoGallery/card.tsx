@@ -9,15 +9,15 @@ export interface DemoCardProps {
 
 export default function DemoCard({ IconComponent, href, title, description }: DemoCardProps) {
   return (
-    <a href={href} className="demo-box" target="_blank">
+    <div className="demo-box">
       <div className="icon-wrapper">
         <IconComponent className="demo-icon" />
       </div>
       <h3>{title}</h3>
       <p>{description}</p>
-      <div className="demo-cta-button" data-demo-industry={title.toLowerCase()}>
+      <a href={href} target="_blank" className="demo-cta-button" data-demo-industry={title.toLowerCase()}>
         Explore the {title} demo
-      </div>
-    </a>
+      </a>
+    </div>
   );
 }

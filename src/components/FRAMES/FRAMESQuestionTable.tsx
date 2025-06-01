@@ -104,7 +104,7 @@ const FRAMESQuestionTable = () => {
   const collapse_button_style = {
     width: '100%',
     padding: '1rem 0',
-    color: '#B6FC34',
+    color: 'var(--heading-text)',
     background: 'transparent',
     fontWeight: '800',
     fontSize: '1.25rem',
@@ -306,7 +306,7 @@ const FRAMESQuestionTable = () => {
               width: '100%',
               height: '8rem',
               bottom: '40px',
-              background: 'linear-gradient(to top, black 20%, transparent 100%)',
+              background: 'linear-gradient(to top, var(--main-bg-color) 20%, transparent 100%)',
             }}
           />
           <button onClick={() => setIsExpanded(true)} style={{ ...collapse_button_style }}>

@@ -97,7 +97,7 @@ const ChartContainer = React.forwardRef<
           }
           
           .chart-container .recharts-rectangle.recharts-tooltip-cursor {
-            fill: #374151; /* dark muted */
+            fill: transparent !important;
           }
           
           .chart-container .recharts-reference-line [stroke='#ccc'] {
@@ -407,7 +407,6 @@ const ChartLegendContent = React.forwardRef<
           align-items: center;
           justify-content: center;
           gap: 1rem;
-          color: #e5e7eb;
         }
         
         .legend-item {
@@ -419,7 +418,6 @@ const ChartLegendContent = React.forwardRef<
         .legend-item > svg {
           height: 0.75rem;
           width: 0.75rem;
-          color: #9ca3af;
         }
         
         .legend-icon {

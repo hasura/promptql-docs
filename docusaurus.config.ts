@@ -131,12 +131,14 @@ const config: Config = {
   themeConfig: {
     colorMode: {
       defaultMode: 'dark',
-      disableSwitch: true,
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
-    sidebar: {
-      hideable: true,
+    docs: {
+      sidebar: {
+        hideable: true,
+      },
     },
-
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
     algolia: {
@@ -149,10 +151,10 @@ const config: Config = {
       title: '',
       hideOnScroll: true,
       logo: {
-        alt: 'Hasura Logo',
-        src: 'img/prompt-ql-beta@2x.png',
+        alt: 'PromptQL Logo',
+        src: 'img/pql-logo-large.svg',
         href: '/index',
-        srcDark: '/img/prompt-ql-beta@2x.png',
+        srcDark: '/img/pql-logo-large-dark-mode.svg',
       },
       items: [
         {
@@ -176,21 +178,28 @@ const config: Config = {
         },
       ],
     },
-
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.dracula,
       additionalLanguages: ['json', 'typescript', 'bash', 'yaml'],
     },
-    stylesheets: [
-      {
-        href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-        type: 'text/css',
-        integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-        crossorigin: 'anonymous',
-      },
-    ],
+    
   } satisfies Preset.ThemeConfig,
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
+  ],
   markdown: {
     mermaid: true,
   },
