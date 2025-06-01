@@ -36,7 +36,7 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
               <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
                 <TwitterIcon />
               </a>
-              <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
+              <a href="https://forum.promptql.io" target="_blank" rel="noopener noreferrer">
                 <DiscourseIcon />
               </a>
               <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">

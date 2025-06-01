@@ -163,8 +163,8 @@ export const Feedback = () => {
                     GitHub issue
                   </a>{' '}
                   if you think this is a bug, or check out our{' '}
-                  <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
-                    Hasura Community Forum
+                  <a href="https://forum.promptql.io" target="_blank" rel="noopener noreferrer">
+                    PromptQL Community Forum
                   </a>
                   , where Hasurians and community users are ready to engage.
                 </p>

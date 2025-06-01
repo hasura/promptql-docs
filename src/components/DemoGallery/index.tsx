@@ -90,7 +90,7 @@ export default function DemoGallery() {
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="var(--heading-color)"
+            stroke="#000000"
             strokeWidth="2"
           >
             <polyline points="6,9 12,15 18,9" />
