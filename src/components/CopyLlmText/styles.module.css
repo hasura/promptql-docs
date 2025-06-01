@@ -49,6 +49,10 @@
   z-index: 1000;
 }
 
+[data-theme='dark'] .dropdown {
+  background-color: var(--ifm-background-color);
+}
+
 .dropdownItem {
   display: block;
   width: 100%;
