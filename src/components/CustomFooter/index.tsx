@@ -39,7 +39,7 @@ const CustomFooter = () => {
           </Link>
         </div>
         <div className={styles['socialBrands']}>
-          <Link href={'https://forum.hasura.io'} rel="noopener noreferrer" aria-label={'Hasura Community Forum'}>
+          <Link href={'https://forum.promptql.io'} rel="noopener noreferrer" aria-label={'PromptQL Community Forum'}>
             <DiscourseIcon />
           </Link>
         </div>
