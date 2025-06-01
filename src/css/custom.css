@@ -94,7 +94,7 @@
   --ifm-color-primary-dark: #abfc16;
   --ifm-color-primary-darker: #a6fb07;
   --ifm-color-primary-darkest: #89d203;
-  --ifm-color-primary-light: #c1fc52;
+  --ifm-color-primary-light: #DAFD9A;
   --ifm-color-primary-lighter: #c6fd61;
   --ifm-color-primary-lightest: #d6fd8e;
   --ifm-code-font-size: 95%;
@@ -1597,8 +1597,8 @@ pre[class*='language-'] code span.token {
 }
 
 .docs-doc-id-index .demo-expand-button {
-  border: 1px solid var(--heading-color);
-  background: transparent;
+  background: var(--ifm-color-primary-light);
+  border: none;
   border-radius: 50%;
   width: 48px;
   height: 48px;
@@ -1607,10 +1607,11 @@ pre[class*='language-'] code span.token {
   justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
-  color: var(--heading-color);
+  color: #000000;
 }
 
 .docs-doc-id-index .demo-expand-button:hover {
+  background: var(--ifm-color-primary);
   transform: translateY(-2px);
 }
 
@@ -1687,10 +1688,10 @@ pre[class*='language-'] code span.token {
 
 .docs-doc-id-index .homepage-demo-grid .demo-box .demo-cta-button {
   display: inline-block;
-  border: solid 1px var(--heading-color);
   padding: 0.5rem 1rem;
   border-radius: 20px;
-  color: var(--heading-color) !important;
+  background-color: var(--ifm-color-primary-light);
+  color: #000000 !important;
   text-decoration: none;
   font-weight: 500;
   font-size: 0.8rem;
@@ -1699,30 +1700,9 @@ pre[class*='language-'] code span.token {
 }
 
 .docs-doc-id-index .homepage-demo-grid .demo-box .demo-cta-button:hover {
-  border: solid 1px var(--ifm-color-primary);
-}
-
-.docs-doc-id-index .cta-button-demos {
-  display: inline-block;
   background-color: var(--ifm-color-primary);
-  padding: 0.2rem 0.8rem;
-  border-radius: 20px;
-  color: #000000 !important;
-  text-decoration: none;
-  font-weight: 500;
-  margin-top: 1rem;
-  transition: background-color 0.2s;
 }
 
-.docs-doc-id-index .cta-button-demos a p {
-  color: #000000 !important;
-}
-
-.docs-doc-id-index .cta-button-demos:hover {
-  background-color: var(--ifm-color-primary-darker);
-  text-decoration: none;
-  color: #000000 !important;
-}
 
 .sidebar-divider-bottom {
   border-bottom: 2px solid var(--sidebar-divider) !important;
