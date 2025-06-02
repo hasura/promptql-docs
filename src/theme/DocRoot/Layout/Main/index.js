@@ -33,16 +33,16 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
               <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
                 <GithubIcon />
               </a>
-              <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
+              <a href="https://x.com/PromptQL" target="_blank" rel="noopener noreferrer">
                 <TwitterIcon />
               </a>
               <a href="https://forum.promptql.io" target="_blank" rel="noopener noreferrer">
                 <DiscourseIcon />
               </a>
-              <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.youtube.com/@PromptQL" target="_blank" rel="noopener noreferrer">
                 <YoutubeIcon />
               </a>
-              <a href="https://www.linkedin.com/company/hasura" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/company/promptql-io" target="_blank" rel="noopener noreferrer">
                 <LinkedinIcon />
               </a>
             </div>
