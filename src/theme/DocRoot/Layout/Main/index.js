@@ -8,6 +8,7 @@ import TwitterIcon from '@site/static/icons/twitter.svg';
 import DiscourseIcon from '@site/static/icons/discourse.svg';
 import YoutubeIcon from '@site/static/icons/youtube.svg';
 import LinkedinIcon from '@site/static/icons/linkedin.svg';
+import PromptQlIcon from '@site/static/img/icon-light.svg';
 
 export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) {
   const sidebar = useDocsSidebar();
@@ -30,6 +31,9 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
             </div>
             <div className={styles.footerCopyright}>© {new Date().getFullYear()} Hasura Inc. All rights reserved</div>
             <div className={styles.footerSocial}>
+              <a href="https://promptql.io" target="_blank" rel="noopener noreferrer">
+                <PromptQlIcon />
+              </a>
               <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
                 <GithubIcon />
               </a>
