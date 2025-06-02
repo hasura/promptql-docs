@@ -141,12 +141,12 @@ const config: Config = {
     },
     // Replace with your project's social card
     image: 'img/og-social-card.jpg',
-    // algolia: {
-      // appId: 'SRR7ESDJ9D',
-      // // Public API key: it is safe to commit it
-      // apiKey: '3b1c345518f2e525056dac73aa24e17c',
-      // indexName: 'hasura',
-    // },
+    algolia: {
+      appId: 'FWSSPB5BLA',
+      // Public API key: it is safe to commit it
+      apiKey: '2d6b3d71bbd36bdc4e6244526db0c13a',
+      indexName: 'promptql',
+    },
     navbar: {
       title: '',
       hideOnScroll: true,
