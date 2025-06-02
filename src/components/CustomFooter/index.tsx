@@ -26,7 +26,7 @@ const CustomFooter = () => {
       <div className={styles['footerSocialIconsWrapper']}>
         <div className={styles['socialBrands']}>
           <Link
-            href={'https://github.com/hasura/graphql-engine/blob/master/v3/README.md'}
+            href={'https://github.com/hasura/promptql-docs'}
             rel="noopener noreferrer"
             aria-label={'Github'}
           >
@@ -34,7 +34,7 @@ const CustomFooter = () => {
           </Link>
         </div>
         <div className={styles['socialBrands']}>
-          <Link href={'https://twitter.com/hasurahq'} rel="noopener noreferrer" aria-label={'Twitter'}>
+          <Link href={'https://x.com/PromptQL'} rel="noopener noreferrer" aria-label={'Twitter'}>
             <TwitterIcon />
           </Link>
         </div>
@@ -45,7 +45,7 @@ const CustomFooter = () => {
         </div>
         <div className={styles['socialBrands']}>
           <Link
-            href={'https://www.youtube.com/channel/UCZo1ciR8pZvdD3Wxp9aSNhQ'}
+            href={'https://www.youtube.com/@PromptQL'}
             rel="noopener noreferrer"
             aria-label={'Youtube'}
           >
@@ -53,7 +53,7 @@ const CustomFooter = () => {
           </Link>
         </div>
         <div className={styles['socialBrands']}>
-          <Link href={'https://www.linkedin.com/company/hasura'} rel="noopener noreferrer" aria-label={'Linkedin'}>
+          <Link href={'https://www.linkedin.com/company/promptql-io'} rel="noopener noreferrer" aria-label={'Linkedin'}>
             <LinkedInIcon />
           </Link>
         </div>
