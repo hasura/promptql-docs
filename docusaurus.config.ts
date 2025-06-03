@@ -157,25 +157,6 @@ const config: Config = {
         srcDark: '/img/pql-logo-large-dark-mode.svg',
       },
       items: [
-        {
-          type: 'docsVersionDropdown',
-          position: 'left',
-          dropdownActiveClassDisabled: true,
-          dropdownItemsAfter: [
-            {
-              href: 'https://hasura.io/docs/3.0/index/',
-              label: 'v3.x (DDN)',
-            },
-            {
-              href: 'https://hasura.io/docs/2.0/index/',
-              label: 'v2.x',
-            },
-            {
-              href: 'https://hasura.io/docs/1.0/graphql/core/index.html',
-              label: 'v1.x',
-            },
-          ],
-        },
       ],
     },
     prism: {
