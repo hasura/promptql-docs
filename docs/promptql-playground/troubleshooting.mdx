@@ -107,3 +107,24 @@ promptql-playground:
 **Step 3. Restart the local services**
 
 Restart the local services, e.g. `docker compose down && ddn run docker-start`.
+
+## PromptQlInternalException: Error accessing PromptQL runtime: Error calling Gemini: AssertionError()
+
+The visualization primitive has known issues when using `gemini-*-pro` as the model for `ai_primitives_llm`. Instead,
+use another model — such as `gemini-*-flash`:
+
+```yaml {11}
+kind: PromptQlConfig
+version: v2
+definition:
+llm:
+  provider: gemini
+  model: gemini-2.5-flash-preview-05-20
+  apiKey:
+    valueFromEnv: GEMINI_API_KEY
+aiPrimitivesLlm:
+  provider: gemini
+  model: gemini-2.5-flash-preview-05-20
+  apiKey:
+    valueFromEnv: GEMINI_API_KEY
+```
