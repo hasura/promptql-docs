@@ -107,9 +107,10 @@ Execute a PromptQL program with your data.
 
 :::note Private DDN Endpoint
 
-For Private DDN setups the endpoint will change. Eg: For `my-private-ddn`:
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
+by the control plane. For example:
 
-`https://promptql.my-private-ddn.private-ddn.hasura.app/api/execute_program`
+`https://promptql.<FQDN>/api/execute_program`
 
 :::
 
