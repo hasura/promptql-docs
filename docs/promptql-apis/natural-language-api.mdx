@@ -67,10 +67,6 @@ communicate with PromptQL in real-time.
 
 ## Query Endpoint
 
-Send messages to PromptQL and receive responses, optionally in a streaming format.
-
-### Request
-
 `POST https://api.promptql.pro.hasura.io/query`
 
 :::note Private DDN Endpoint
@@ -82,11 +78,26 @@ by the control plane. For example:
 
 :::
 
+Send messages to PromptQL and receive responses, optionally in a streaming format.
+
+The Natural Language API supports two versions:
+- **Version 1 (v1)**: Uses direct DDN URL configuration with optional LLM settings
+- **Version 2 (v2)**: Uses DDN build-based configuration with settings from build metadata
+
+### Request v1
+
 **Headers**
 
 ```
 Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
 ```
+
+:::info Authentication
+
+Version 1 requests support both Authorization header (recommended) and the deprecated `promptql_api_key` field in the request body. For new implementations, use the Authorization header with Bearer token format.
+
+:::
 
 **Request Body**
 
@@ -176,10 +187,113 @@ You get $20 worth of free credits with Hasura's built-in provider during the tri
 }
 ```
 
-#### Request DDN Auth
+### Request v2
 
-The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
-[auth with these APIs](/promptql-apis/auth.mdx).
+Version 2 requests use supergraph build versions instead of direct DDN URLs. The `build_version` refers to the version of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
+
+**Headers**
+
+```
+Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
+```
+
+:::info Authentication
+
+Version 2 requests require the PromptQL API key to be sent as a Bearer token in the Authorization header.
+
+:::
+
+**Request Body**
+
+```json
+{
+  "version": "v2",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {}
+  },
+  "artifacts": [],
+  "timezone": "America/Los_Angeles",
+  "interactions": [
+    {
+      "user_message": {
+        "text": "Your message here"
+      },
+      "assistant_actions": [
+        {
+          "message": "Previous assistant message",
+          "plan": "Previous execution plan",
+          "code": "Previously executed code",
+          "code_output": "Previous code output",
+          "code_error": "Previous error message if any"
+        }
+      ]
+    }
+  ],
+  "stream": false
+}
+```
+
+**Request Body Fields**
+
+| Field                 | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
+| --------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`             | string  | Yes      | Must be set to "v2"                                                                                                                                                                                                                                                                               |
+| `ddn`                 | object  | Yes      | DDN configuration including `build_version` and headers                                                                                                                                                                                                                                                       |
+| `artifacts`           | array   | No       | List of existing artifacts to provide context                                                                                                                                                                                                                                                     |
+| `timezone`            | string  | Yes      | IANA timezone for interpreting time-based queries                                                                                                                                                                                                                                                 |
+| `interactions`        | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
+| `stream`              | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
+
+#### PromptQL Configuration
+
+Unlike v1 requests, v2 requests do not accept `llm`, `ai_primitives_llm`, or `system_instructions` fields in the request body. Instead, these PromptQL settings are automatically inferred from the supergraph build configuration.
+
+**Configuration Resolution Order:**
+1. **Build-level PromptQL Config**: Settings are first retrieved from the [PromptQL configuration](/project-configuration/promptql-config/) associated with the specified `build_version`
+2. **Project-level Fallback**: For older builds that don't have PromptQL config included, the system falls back to the PromptQL configuration saved in the project settings
+
+This approach ensures consistent configuration management and eliminates the need to specify LLM settings in each API request when using v2.
+
+
+### DDN Auth
+
+The `ddn.headers` field allows you to pass authentication headers to your DDN endpoint and is supported in both **Version 1 (v1)** and **Version 2 (v2)** requests. This enables you to use any DDN-compatible authentication strategy with the Natural Language API.
+
+**In Version 1 requests**, configure headers in the `ddn.headers` object as shown in the [Request v1](#request-v1) section:
+
+```json
+{
+  "version": "v1",
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+**In Version 2 requests**, configure headers in the `ddn.headers` object as shown in the [Request v2](#request-v2) section:
+
+```json
+{
+  "version": "v2",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+:::info Authentication Strategies
+
+The headers you need to include depend on your DDN project's authentication configuration. For comprehensive information about setting up authentication modes and understanding which headers to use, refer to our [Authentication in APIs](/promptql-apis/auth.mdx) documentation.
+
+:::
 
 ### Response
 
