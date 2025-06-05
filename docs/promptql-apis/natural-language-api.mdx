@@ -137,7 +137,7 @@ request body. For new implementations, use the Authorization header with Bearer 
 }
 ```
 
-**Request Body Fields**
+#### Request Body Fields
 
 | Field                 | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
 | --------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -152,7 +152,7 @@ request body. For new implementations, use the Authorization header with Bearer 
 | `interactions`        | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
 | `stream`              | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
 
-**LLM Provider Options**
+#### LLM Provider Options**
 
 The `llm` and `ai_primitives_llm` fields support the following providers:
 
