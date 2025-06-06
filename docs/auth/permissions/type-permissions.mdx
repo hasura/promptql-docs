@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-description: "Guide on defining Type Permissions for API fields in a supergraph."
+description: "Guide on defining Type Permissions for API fields in your metadata."
 keywords:
   - type permissions
   - supergraph roles
@@ -14,9 +14,9 @@ To make API **fields** available to a role, you define a `TypePermissions` objec
 
 You can think of TypePermissions as being similar to column-level permissions in a relational database. Just as you can
 restrict access to specific columns in a table based on the user's role, TypePermissions allow you to control access to
-specific fields in a type within your supergraph.
+specific fields in a type within your metadata.
 
-By default, whenever a new type is created in your supergraph, each field is defined as being only accessible to the
+By default, whenever a new type is created in your metadata, each field is defined as being only accessible to the
 `admin` role.
 
 To add a new role, add a new item to the `permissions` array in the TypePermissions object.

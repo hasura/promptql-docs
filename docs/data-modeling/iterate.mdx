@@ -16,8 +16,8 @@ toc_max_heading_level: 3
 
 ## Introduction
 
-After you've created a DDN supergraph to use with PromptQL, you'll often need to iterate on your data model — whether
-you're adding a new table, refining a command, or evolving your business logic.
+After first creating your semantic metadata layer to use with PromptQL, you'll often need to iterate on your underlying
+data models — whether you're adding a new table, refining a command, or evolving your business logic.
 
 This guide explains when and why you need to run `ddn supergraph build local` to ensure your changes are reflected in
 your API.
@@ -43,8 +43,8 @@ rebuilding.
 
 Whether your metadata changes are generated via the CLI or you've hand-authored a change (using the
 [VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura)), you'll need to create a new
-build of your application. This will ensure the JSON configuration files consumed by your Hasura Engine are updated with
-the latest changes.
+build of your application. This will ensure the JSON configuration files consumed by the distributed query engine are
+updated with the latest changes.
 
 ### You make changes to your underlying data model
 
@@ -53,7 +53,7 @@ MongoDB. You may have written new custom logic in TypeScript or want to import a
 Whatever it is, you will follow the same steps each time anything changes in your data source schema to iterate on your
 data model.
 
-#### Re-introspecting your data model
+#### Re-introspect your data model
 
 Re-introspecting your data model will update the connector configuration to reflect the changes in your data sources.
 
@@ -61,13 +61,13 @@ Re-introspecting your data model will update the connector configuration to refl
 ddn connector introspect my_connector
 ```
 
-#### Viewing resources
+#### View resources
 
 ```ddn title="You can then view the resources that have been discovered by running:"
 ddn connector show-resources my_connector
 ```
 
-#### Adding resources
+#### Add resources
 
 ```ddn title="And add precisely the resources you need running any of the following commands with real values:"
 ddn model add my_connector my_model
@@ -81,7 +81,7 @@ ddn command add my_connector "*"
 ddn relationship add my_connector "*"
 ```
 
-#### Adding semantic Information
+#### Add semantic Information
 
 It's highly recommended to provide extra natural language descriptions of the resources in your project so that the
 PromptQL can better understand your data and create appropriate query plans.
@@ -89,15 +89,15 @@ PromptQL can better understand your data and create appropriate query plans.
 The description field can be added to `Model`, `Command` and `Relationship` metadata elements to provide semantic
 context. See more about [semantic information here](/data-modeling/semantic-information.mdx).
 
-#### Building a new supergraph
+#### Rebuild
 
-```ddn title="You can then build a new local supergraph by running:"
+```ddn title="You can then create a new build:"
 ddn supergraph build local
 ```
 
 :::info Build for Hasura Cloud
 
-You can also build a new supergraph for a project on Hasura Cloud:
+You can also create a new build on Hasura Cloud:
 
 If you don't have a project on Hasura Cloud, you can create one by running:
 
@@ -113,7 +113,7 @@ ddn supergraph build create
 
 :::
 
-#### Restarting services locally
+#### Restart services locally
 
 If you are iterating locally, you then need to restart the Docker services by running:
 

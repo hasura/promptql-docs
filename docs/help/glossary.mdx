@@ -38,9 +38,9 @@ generates and runs programs that compose tool calls and LLM tasks, providing:
 - Detailed execution plans for complete explainability
 - Fine-grained authorization to protect sensitive data
 
-PromptQL uses Hasura DDN's data layer which provides out-of-the-box connectors to a wide range of data sources,
-introspecting your data and helping you build a high-quality realtime data product with semantic metadata and
-fine-grained entitlements.
+PromptQL uses a semantic metadata layer which utilizes out-of-the-box connectors to access a wide range of data sources,
+introspect your data and help you build a high-quality realtime data product with declarative metadata and fine-grained
+entitlements.
 
 ## Hasura Data Delivery Network (DDN)
 
@@ -97,12 +97,12 @@ The data plane manages the actual handling of application requests and responses
 application operations, the transmission of data between clients and endpoints, and the processing of data payloads. The
 following are the main components of a data plane:
 
-**Hasura v3 GraphQL Engine:** The engine takes in an API request (e.g., a question for PromptQL), converts it into an
+**Distributed Query Engine:** The engine takes in an API request (e.g., a question for PromptQL), converts it into an
 intermediate representation that the connectors can handle, and creates a plan for the query execution across various
 data sources.
 
-**Hasura connectors:** These handle the actual API execution. They accept the intermediate representation from the
-engine and use the most efficient mechanism to execute the query and fetch/mutate data from the underlying data source.
+**Data Connectors:** These handle the actual API execution. They accept the intermediate representation from the engine
+and use the most efficient mechanism to execute the query and fetch/mutate data from the underlying data source.
 
 ## Supergraph
 
@@ -142,10 +142,10 @@ your conversations correctly.
 
 By default, these objects live in the `globals` subgraph, but you can move them to another subgraph if needed.
 
-## Hasura metadata
+## Agentic Semantic Metadata Layer
 
-Hasura metadata defines the structure of your supergraph; it gives PromptQL the context it needs to ask the right
-questions, enforce permissions, and return meaningful answers.
+Metadata defines the structure of your supergraph; it gives PromptQL the context it needs to ask the right questions,
+enforce permissions, and return meaningful answers.
 
 Metadata is written declaratively and describes how to connect to your data sources, what the API should look like, and
 how different parts of your system relate to each other. It introduces key modeling constructs such as `Types`,
@@ -159,7 +159,7 @@ full control over how the application behaves.
 
 ## .hml (Hasura Metadata Language)
 
-`.hml` is the file extension used for writing Hasura metadata. It shares the same syntax as `.yaml`, and offers the same
+`.hml` is the file extension used for writing metadata. It shares the same syntax as `.yaml`, and offers the same
 benefits: it's readable, supports nested data structures, allows for inline comments, and is portable across
 environments and teams.
 
@@ -186,14 +186,14 @@ something goes wrong, you can roll back just as easily.
 
 ## Data Sources
 
-Any external data source, database, or service that can be connected to Hasura DDN using a Data Connector agent.
+Any external data source, database, or service that can be integrated into your application using a data connector.
 
 [Learn more](/reference/metadata-reference/data-connector-links.mdx).
 
 ## Native Data Connector Specification (NDC Spec)
 
-A standardized specification that allows you to extend the functionality of the Hasura server by providing web services
-that resolve new sources of data and business logic and help define the metadata structure for APIs in Hasura DDN. The
+A standardized specification that allows you to extend the functionality of the query engine by providing web services
+that resolve new sources of data and business logic and help define the metadata structure for APIs in your project. The
 specification defines types such as `collections`, `functions`, and `procedures` that help in describing the behavior of
 agents or connectors that connect to the underlying data source. It provides a framework and guidelines on the types of
 web service endpoints that a connector needs to implement.
@@ -202,10 +202,11 @@ web service endpoints that a connector needs to implement.
 
 ## Native Data Connectors
 
-Data connectors are specialized agents that connect subgraphs to data sources, enabling communication in the data
+Data connectors are specialized servers that connect subgraphs to data sources, enabling communication in the data
 source's native language.
 
-They integrate Hasura with various external data sources and services based on the native data connector specification.
+They integrate your application with various external data sources and services based on the native data connector
+specification.
 
 Each subgraph can have multiple data connectors, and the same data source can be connected to different subgraphs via
 separate connector instances - allowing teams to work with the same source from different domain perspectives.
@@ -218,14 +219,13 @@ data sources.
 
 ## Push-Down Capabilities
 
-The ability in Hasura DDN to delegate certain query operations including Authorization to the underlying data source.
-This can improve query optimization and performance and is the reason why data connectors in Hasura DDN are called
-'native'.
+The ability for the query engine to delegate certain query operations (including authorization) to the underlying data
+source. This can improve query optimization and performance and is the reason why data connectors are called 'native'.
 
 ## Connector Hub
 
 Refers to the public site where all Native Data Connectors for Hasura DDN are listed. Users can discover connectors, get
-more information about their specific features and find documentation on how to use each connector with Hasura DDN.
+more information about their specific features and find documentation on how to use each connector with a project.
 
 [Learn more](https://hasura.io/connectors/).
 
@@ -271,13 +271,14 @@ validation as you author metadata.
 
 ## Authorization Permissions
 
-Authentication is managed at the supergraph level in Hasura DDN as defined by the `AuthConfig` object and cannot be
-customized at the subgraph level.
+Authentication is managed at the supergraph level as defined by the `AuthConfig` object and cannot be customized at the
+subgraph level.
 
-Authorization however, which is a metadata object in Hasura DDN that defines the access control or authorization rules
-on models and commands. [Learn more](/reference/metadata-reference/permissions.mdx), is managed at the subgraph level in
-Hasura DDN. This means that the permissions for models and commands are defined within the context of those objects in
-their respective subgraphs, and do not affect other subgraphs.
+Authorization however, is controlled via metadata objects that defines the access control or authorization rules on
+models and commands. [Learn more](/reference/metadata-reference/permissions.mdx)
+
+This is managed at the subgraph level in your project. This means that the permissions for models and commands are
+defined within the context of those objects in their respective subgraphs, and do not affect other subgraphs.
 
 Authorization rules in one subgraph can also be defined to reference data in a foreign subgraph even if that subgraph is
 in another repository.
@@ -290,7 +291,7 @@ querying capabilities.
 Each collection is defined by its name, any collection arguments (need to parametrize the collections), the object type
 (a collection of fields) of its rows, and some additional metadata related to constraints.
 
-Tracking a collection results in the creation of a 'model' object in Hasura metadata.
+Tracking a collection results in the creation of a 'model' object in metadata.
 
 [Learn more](https://hasura.github.io/ndc-spec/specification/schema/collections.html).
 
@@ -300,7 +301,7 @@ A function is a Native Data Connector Specification object that can be invoked w
 doesn't have side-effects and is thus "read only". Unlike collections, functions do not describe constraints and do not
 have object types.
 
-Tracking a function results in the creation of a `Command` Supergraph object in Hasura metadata.
+Tracking a function results in the creation of a `Command` Supergraph object in metadata.
 
 [Learn more](https://hasura.github.io/ndc-spec/specification/schema/functions.html).
 
@@ -309,51 +310,52 @@ Tracking a function results in the creation of a `Command` Supergraph object in 
 A procedure is a native data connector specification object, and it defines an action that the data connector implements
 and can mutate data and have other side-effects. Each procedure has arguments and a return type.
 
-Tracking a procedure results in the creation of a `Command` object in Hasura metadata.
+Tracking a procedure results in the creation of a `Command` object in metadata.
 
 [Learn more](https://hasura.github.io/ndc-spec/specification/schema/procedures.html).
 
 ## Supergraph config
 
-Supergraph config tells Hasura DDN how to construct your supergraph. A config will contain information such as which
-subgraphs to include and which resources to use for the build.
+The supergraph config tells the metadata build service (which we take care of running for you and refer to as **MBS**)
+how to construct your supergraph. A config will contain information such as which subgraphs to include and which
+resources to use for the build.
 
 [Learn more](/project-configuration/overview.mdx).
 
 ## Connector config
 
-Connector config tells Hasura DDN how to build your connector. It will contain information such as the type of connector
-and the location to the context files needed to build the connector.
+The connector config tells the MBS how to build your connector. It will contain information such as the type of
+connector and the location to the context files needed to build the connector.
 
 [Learn more](/project-configuration/overview.mdx).
 
 ## DDN CLI (Command-Line Interface)
 
-A tool in Hasura DDN that enables developers to interact with DDN from the command line. It supports various commands
-for creating builds, tracking objects, and deploying projects.
+A tool that enables developers to interact with Hasura DDN from the command line and manage local projects. It supports
+various commands for creating builds, tracking objects, and deploying projects.
 
 [Learn more](/reference/cli/index.mdx).
 
 ## VS Code Extension
 
-The Hasura VS Code extension enables features like inline validation of Hasura DDN metadata without having to create
-builds, code scaffolding snippets which can be used to quickly scaffold DDN metadata objects, intelligent autocomplete
-which shows autocomplete suggestions based on the current state of the DDN project, and other features like
-go-to-definition for inter-related DDN metadata objects, documentation on hover of any DDN metadata object, a project
-tree on sidebar which shows all DDN projects and metadata objects present in the currently opened folder.
+The Hasura VS Code extension enables features like inline validation of metadata without having to create builds, code
+scaffolding snippets which can be used to quickly scaffold DDN metadata objects, intelligent autocomplete which shows
+autocomplete suggestions based on the current state of the DDN project, and other features like go-to-definition for
+inter-related metadata objects, documentation on hover of any metadata object, a project tree on sidebar which shows all
+DDN projects and metadata objects present in the currently opened folder.
 
-It is strongly recommended to download the VS code extension while working with DDN projects, it can be downloaded from
-the [VS Code extension marketplace](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura).
+It is strongly recommended to use the VS code extension and can be downloaded from the
+[VS Code extension marketplace](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura).
 
-## Metadata build service
+## Metadata Build Service (MBS)
 
-Creates builds from the metadata and makes it available to Hasura v3 GraphQL Engine at the edge for it to serve the
-application. Provides essential error handling for fast debugging and troubleshooting.
+MBS creates builds from your metadata and makes it available to the distributed query engine at the edge for it to serve
+the application. Provides essential error handling for fast debugging and troubleshooting.
 
 ## Control plane cloud API
 
 This component is the underlying cloud service, which enables creating builds, applying builds and testing your API. We
-consider this the brain of DDN Console and CLI – the component that drives most of the DX functionalities.
+consider this the brain of the Hasura DDN Console and CLI – the component that drives most of the DX functionalities.
 
 ## PromptQL Console and Playground
 

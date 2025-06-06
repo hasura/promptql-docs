@@ -18,10 +18,10 @@ seoFrontMatterUpdated: false
 ## Introduction
 
 In this tutorial, you'll learn how to configure an existing [Clerk application](https://clerk.com/) and generate a JWT
-which you can pass in the header of your requests to Hasura. After setting up your
+which you can pass in the header of your requests. After setting up your
 [AuthConfig](/reference/metadata-reference/auth-config.mdx) object to use JWT mode, this will allow you to validate
 users' identities and create [permission rules](/reference/metadata-reference/permissions.mdx) which can limit access to
-underlying data served by Hasura DDN.
+underlying data served by the query engine to PromptQL.
 
 :::info Prerequisites
 
@@ -29,7 +29,7 @@ Before continuing, ensure you have:
 
 - A [Clerk application](https://clerk.com/docs/quickstarts/setup-clerk).
 - A local application that can integrate with Clerk for authentication.
-- A local Hasura project.
+- A local PromptQL project.
 
 ### Step 1. Create a JWT template
 
@@ -51,8 +51,8 @@ In the claims editor, add the following:
 }
 ```
 
-This will add the required Hasura namespace with the keys that Hasura expects when decoding a JWT. You can modify the
-keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
+This will add the required `Hasura` namespace with the keys the query engine expects when decoding a JWT. You can modify
+the keys to suit your application's [roles](/reference/metadata-reference/permissions.mdx#typepermissions).
 
 You can also see that we're hard-coding the user's role. You can dynamically set a user's role using Clerk's metadata to
 set a `role` field on the `User` object whenever a user registers. You can learn more
@@ -63,7 +63,7 @@ This enables you to then pass the value of `{{user.publicMetadata.role}}` in the
 :::tip Custom claims
 
 You can create any custom keys you wish and reference them in your permissions using session variables. Above,
-`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the Hasura.
+`x-hasura-user-id` is simply an example. Any claim prefixed with `x-hasura-` is accessible to the query engine.
 
 :::
 
@@ -110,14 +110,13 @@ const jwt = await session.getToken({ template: "hasura" });
 
 ## Wrapping up
 
-In this guide, you learned how to integrate Clerk with Hasura DDN and PromptQL to create a secure and scalable identity
-management solution using JWTs. By leveraging custom claims in conjunction with
-[permissions](/reference/metadata-reference/permissions.mdx), you can define precise access-control rules, ensuring that
-your application remains secure and meets your users' needs.
+In this guide, you learned how to integrate Clerk to create a secure and scalable identity management solution using
+JWTs. By leveraging custom claims in conjunction with [permissions](/reference/metadata-reference/permissions.mdx), you
+can define precise access-control rules, ensuring that your application remains secure and meets your users' needs.
 
-As you continue building out your supergraph, keep in mind that authentication and authorization are crucial components.
-Always validate your configuration and regularly test your setup to ensure it functions as expected across different
-roles and environments.
+As you continue building out your application, keep in mind that authentication and authorization are crucial
+components. Always validate your configuration and regularly test your setup to ensure it functions as expected across
+different roles and environments.
 
 If you encounter issues or need further customization, consider reviewing our related documentation or exploring
 additional Clerk features that can enhance your authentication flows.

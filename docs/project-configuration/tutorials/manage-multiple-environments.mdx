@@ -14,10 +14,10 @@ keywords:
 
 ## Introduction
 
-Managing multiple contexts in Hasura allows you to replicate the functionality of traditional environments like
-`staging` and `production`, but with greater flexibility. Instead of rigidly-defined environments, your application uses
-contexts to store key details such as project configurations, metadata, and environment variables. This approach lets
-you switch between different setups without disrupting your workflow or end users.
+Managing multiple contexts in your application allows you to replicate the functionality of traditional environments
+like `staging` and `production`, but with greater flexibility. Instead of rigidly-defined environments, your application
+uses contexts to store key details such as project configurations, metadata, and environment variables. This approach
+lets you switch between different setups without disrupting your workflow or end users.
 
 In this tutorial, you'll learn how to:
 
@@ -42,14 +42,16 @@ This will scaffold out the necessary files for a project in a new `environments-
 In this tutorial, we'll use the PostgreSQL connector and a sample PostgreSQL database:
 
 ```plaintext
-postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
+jdbc:postgresql://35.236.11.122:5432/v3-docs-sample-app?user=read_only_user&password=readonlyuser
 ```
 
-```ddn title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
+```ddn title="In your project directory, run the following, choose hasura/postrges-promptql, and pass the connection URI above when prompted:"
 ddn connector init my_pg -i
 ```
 
-### Step 3. Generate the Hasura metadata
+Be sure to include the `public` schema.
+
+### Step 3. Generate the metadata
 
 ```ddn title="Next, use the CLI to introspect the PostgreSQL database:"
 ddn connector introspect my_pg
@@ -58,11 +60,11 @@ ddn connector introspect my_pg
 After running this, you should see a representation of your database's schema in the
 `app/connector/my_pg/configuration.json` file; you can view this using `cat` or open the file in your editor.
 
-```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your metadata:"
 ddn models add my_pg users
 ```
 
-Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The DDN CLI will use this Hasura
+Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The CLI will use this Hasura
 Metadata Language file to represent the `users` table from PostgreSQL in your API as a
 [model](/reference/metadata-reference/models.mdx).
 
@@ -74,7 +76,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```ddn title="Start your local Hasura instance and PostgreSQL connector:"
+```ddn title="Start your local query engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 

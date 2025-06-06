@@ -14,7 +14,7 @@ seoFrontMatterUpdated: true
 
 # Set up a JWT for Testing
 
-By default, your supergraph uses your Hasura Cloud authentication token, also known as a personal access token (PAT),
+By default, your application uses your Hasura Cloud authentication token, also known as a personal access token (PAT),
 for authentication. This is convenient for testing from the Playground, but should not be used in an application or
 shared with others.
 
@@ -70,7 +70,7 @@ definition:
 
 ## Step 4. Create a new build
 
-Create a supergraph build using this `AuthConfig`.
+Create a new build using this `AuthConfig`.
 
 ```ddn title="From the root of your project, run:"
 ddn supergraph build create --description "use jwt-based authconfig"
@@ -92,7 +92,7 @@ In the example above, we're setting the following values:
 - The default role as `admin`.
 - The allowed roles as `admin`.
 
-For more information about the claims Hasura expects, check out [this page](/auth/jwt/jwt-configuration.mdx).
+For more information about the claims the query engine expects, check out [this page](/auth/jwt/jwt-configuration.mdx).
 
 ## Step 6: Test your AuthConfig
 

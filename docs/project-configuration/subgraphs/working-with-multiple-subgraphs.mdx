@@ -41,7 +41,7 @@ For more information about prefixing, see the
 ## Set subgraph context
 
 If you're working in a project with multiple subgraphs, there will be the need to switch between subgraphs when
-executing commands with the DDN CLI. While the CLI supports a `--subgraph` flag, it is much more convenient to set your
+executing commands with the CLI. While the CLI supports a `--subgraph` flag, it is much more convenient to set your
 subgraph in context.
 
 ```ddn title="Switch between context using the path to the subgraph's configuration file:"
@@ -103,8 +103,8 @@ In these cases the Hasura VS Code extension cannot validate the entirety of the 
 manually author cross-repo relationships and ensure that the field mappings are correct. However, upon creating a
 supergraph build, all cross-subgraph metadata is validated to prevent mistakes from being deployed to the final API.
 
-You can still easily use the Hasura DDN console to explore the supergraph and test relationships across subgraphs once
-you have created a build.
+You can still easily use the console to explore the supergraph and test relationships across subgraphs once you have
+created a build.
 
 If you perform a _local_ supergraph build using the CLI (ie. `ddn supergraph build local`), cross-repo relationships
 will be ignored and will not be validated. If you run the build locally you will only see the subgraphs in that
@@ -153,7 +153,7 @@ the relationship in action, you'll need to follow these steps:
 
 1. Create a new supergraph build on DDN using the `ddn supergraph build create` command. (Subgraph builds do not get an
    API, so supergraph builds are required to test.)
-2. You can then use the Hasura DDN console to explore and test the relationship across subgraphs.
+2. You can then use the console to explore and test the relationship across subgraphs.
 3. If you have admin permissions, you can apply the subgraph to the supergraph with the `ddn subgraph apply` command.
 
 Remember, cross-repo relationships only come into effect when the subgraphs are combined in the DDN environment. Local

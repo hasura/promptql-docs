@@ -21,7 +21,7 @@ seoFrontMatterUpdated: false
 By default, the CLI command to build the supergraph, i.e.
 [ddn supergraph build create](/reference/cli/commands/ddn_supergraph_build_create.mdx), also builds the connectors
 required by the supergraph for convenience. Though in certain cases, you might want to do these steps independently,
-e.g. when the connectors are self-hosted and not deployed on Hasura DDN.
+e.g., when the connectors are self-hosted and not deployed on Hasura DDN.
 
 In this recipe, you'll learn how to manage independent deployments for your connectors and the supergraph.
 
@@ -29,7 +29,7 @@ In this recipe, you'll learn how to manage independent deployments for your conn
 
 Before continuing, ensure you have:
 
-- A [local Hasura project](/quickstart.mdx).
+- A [local PromptQL project](/quickstart.mdx).
 
 :::
 
@@ -124,7 +124,7 @@ The `--project`, `--supergraph` and `--env-file` flags can be skipped if the key
 
 ### Step 4. (Optional) Add a custom script to build the supergraph
 
-You can add the above command as a [custom script](/project/configuration/overview.mdxthe `--no-build-connectors` flag
+You can add the above command as a [custom script](/project-configuration/overview.mdx) the `--no-build-connectors` flag
 each time.
 
 For example, you can update your context config to the following:
@@ -167,4 +167,4 @@ The `--project`, `--supergraph` and `--env-file` flags can be skipped if the key
 
 ## Learn more
 
-- [Project configuration](/project/configuration/overview.mdx
+- [Project configuration](/project-configuration/overview.mdx)

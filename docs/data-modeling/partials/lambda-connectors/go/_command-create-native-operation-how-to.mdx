@@ -33,11 +33,11 @@ func ProcedureCustomCode(ctx context.Context, state *types.State, arguments *Inp
 }
 ```
 
-Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutation in your supergraph. Prefixing with
+Using the prefix `Procedure` ensures ProcedureCustomCode() is exposed as a mutation in your metadata. Prefixing with
 `Function` identifies it as a function to be exposed as a query. Both will be accessible through PromptQL.
 
 Both have typed input arguments and return strings, which the connector will use to generate the corresponding schema
-for your supergraph.
+for your metadata.
 
 ```ddn title="Introspect the connector:"
 ddn connector introspect my_go

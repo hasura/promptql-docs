@@ -31,9 +31,9 @@ addresses. You can do this by adding the following to your allowlist:
 
 #### Docker networking issues
 
-Hasura DDN resolves `local.hasura.dev` to your machine's `localhost`. This avoids Docker networking conflicts, where
-`localhost` might point to your source's container instead of your local machine. To fix this, update any `localhost`
-references in your connection strings to `local.hasura.dev`.
+We resolve `local.hasura.dev` to your machine's `localhost`. This avoids Docker networking conflicts, where `localhost`
+might point to your source's container instead of your local machine. To fix this, update any `localhost` references in
+your connection strings to `local.hasura.dev`.
 
 ### My connector won't introspect my data source
 
@@ -67,7 +67,7 @@ kill it and then try initializing the connector again.
 ### My connector isn't reflecting schema changes in my data source
 
 You may have not re-run the introspection steps. Remember, each time your data source's schema changes, you'll need to
-re-run this command to make Hasura DDN aware of the new schema. Follow the guide
+re-run this command to make your connector aware of the new schema. Follow the guide
 [here](/data-sources/introspect-a-source.mdx).
 
 ### My connector isn't reflecting schema changes in my application
