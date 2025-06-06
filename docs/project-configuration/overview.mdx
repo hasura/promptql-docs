@@ -16,10 +16,10 @@ keywords:
 
 ## Introduction
 
-A **project** in PromptQL is the foundation for building and managing your application. This foundational layer is known
-as the **Hasura DDN (Data Delivery Network)** and contains a structured collection of metadata files that define the
-behavior, relationships, and permissions for your application. These metadata files can be organized into **subgraphs**,
-each representing a distinct data domain.
+A **project** in PromptQL forms the backbone for building and managing your application. It contains a semantic
+collection of metadata objects that define the behavior, relationships, and permissions of your application. We
+sometimes refer to this as the **supergraph**. You can organize the files containing these metadata objects into
+**subgraphs**, with each subgraph representing a distinct data domain.
 
 Projects are designed to support both local development and cloud deployment. During development, you work with a local
 version of your project, which is linked to a cloud project through a
@@ -52,12 +52,12 @@ maintain robust applications efficiently.
 PromptQL also supports multi-repository setups, giving teams greater autonomy in their development process. With this
 setup:
 
-- Each team can maintain their **subgraph** in a separate repository while still contributing to the shared
-  **supergraph**.
+- Each team can maintain their metadata in a separate repository while still contributing to the shared semantic
+  metadata layer.
 - Teams can develop, test, and deploy their subgraphs independently, enabling faster iteration and minimizing
   dependencies on other teams.
-- The supergraph integrates these subgraphs into a single application, ensuring that the overall application remains
-  consistent and cohesive.
+- The query engine integrates these subgraphs into a single metadata layer, ensuring that the overall application
+  remains consistent and cohesive.
 
 This approach is ideal for large organizations where multiple teams work on distinct data domains but need to
 collaborate through a unified API. For more information, check out
