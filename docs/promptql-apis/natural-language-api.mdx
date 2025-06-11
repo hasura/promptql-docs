@@ -78,7 +78,6 @@ by the control plane. For example:
 
 :::
 
-Send messages to PromptQL and receive responses, optionally in a streaming format.
 
 The Natural Language API supports two versions:
 
@@ -96,12 +95,12 @@ Authorization: Bearer <your-promptql-api-key>
 
 :::info Authentication
 
-Version 1 requests support both Authorization header (recommended) and the deprecated `promptql_api_key` field in the
-request body. For new implementations, use the Authorization header with Bearer token format.
+Version 1 requests support both the `Authorization` header (recommended) and the deprecated `promptql_api_key` field in the
+request body. For new implementations, use the `Authorization` header with the `Bearer <your-promptql-api-key>` token format.
 
 :::
 
-**Request Body**
+#### Request Body
 
 ```json
 {
@@ -195,7 +194,7 @@ Version 2 requests use supergraph build versions instead of direct DDN URLs. The
 of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
 using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
 
-**Headers**
+#### Headers
 
 ```
 Content-Type: application/json
@@ -208,7 +207,7 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 
 :::
 
-**Request Body**
+#### Request Body
 
 ```json
 {
@@ -239,7 +238,7 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 }
 ```
 
-**Request Body Fields**
+#### Request Body Fields
 
 | Field          | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
 | -------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -268,10 +267,10 @@ request when using v2.
 ### DDN Auth
 
 The `ddn.headers` field allows you to pass authentication headers to your DDN endpoint and is supported in both
-**Version 1 (v1)** and **Version 2 (v2)** requests. This enables you to use any DDN-compatible authentication strategy
+**version 1 (v1)** and **version 2 (v2)** requests. This enables you to use any DDN-compatible authentication strategy
 with the Natural Language API.
 
-**In Version 1 requests**, configure headers in the `ddn.headers` object as shown in the [Request v1](#request-v1)
+**In version 1 requests**, configure headers in the `ddn.headers` object as shown in the [Request v1](#request-v1)
 section:
 
 ```json
@@ -286,7 +285,7 @@ section:
 }
 ```
 
-**In Version 2 requests**, configure headers in the `ddn.headers` object as shown in the [Request v2](#request-v2)
+**In version 2 requests**, configure headers in the `ddn.headers` object as shown in the [Request v2](#request-v2)
 section:
 
 ```json
