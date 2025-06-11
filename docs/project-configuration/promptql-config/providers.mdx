@@ -84,6 +84,13 @@ following have been tested with PromptQL:
 
 With Hasura—used as the default provider—there is **no specific model necessary** in your configuration.
 
+:::warning HIPAA Compliance
+
+If you plan to interact with PHI using PromptQL, you should not use the Hasura provider as it is not 
+HIPAA compliant. You will have to bring your own LLM with another supported provider.
+
+:::
+
 ### Microsoft Azure
 
 To use an [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models), set the
