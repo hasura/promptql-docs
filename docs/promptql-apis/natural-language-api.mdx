@@ -6,8 +6,11 @@ keywords:
   - hasura ddn
   - natural language
   - apis
-toc_max_heading_level: 4
+toc_max_heading_level: 2
 ---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # Natural Language API
 
@@ -80,13 +83,19 @@ by the control plane. For example:
 
 :::
 
+### API Versions
 
 The Natural Language API supports two versions:
 
 - **Version 1 (v1)**: Uses direct DDN URL configuration with optional LLM settings
 - **Version 2 (v2)**: Uses DDN build-based configuration with settings from build metadata
 
-### Request v1
+## Request Specifications
+
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+### Request
 
 #### Headers
 
@@ -153,7 +162,7 @@ request body. For new implementations, use the `Authorization` header with the `
 | `interactions`        | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
 | `stream`              | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
 
-#### LLM Provider Options**
+#### LLM Provider Configuration
 
 The `llm` and `ai_primitives_llm` fields support the following providers:
 
@@ -190,7 +199,10 @@ You get $20 worth of free credits with Hasura's built-in provider during the tri
 }
 ```
 
-### Request v2
+</TabItem>
+<TabItem value="v2" label="Version 2">
+
+### Request
 
 Version 2 requests use supergraph build versions instead of direct DDN URLs. The `build_version` refers to the version
 of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
@@ -266,14 +278,28 @@ body. Instead, these PromptQL settings are automatically inferred from the super
 This approach ensures consistent configuration management and eliminates the need to specify LLM settings in each API
 request when using v2.
 
-### DDN Auth
+</TabItem>
+</Tabs>
+
+## Authentication
+
+### PromptQL API Authentication
+
+Both API versions require authentication using your PromptQL API key:
+
+- **Version 1**: Supports both `Authorization` header (recommended) and deprecated `promptql_api_key` field
+- **Version 2**: Requires `Authorization` header with Bearer token format
+
+### DDN Authentication
 
 The `ddn.headers` field allows you to pass authentication headers to your DDN endpoint and is supported in both
 **version 1 (v1)** and **version 2 (v2)** requests. This enables you to use any DDN-compatible authentication strategy
 with the Natural Language API.
 
-**In version 1 requests**, configure headers in the `ddn.headers` object as shown in the [Request v1](#request-v1)
-section:
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+Configure headers in the `ddn.headers` object:
 
 ```json
 {
@@ -287,8 +313,10 @@ section:
 }
 ```
 
-**In version 2 requests**, configure headers in the `ddn.headers` object as shown in the [Request v2](#request-v2)
-section:
+</TabItem>
+<TabItem value="v2" label="Version 2">
+
+Configure headers in the `ddn.headers` object:
 
 ```json
 {
@@ -302,6 +330,9 @@ section:
 }
 ```
 
+</TabItem>
+</Tabs>
+
 :::info Authentication Strategies
 
 The headers you need to include depend on your DDN project's authentication configuration. For comprehensive information
@@ -310,11 +341,13 @@ about setting up authentication modes and understanding which headers to use, re
 
 :::
 
-### Response
+## Response Format
 
-The response format depends on the `stream` parameter:
+The response format depends on the `stream` parameter in your request:
 
-**Non-streaming Response** (application/json)
+### Non-streaming Response
+
+**Content-Type:** `application/json`
 
 ```json
 {
@@ -338,7 +371,9 @@ The response format depends on the `stream` parameter:
 }
 ```
 
-**Streaming Response** (text/event-stream)
+### Streaming Response
+
+**Content-Type:** `text/event-stream`
 
 The streaming response sends chunks of data in Server-Sent Events (SSE) format:
 
