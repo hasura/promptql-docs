@@ -26,7 +26,7 @@ For example, you can use one model for conversational tasks and another for adva
 
 ```yaml {5-6,8-9}
 kind: PromptQlConfig
-version: v1
+version: v2
 definition:
   llm:
     provider: openai
@@ -86,8 +86,8 @@ With Hasura—used as the default provider—there is **no specific model necess
 
 :::warning HIPAA Compliance
 
-If you plan to interact with PHI using PromptQL, you should not use the Hasura provider as it is not 
-HIPAA compliant. You will have to bring your own LLM with another supported provider.
+If you plan to interact with PHI using PromptQL, you should not use the Hasura provider as it is not HIPAA compliant.
+You will have to bring your own LLM with another supported provider.
 
 :::
 
