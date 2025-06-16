@@ -34,7 +34,7 @@ domain (e.g., users, orders, products) and can be managed by different teams.
 :::tip Key Concepts
 
 - Supergraph and subgraph builds are immutable and have unique IDs
-- A subgraph must exist in the DDN project before inviting collaborators to it
+- A subgraph must exist in the PromptQL project before inviting collaborators to it
 - Each subgraph is namespaced and internal metadata objects cannot conflict with other subgraphs
 - The supergraph is where subgraphs meet and conflicts can occur with root field and type names
 - [Subgraph prefixing](/project-configuration/subgraphs/subgraph-prefixing.mdx) can automatically remedy naming
@@ -94,7 +94,7 @@ This will serve as the parent project.
 ddn supergraph init <parent-project> && cd <parent-project> && git init
 ```
 
-This will scaffold the local configuration for your DDN project and initialize a Git repository.
+This will scaffold the local configuration for your PromptQL project and initialize a Git repository.
 
 ### Step 2. Initialize the cloud project
 
@@ -117,8 +117,8 @@ Push this repository to your preferred hosting service to share it with collabor
 
 ### Step 4. Provision subgraphs on the cloud parent project
 
-If you know the subgraphs to include, you can provision them using the DDN CLI. Replace `<subgraph-name>` with the
-desired name:
+If you know the subgraphs to include, you can provision them using the CLI. Replace `<subgraph-name>` with the desired
+name:
 
 ```ddn
 ddn project subgraph create <subgraph-name>

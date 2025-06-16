@@ -24,9 +24,9 @@ import Prereqs from "@site/docs/_prereqs.mdx";
 You can use lambda connectors to give PromptQL abilities to execute custom business logic on behalf of the user. We can
 add a lamdba connector runtime in Node.js with **TypeScript**, **Python**, or **Go**, and expose functions to PromptQL
 as tools it can use. This means PromptQL isn't limited to querying data — it can **trigger logic**, **run workflows**,
-or **transform inputs into actions**, all within a secure and consistent API environment.
+or **transform inputs into actions & automations**, all within a secure and consistent API environment.
 
-By treating logic like a first-class data source, PromptQL ensures your application has a unified surface for
+By treating logic like a first-class data source, PromptQL ensures your application has a unified interface for
 interacting with databases, API services, and whatever actions you want your application to be able to take. You define
 how the system should respond to user queries, apply business rules, or even call third-party APIs.
 
@@ -103,8 +103,8 @@ The JSDoc comments are optional, but the first general comment is highly recomme
 function's purpose and parameters and will be added to the function's metadata.
 
 The `@readonly` tag indicates that the function does not modify any data, and PromptQL will be able to call this without
-asking for confirmation. Under the hood, DDN will create an NDC function for `@readonly` lambdas and an NDC procedure
-for functions that are not marked as `@readonly`.
+asking for confirmation. Under the hood, the connector will expose an NDC function for `@readonly` lambdas and an NDC
+procedure for functions that are not marked as `@readonly`.
 
 </TabItem>
 <TabItem value="Python" label="Python">

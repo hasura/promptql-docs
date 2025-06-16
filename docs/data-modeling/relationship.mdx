@@ -38,13 +38,13 @@ be in the same subgraph.
 
 ## Lifecycle
 
-Many relationships can be created automatically by the DDN CLI from detected underlying connections such as foreign
-keys. In such cases the lifecycle in creating a relationship in your metadata is as follows:
+Many relationships can be created automatically by the CLI from detected underlying connections such as foreign keys. In
+such cases the lifecycle in creating a relationship in your metadata is as follows:
 
-1. Introspect your data source using the DDN CLI with the relevant data connector to fetch the entity resources.
-2. Add the detected relationships to your metadata with the DDN CLI.
-3. Create a build of your supergraph API with the DDN CLI.
-4. Serve your build to enable PromptQL to access your data with the Hasura engine either locally or in the cloud.
+1. Introspect your data source using the CLI with the relevant data connector to fetch the entity resources.
+2. Add the detected relationships to your metadata with the CLI.
+3. Create a build with the CLI.
+4. Serve your build via the packaged distributed query engine, either locally or in the cloud.
 5. Iterate on your PromptQL experience by repeating this process or by editing your metadata manually as needed.
 
 <Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" width="1000px" />
@@ -63,10 +63,10 @@ commands.
 The target command can be enabled with a custom piece of business logic on a lambda data connector, or a native mutation
 operation.
 
-### Using the DDN CLI
+### Using the CLI
 
-The DDN CLI and your data connectors will detect many relationships in your data sources automatically, for instance
-from foreign keys in a relational database, and once introspected, you can add them to your metadata.
+The CLI and your data connectors will detect many relationships in your data sources automatically, for instance from
+foreign keys in a relational database, and once introspected, you can add them to your metadata.
 
 ```ddn title="Introspect your data source:"
 ddn connector introspect <connector_name>
@@ -90,7 +90,7 @@ ddn relationship add <connector_link_name> "*"
 
 Note that the above CLI commands work without also adding the relevant subgraph to the command with the `--subgraph`
 flag because this has been set in the CLI context. You can learn more about creating and switching contexts in the
-[CLI context](/) section. {/* TODO: Add link */}
+[CLI context](/project-configuration/project-management/manage-contexts.mdx) section.
 
 :::
 
@@ -153,7 +153,7 @@ ddn connector introspect <connector_name>
 ddn model update <connector_name> <model_name>
 ```
 
-Now, you can either delete the existing `Relationship` object and use the DDN CLI to add it again:
+Now, you can either delete the existing `Relationship` object and use the CLI to add it again:
 
 ```ddn title="Delete your existing relationship manually and add it again:"
 ddn relationship add <connector_link_name> <collection_name>

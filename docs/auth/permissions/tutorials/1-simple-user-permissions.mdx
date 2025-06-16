@@ -19,14 +19,14 @@ seoFrontMatterUpdated: false
 In this tutorial, you'll learn how to configure [permissions](/reference/metadata-reference/permissions.mdx) to limit
 users to accessing only their data.
 
-This can be done by passing a value in the header of each request to your application; Hasura will then use that value
-to return only the data which matches conditions you specify.
+This can be done by passing a value in the header of each request to your application; the query engine will then use
+that value to return only the data which matches conditions you specify.
 
 :::info Prerequisites
 
 Before continuing, ensure you have:
 
-- A local Hasura project.
+- A local PromptQL project.
 - Either JWT or Webhook mode enabled in your [AuthConfig](/reference/metadata-reference/auth-config.mdx).
 
 :::
@@ -36,7 +36,7 @@ Before continuing, ensure you have:
 ### Step 1. Create your ModelPermissions {#step-one}
 
 To create a new role, such as `user`, simply add the role to the list of `permissions` for the model to which you wish
-to limit access. Then, set up your access control rules.
+to limit access. Then, set up your access-control rules.
 
 In the example below, we'll allow users with the role of `user` to access only their own rows from a `Users` model by
 checking for a header value matching their `id`:
@@ -137,8 +137,8 @@ different roles and environments.
 
 ## Learn more about permissions and auth
 
-- [Permissions](/auth/permissions/index.mdx) with Hasura DDN
-- [Auth](/auth/overview.mdx) with Hasura DDN
+- [Permissions](/auth/permissions/index.mdx)
+- [Auth](/auth/overview.mdx)
 
 ## Similar tutorials
 
