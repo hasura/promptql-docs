@@ -6,8 +6,11 @@ keywords:
   - hasura ddn
   - natural language
   - apis
-toc_max_heading_level: 4
+toc_max_heading_level: 2
 ---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # Natural Language API
 
@@ -69,8 +72,6 @@ communicate with PromptQL in real-time.
 
 Send messages to PromptQL and receive responses, optionally in a streaming format.
 
-### Request
-
 `POST https://promptql.ddn.hasura.me/api/query`
 
 :::note Private DDN Endpoint
@@ -82,13 +83,35 @@ by the control plane. For example:
 
 :::
 
-**Headers**
+### API Versions
+
+The Natural Language API supports two versions:
+
+- **Version 1 (v1)**: Uses direct DDN URL configuration with optional LLM settings
+- **Version 2 (v2)**: Uses DDN build-based configuration with settings from build metadata
+
+## Request Specifications
+
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+### Request
+
+#### Headers
 
 ```
 Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
 ```
 
-**Request Body**
+:::info Authentication
+
+Version 1 requests support both the `Authorization` header (recommended) and the deprecated `promptql_api_key` field in the
+request body. For new implementations, use the `Authorization` header with the `Bearer <your-promptql-api-key>` token format.
+
+:::
+
+#### Request Body
 
 ```json
 {
@@ -124,7 +147,7 @@ Content-Type: application/json
 }
 ```
 
-**Request Body Fields**
+#### Request Body Fields
 
 | Field                 | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
 | --------------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -139,7 +162,7 @@ Content-Type: application/json
 | `interactions`        | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
 | `stream`              | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
 
-**LLM Provider Options**
+#### LLM Provider Configuration
 
 The `llm` and `ai_primitives_llm` fields support the following providers:
 
@@ -176,16 +199,155 @@ You get $20 worth of free credits with Hasura's built-in provider during the tri
 }
 ```
 
-#### Request DDN Auth
+</TabItem>
+<TabItem value="v2" label="Version 2">
 
-The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
-[auth with these APIs](/promptql-apis/auth.mdx).
+### Request
 
-### Response
+Version 2 requests use supergraph build versions instead of direct DDN URLs. The `build_version` refers to the version
+of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
+using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
 
-The response format depends on the `stream` parameter:
+#### Headers
 
-**Non-streaming Response** (application/json)
+```
+Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
+```
+
+:::info Authentication
+
+Version 2 requests require the PromptQL API key to be sent as a Bearer token in the Authorization header.
+
+:::
+
+#### Request Body
+
+```json
+{
+  "version": "v2",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {}
+  },
+  "artifacts": [],
+  "timezone": "America/Los_Angeles",
+  "interactions": [
+    {
+      "user_message": {
+        "text": "Your message here"
+      },
+      "assistant_actions": [
+        {
+          "message": "Previous assistant message",
+          "plan": "Previous execution plan",
+          "code": "Previously executed code",
+          "code_output": "Previous code output",
+          "code_error": "Previous error message if any"
+        }
+      ]
+    }
+  ],
+  "stream": false
+}
+```
+
+#### Request Body Fields
+
+| Field          | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
+| -------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `version`      | string  | Yes      | Must be set to "v2"                                                                                                                                                                                                                                                                               |
+| `ddn`          | object  | Yes      | DDN configuration including `build_version` and headers                                                                                                                                                                                                                                           |
+| `artifacts`    | array   | No       | List of existing artifacts to provide context                                                                                                                                                                                                                                                     |
+| `timezone`     | string  | Yes      | IANA timezone for interpreting time-based queries                                                                                                                                                                                                                                                 |
+| `interactions` | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
+| `stream`       | boolean | Yes      | Whether to return a streaming response                                                                                                                                                                                                                                                            |
+
+#### PromptQL Configuration
+
+Unlike v1 requests, v2 requests do not accept `llm`, `ai_primitives_llm`, or `system_instructions` fields in the request
+body. Instead, these PromptQL settings are automatically inferred from the supergraph build configuration.
+
+**Configuration Resolution Order:**
+
+1. **Build-level PromptQL Config**: Settings are first retrieved from the
+   [PromptQL configuration](/project-configuration/promptql-config/) associated with the specified `build_version`
+2. **Project-level Fallback**: For older builds that don't have PromptQL config included, the system falls back to the
+   PromptQL configuration saved in the project settings
+
+This approach ensures consistent configuration management and eliminates the need to specify LLM settings in each API
+request when using v2.
+
+</TabItem>
+</Tabs>
+
+## Authentication
+
+### PromptQL API Authentication
+
+Both API versions require authentication using your PromptQL API key:
+
+- **Version 1**: Supports both `Authorization` header (recommended) and deprecated `promptql_api_key` field
+- **Version 2**: Requires `Authorization` header with Bearer token format
+
+### DDN Authentication
+
+The `ddn.headers` field allows you to pass authentication headers to your DDN endpoint and is supported in both
+**version 1 (v1)** and **version 2 (v2)** requests. This enables you to use any DDN-compatible authentication strategy
+with the Natural Language API.
+
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+Configure headers in the `ddn.headers` object:
+
+```json
+{
+  "version": "v1",
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="v2" label="Version 2">
+
+Configure headers in the `ddn.headers` object:
+
+```json
+{
+  "version": "v2",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::info Authentication Strategies
+
+The headers you need to include depend on your DDN project's authentication configuration. For comprehensive information
+about setting up authentication modes and understanding which headers to use, refer to our
+[Authentication in APIs](/promptql-apis/auth.mdx) documentation.
+
+:::
+
+## Response Format
+
+The response format depends on the `stream` parameter in your request:
+
+### Non-streaming Response
+
+**Content-Type:** `application/json`
 
 ```json
 {
@@ -209,7 +371,9 @@ The response format depends on the `stream` parameter:
 }
 ```
 
-**Streaming Response** (text/event-stream)
+### Streaming Response
+
+**Content-Type:** `text/event-stream`
 
 The streaming response sends chunks of data in Server-Sent Events (SSE) format:
 
