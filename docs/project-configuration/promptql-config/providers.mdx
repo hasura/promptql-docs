@@ -24,14 +24,16 @@ and the freedom to switch between providers and models as needed depending the t
 
 For example, you can use one model for conversational tasks and another for advanced AI primitives:
 
-```yaml {5-6,8-9}
+```yaml {5-6,8-9} title="Example of globals/metadata/promptql-config.hml"
 kind: PromptQlConfig
 version: v2
 definition:
   llm:
     provider: openai
     model: o3-mini
-  ai_primitives_llm:
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
 ```
@@ -41,9 +43,9 @@ definition:
 The `llm` configuration is used to define the LLM provider and model for **conversational tasks** in your application.
 In the example above, we're using `openai` as the provider with the `o3-mini` model.
 
-### `ai_primitives_llm`
+### `aiPrimitivesLlm`
 
-The `ai_primitives_llm` configuration is used to define the LLM provider and model for
+The `aiPrimitivesLlm` configuration is used to define the LLM provider and model for
 [**AI primitives** in your application](/promptql-apis/execute-program-api.mdx). This is used for tasks such as
 **program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
 model.
@@ -140,6 +142,7 @@ definition:
 ```
 
 Be sure to also include the key-value pair for your API key (`<PROVIDER>_API_KEY=your-key`) in your project's `.env`
-files.
+files and if you're developing locally, in the root `compose.yaml` file in `services.promptql-playground.environment` as
+well.
 
 :::
