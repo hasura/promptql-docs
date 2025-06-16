@@ -28,10 +28,12 @@ definition:
   llm:
     provider: openai
     model: o3-mini
-  ai_primitives_llm:
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
-  system_instructions: |
+  systemInstructions: |
     You are a helpful AI Assistant.
 ```
 
