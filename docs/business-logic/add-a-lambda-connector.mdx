@@ -72,10 +72,18 @@ As this is a Go project, you can easily add any dependencies you desire by addin
 
 ## Write a function
 
-There are two types of lambdas you can write, functions and procedures.
+There are two types of lambdas you can write, **functions and procedures**.
 
-- Functions are read-only. Queries without side effects. PromptQL will not ask for confirmation before calling them.
-- Procedures can mutate data and have side effects. PromptQL will ask for confirmation before calling them.
+- **Functions** are read-only. Queries without side effects. PromptQL will not ask for confirmation before calling them.
+- **Procedures** can mutate data and have side effects. PromptQL will ask for confirmation before calling them.
+
+:::tip Return types
+
+Lambda functions work best when you use a non-scalar return type as the added context of the shape of the type helps
+PromptQL understand how the function can and should be used. In the examples below, you'll see various interfaces,
+types, and structs used as the return types in these functions. 
+
+:::
 
 ### Examples
 
@@ -89,13 +97,36 @@ examples.
 
 ```ts title="<subgraph-name>/connector/<connector-name>/functions.ts"
 /**
- * Takes an optional name parameter and returns a friendly greeting string
- * @param {string} [name] - Optional name to personalize the greeting
- * @returns {string} A greeting in the format "hello {name}" or "hello world" if no name provided
- * @readonly
+ * This interface represents the standard response returned by greeting or other playful functions.
  */
-export function hello(name?: string) {
-  return `hello ${name ?? "world"}`;
+interface HelloResponse {
+  success: boolean;
+  message: string;
+}
+
+/**
+ * The hello() function takes in an optional name as a string and returns a HelloResponse object with a success boolean and greeting as the message's value.
+ * @param {string} name - An optional name to greet.
+ * @returns {HelloResponse} A HelloResponse object greeting the person.
+ * @readonly Exposes the function as an NDC function (the function should only query data without making modifications)
+ */
+export function hello(name?: string): HelloResponse {
+  return {
+    success: true,
+    message: `hello ${name ?? "world"}`,
+  };
+}
+
+/**
+ * The complimentPerson() function pretends to improve a person's day by giving them a compliment.
+ * @param {string} name - An optional name of the person to compliment.
+ * @returns {HelloResponse} A HelloResponse object with a positive message.
+ */
+export function complimentPerson(name?: string): HelloResponse {
+  return {
+    success: true,
+    message: `You're doing great today, ${name ?? "friend"}!`,
+  };
 }
 ```
 
@@ -112,16 +143,31 @@ procedure for functions that are not marked as `@readonly`.
 ```python title="<subgraph-name>/connector/<connector-name>/functions.py"
 from hasura_ndc import start
 from hasura_ndc.function_connector import FunctionConnector
+from pydantic import BaseModel, Field # You only need this import if you plan to have complex inputs/outputs, which function similar to how frameworks like FastAPI do
+from hasura_ndc.errors import UnprocessableContent
 from typing import Annotated
+from typing import Optional
+
 
 connector = FunctionConnector()
 
+
+# A standard response model
+class HelloResponse(BaseModel):
+    success: bool
+    message: str
+
+
+# The hello() function takes in an optional name and returns a HelloResponse object.
 @connector.register_query
-def hello(name: str | None = None) -> str:
-    """
-    Takes an optional name parameter and returns a friendly greeting string
-    """
-    return f"hello {name or 'world'}"
+def hello(name: Optional[str] = None) -> HelloResponse:
+    return HelloResponse(success=True, message=f"Hello {name or 'world'}")
+
+
+# The compliment_person() function pretends to give a nice compliment.
+@connector.register_mutation
+def compliment_person(name: Optional[str] = None) -> HelloResponse:
+    return HelloResponse(success=True, message=f"You're doing great today, {name or 'friend'}!")
 
 if __name__ == "__main__":
     start(connector)
@@ -137,6 +183,18 @@ instead.
 </TabItem>
 <TabItem value="Go" label="Go">
 
+First, let's add a new type:
+
+```go title="<subgraph-name>/connector/<connector-name>/types/connector.go"
+// Sample Response for hello.go and greet.go
+type SampleResponse struct {
+	Success bool   `json:"success"`
+	Message string `json:"message"`
+}
+```
+
+Then, let's modify our `hello.go`:
+
 ```go title="<subgraph-name>/connector/<connector-name>/functions/hello.go"
 package functions
 
@@ -147,25 +205,55 @@ import (
 	"hasura-ndc.dev/ndc-go/types"
 )
 
-// HelloArguments defines the input parameters
+// This struct represents the input arguments for the hello function.
 type HelloArguments struct {
-	Name *string `json:"name"` // Pointer makes it optional
+	Name *string `json:"name"`
 }
 
-// HelloResult defines the return type
-type HelloResult struct {
-	Greeting string `json:"greeting"`
-}
-
-// FunctionHello takes an optional name parameter and returns a friendly greeting string
-func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments) (*HelloResult, error) {
-	name := "world"
-	if args.Name != nil {
-		name = *args.Name
+// FunctionHello takes in an optional name as a struct field and returns a HelloResponse object
+// with a success boolean and a greeting as the message's value.
+// If name is not provided, it defaults to "world".
+func FunctionHelloGo(ctx context.Context, state *types.State, arguments *HelloArguments) (*types.SampleResponse, error) {
+	greeting := "world"
+	if arguments.Name != nil && *arguments.Name != "" {
+		greeting = *arguments.Name
 	}
+	return &types.SampleResponse{
+		Success: true,
+		Message: fmt.Sprintf("hello %s", greeting),
+	}, nil
+}
+```
 
-	return &HelloResult{
-		Greeting: fmt.Sprintf("hello %s", name),
+Finally, let's add a `compliment.go`:
+
+```go title="<subgraph-name>/connector/<connector-name>/functions/compliment.go"
+package functions
+
+import (
+	"context"
+	"fmt"
+
+	"hasura-ndc.dev/ndc-go/types"
+)
+
+// This struct represents the input arguments for the compliment function.
+type ComplimentArguments struct {
+	Name *string `json:"name"`
+}
+
+// ProcedureComplimentPerson pretends to improve a person's day by giving them a compliment.
+// It takes in an optional name as a struct field and returns a ComplimentResponse object
+// with a success boolean and a positive message.
+// If name is not provided, it defaults to "friend".
+func ProcedureComplimentPersonGo(ctx context.Context, state *types.State, arguments *ComplimentArguments) (*types.SampleResponse, error) {
+	name := "friend"
+	if arguments.Name != nil && *arguments.Name != "" {
+		name = *arguments.Name
+	}
+	return &types.SampleResponse{
+		Success: true,
+		Message: fmt.Sprintf("You're doing great today, %s!", name),
 	}, nil
 }
 ```
@@ -173,7 +261,8 @@ func FunctionHello(ctx context.Context, state *types.State, args *HelloArguments
 Function names are important as they determine how the function will be exposed in the API:
 
 - Functions starting with `Function` (like `FunctionHello`) are treated as queries (read-only)
-- Functions starting with `Procedure` (like `ProcedureCreateUser`) are treated as mutations (data modifications)
+- Functions starting with `Procedure` (like `ProcedureComplimentPerson`) are treated as mutations (data modifications)
+  and **will require approval**.
 
 The function documentation is highly recommended to help PromptQL understand the function's purpose and parameters and
 will be added to the function's metadata.
@@ -232,9 +321,16 @@ Head over to the PromptQL Playground and ask PromptQL to call your lambda functi
 say hello to everyone
 ```
 
+Or, try your procedure and get a nice compliment (after approval of course!):
+
+```plaintext
+Give Rikin a compliment
+```
+
 ## Retrieve information
 
-You can add a lambda function which reaches out to external APIs to retrieve data which PromptQL can use.
+The examples above are great templates for learning how to use functions and procedures. A common use for **functions**
+is to reach out to external APIs to retrieve data which PromptQL can use. You can learn more about that below.
 
 ### Step 1. Call an external API
 
@@ -381,138 +477,6 @@ func FunctionHelloFromHttpBin(ctx context.Context, state *types.State, args *Hel
 
 Remember to expose your lambda functions to PromptQL by following the steps in
 [Exposing your lambda functions](#exposing-your-lambda-functions).
-
-## Take action
-
-You can use lambda connectors to add custom business logic to your application that takes action on behalf of a user.
-
-### Step 1. Add custom logic
-
-<Tabs groupId="source-preference" className="api-tabs">
-
-<TabItem value="TypeScript" label="TypeScript">
-
-```typescript title="Replace the contents of functions.ts with the following:"
-/*
- * Interface for the response when taking action on behalf of a user.
- * Contains success status and message.
- */
-interface UserActionResponse {
-  success: boolean;
-  message: string;
-}
-
-/*
- * This function simulates taking an action on behalf of a user. It logs the request made by the user
- * and returns a response object indicating the success status and a message.
- *
- * @param {string} request - What the user wants to do
- * @returns {UserActionResponse} - The response object containing success status and message
- */
-export function takeActionOnBehalfOfUser(request: string): UserActionResponse {
-  // In a real application, you'd replace this with your custom business logic.
-  // You could update data in a database or use an API to update another service.
-  console.log(`Taking action on behalf of user: ${request}`);
-  return {
-    success: true,
-    message: `Successfully took action on user's behalf: ${request}`,
-  };
-}
-```
-
-The absence of the `@readonly` tag indicates that this function will modify data. PromptQL will ask for confirmation
-before calling it.
-
-</TabItem>
-
-<TabItem value="Python" label="Python">
-
-```python title="Replace the contents of functions.py with the following:"
-from hasura_ndc import start
-from hasura_ndc.function_connector import FunctionConnector
-from pydantic import BaseModel, Field
-from hasura_ndc.errors import UnprocessableContent
-from typing import Annotated
-
-connector = FunctionConnector()
-
-class UserActionArguments(BaseModel):
-    request: Annotated[str, Field(description="What the user wants to do")]
-
-class UserActionResponse(BaseModel):
-    success: bool
-    message: str
-
-@connector.register_mutation
-def take_action_on_behalf_of_user(args: UserActionArguments) -> UserActionResponse:
-    # In a real application, you'd replace this with business logic
-    # You could update data in a database or use an API to update another service.
-    print("Taking action on behalf of user")
-    return UserActionResponse(
-        success=True,
-        message=f"Successfully took action on user's behalf: {args.request}"
-    )
-
-if __name__ == "__main__":
-    start(connector)
-```
-
-The addition of the `@connector.register_mutation` decorator indicates that the function will modify data, and PromptQL
-will ask for confirmation before calling it.
-
-</TabItem>
-
-<TabItem value="Go" label="Go">
-
-```go title="Add the following to a new file called app/connector/my_go/functions/take_action_on_behalf_of_user.go:"
-package functions
-
-import (
-	"context"
-	"fmt"
-
-	"hasura-ndc.dev/ndc-go/types"
-)
-
-// TakeActionArguments represents the input arguments for a user action.
-type TakeActionArguments struct {
-	Request string `json:"request"`
-}
-
-// TakeActionResponse represents the response after performing a user action.
-type TakeActionResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
-// ProcedureTakeActionOnBehalfOfUser simulates taking an action for the user.
-func ProcedureTakeActionOnBehalfOfUser(
-	ctx context.Context,
-	state *types.State,
-	args *TakeActionArguments,
-) (*TakeActionResponse, error) {
-	// In a real application, you'd replace this with your custom business logic
-  // You could update data in a database or use an API to update another service.
-	fmt.Println("Taking action on behalf of user")
-
-	return &TakeActionResponse{
-		Success: true,
-		Message: fmt.Sprintf("Successfully took action on user's behalf: %s", args.Request),
-	}, nil
-}
-```
-
-By prefixing the function name with `Procedure`, we indicate that the function will modify data, and PromptQL will ask
-for confirmation before calling it.
-
-</TabItem>
-
-</Tabs>
-
-Remember to expose your lambda functions to PromptQL by following the steps in
-[Exposing your lambda functions](#exposing-your-lambda-functions).
-
-<Thumbnail src="/img/business-logic/take-action.png" alt="Take action on behalf of user" />
 
 :::info What about custom native operations?
 
