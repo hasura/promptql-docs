@@ -1,0 +1,84 @@
+---
+sidebar_position: 6
+sidebar_label: Recast types
+description: "Learn how to cast types at your metadata layer."
+keywords:
+  - data modeling
+  - promptql
+  - ai
+  - typecast
+  - recast
+title: Typecasting
+---
+
+# Recast Types
+
+## Overview
+
+At times, your database schema may not perfectly align with how you want to expose data types in your API. For example,
+you might have text fields that contain numeric values, JSON fields you want to filter as strings, or custom database
+types that would work better as standard types in your API.
+
+Your semantic metadata layer allows you to recast these types without requiring any changes to your underlying
+datasource schema. This powerful feature enables you to unlock type-specific operations like numeric aggregations on
+text fields or string filtering on JSON data, all through simple metadata configuration changes.
+
+## Step 1. Update the representation mapping
+
+In the `<connector-name>-types.hml` file for your connector, you'll find definitions and mappings for your data source's
+types. For the type you wish to recast, you'll need to identify the correct `DataConnectorScalarRepresentation` and
+change the value for the `representation` key.
+
+If you don't know which types are available when recasting, trigger the
+[Hasura VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) by pressing
+`CTRL+SPACEBAR`. Check out the example below.
+
+```yaml title="Here we'll change a text type (represented as a string):" {6}
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: pg
+  dataConnectorScalarType: text
+  representation: string
+  graphql:
+    comparisonExpressionTypeName: string_comparison_exp
+```
+
+```yaml title="To an int:" {6,8}
+kind: DataConnectorScalarRepresentation
+version: v1
+definition:
+  dataConnectorName: pg
+  dataConnectorScalarType: text
+  representation: int32
+  graphql:
+    comparisonExpressionTypeName: text_as_int32_comparison_exp
+```
+
+:::tip Comparison Expression Type
+
+We're also amending the `comparisonExpressionTypeName` as these must be unique.
+
+:::
+
+## Step 2. Regenerate your metadata
+
+```ddn title="Update your metadata by running the following:"
+ddn model add <connector-name> "*"
+```
+
+This will update your metadata to use the new type; you'll find changes in both the `<connector-name>-types.hml` file
+for various expressions (such as aggregates and boolean) and any models which use the recast type.
+
+## Step 3. Test it out
+
+```ddn title="Rebuild your metadata:"
+ddn supergraph build local
+```
+
+```ddn title="Then, restart your services:"
+ddn run docker-start
+```
+
+If you explore your metadata, you'll see the type recast, allowing you to perform operations that weren't previously
+possible.
