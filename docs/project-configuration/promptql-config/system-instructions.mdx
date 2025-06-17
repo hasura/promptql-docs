@@ -21,13 +21,13 @@ interprets questions and crafts responses.
 
 **While powerful, use this feature judiciously to maintain optimal performance.**
 
-```yaml title="Consider this example where we set the system instructions using the PromptQlConfig file:"
+```yaml title="Consider this example where we set the system instructions using the promptql-config.hml file:"
 kind: PromptQlConfig
-version: v1
+version: v2
 definition:
   llm:
     provider: hasura
-  system_instructions: |
+  systemInstructions: |
 
     You are an AI assistant that helps go-to-market teams make data-driven decisions.
 
