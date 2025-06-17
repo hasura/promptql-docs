@@ -3,7 +3,7 @@ import { join, dirname, resolve } from 'path';
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { fileURLToPath } from 'node:url';
 
-const BASE_URL = 'https://hasura.io/docs/promptql';
+const BASE_URL = 'https://promptql.io/docs';
 
 async function expandPartials(content: string, docPath: string, rootDir: string, depth: number = 0): Promise<string> {
   if (depth > 10) {
@@ -102,7 +102,7 @@ export async function writeMarkdown(
       // Get the relative path for the URL, starting from the 'docs' directory
       const relativePath = doc.path.split('/docs/').pop() || '';
       const cleanPath = relativePath.replace(/index\.mdx?$/, '').replace(/\.mdx?$/, '');
-      const url = `${BASE_URL}/${cleanPath}`;
+      const url = cleanPath ? `${BASE_URL}/${cleanPath}/` : `${BASE_URL}/`;
 
       // Handle partial imports and expand them recursively
       const content = await expandPartials(doc.content, doc.path, rootDir);
