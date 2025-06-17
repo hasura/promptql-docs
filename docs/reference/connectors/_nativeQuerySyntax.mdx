@@ -1,4 +1,4 @@
-There are a few requirements for writing valid PromptQL Native Operations SQL:
+There are a few requirements for writing valid PromptQL Native Operations SQL.
 
 ## Arguments are defined as a colon prefixed string
 
@@ -33,14 +33,14 @@ For example:
 SELECT * FROM "Artist" WHERE "Name" LIKE '%John%'
 ```
 
-can be written as
+Can be written as:
 
 ```sql
 SELECT * FROM "Artist" WHERE "Name" LIKE '%' || :name || '%'
 ```
 
-using the `||` concatenation operator to concatenate the parts of the pattern with the argument variable.
+Using the `||` concatenation operator to concatenate the parts of the pattern with the argument variable.
 
-## No "hasura\_" prefixed arguments
+## No `hasura_` prefixed arguments
 
 Argument names that begin with the prefix `hasura_` are reserved for internal use.
