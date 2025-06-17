@@ -67,7 +67,8 @@
                                 "2025-03-21",
                                 "2025-03-26",
                                 "2025-04-03",
-                                "2025-04-24"
+                                "2025-04-24",
+                                "2025-05-30"
                               ]
                             },
                             {
@@ -88,7 +89,7 @@
                   "description": "Definition of the authentication configuration used by the API server.",
                   "oneOf": [
                     {
-                      "title": "AuthConfig1",
+                      "title": "AuthConfigV1",
                       "description": "Definition of the authentication configuration v1, used by the API server.",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
@@ -686,7 +687,7 @@
                       "additionalProperties": false
                     },
                     {
-                      "title": "AuthConfig2",
+                      "title": "AuthConfigV2",
                       "description": "Definition of the authentication configuration v2, used by the API server.",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
@@ -716,7 +717,7 @@
                       "additionalProperties": false
                     },
                     {
-                      "title": "AuthConfig3",
+                      "title": "AuthConfigV3",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
                       "properties": {
@@ -1048,6 +1049,54 @@
                         }
                       },
                       "additionalProperties": false
+                    },
+                    {
+                      "title": "AuthConfigV4",
+                      "type": "object",
+                      "required": ["definition", "kind", "version"],
+                      "properties": {
+                        "kind": {
+                          "type": "string",
+                          "enum": ["AuthConfig"]
+                        },
+                        "version": {
+                          "type": "string",
+                          "enum": ["v4"]
+                        },
+                        "definition": {
+                          "$id": "https://hasura.io/jsonschemas/metadata/AuthConfigV4",
+                          "title": "AuthConfigV4",
+                          "description": "Definition of the authentication configuration v4, used by the API server.",
+                          "type": "object",
+                          "required": ["mode"],
+                          "properties": {
+                            "mode": {
+                              "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/1/oneOf/2/properties/definition/properties/mode"
+                            },
+                            "alternativeModes": {
+                              "type": ["array", "null"],
+                              "items": {
+                                "$id": "https://hasura.io/jsonschemas/metadata/AlternativeMode",
+                                "title": "AlternativeMode",
+                                "description": "Alternative Authentication Modes",
+                                "type": "object",
+                                "required": ["config", "identifier"],
+                                "properties": {
+                                  "identifier": {
+                                    "type": "string"
+                                  },
+                                  "config": {
+                                    "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/1/oneOf/2/properties/definition/properties/mode"
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
+                            }
+                          },
+                          "additionalProperties": false
+                        }
+                      },
+                      "additionalProperties": false
                     }
                   ]
                 },
@@ -1219,6 +1268,99 @@
                                               "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/1/oneOf/15/oneOf/0/properties/definition/oneOf/0/properties/url/allOf/0"
                                             }
                                           ]
+                                        },
+                                        "safetySettings": {
+                                          "description": "Safety settings for the Gemini API",
+                                          "anyOf": [
+                                            {
+                                              "$id": "https://hasura.io/jsonschemas/metadata/GeminiSafetySettings",
+                                              "title": "GeminiSafetySettings",
+                                              "type": "object",
+                                              "properties": {
+                                                "harassment": {
+                                                  "description": "Negative or harmful comments targeting identity and/or protected attributes.",
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0/oneOf/4/properties/safetySettings/anyOf/0/properties/dangerous/anyOf/0"
+                                                    },
+                                                    {
+                                                      "type": "null"
+                                                    }
+                                                  ]
+                                                },
+                                                "hateSpeech": {
+                                                  "description": "Content that is rude, disrespectful, or profane.",
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0/oneOf/4/properties/safetySettings/anyOf/0/properties/dangerous/anyOf/0"
+                                                    },
+                                                    {
+                                                      "type": "null"
+                                                    }
+                                                  ]
+                                                },
+                                                "sexuallyExplicit": {
+                                                  "description": "Contains references to sexual acts or other lewd content.",
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0/oneOf/4/properties/safetySettings/anyOf/0/properties/dangerous/anyOf/0"
+                                                    },
+                                                    {
+                                                      "type": "null"
+                                                    }
+                                                  ]
+                                                },
+                                                "dangerous": {
+                                                  "description": "Promotes, facilitates, or encourages harmful acts.",
+                                                  "anyOf": [
+                                                    {
+                                                      "description": "Configuration settings for a Gemini LLM",
+                                                      "oneOf": [
+                                                        {
+                                                          "description": "Always show regardless of probability of unsafe content",
+                                                          "type": "string",
+                                                          "enum": ["blockNone"]
+                                                        },
+                                                        {
+                                                          "description": "Block when high probability of unsafe content",
+                                                          "type": "string",
+                                                          "enum": ["blockOnlyHigh"]
+                                                        },
+                                                        {
+                                                          "description": "Block when medium or high probability of unsafe content",
+                                                          "type": "string",
+                                                          "enum": ["blockMediumAndAbove"]
+                                                        },
+                                                        {
+                                                          "description": "Block when low, medium or high probability of unsafe content",
+                                                          "type": "string",
+                                                          "enum": ["blockLowAndAbove"]
+                                                        }
+                                                      ]
+                                                    },
+                                                    {
+                                                      "type": "null"
+                                                    }
+                                                  ]
+                                                },
+                                                "civicIntegrity": {
+                                                  "description": "Election-related queries.",
+                                                  "anyOf": [
+                                                    {
+                                                      "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0/oneOf/4/properties/safetySettings/anyOf/0/properties/dangerous/anyOf/0"
+                                                    },
+                                                    {
+                                                      "type": "null"
+                                                    }
+                                                  ]
+                                                }
+                                              },
+                                              "additionalProperties": false
+                                            },
+                                            {
+                                              "type": "null"
+                                            }
+                                          ]
                                         }
                                       },
                                       "additionalProperties": false
@@ -1228,13 +1370,7 @@
                                       "title": "BedrockLlmConfig",
                                       "description": "Configuration settings for an AWS Bedrock-provided LLM",
                                       "type": "object",
-                                      "required": [
-                                        "awsAccessKeyId",
-                                        "awsSecretAccessKey",
-                                        "modelId",
-                                        "provider",
-                                        "regionName"
-                                      ],
+                                      "required": ["awsAccessKeyId", "awsSecretAccessKey", "modelId", "provider", "regionName"],
                                       "properties": {
                                         "provider": {
                                           "type": "string",
@@ -1272,7 +1408,7 @@
                               ]
                             },
                             "aiPrimitivesLlm": {
-                              "description": "Configuration of the LLM to be used for AI primitives, such as classification, summarization etc",
+                              "description": "Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc",
                               "anyOf": [
                                 {
                                   "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0"
@@ -1281,6 +1417,40 @@
                                   "type": "null"
                                 }
                               ]
+                            },
+                            "overrideAiPrimitivesLlm": {
+                              "description": "Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc",
+                              "default": [],
+                              "type": "array",
+                              "items": {
+                                "$id": "https://hasura.io/jsonschemas/metadata/AiPrimitivesLlmConfig",
+                                "title": "AiPrimitivesLlmConfig",
+                                "description": "Configure PromptQL to use a particular LLM for a specific primitive",
+                                "type": "object",
+                                "required": ["llm", "primitiveName"],
+                                "properties": {
+                                  "primitiveName": {
+                                    "description": "The name of the operation to override",
+                                    "allOf": [
+                                      {
+                                        "$id": "https://hasura.io/jsonschemas/metadata/LlmPrimitive",
+                                        "title": "LlmPrimitive",
+                                        "description": "The name of an LLM primitive, such as `classify`, `summarize`, `extract` and `visualize`.",
+                                        "type": "string"
+                                      }
+                                    ]
+                                  },
+                                  "llm": {
+                                    "description": "The configuration to use for this operation",
+                                    "allOf": [
+                                      {
+                                        "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/0/oneOf/2/oneOf/0/properties/definition/properties/llm/allOf/0"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": false
+                              }
                             },
                             "featureFlags": {
                               "description": "Feature flags to be used for PromptQL",
@@ -1454,13 +1624,7 @@
                                           "$schema": "http://json-schema.org/draft-07/schema#",
                                           "title": "Schema Response",
                                           "type": "object",
-                                          "required": [
-                                            "collections",
-                                            "functions",
-                                            "object_types",
-                                            "procedures",
-                                            "scalar_types"
-                                          ],
+                                          "required": ["collections", "functions", "object_types", "procedures", "scalar_types"],
                                           "properties": {
                                             "scalar_types": {
                                               "description": "A list of scalar types which will be used as the types of collection columns",
@@ -1979,13 +2143,7 @@
                                             "CollectionInfo": {
                                               "title": "Collection Info",
                                               "type": "object",
-                                              "required": [
-                                                "arguments",
-                                                "foreign_keys",
-                                                "name",
-                                                "type",
-                                                "uniqueness_constraints"
-                                              ],
+                                              "required": ["arguments", "foreign_keys", "name", "type", "uniqueness_constraints"],
                                               "properties": {
                                                 "name": {
                                                   "description": "The name of the collection\n\nNote: these names are abstract - there is no requirement that this name correspond to the name of an actual collection in the database.",
@@ -2346,13 +2504,7 @@
                                           "$schema": "http://json-schema.org/draft-07/schema#",
                                           "title": "Schema Response",
                                           "type": "object",
-                                          "required": [
-                                            "collections",
-                                            "functions",
-                                            "object_types",
-                                            "procedures",
-                                            "scalar_types"
-                                          ],
+                                          "required": ["collections", "functions", "object_types", "procedures", "scalar_types"],
                                           "properties": {
                                             "scalar_types": {
                                               "description": "A list of scalar types which will be used as the types of collection columns",
@@ -3059,11 +3211,7 @@
                                               "title": "Scalar Type",
                                               "description": "The definition of a scalar type, i.e. types that can be used as the types of columns.",
                                               "type": "object",
-                                              "required": [
-                                                "aggregate_functions",
-                                                "comparison_operators",
-                                                "representation"
-                                              ],
+                                              "required": ["aggregate_functions", "comparison_operators", "representation"],
                                               "properties": {
                                                 "representation": {
                                                   "description": "A description of valid values for this scalar type.",
@@ -4270,13 +4418,7 @@
                                             "RelationalExpressionCapabilities": {
                                               "title": "Relational Expression Capabilities",
                                               "type": "object",
-                                              "required": [
-                                                "aggregate",
-                                                "comparison",
-                                                "conditional",
-                                                "scalar",
-                                                "window"
-                                              ],
+                                              "required": ["aggregate", "comparison", "conditional", "scalar", "window"],
                                               "properties": {
                                                 "conditional": {
                                                   "$ref": "#/definitions/SubgraphObject/anyOf/0/anyOf/1/oneOf/0/oneOf/0/properties/definition/properties/schema/allOf/0/oneOf/1/properties/capabilities/definitions/RelationalConditionalExpressionCapabilities"
@@ -6141,13 +6283,7 @@
                           "title": "ObjectBooleanExpressionTypeV1",
                           "description": "Definition of a type representing a boolean expression on an Open DD object type. Deprecated in favour of `BooleanExpressionType`.",
                           "type": "object",
-                          "required": [
-                            "comparableFields",
-                            "dataConnectorName",
-                            "dataConnectorObjectType",
-                            "name",
-                            "objectType"
-                          ],
+                          "required": ["comparableFields", "dataConnectorName", "dataConnectorObjectType", "name", "objectType"],
                           "properties": {
                             "name": {
                               "description": "The name to give this object boolean expression type, used to refer to it elsewhere in the metadata. Must be unique across all types defined in this subgraph.",
@@ -6500,11 +6636,7 @@
                                                 "title": "DataConnectorOperatorMapping",
                                                 "description": "Mapping between OpenDD operator names and the names used in the data connector schema",
                                                 "type": "object",
-                                                "required": [
-                                                  "dataConnectorName",
-                                                  "dataConnectorScalarType",
-                                                  "operatorMapping"
-                                                ],
+                                                "required": ["dataConnectorName", "dataConnectorScalarType", "operatorMapping"],
                                                 "properties": {
                                                   "dataConnectorName": {
                                                     "description": "Name of the data connector this mapping applies to",
@@ -7182,11 +7314,7 @@
                                                 "title": "DataConnectorAggregationFunctionMapping",
                                                 "description": "Definition of how to map an aggregate expression's aggregation functions to data connector aggregation functions.",
                                                 "type": "object",
-                                                "required": [
-                                                  "dataConnectorName",
-                                                  "dataConnectorScalarType",
-                                                  "functionMapping"
-                                                ],
+                                                "required": ["dataConnectorName", "dataConnectorScalarType", "functionMapping"],
                                                 "properties": {
                                                   "dataConnectorName": {
                                                     "description": "The data connector being mapped to",
@@ -7427,7 +7555,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV1",
-                          "title": "Model1",
+                          "title": "ModelV1",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations.",
                           "type": "object",
                           "required": ["name", "objectType", "orderableFields"],
@@ -7928,7 +8056,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV2",
-                          "title": "Model2",
+                          "title": "ModelV2",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations. ModelV2 implements the changes described in rfcs/open-dd-expression-type-changes.md.",
                           "type": "object",
                           "required": ["name", "objectType"],
@@ -9381,6 +9509,21 @@
                                             "type": "boolean"
                                           }
                                         },
+                                        "additionalProperties": false
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "relationalInsert": {
+                                    "description": "The permissions for relational insert operations on this model for this role. If this is null, the role is not allowed to perform relational inserts on this model. This is only applicable for data connectors that support relational operations.",
+                                    "anyOf": [
+                                      {
+                                        "$id": "https://hasura.io/jsonschemas/metadata/RelationalInsertPermission",
+                                        "title": "RelationalInsertPermission",
+                                        "description": "Defines the permissions for relational insert operations on a model for a role. If null, the role is not allowed to perform relational inserts on this model. This is only applicable for data connectors that support relational operations.",
+                                        "type": "object",
                                         "additionalProperties": false
                                       },
                                       {
