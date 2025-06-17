@@ -43,12 +43,14 @@ ddn supergraph init subgraph-example --with-promptql && cd subgraph-example
 In this tutorial, we'll use the PostgreSQL connector and a sample PostgreSQL database:
 
 ```plaintext
-postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
+jdbc:postgresql://35.236.11.122:5432/v3-docs-sample-app?user=read_only_user&password=readonlyuser
 ```
 
-```ddn title="In your project directory, run the following, choose hasura/postrges, and pass the connection URI above when prompted:"
+```ddn title="In your project directory, run the following, choose hasura/postrges-promptql, and pass the connection URI above when prompted:"
 ddn connector init customers_pg -i
 ```
+
+Be sure to include the `public` schema.
 
 ### Step 3. Generate the Hasura metadata
 
@@ -59,11 +61,11 @@ ddn connector introspect customers_pg
 After running this, you should see a representation of your database's schema in the
 `app/connector/customers_pg/configuration.json` file; you can view this using `cat` or open the file in your editor.
 
-```ddn title="Now, track the table from your PostgreSQL database as a model in your DDN metadata:"
+```ddn title="Now, track the table from your PostgreSQL database as a model in your metadata:"
 ddn models add customers_pg users
 ```
 
-Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The DDN CLI will use this Hasura
+Open the `app/metadata` directory and you'll find a newly-generated file: `Users.hml`. The CLI will use this Hasura
 Metadata Language file to represent the `users` table from PostgreSQL in your application as a
 [model](/reference/metadata-reference/models.mdx).
 
@@ -75,7 +77,7 @@ ddn supergraph build local
 
 The build is stored as a set of JSON files in `engine/build`.
 
-```ddn title="Start your local Hasura instance and PostgreSQL connector:"
+```ddn title="Start your local query engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 
@@ -95,7 +97,7 @@ Show me all the users in my application.
 
 ### Step 5. Create a new `billing` subgraph
 
-```ddn title="Use the DDN CLI to create the subgraph in your local metadata:"
+```ddn title="Use the CLI to create the subgraph in your local metadata:"
 ddn subgraph init billing --graphql-type-name-prefix billing
 ```
 
@@ -142,12 +144,14 @@ required — we're referencing the `billing` subgraph.
 As before, we'll use the PostgreSQL connector with the same sample database:
 
 ```plaintext
-postgresql://read_only_user:readonlyuser@35.236.11.122:5432/v3-docs-sample-app
+jdbc:postgresql://35.236.11.122:5432/v3-docs-sample-app?user=read_only_user&password=readonlyuser
 ```
 
 ```ddn title="In your project directory, run:"
 ddn connector init billing_pg -i
 ```
+
+Be sure to include the `public` schema.
 
 :::info Notice where this connector was added
 
@@ -169,8 +173,8 @@ After running this, you should see a representation of the database's schema in 
 ddn models add billing_pg orders
 ```
 
-Open the `billing/metadata` directory and you'll find a newly-generated file: `PaymentInformation.hml`. The DDN CLI will
-use this Hasura Metadata Language file to represent the `payment_information` table from PostgreSQL in your API as a
+Open the `billing/metadata` directory and you'll find a newly-generated file: `PaymentInformation.hml`. The CLI will use
+this Hasura Metadata Language file to represent the `payment_information` table from PostgreSQL in your API as a
 [model](/reference/metadata-reference/models.mdx).
 
 ### Step 9. Create a new local build and test the application
@@ -183,7 +187,7 @@ ddn supergraph build local
 CTRL+C
 ```
 
-```ddn title="Restart your local Hasura DDN Engine and PostgreSQL connector:"
+```ddn title="Restart your local query engine and PostgreSQL connector:"
 ddn run docker-start
 ```
 

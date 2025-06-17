@@ -1,7 +1,7 @@
 ---
 sidebar_position: 3
 description:
-  "Guide on configuring command permissions in your supergraph, including role-based access and argument presets."
+  "Guide on configuring command permissions in your metadata, including role-based access and argument presets."
 keywords:
   - command permissions
   - role-based access
@@ -14,7 +14,7 @@ sidebar_label: Command Permissions
 
 To limit what **commands** are available to a role, you define a `CommandPermissions` object.
 
-By default, whenever a new command is created in your supergraph, it is only executable by the `admin` role.
+By default, whenever a new command is created in your metadata, it is only executable by the `admin` role.
 
 You can enable or restrict access to commands by adding a new item to the `permissions` array in the
 `CommandPermissions` object. Each item in the array should have a `role` field and an `allowExecution` field. The
