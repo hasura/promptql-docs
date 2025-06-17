@@ -430,6 +430,7 @@ Defines the permissions for an OpenDD model.
 |-----|-----|-----|-----|
 | `role` | [Role](#modelpermissions-role) | true | The role for which permissions are being defined. |
 | `select` | [SelectPermission](#modelpermissions-selectpermission) / null | false | The permissions for selecting from this model for this role. If this is null, the role is not allowed to query the model. |
+| `relationalInsert` | [RelationalInsertPermission](#modelpermissions-relationalinsertpermission) / null | false | The permissions for relational insert operations on this model for this role. If this is null, the role is not allowed to perform relational inserts on this model. This is only applicable for data connectors that support relational operations. |
 
  **Example:**
 
@@ -447,6 +448,15 @@ select:
       value:
         literal: true
 ```
+
+
+#### RelationalInsertPermission {#modelpermissions-relationalinsertpermission}
+
+Defines the permissions for relational insert operations on a model for a role. If null, the role is not allowed to perform relational inserts on this model. This is only applicable for data connectors that support relational operations.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+
 
 
 #### SelectPermission {#modelpermissions-selectpermission}
