@@ -140,7 +140,7 @@ const config: Config = {
       },
     },
     // Replace with your project's social card
-    image: 'img/og-social-card.jpg',
+    image: 'img/og-promptql.jpg',
     algolia: {
       appId: 'FWSSPB5BLA',
       // Public API key: it is safe to commit it

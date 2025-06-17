@@ -21,17 +21,19 @@ toc_max_heading_level: 4
 Your PromptQlConfig is a metadata object that defines the configuration of PromptQL for your project. It includes the
 LLM to be used, the system instructions, and other settings.
 
-```yaml title="Example PromptQlConfig"
+```yaml title="Example of globals/metadata/promptql-config.hml"
 kind: PromptQlConfig
 version: v2
 definition:
   llm:
     provider: openai
     model: o3-mini
-  ai_primitives_llm:
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
-  system_instructions: |
+  systemInstructions: |
     You are a helpful AI Assistant.
 ```
 
