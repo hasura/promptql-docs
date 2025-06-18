@@ -1,32 +1,144 @@
 ---
 sidebar_position: 0
 sidebar_label: Quickstart
-description:
-  "Learn how to set up and deploy PromptQL. This guide covers installing prerequisites, configuring API keys, running
-  PromptQL locally, and deploying to Hasura DDN."
+description: "Learn how to get started with PromptQL by asking complex questions and building automations."
 keywords:
   - promptql
-  - hasura ddn
   - quickstart
   - getting started
   - guide
-  - quickstart
 sidebar_class_name: quickstart-icon
 ---
 
-import Prereqs from "@site/docs/_prereqs.mdx";
-import Quickstart from "@site/docs/_quickstart_template.mdx";
+import Thumbnail from "@site/src/components/Thumbnail";
 
 # Quickstart with PromptQL
 
-In this getting started guide, you'll deploy PromptQL and connect it to a sample dataset — a hosted PostgreSQL database
-pre-loaded with IMDb movie data. You'll start by exploring the dataset through natural language queries, discovering how
-PromptQL can reliably answer questions and assist in decision-making. Then, you'll add custom business logic that lets
-PromptQL act on your behalf — like renting a movie for a user — showing how it can go beyond answering questions to
-automating tasks.
+This guide is designed to give you a high-level overview of PromptQL and how you can use it to make better decisions
+about your business and automate tasks—all without any coding knowledge required.
 
-<Prereqs />
+:::info Prerequisites
 
-## Build your first PromptQL app
+Before continuing, you'll need a [Hasura Cloud account](https://cloud.hasura.io/signup/new_user).
 
-<Quickstart />
+If you have your own project, you can apply the information below to it. Otherwise, we have a
+[collection of sandboxes](/index.mdx#demos) which allow you to try PromptQL and get a feel for the experience.
+
+:::
+
+## Open your project
+
+Each PromptQL project can be accessed via a unique URL. You can access all your projects
+[from the PromptQL Console](https://promptql.console.hasura.io/).
+
+<Thumbnail
+  src="/img/get-started/pql-console-all-projects.png"
+  alt="The PromptQL Cloud Console with all projects."
+  width="1000px"
+/>
+
+When you navigate to a project, you're dropped into its **playground**; this is the chat interface that allows you to
+ask questions about your data and create automations.
+
+<Thumbnail src="/img/get-started/pql-playground.png" alt="The PromptQL Playground." width="1000px" />
+
+## Talk to your data
+
+Primarily, you'll interact with PromptQL in one of two ways: either by asking questions, or creating automations.
+
+### Ask a complex question
+
+Using [the `sandbox-gtm` project](https://promptql.console.hasura.io/public/sandbox-gtm/playground), we're going to ask
+the following question:
+
+```plaintext
+Which enterprise deals are at risk of slipping this quarter based on engagement patterns?
+```
+
+<details>
+  <summary>
+    Why is this complex?
+  </summary>
+
+This is complex because it requires:
+
+1. Defining "enterprise deals" - Could be based on:
+
+   - Account tier/type
+   - Deal size
+   - Number of users/usage metrics
+   - Industry/vertical
+
+2. Determining "risk of slipping" by analyzing:
+
+   - Sales engagement (calls, tasks, events)
+   - Buyer engagement signals (6sense scores, successful touches)
+   - Deal velocity compared to similar won deals
+   - Current stage vs time left in quarter
+   - Historical patterns of similar deals that slipped
+
+3. Understanding "engagement patterns" through:
+
+   - Call transcripts and topics discussed
+   - Email sequence responses
+   - Product usage metrics
+   - Multiple stakeholder involvement
+   - Comparison to successful deal patterns
+
+</details>
+
+#### Query plan
+
+PromptQL will respond with a **query plan**. This is a step-by-step breakdown in plain language of how it will process
+your request, including any data retrieval, filtering, or AI operations it will perform.
+
+<Thumbnail
+  src="/img/get-started/pql-query-plan.png"
+  alt="A query plan for a question detailing all steps to find the right data."
+  width="1000px"
+/>
+
+It helps make PromptQL's approach transparent by explaining what it's going to do before it does it, including any
+assumptions it's making about the data or process.
+
+:::tip Query plans are modifiable
+
+You can edit a query plan by clicking the pencil next to a query plan.
+
+You have domain-specific expertise which you can share with PromptQL. When you modify a query plan, PromptQL remembers
+and self-corrects for future threads!
+
+:::
+
+#### Execution
+
+The query plan is then **executed** against your data.
+
+<Thumbnail src="/img/get-started/pql-execution.png" alt="A query plan's execution of Python and SQL." width="1000px" />
+
+PromptQL writes Python code that includes SQL queries to retrieve data, and then processes that data using Python's data
+structures and the AI functions provided to it.
+
+#### Artifacts
+
+Typically, the execution of a query plan will result in an **artifact**.
+
+<Thumbnail
+  src="/img/get-started/pql-artifact.png"
+  alt="A table artifact produced via the execution of a query plan."
+  width="1000px"
+/>
+
+Artifacts are structured outputs like tables, text, or visualizations that store the processed data or analysis results,
+which can be referenced later in the conversation, exported, or used to start new threads for further analysis.
+
+### Give it a task to automate
+
+TODO: After conversation with Sooraj on Monday, 23 June
+
+- Reusable programs
+- Ability to export executable code and run it from an API
+
+## Next steps
+
+- Dev mode
