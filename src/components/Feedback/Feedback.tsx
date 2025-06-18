@@ -73,7 +73,7 @@ export const Feedback = () => {
         redirect: 'follow' as RequestRedirect,
       };
 
-      fetch(docsServerURL + '/feedback/public-new-feedback?', requestOptions)
+      fetch(docsServerURL + '/docs-services/docs-server/feedback/public-new-feedback', requestOptions)
         .then(response => response.text())
         .catch(error => console.error('error', error));
     };
