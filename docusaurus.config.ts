@@ -14,14 +14,14 @@ const DOCS_SERVER_ROOT_URLS = {
 
 const DOCS_SERVER_URLS = {
   development: `http://${DOCS_SERVER_ROOT_URLS.development}`,
-  production: `https://${DOCS_SERVER_ROOT_URLS.production}`,
-  staging: `https://${DOCS_SERVER_ROOT_URLS.staging}`,
+  production: `https://${DOCS_SERVER_ROOT_URLS.production}/docs-services/docs-server`,
+  staging: `https://${DOCS_SERVER_ROOT_URLS.staging}/docs-services/docs-server`,
 };
 
 const BOT_ROUTES = {
   development: `ws://${DOCS_SERVER_ROOT_URLS.development}/bot/query`,
-  production: `wss://${DOCS_SERVER_ROOT_URLS.production}/docs-services/docs-server/bot/query`,
-  staging: `wss://${DOCS_SERVER_ROOT_URLS.staging}/docs-services/docs-server/bot/query`,
+  production: `wss://${DOCS_SERVER_ROOT_URLS.production}/bot/query`,
+  staging: `wss://${DOCS_SERVER_ROOT_URLS.staging}/bot/query`,
 };
 
 const config: Config = {
