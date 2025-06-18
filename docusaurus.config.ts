@@ -77,7 +77,7 @@ const config: Config = {
         return DOCS_SERVER_URLS[mode ?? 'development'];
       }
     })(),
-    hasuraVersion: 3,
+    hasuraVersion: "promptql",
     DEV_TOKEN: process.env.DEV_TOKEN,
     openReplayIngestPoint: 'https://analytics-openreplay.hasura-app.io/ingest',
     openReplayProjectKey: 'x5WnKn7RdPjizi93Vp5I',
