@@ -36,7 +36,22 @@ definition:
   aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  overrideAiPrimitivesLlm:
+    summarize:
+      provider: anthropic
+      model: claude-3-5-sonnet-latest
+      apiKey:
+        valueFromEnv: ANTHROPIC_API_KEY
 ```
+
+:::tip Mapping environment variables
+
+If you do specify environment variables in your `promptql-config.hml`, don't forget to add them to the `globals`
+subgraph's `subgraph.yaml` under the `envMapping` section.
+
+:::
 
 ### `llm`
 
@@ -49,6 +64,19 @@ The `aiPrimitivesLlm` configuration is used to define the LLM provider and model
 [**AI primitives** in your application](/promptql-apis/execute-program-api.mdx). This is used for tasks such as
 **program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
 model.
+
+If `aiPrimitiveLlm` is not specified, the `llm` configuration is used for AI primitives as well.
+
+### `overrideAiPrimitivesLlm`
+
+If you need to use a different LLM for a specific AI primitive, you can use the `overrideAiPrimitivesLlm` configuration.
+This is useful if you want to use a different model for a specific primitive. Example primitives are `summarize`,
+`classify`, and `extract`. In the example above, we're using `anthropic` as the provider with the
+`claude-3-5-sonnet-latest` model for the `summarize` primitive.
+
+Any specific AI primitive will first use the LLM specified in `overrideAiPrimitivesLlm` before falling back to the
+`aiPrimitivesLlm` configuration if nothing is specified, and then the `llm` configuration if nothing is specified there
+either.
 
 ## Available providers & models
 
@@ -142,7 +170,6 @@ definition:
 ```
 
 Be sure to also include the key-value pair for your API key (`<PROVIDER>_API_KEY=your-key`) in your project's `.env`
-files and if you're developing locally, in the root `compose.yaml` file in `services.promptql-playground.environment` as
-well.
+files.
 
 :::
