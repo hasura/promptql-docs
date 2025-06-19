@@ -72,7 +72,7 @@ communicate with PromptQL in real-time.
 
 Send messages to PromptQL and receive responses, optionally in a streaming format.
 
-`POST https://promptql.ddn.hasura.me/api/query`
+`POST https://promptql.ddn.hasura.app/api/query`
 
 :::note Private DDN Endpoint
 
@@ -106,8 +106,9 @@ Authorization: Bearer <your-promptql-api-key>
 
 :::info Authentication
 
-Version 1 requests support both the `Authorization` header (recommended) and the deprecated `promptql_api_key` field in the
-request body. For new implementations, use the `Authorization` header with the `Bearer <your-promptql-api-key>` token format.
+Version 1 requests support both the `Authorization` header (recommended) and the deprecated `promptql_api_key` field in
+the request body. For new implementations, use the `Authorization` header with the `Bearer <your-promptql-api-key>`
+token format.
 
 :::
 
