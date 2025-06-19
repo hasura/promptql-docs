@@ -47,16 +47,15 @@
   background: var(--primary-neutral-800);
   padding: 16px 20px;
   border-radius: 16px;
-  color: var(--primary-neutral-200);
   font-size: 15px;
   line-height: 1.5;
   border: 1px solid var(--primary-neutral-700);
   max-width: 85%;
 }
 
-[data-theme='dark'] .chatContainer .pqlMessage li,
-[data-theme='dark'] .chatContainer .pqlMessage p {
-  color: var(--primary-neutral-200);
+
+.pqlMessage, .pqlMessage * {
+  color: var(--primary-neutral-200) !important;
 }
 
 .queryPlanHeader {
