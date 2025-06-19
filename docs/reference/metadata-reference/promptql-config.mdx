@@ -33,6 +33,8 @@ definition:
   aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
   systemInstructions: |
     You are a helpful AI Assistant.
 ```
@@ -132,83 +134,21 @@ Configuration settings for a Gemini LLM
 
 #### GeminiSafetySettings {#promptqlconfigv2-geminisafetysettings}
 
+Configuration to control Gemini's safety settings
+
 | Key | Value | Required | Description |
 |-----|-----|-----|-----|
-| `harassment` | [undefined](#promptqlconfigv2-undefined) / null | false | Negative or harmful comments targeting identity and/or protected attributes. |
-| `hateSpeech` | [undefined](#promptqlconfigv2-undefined) / null | false | Content that is rude, disrespectful, or profane. |
-| `sexuallyExplicit` | [undefined](#promptqlconfigv2-undefined) / null | false | Contains references to sexual acts or other lewd content. |
-| `dangerous` | [undefined](#promptqlconfigv2-undefined) / null | false | Promotes, facilitates, or encourages harmful acts. |
-| `civicIntegrity` | [undefined](#promptqlconfigv2-undefined) / null | false | Election-related queries. |
+| `harassment` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Negative or harmful comments targeting identity and/or protected attributes. |
+| `hateSpeech` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Content that is rude, disrespectful, or profane. |
+| `sexuallyExplicit` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Contains references to sexual acts or other lewd content. |
+| `dangerous` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Promotes, facilitates, or encourages harmful acts. |
+| `civicIntegrity` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Election-related queries. |
 
 
 
-#### undefined {#promptqlconfigv2-undefined}
+#### GeminiBlockType {#promptqlconfigv2-geminiblocktype}
 
-Configuration settings for a Gemini LLM
-
-
-**One of the following values:**
-
-| Value | Description |
-|-----|-----|
-| `blockNone` | Always show regardless of probability of unsafe content |
-| `blockOnlyHigh` | Block when high probability of unsafe content |
-| `blockMediumAndAbove` | Block when medium or high probability of unsafe content |
-| `blockLowAndAbove` | Block when low, medium or high probability of unsafe content |
-
-
-
-#### undefined {#promptqlconfigv2-undefined}
-
-Configuration settings for a Gemini LLM
-
-
-**One of the following values:**
-
-| Value | Description |
-|-----|-----|
-| `blockNone` | Always show regardless of probability of unsafe content |
-| `blockOnlyHigh` | Block when high probability of unsafe content |
-| `blockMediumAndAbove` | Block when medium or high probability of unsafe content |
-| `blockLowAndAbove` | Block when low, medium or high probability of unsafe content |
-
-
-
-#### undefined {#promptqlconfigv2-undefined}
-
-Configuration settings for a Gemini LLM
-
-
-**One of the following values:**
-
-| Value | Description |
-|-----|-----|
-| `blockNone` | Always show regardless of probability of unsafe content |
-| `blockOnlyHigh` | Block when high probability of unsafe content |
-| `blockMediumAndAbove` | Block when medium or high probability of unsafe content |
-| `blockLowAndAbove` | Block when low, medium or high probability of unsafe content |
-
-
-
-#### undefined {#promptqlconfigv2-undefined}
-
-Configuration settings for a Gemini LLM
-
-
-**One of the following values:**
-
-| Value | Description |
-|-----|-----|
-| `blockNone` | Always show regardless of probability of unsafe content |
-| `blockOnlyHigh` | Block when high probability of unsafe content |
-| `blockMediumAndAbove` | Block when medium or high probability of unsafe content |
-| `blockLowAndAbove` | Block when low, medium or high probability of unsafe content |
-
-
-
-#### undefined {#promptqlconfigv2-undefined}
-
-Configuration settings for a Gemini LLM
+Blocking level used for Gemini safety settings
 
 
 **One of the following values:**
