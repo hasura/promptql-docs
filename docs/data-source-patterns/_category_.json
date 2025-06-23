@@ -1,0 +1,8 @@
+{
+  "label": "Data Source Patterns",
+  "position": 1,
+  "className": "connectors-icon",
+  "customProps": {
+    "sidebar_pathname": "data-source-patterns"
+  }
+}

@@ -1,0 +1,332 @@
+- Introduction
+- Quickstart
+- Build with PromptQL
+  - Common Patterns
+  - With Persistent Datasources
+  - With API Endpoints
+  - With Bulk API Data
+  - With Amazon Athena
+  - With Amazon Redshift
+  - With BigQuery
+  - With Databricks
+  - With MySQL
+  - With PostgreSQL
+  - With Snowflake
+  - With other sources
+- Data Sources
+  - Basics
+  - Connect to a Source
+  - Introspect a Source
+  - Troubleshooting
+  - Publish a Data Connector
+- Business Logic
+  - Basics
+  - Lambda Connector Basics
+  - Add custom environment variables
+  - Live reloading
+  - Lambda Connector Types
+  - Debug & handle errors
+- Data Modeling
+  - Basics
+  - Models read data
+  - Commands act on data
+  - Relationships connect data
+  - Permissions protect data
+  - Data Modeling Workflows
+  - Iterate on your data model
+  - Recast types
+  - Semantic Information
+- PromptQL Playground
+  - Basics
+  - Threads
+    - Shared Threads
+    - Thread Titles
+    - Pin Thread
+    - Delete Thread
+  - Artifacts
+  - Public Projects
+  - Project READMEs
+  - Saved Prompts
+  - Troubleshooting
+- PromptQL APIs
+  - Basics
+  - Natural Language API
+  - Execute Program API
+  - Authentication in APIs
+  - SDKs
+    - Node.js
+    - Python
+    - Go
+- Observability
+  - Basics
+  - PromptQL Traces
+  - Playground History
+  - API History
+  - Monitoring
+- Auth
+  - Basics
+  - Playground Auth
+  - JWT
+    - JWT Mode
+    - JWT Configuration
+    - Tutorials
+      - Third-Party Integrations
+        - Auth0
+        - AWS Cognito
+        - Firebase
+        - Clerk
+      - Set up a Test JWT
+  - Webhook
+    - Webhook Mode
+  - NoAuth
+  - Multiple Auth Modes
+  - Permissions
+    - Model Permissions
+    - Type Permissions
+    - Command Permissions
+    - Tutorials
+      - Limit data to users
+  - FAQ
+- Recipes
+  - Overview
+  - Tutorials
+    - GitHub Assistant
+    - Apple Health Assistant
+    - Huggingface Datasets
+    - Realtime Chat with the BART API
+    - CSV Files
+    - Kaggle Datasets
+    - DuckDuckGo Web Search
+    - Add Vector Search to PostgreSQL
+    - Add JSONB Support for Snowflake
+    - Add Support for Weaviate
+- Projects
+  - Basics
+  - Tutorials
+    - Manage multiple environments
+    - Work with multiple subgraphs
+    - Remove a subgraph
+    - Work with multiple repositories
+    - Rename a subgraph
+    - Deploy connectors independently
+  - PromptQL Configuration
+    - Providers & Models
+    - System Instructions
+  - Supergraph
+  - Subgraphs
+    - Create a subgraph
+    - Work with multiple subgraphs
+    - Split Subgraphs across repositories
+    - Subgraph Prefixing
+  - Project management
+    - Manage project contexts
+    - Manage project collaborators
+    - Environments
+    - Service Accounts
+    - Comment on metadata
+    - Manage environment variables
+- Deployment
+  - Basics
+  - Hasura DDN
+    - Deploy to DDN
+    - Deploying incrementally
+    - CI/CD
+    - Region Routing
+- Private DDN
+  - Basics
+  - Architecture
+    - Dedicated
+    - BYOC
+    - Self-Hosted
+  - Creating a Data Plane
+    - Dedicated
+    - BYOC
+  - Add collaborators to a Data Plane
+  - Create a project
+  - Private Endpoints
+    - AWS
+  - Connector Deployment Resources
+  - DDN workspace
+  - Data Transfer Costs
+- Reference
+  - Overview
+  - Metadata Reference
+    - Working with Metadata
+    - Build configs
+    - Data Connector Links
+    - Types
+    - Models
+    - Commands
+    - Boolean Expressions
+    - Aggregate Expressions
+    - Orderby Expressions
+    - Relationships
+    - Permissions
+    - GraphQL API Configuration
+    - AuthConfig
+    - CompatibilityConfig
+    - Engine Plugins
+    - PromptQL Configuration
+  - Hasura CLI
+    - Installation
+    - Commands
+      - ddn
+      - ddn auth
+      - ddn auth generate-promptql-secret-key
+      - ddn auth login
+      - ddn auth logout
+      - ddn auth print-access-token
+      - ddn auth print-promptql-secret-key
+      - ddn codemod
+      - ddn codemod configure-header-forwarding
+      - ddn codemod enable-promptql
+      - ddn codemod fix-traces-env-var
+      - ddn codemod rename-graphql-prefixes
+      - ddn codemod upgrade-auth-config-to-v3
+      - ddn codemod upgrade-context-v2-to-v3
+      - ddn codemod upgrade-graphqlconfig-aggregate
+      - ddn codemod upgrade-graphqlconfig-subscriptions
+      - ddn codemod upgrade-model-v1-to-v2
+      - ddn codemod upgrade-object-boolean-expression-types
+      - ddn codemod upgrade-project-config-v2-to-v3
+      - ddn codemod upgrade-supergraph-config-v1-to-v2
+      - ddn command
+      - ddn command add
+      - ddn command list
+      - ddn command remove
+      - ddn command show
+      - ddn command update
+      - ddn connector
+      - ddn connector build
+      - ddn connector build create
+      - ddn connector build delete
+      - ddn connector build get
+      - ddn connector build logs
+      - ddn connector env
+      - ddn connector env add
+      - ddn connector init
+      - ddn connector introspect
+      - ddn connector list
+      - ddn connector plugin
+      - ddn connector remove
+      - ddn connector setenv
+      - ddn connector show-resources
+      - ddn connector upgrade
+      - ddn connector-link
+      - ddn connector-link add
+      - ddn connector-link add-resources
+      - ddn connector-link remove
+      - ddn connector-link show
+      - ddn connector-link update
+      - ddn console
+      - ddn context
+      - ddn context create-context
+      - ddn context get
+      - ddn context get-context
+      - ddn context get-current-context
+      - ddn context set
+      - ddn context set-current-context
+      - ddn context unset
+      - ddn doctor
+      - ddn model
+      - ddn model add
+      - ddn model list
+      - ddn model remove
+      - ddn model show
+      - ddn model update
+      - ddn plugins
+      - ddn plugins install
+      - ddn plugins list
+      - ddn plugins uninstall
+      - ddn plugins upgrade
+      - ddn project
+      - ddn project create
+      - ddn project delete
+      - ddn project get
+      - ddn project init
+      - ddn project set-api-access-mode
+      - ddn version
+      - ddn project set-self-hosted-engine-url
+      - ddn project subgraph
+      - ddn project subgraph create
+      - ddn project subgraph delete
+      - ddn project subgraph get
+      - ddn relationship
+      - ddn relationship add
+      - ddn relationship list
+      - ddn run
+      - ddn subgraph
+      - ddn subgraph add
+      - ddn subgraph build
+      - ddn subgraph build apply
+      - ddn subgraph build create
+      - ddn subgraph build get
+      - ddn subgraph delete
+      - ddn update-cli
+      - ddn subgraph init
+      - ddn supergraph
+      - ddn completion
+      - ddn supergraph build
+      - ddn completion bash
+      - ddn supergraph build apply
+      - ddn completion fish
+      - ddn supergraph build create
+      - ddn completion PowerShell
+      - ddn supergraph build delete
+      - ddn completion zsh
+      - ddn supergraph build diff
+      - ddn supergraph build export-descriptions
+      - ddn supergraph build get
+      - ddn supergraph build local
+      - ddn supergraph build set-self-hosted-engine-url
+      - ddn supergraph init
+      - ddn supergraph prune
+    - Troubleshooting FAQ
+  - Connector Configuration
+    - Amazon Athena
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+    - Amazon Redshift
+      - Configuration
+      - Troubleshooting
+    - BigQuery
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+    - Databricks
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+    - MySQL
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+    - PostgreSQL
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+    - Snowflake
+      - Native Operations
+        - Native Queries
+        - Syntax
+      - Configuration
+      - Troubleshooting
+  - Benchmark | Case Study
+  - Achieving 100% accuracy
+- Help
+  - Overview
+  - Glossary
+  - Security
+  - Policies
+    - Version Support Policy
