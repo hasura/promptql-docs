@@ -1,32 +1,32 @@
 export const CATEGORY_CONFIG = {
   gettingStarted: {
     title: 'Getting Started',
-    directories: ['quickstart', 'data-source-patterns', 'how-to-build-with-promptql'],
+    directories: ['quickstart', 'how-to-talk-to-promptql', 'what-can-promptql-do', 'decision-making', 'automation', 'add-context', 'autograph'],
     exactMatch: true,
   },
   coreConcepts: {
-    title: 'Talk to Your Data', 
-    directories: ['how-to-talk-to-promptql', 'promptql-playground', 'promptql-apis'],
+    title: 'Core Concepts', 
+    directories: ['architecture', 'semantic-metadata', 'ai-primitives', 'data-sources', 'business-logic', 'auth', 'use-cases'],
     exactMatch: false,
   },
   buildingApps: {
-    title: 'Modeling Data',
-    directories: ['data-modeling', 'data-sources', 'business-logic', 'auth', 'project-configuration'],
+    title: 'Building Apps',
+    directories: ['project-configuration', 'how-to-build-with-promptql', 'how-to-build-your-semantic-layer', 'promptql-apis', 'tutorials'],
     exactMatch: true,
   },
   deployment: {
-    title: 'Operations & Deployment',
-    directories: ['deployment', 'observability', 'private-ddn'],
+    title: 'Deployment & Operations',
+    directories: ['deployment', 'observability', 'private-ddn', 'troubleshooting'],
     exactMatch: true,
   },
   guides: {
-    title: 'Recipes',
+    title: 'Guides & Recipes',
     directories: ['recipes'],
     exactMatch: true,
   },
   reference: {
-    title: 'Reference & Help',
-    directories: ['reference', 'billing', 'help'],
+    title: 'Reference',
+    directories: ['reference', 'help'],
     exactMatch: true,
   },
 } as const;
