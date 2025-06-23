@@ -1,8 +1,6 @@
 name: Weekly Changelog to Slack
 
 on:
-  schedule:
-    - cron: '0 15 * * 1'
   workflow_dispatch:
 
 jobs:
