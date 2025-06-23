@@ -50,7 +50,7 @@ started. Check the reference table for more information on each field.
 
 ```yaml title="An AuthConfig for noAuth mode:"
 kind: AuthConfig
-version: v3
+version: v4
 definition:
   mode:
     noAuth:
@@ -67,7 +67,7 @@ definition:
 
 ```yaml title="An AuthConfig for JWT mode:"
 kind: AuthConfig
-version: v3
+version: v4
 definition:
   mode:
     jwt:
@@ -94,7 +94,7 @@ definition:
 
 ```yaml title="An AuthConfig for Webhook mode:"
 kind: AuthConfig
-version: v3
+version: v4
 definition:
   mode:
     webhook:
@@ -136,6 +136,17 @@ Definition of the authentication configuration used by the API server.
 | [AuthConfig1](#authconfig-authconfig1) | Definition of the authentication configuration v1, used by the API server. |
 | [AuthConfig2](#authconfig-authconfig2) | Definition of the authentication configuration v2, used by the API server. |
 | [AuthConfig3](#authconfig-authconfig3) |  |
+| [AuthConfigV4](#authconfig-authconfigv4) |  |
+
+
+
+#### AuthConfigV4 {#authconfig-authconfigv4}
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `kind` | `AuthConfig` | true |  |
+| `version` | `v4` | true |  |
+| `definition` | [AuthConfigV4](#authconfig-authconfigv4) | true | Definition of the authentication configuration v4, used by the API server. |
 
 
 
