@@ -55,7 +55,8 @@ export const Feedback = () => {
 
       // { pageTitle, pageUrl, score, userFeedback, version, docsUserId }
 
-      const storedUserID = localStorage.getItem('hasuraDocsUserID') as string | 'null';
+      const storedUserID = localStorage.getItem('hasuraDocsUserID') as string | 'null';      
+      const destinationUrl = docsServerURL + '/feedback/public-new-feedback';
 
       const raw = JSON.stringify({
         score: rating,
@@ -73,20 +74,16 @@ export const Feedback = () => {
         redirect: 'follow' as RequestRedirect,
       };
 
-      fetch(docsServerURL + '/feedback/public-new-feedback?', requestOptions)
-        .then(response => response.text())
-        .catch(error => console.error('error', error));
+      
+      fetch(destinationUrl, requestOptions)
+        .then(response => {
+          console.log('Feedback submission status:', response.ok ? 'Success' : 'Failed');
+          return response.text();
+        })
+        .catch(error => {
+          console.error('Feedback submission failed:', error);
+        });
     };
-
-    // if (!window.location.hostname.includes('hasura.io')) {
-    //   alert(
-    //     'Hey! We like that you like our docs and chose to use them 🎉\n\nHowever, you might want to remove the feedback component or modify the route you hit, lest you want us reading what people think of your site ✌️'
-    //   );
-    //   setRating(null);
-    //   setNotes(null);
-    //   setIsSubmitSuccess(true);
-    //   return;
-    // }
 
     sendData()
       .then(() => {
@@ -163,8 +160,8 @@ export const Feedback = () => {
                     GitHub issue
                   </a>{' '}
                   if you think this is a bug, or check out our{' '}
-                  <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
-                    Hasura Community Forum
+                  <a href="https://forum.promptql.io" target="_blank" rel="noopener noreferrer">
+                    PromptQL Community Forum
                   </a>
                   , where Hasurians and community users are ready to engage.
                 </p>

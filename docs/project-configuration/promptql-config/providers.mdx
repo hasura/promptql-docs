@@ -24,29 +24,59 @@ and the freedom to switch between providers and models as needed depending the t
 
 For example, you can use one model for conversational tasks and another for advanced AI primitives:
 
-```yaml {5-6,8-9}
+```yaml {5-6,8-9} title="Example of globals/metadata/promptql-config.hml"
 kind: PromptQlConfig
-version: v1
+version: v2
 definition:
   llm:
     provider: openai
     model: o3-mini
-  ai_primitives_llm:
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  aiPrimitivesLlm:
     provider: openai
     model: gpt-4o
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  overrideAiPrimitivesLlm:
+    summarize:
+      provider: anthropic
+      model: claude-3-5-sonnet-latest
+      apiKey:
+        valueFromEnv: ANTHROPIC_API_KEY
 ```
+
+:::tip Mapping environment variables
+
+If you do specify environment variables in your `promptql-config.hml`, don't forget to add them to the `globals`
+subgraph's `subgraph.yaml` under the `envMapping` section.
+
+:::
 
 ### `llm`
 
 The `llm` configuration is used to define the LLM provider and model for **conversational tasks** in your application.
 In the example above, we're using `openai` as the provider with the `o3-mini` model.
 
-### `ai_primitives_llm`
+### `aiPrimitivesLlm`
 
-The `ai_primitives_llm` configuration is used to define the LLM provider and model for
+The `aiPrimitivesLlm` configuration is used to define the LLM provider and model for
 [**AI primitives** in your application](/promptql-apis/execute-program-api.mdx). This is used for tasks such as
 **program generation and execution**. In the example above, we're using `openai` as the provider with the `gpt-4o`
 model.
+
+If `aiPrimitiveLlm` is not specified, the `llm` configuration is used for AI primitives as well.
+
+### `overrideAiPrimitivesLlm`
+
+If you need to use a different LLM for a specific AI primitive, you can use the `overrideAiPrimitivesLlm` configuration.
+This is useful if you want to use a different model for a specific primitive. Example primitives are `summarize`,
+`classify`, and `extract`. In the example above, we're using `anthropic` as the provider with the
+`claude-3-5-sonnet-latest` model for the `summarize` primitive.
+
+Any specific AI primitive will first use the LLM specified in `overrideAiPrimitivesLlm` before falling back to the
+`aiPrimitivesLlm` configuration if nothing is specified, and then the `llm` configuration if nothing is specified there
+either.
 
 ## Available providers & models
 
@@ -84,6 +114,13 @@ following have been tested with PromptQL:
 
 With Hasura—used as the default provider—there is **no specific model necessary** in your configuration.
 
+:::warning HIPAA Compliance
+
+If you plan to interact with PHI using PromptQL, you should not use the Hasura provider as it is not HIPAA compliant.
+You will have to bring your own LLM with another supported provider.
+
+:::
+
 ### Microsoft Azure
 
 To use an [Azure foundational model](https://azure.microsoft.com/en-us/products/ai-model-catalog#Models), set the
@@ -112,3 +149,27 @@ PromptQL program generation.
 - If `ai_primitives_llm` is not defined, it defaults to the provider specified in the `llm` configuration.
 - [`system_instructions` are optional](/project-configuration/promptql-config/system-instructions.mdx) but recommended
   to customize the behavior of your LLM.
+
+:::tip Set your API key as an environment variable
+
+If you're utilizing a provider aside from Hasura, you'll need to add your environment variable to the `globals` subgraph
+so the container running PromptQL has access to it.
+
+```yaml title="As an example, in globals/subgraph.yaml:" {9-11}
+kind: Subgraph
+version: v2
+definition:
+  name: globals
+  generator:
+    rootPath: .
+  includePaths:
+    - metadata
+  envMapping:
+    ANTHROPIC_API_KEY:
+      fromEnv: ANTHROPIC_API_KEY
+```
+
+Be sure to also include the key-value pair for your API key (`<PROVIDER>_API_KEY=your-key`) in your project's `.env`
+files.
+
+:::

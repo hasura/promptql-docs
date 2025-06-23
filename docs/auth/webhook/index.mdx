@@ -20,10 +20,10 @@ sidebar_label: Webhook
 
 ## Introduction
 
-You can configure Hasura DDN to use webhook mode in order to authenticate incoming requests.
+You can configure the query engine to use webhook mode in order to authenticate incoming requests.
 
-This requires specifying a URL - which Hasura calls with the original request headers - that then returns a body
-containing the session variables after authenticating the request.
+This requires specifying a URL - which the query engine will call with the original request headers - that then returns
+a body containing the session variables after authenticating the request.
 
 ## Webhook mode setup
 

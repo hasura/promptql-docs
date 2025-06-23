@@ -15,15 +15,15 @@ toc_max_heading_level: 4
 
 ## Overview
 
-You can manage PromptQL's LLM settings and system instructions from a single `promptql_config.yaml` file, automatically
-created at the root of your DDN project when you initialize a project with the `--with-promptql` flag using the Hasura
-DDN CLI.
+You can manage PromptQL's LLM settings and system instructions from a single `promptql-config.hml` file, automatically
+created in the `globals/metadata` directory of your project when you initialize a project with the `--with-promptql`
+flag using the CLI.
 
 ## Examples
 
 ```yaml title="Minimal configuration:"
 kind: PromptQlConfig
-version: v1
+version: v2
 definition:
   llm:
     provider: hasura
@@ -31,22 +31,33 @@ definition:
 
 ```yaml title="Custom providers for LLM & AI primitives and custom system instructions:"
 kind: PromptQlConfig
-version: v1
+version: v2
 definition:
   llm:
     provider: openai
     model: o3-mini
-  ai_primitives_llm:
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
+  aiPrimitiveLlm:
     provider: openai
     model: gpt-4o
+    apiKey:
+      valueFromEnv: OPENAI_API_KEY
   system_instructions: |
     You are a helpful AI Assistant.
 ```
 
-With this file, you can:
+:::tip Mapping environment variables
+
+If you do specify environment variables in your `promptql-config.hml`, don't forget to add them to the `globals`
+subgraph's `subgraph.yaml` under the `envMapping` section.
+
+:::
+
+With `promptql-config.hml` file, you can:
 
 - Set the LLM provider and model used across the application.
-- Define a separate LLM for AI Primitives such as **Classification**, **Summarization**, and **Extraction**.
+- Define a separate LLMs for AI Primitives such as **Classification**, **Summarization**, and **Extraction**.
 - Add system instructions that apply to every PromptQL interaction.
 
 ## Next steps

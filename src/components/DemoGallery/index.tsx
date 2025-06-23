@@ -67,8 +67,8 @@ export default function DemoGallery() {
   return (
     <>
       <p>
-        Check out these demos to get a feel for how PromptQL works. Each of these will take you to a README outlining
-        the connected data sources and will suggest some ways of interacting with the application.
+        Each demo below will take you to a README outlining the connected data sources and
+        give you a feel for how PromptQL works by suggesting some questions to ask.
       </p>
       <div className={`homepage-demo-container ${isExpanded ? 'expanded' : ''}`}>
         <div className="homepage-demo-grid">
@@ -90,7 +90,7 @@ export default function DemoGallery() {
             height="24"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="currentColor"
+            stroke="#000000"
             strokeWidth="2"
           >
             <polyline points="6,9 12,15 18,9" />

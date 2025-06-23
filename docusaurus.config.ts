@@ -14,8 +14,8 @@ const DOCS_SERVER_ROOT_URLS = {
 
 const DOCS_SERVER_URLS = {
   development: `http://${DOCS_SERVER_ROOT_URLS.development}`,
-  production: `https://${DOCS_SERVER_ROOT_URLS.production}`,
-  staging: `https://${DOCS_SERVER_ROOT_URLS.staging}`,
+  production: `https://${DOCS_SERVER_ROOT_URLS.production}/docs-services/docs-server`,
+  staging: `https://${DOCS_SERVER_ROOT_URLS.staging}/docs-services/docs-server`,
 };
 
 const BOT_ROUTES = {
@@ -30,11 +30,11 @@ const config: Config = {
   favicon: 'img/favicon.png',
 
   // Set the production url of your site here
-  url: 'https://hasura.io',
+  url: 'https://promptql.io',
 
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: process.env.CF_PAGES === '1' ? '/' : '/docs/promptql',
+  baseUrl: process.env.CF_PAGES === '1' ? '/' : '/docs',
   trailingSlash: true,
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
@@ -77,7 +77,7 @@ const config: Config = {
         return DOCS_SERVER_URLS[mode ?? 'development'];
       }
     })(),
-    hasuraVersion: 3,
+    hasuraVersion: "promptql",
     DEV_TOKEN: process.env.DEV_TOKEN,
     openReplayIngestPoint: 'https://analytics-openreplay.hasura-app.io/ingest',
     openReplayProjectKey: 'x5WnKn7RdPjizi93Vp5I',
@@ -131,66 +131,56 @@ const config: Config = {
   themeConfig: {
     colorMode: {
       defaultMode: 'dark',
-      disableSwitch: true,
+      disableSwitch: false,
+      respectPrefersColorScheme: true,
     },
-    sidebar: {
-      hideable: true,
+    docs: {
+      sidebar: {
+        hideable: true,
+      },
     },
-
     // Replace with your project's social card
-    image: 'img/og-social-card.jpg',
+    image: 'img/og-promptql.jpg',
     algolia: {
-      appId: 'SRR7ESDJ9D',
+      appId: 'FWSSPB5BLA',
       // Public API key: it is safe to commit it
-      apiKey: '3b1c345518f2e525056dac73aa24e17c',
-      indexName: 'hasura',
+      apiKey: '2d6b3d71bbd36bdc4e6244526db0c13a',
+      indexName: 'promptql',
     },
     navbar: {
       title: '',
       hideOnScroll: true,
       logo: {
-        alt: 'Hasura Logo',
-        src: 'img/prompt-ql-beta@2x.png',
+        alt: 'PromptQL Logo',
+        src: 'img/pql-logo-large.svg',
         href: '/index',
-        srcDark: '/img/prompt-ql-beta@2x.png',
+        srcDark: '/img/pql-logo-large-dark-mode.svg',
       },
       items: [
-        {
-          type: 'docsVersionDropdown',
-          position: 'left',
-          dropdownActiveClassDisabled: true,
-          dropdownItemsAfter: [
-            {
-              href: 'https://hasura.io/docs/3.0/index/',
-              label: 'v3.x (DDN)',
-            },
-            {
-              href: 'https://hasura.io/docs/2.0/index/',
-              label: 'v2.x',
-            },
-            {
-              href: 'https://hasura.io/docs/1.0/graphql/core/index.html',
-              label: 'v1.x',
-            },
-          ],
-        },
       ],
     },
-
     prism: {
-      theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      theme: prismThemes.dracula,
       additionalLanguages: ['json', 'typescript', 'bash', 'yaml'],
     },
-    stylesheets: [
-      {
-        href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-        type: 'text/css',
-        integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-        crossorigin: 'anonymous',
-      },
-    ],
+    
   } satisfies Preset.ThemeConfig,
+  stylesheets: [
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://fonts.googleapis.com/css2?family=Archivo:ital,wght@0,100..900;1,100..900&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap',
+      rel: 'stylesheet',
+    },
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity: 'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
+  ],
   markdown: {
     mermaid: true,
   },

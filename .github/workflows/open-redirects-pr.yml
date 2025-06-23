@@ -53,23 +53,23 @@ jobs:
           echo "diff-status=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Checkout the hasura.io repository
+      - name: Checkout the promptql.io repository
         if: steps.grab-renamed.outputs.diff-status == 'true'
         uses: actions/checkout@v2
         with:
-          repository: hasura/hasura.io
-          path: hasura.io
+          repository: hasura/promptql.io
+          path: promptql.io
           token: ${{ secrets.DOCS_GITHUB_TOKEN }}
 
       - name: Create new branch and update redirects
         if: steps.grab-renamed.outputs.diff-status == 'true'
         run: |
-          cd hasura.io
+          cd promptql.io
           PR_NUMBER=${{ github.event.pull_request.number }}
           PR_TITLE="${{ github.event.pull_request.title }}"
           BRANCH_NAME="docs-redirects-${PR_NUMBER}"
 
-          REDIRECTS_FILE="redirects/paths/docs.conf"
+          REDIRECTS_FILE="nginx-promptql/paths/docs.conf"
           TIMESTAMP=$(date +"%d/%m/%Y")
 
           cat <<EOF >> $REDIRECTS_FILE
@@ -84,12 +84,12 @@ jobs:
         if: steps.grab-renamed.outputs.diff-status == 'true'
         uses: peter-evans/create-pull-request@v5.0.2
         with:
-          path: hasura.io
+          path: promptql.io
           token: ${{ secrets.DOCS_GITHUB_TOKEN }}
           author: hasura-bot <build@hasura.io>
           commit-message: 'Redirects: PromptQL DOCS PR#${{ github.event.pull_request.number }}'
           branch: docs-redirects-${{ github.event.pull_request.number }}
-          base: master
+          base: main
           title: 'Redirects: PromptQL Docs PR#${{ github.event.pull_request.number }}'
           body: |
             This PR adds _templated_ redirects for the merged docs PR hasura/promptql-docs#${{ github.event.pull_request.number }}.

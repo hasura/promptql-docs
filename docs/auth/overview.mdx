@@ -22,32 +22,36 @@ keywords:
 
 ## Introduction
 
-By default, PromptQL accesses your data through Hasura DDN in [NoAuth](/auth/noauth-mode.mdx) mode as an `admin` user.
-This means that by default on a new installation, it has full access to your data.
+By default, PromptQL accesses your data through the distributed query engine in [NoAuth](/auth/noauth-mode.mdx) mode as
+an `admin` user. This means that by default on a new installation, it has full access to your data.
 
 However, you can integrate many popular auth services or use your own custom solution to authenticate users.
 
 After the authentication step, session variables, including a user role, are passed via either a valid JWT or webhook
-response, to the Hasura Engine to be checked against the access control rules or "permissions" to determine what data
-the user can access. This ensures any PromptQL conversations are scoped to only return information that a particular
-user is permitted to access.
+response, to the query engine to be checked against the access control rules or "permissions" to determine what data the
+user can access. This ensures any PromptQL conversations are scoped to only return information that a particular user is
+permitted to access.
 
-As you will most often be using PromptQL in the console interface, you can check the auth which the client is using by
-clicing the "Auth" button on the left of the chat textbox.
-
-## PromptQL Playground Auth
+:::info Which auth mode am I using?
 
 Learn how to check the auth which the PromptQL Playground client is using [here](/auth/playground-auth.mdx).
 
+:::
+
 ## AuthConfig options
 
-Authentication can be set up in one of three modes. These modes and their configuration options are specified in the
-`AuthConfig` object within your metadata.
+Authentication can be set up in one of three modes or multiple modes. These modes and their configuration options are
+specified in the `AuthConfig` object within your metadata.
+
+You can configure a single authentication mode or multiple authentication modes using the `alternativeModes` field in
+`AuthConfig` v4. When using multiple authentication modes, you can specify which mode to use for a particular request by
+including the `X-Hasura-Auth-Mode` header with the identifier of the desired authentication mode. [Read more about
+multiple auth modes](/auth/multiple-auth-modes.mdx).
 
 ### JWT mode
 
-Your authentication service must issue JWTs which contain session variables that are passed to the Hasura Engine by the
-PromptQL client on each request.
+Your authentication service must issue JWTs which contain session variables that are passed to the distributed query
+engine by PromptQL on each request.
 
 [Read more](/auth/jwt/index.mdx).
 

@@ -8,6 +8,7 @@ import TwitterIcon from '@site/static/icons/twitter.svg';
 import DiscourseIcon from '@site/static/icons/discourse.svg';
 import YoutubeIcon from '@site/static/icons/youtube.svg';
 import LinkedinIcon from '@site/static/icons/linkedin.svg';
+import PromptQlIcon from '@site/static/img/icon-light.svg';
 
 export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) {
   const sidebar = useDocsSidebar();
@@ -30,19 +31,22 @@ export default function DocRootLayoutMain({ hiddenSidebarContainer, children }) 
             </div>
             <div className={styles.footerCopyright}>© {new Date().getFullYear()} Hasura Inc. All rights reserved</div>
             <div className={styles.footerSocial}>
+              <a href="https://promptql.io" target="_blank" rel="noopener noreferrer">
+                <PromptQlIcon />
+              </a>
               <a href="https://github.com/hasura" target="_blank" rel="noopener noreferrer">
                 <GithubIcon />
               </a>
-              <a href="https://twitter.com/HasuraHQ" target="_blank" rel="noopener noreferrer">
+              <a href="https://x.com/PromptQL" target="_blank" rel="noopener noreferrer">
                 <TwitterIcon />
               </a>
-              <a href="https://forum.hasura.io" target="_blank" rel="noopener noreferrer">
+              <a href="https://forum.promptql.io" target="_blank" rel="noopener noreferrer">
                 <DiscourseIcon />
               </a>
-              <a href="https://www.youtube.com/@HasuraHQ" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.youtube.com/@PromptQL" target="_blank" rel="noopener noreferrer">
                 <YoutubeIcon />
               </a>
-              <a href="https://www.linkedin.com/company/hasura" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/company/promptql-io" target="_blank" rel="noopener noreferrer">
                 <LinkedinIcon />
               </a>
             </div>
