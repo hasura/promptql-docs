@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
+import { useColorMode } from '@docusaurus/theme-common';
 import type { PropSidebarItem } from '@docusaurus/plugin-content-docs';
 import { 
   buildCategories, 
@@ -9,8 +10,9 @@ import {
 } from './utils';
 import './CustomSidebar.css';
 
-// Import logo
-import Logo from '@site/static/img/pql-logo-large.svg';
+// Import logos
+import LogoLight from '@site/static/img/pql-logo-large.svg';
+import LogoDark from '@site/static/img/pql-logo-large-dark-mode.svg';
 
 // Import icons
 import GettingStarted from '@site/static/icons/home-smile.svg';
@@ -26,6 +28,7 @@ interface CustomSidebarProps {
 
 const CustomSidebar: React.FC<CustomSidebarProps> = ({ sidebar }) => {
   const location = useLocation();
+  const { colorMode } = useColorMode();
   const categories: Category[] = buildCategories(sidebar);
 
   // Icon mapping function
@@ -127,7 +130,7 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ sidebar }) => {
   return (
     <div className="custom-sidebar">
       <div className="custom-sidebar__logo">
-        <Logo />
+        {colorMode === 'dark' ? <LogoDark /> : <LogoLight />}
       </div>
       <div className="custom-sidebar__content">
         {categories.map(renderCategory)}
