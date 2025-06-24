@@ -1,4 +1,5 @@
 import React from 'react';
+import { useColorMode } from '@docusaurus/theme-common';
 import styles from './PqlChat.module.css';
 import PqlIconSvg from './pq.svg';
 
@@ -19,7 +20,8 @@ interface QueryPlanProps {
 }
 
 export const PqlChat: React.FC<PqlChatProps> = ({ children }) => {
-  return <div className={styles.chatContainer}>{children}</div>;
+  const { colorMode } = useColorMode();
+  return <div className={`${styles.chatContainer} ${styles[colorMode]}`}>{children}</div>;
 };
 
 export const User: React.FC<UserProps> = ({ children }) => {
@@ -36,7 +38,7 @@ export const Pql: React.FC<PqlProps> = ({ children }) => {
   return (
     <div className={styles.messageContainer}>
       <div className={styles.avatar}>
-        <PqlIconSvg />
+        <PqlIconSvg className={styles.botIcon} />
       </div>
       <div className={styles.messageContent}>
         <div className={styles.pqlMessage}>{children}</div>
