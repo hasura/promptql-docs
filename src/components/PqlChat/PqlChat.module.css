@@ -1,11 +1,24 @@
+/* Base chat container styles */
 .chatContainer {
   max-width: 100%;
   margin: 32px 0;
   padding: 24px;
-  background: var(--primary-neutral-950);
   border-radius: 12px;
-  border: 1px solid var(--primary-neutral-900);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  border: 1px solid;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Light theme styles */
+.chatContainer.light {
+  background: #f8f7f6;
+  border-color: #e5e7eb;
+}
+
+/* Dark theme styles */
+.chatContainer.dark {
+  background: #202123;
+  border-color: var(--primary-neutral-900);
 }
 
 .messageContainer {
@@ -18,13 +31,44 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary-neutral-800);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid var(--primary-neutral-700);
   padding: 6px;
+  margin-top: 4px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Light theme avatar */
+.light .avatar {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+/* Dark theme avatar */
+.dark .avatar {
+  background: #2e3033;
+  border-color: var(--primary-neutral-700);
+}
+
+/* Bot SVG styling - black stroke for outline icon */
+.botIcon {
+  stroke: #000000 !important;
+  color: #000000 !important;
+}
+
+.botIcon path {
+  stroke: #000000 !important;
+}
+
+.dark .botIcon {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.dark .botIcon path {
+  stroke: #ffffff !important;
 }
 
 .messageContent {
@@ -32,29 +76,64 @@
 }
 
 .userMessage {
-  background: #242f5c;
-  padding: 16px 20px;
-  border-radius: 16px;
-  color: var(--primary-neutral-200);
+  padding: 20px 20px;
+  border-radius: 30px;
+  border-bottom-right-radius: 0;
   font-size: 15px;
   line-height: 1.5;
   max-width: fit-content;
   margin-left: auto;
-  border: 1px solid #2d3a6d;
+  border: 1px solid;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Light theme user message */
+.light .userMessage {
+  background: #fcfcfc;
+  border-color: #e5e7eb;
+  color: #000000;
+}
+
+/* Dark theme user message */
+.dark .userMessage {
+  background: #2e3033;
+  border-color: #2d3a6d;
+  border: none;
+  color: var(--primary-neutral-200);
 }
 
 .pqlMessage {
-  background: var(--primary-neutral-800);
-  padding: 16px 20px;
+  padding: 0px 20px;
   border-radius: 16px;
   font-size: 15px;
   line-height: 1.5;
-  border: 1px solid var(--primary-neutral-700);
+  border: 1px solid;
   max-width: 85%;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
+/* Light theme pql message */
+.light .pqlMessage {
+  background: transparent;
+  border-color: transparent;
+  color: #374151;
+}
 
-.pqlMessage, .pqlMessage * {
+/* Dark theme pql message */
+.dark .pqlMessage {
+  background: transparent;
+  border-color: transparent;
+  color: var(--primary-neutral-200);
+}
+
+/* Override text colors for content inside pql messages */
+.light .pqlMessage,
+.light .pqlMessage * {
+  color: #374151 !important;
+}
+
+.dark .pqlMessage,
+.dark .pqlMessage * {
   color: var(--primary-neutral-200) !important;
 }
 
@@ -69,8 +148,18 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  color: var(--primary-neutral-200);
   font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+/* Light theme query plan title */
+.light .queryPlanTitle {
+  color: #374151;
+}
+
+/* Dark theme query plan title */
+.dark .queryPlanTitle {
+  color: var(--primary-neutral-200);
 }
 
 .queryPlanIcon {
@@ -78,14 +167,25 @@
 }
 
 .queryPlan {
-  background: var(--primary-neutral-800);
   padding: 16px 20px;
   border-radius: 12px;
   margin-top: 12px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   font-size: 14px;
-  color: var(--primary-neutral-300);
   line-height: 1.6;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Light theme query plan */
+.light .queryPlan {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Dark theme query plan */
+.dark .queryPlan {
+  background: var(--primary-neutral-800);
+  color: var(--primary-neutral-300);
 }
 
 .queryPlan ol {
@@ -112,15 +212,31 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: var(--primary-neutral-800);
-  border: 1px solid var(--primary-neutral-700);
+  border: 1px solid;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--ifm-color-primary);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-.actionButton:hover {
+/* Light theme action button */
+.light .actionButton {
+  background: #ffffff;
+  border-color: #d1d5db;
+}
+
+.light .actionButton:hover {
+  background: #f3f4f6;
+}
+
+/* Dark theme action button */
+.dark .actionButton {
+  background: var(--primary-neutral-800);
+  border-color: var(--primary-neutral-700);
+}
+
+.dark .actionButton:hover {
   background: var(--primary-neutral-700);
 }

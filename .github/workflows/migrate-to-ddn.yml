@@ -100,8 +100,8 @@ jobs:
         if: steps.create-patches.outputs.patch_created == 'true'
         working-directory: ddn-docs
         run: |
-          git config user.name "seanparkross"
-          git config user.email "sean@hasura.io"
+          git config user.name "roberjtdominguez"
+          git config user.email "rob.dominguez@hasura.io"
 
           # Create a new branch for the changes
           PR_NUMBER=${{ github.event.pull_request.number }}
