@@ -143,11 +143,12 @@
   padding: 0;
   margin: 0;
   background-color: var(--sidebar-bg-color);
-  border-left: 3px solid var(--sidebar-divider);
+  margin-left: 0.8rem;
+  /* border-left: 3px solid var(--sidebar-divider); */
 }
 
 .custom-sidebar__subitems .custom-sidebar__link {
-  padding-left: 2.5rem;
+  padding-left: 2.7rem;
   font-weight: 400;
   color: var(--body-text-color);
   border-left: none;
