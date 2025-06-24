@@ -33,7 +33,7 @@ export const itemMatchesPattern = (
       const href = (item as any).href;
       if (href) {
         const directory = getDirectoryFromPath(href);
-        console.log(`Checking link: ${(item as any).label || 'No label'} -> ${href} -> directory: ${directory} against pattern: ${pattern}`);
+        // console.log(`Checking link: ${(item as any).label || 'No label'} -> ${href} -> directory: ${directory} against pattern: ${pattern}`);
         if (exactMatch) {
           return directory === pattern;
         } else {
@@ -43,12 +43,12 @@ export const itemMatchesPattern = (
     }
     
     if (item.type === 'category') {
-      console.log(`Checking category: ${(item as any).label || 'No label'}, has ${(item as any).items?.length || 0} items`);
+      // console.log(`Checking category: ${(item as any).label || 'No label'}, has ${(item as any).items?.length || 0} items`);
       
       const href = (item as any).href;
       if (href) {
         const directory = getDirectoryFromPath(href);
-        console.log(`Category href: ${href} -> directory: ${directory} against pattern: ${pattern}`);
+        // console.log(`Category href: ${href} -> directory: ${directory} against pattern: ${pattern}`);
         if (exactMatch) {
           if (directory === pattern) return true;
         } else {

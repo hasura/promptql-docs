@@ -9,6 +9,9 @@ import {
 } from './utils';
 import './CustomSidebar.css';
 
+// Import logo
+import Logo from '@site/static/img/pql-logo-large.svg';
+
 // Import icons
 import GettingStarted from '@site/static/icons/home-smile.svg';
 import PromptQL from '@site/static/icons/features/prompt-ql.svg';
@@ -123,6 +126,9 @@ const CustomSidebar: React.FC<CustomSidebarProps> = ({ sidebar }) => {
 
   return (
     <div className="custom-sidebar">
+      <div className="custom-sidebar__logo">
+        <Logo />
+      </div>
       <div className="custom-sidebar__content">
         {categories.map(renderCategory)}
       </div>
