@@ -89,7 +89,7 @@
                   "description": "Definition of the authentication configuration used by the API server.",
                   "oneOf": [
                     {
-                      "title": "AuthConfig1",
+                      "title": "AuthConfigV1",
                       "description": "Definition of the authentication configuration v1, used by the API server.",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
@@ -687,7 +687,7 @@
                       "additionalProperties": false
                     },
                     {
-                      "title": "AuthConfig2",
+                      "title": "AuthConfigV2",
                       "description": "Definition of the authentication configuration v2, used by the API server.",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
@@ -717,7 +717,7 @@
                       "additionalProperties": false
                     },
                     {
-                      "title": "AuthConfig3",
+                      "title": "AuthConfigV3",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
                       "properties": {
@@ -1275,6 +1275,7 @@
                                             {
                                               "$id": "https://hasura.io/jsonschemas/metadata/GeminiSafetySettings",
                                               "title": "GeminiSafetySettings",
+                                              "description": "Configuration to control Gemini's safety settings",
                                               "type": "object",
                                               "properties": {
                                                 "harassment": {
@@ -1314,7 +1315,9 @@
                                                   "description": "Promotes, facilitates, or encourages harmful acts.",
                                                   "anyOf": [
                                                     {
-                                                      "description": "Configuration settings for a Gemini LLM",
+                                                      "$id": "https://hasura.io/jsonschemas/metadata/GeminiBlockType",
+                                                      "title": "GeminiBlockType",
+                                                      "description": "Blocking level used for Gemini safety settings",
                                                       "oneOf": [
                                                         {
                                                           "description": "Always show regardless of probability of unsafe content",
@@ -1453,9 +1456,33 @@
                               }
                             },
                             "featureFlags": {
-                              "description": "Feature flags to be used for PromptQL",
-                              "type": ["object", "null"],
-                              "additionalProperties": true
+                              "description": "Feature flags to be used for PromptQL to enable and disable experimental features",
+                              "anyOf": [
+                                {
+                                  "$id": "https://hasura.io/jsonschemas/metadata/PromptQlFeatureFlags",
+                                  "title": "PromptQlFeatureFlags",
+                                  "description": "Feature flags to be used for PromptQL to enable and disable experimental features",
+                                  "type": "object",
+                                  "properties": {
+                                    "enable_automations": {
+                                      "description": "Enable the experimental automations feature",
+                                      "type": ["boolean", "null"]
+                                    },
+                                    "enable_visualizations": {
+                                      "description": "Enable the experimental visualizations feature",
+                                      "type": ["boolean", "null"]
+                                    },
+                                    "enable_visualizations_v2": {
+                                      "description": "Enable the experimental visualizations v2 feature",
+                                      "type": ["boolean", "null"]
+                                    }
+                                  },
+                                  "additionalProperties": true
+                                },
+                                {
+                                  "type": "null"
+                                }
+                              ]
                             }
                           },
                           "additionalProperties": false
@@ -7555,7 +7582,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV1",
-                          "title": "Model1",
+                          "title": "ModelV1",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations.",
                           "type": "object",
                           "required": ["name", "objectType", "orderableFields"],
@@ -8056,7 +8083,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV2",
-                          "title": "Model2",
+                          "title": "ModelV2",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations. ModelV2 implements the changes described in rfcs/open-dd-expression-type-changes.md.",
                           "type": "object",
                           "required": ["name", "objectType"],
@@ -9523,6 +9550,36 @@
                                         "$id": "https://hasura.io/jsonschemas/metadata/RelationalInsertPermission",
                                         "title": "RelationalInsertPermission",
                                         "description": "Defines the permissions for relational insert operations on a model for a role. If null, the role is not allowed to perform relational inserts on this model. This is only applicable for data connectors that support relational operations.",
+                                        "type": "object",
+                                        "additionalProperties": false
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "relationalUpdate": {
+                                    "description": "The permissions for relational update operations on this model for this role. If this is null, the role is not allowed to perform relational updates on this model. This is only applicable for data connectors that support relational operations.",
+                                    "anyOf": [
+                                      {
+                                        "$id": "https://hasura.io/jsonschemas/metadata/RelationalUpdatePermission",
+                                        "title": "RelationalUpdatePermission",
+                                        "description": "Defines the permissions for relational update operations on a model for a role. If null, the role is not allowed to perform relational updates on this model. This is only applicable for data connectors that support relational operations.",
+                                        "type": "object",
+                                        "additionalProperties": false
+                                      },
+                                      {
+                                        "type": "null"
+                                      }
+                                    ]
+                                  },
+                                  "relationalDelete": {
+                                    "description": "The permissions for relational delete operations on this model for this role. If this is null, the role is not allowed to perform relational deletes on this model. This is only applicable for data connectors that support relational operations.",
+                                    "anyOf": [
+                                      {
+                                        "$id": "https://hasura.io/jsonschemas/metadata/RelationalDeletePermission",
+                                        "title": "RelationalDeletePermission",
+                                        "description": "Defines the permissions for relational delete operations on a model for a role. If null, the role is not allowed to perform relational deletes on this model. This is only applicable for data connectors that support relational operations.",
                                         "type": "object",
                                         "additionalProperties": false
                                       },
