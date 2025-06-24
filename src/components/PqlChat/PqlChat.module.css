@@ -48,7 +48,7 @@
 
 /* Dark theme avatar */
 .dark .avatar {
-  background: #ffffff;
+  background: #2e3033;
   border-color: var(--primary-neutral-700);
 }
 
@@ -60,6 +60,15 @@
 
 .botIcon path {
   stroke: #000000 !important;
+}
+
+.dark .botIcon {
+  stroke: #ffffff !important;
+  color: #ffffff !important;
+}
+
+.dark .botIcon path {
+  stroke: #ffffff !important;
 }
 
 .messageContent {
