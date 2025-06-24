@@ -64,7 +64,20 @@ Definition of the configuration of PromptQL for the project
 | `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | Configuration of the LLM to be used for PromptQL |
 | `aiPrimitivesLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc |
 | `overrideAiPrimitivesLlm` | [[AiPrimitivesLlmConfig](#promptqlconfigv2-aiprimitivesllmconfig)] | false | Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc |
-| `featureFlags` | object / null | false | Feature flags to be used for PromptQL |
+| `featureFlags` | [PromptQlFeatureFlags](#promptqlconfigv2-promptqlfeatureflags) / null | false | Feature flags to be used for PromptQL to enable and disable experimental features |
+
+
+
+#### PromptQlFeatureFlags {#promptqlconfigv2-promptqlfeatureflags}
+
+Feature flags to be used for PromptQL to enable and disable experimental features
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `enable_automations` | boolean / null | false | Enable the experimental automations feature |
+| `enable_visualizations` | boolean / null | false | Enable the experimental visualizations feature |
+| `enable_visualizations_v2` | boolean / null | false | Enable the experimental visualizations v2 feature |
+| `<customKey>` |  | false |  |
 
 
 

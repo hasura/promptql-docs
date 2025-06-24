@@ -128,20 +128,31 @@ Definition of the authentication configuration used by the API server.
 
 **One of the following values:**
 
-| Value                                    | Description                                                                |
-| ---------------------------------------- | -------------------------------------------------------------------------- |
-| [AuthConfig1](#authconfig-authconfig1)   | Definition of the authentication configuration v1, used by the API server. |
-| [AuthConfig2](#authconfig-authconfig2)   | Definition of the authentication configuration v2, used by the API server. |
-| [AuthConfig3](#authconfig-authconfig3)   |                                                                            |
-| [AuthConfigV4](#authconfig-authconfigv4) |                                                                            |
+| Value | Description |
+|-----|-----|
+| [AuthConfig1](#authconfig-authconfig1) | Definition of the authentication configuration v1, used by the API server. |
+| [AuthConfig2](#authconfig-authconfig2) | Definition of the authentication configuration v2, used by the API server. |
+| [AuthConfig3](#authconfig-authconfig3) |  |
+| [AuthConfig4](#authconfig-authconfig4) |  |
 
-#### AuthConfigV4 {#authconfig-authconfigv4}
+#### AuthConfig4 {#authconfig-authconfig4}
 
 | Key          | Value                                    | Required | Description                                                                |
 | ------------ | ---------------------------------------- | -------- | -------------------------------------------------------------------------- |
 | `kind`       | `AuthConfig`                             | true     |                                                                            |
 | `version`    | `v4`                                     | true     |                                                                            |
 | `definition` | [AuthConfigV4](#authconfig-authconfigv4) | true     | Definition of the authentication configuration v4, used by the API server. |
+
+#### AuthConfigV4 {#authconfig-authconfigv4}
+
+Definition of the authentication configuration v4, used by the API server.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `mode` | [AuthModeConfigV3](#authconfig-authmodeconfigv3) | true |  |
+| `alternativeModes` | array / null | false |  |
+
+
 
 #### AuthConfig3 {#authconfig-authconfig3}
 
