@@ -1,0 +1,98 @@
+---
+sidebar_position: 51
+sidebar_label: With Automation
+description: "Learn how to build automated workflows and processes with PromptQL for reliable, repeatable business tasks."
+keywords:
+  - promptql automation
+  - automated workflows
+  - business process automation
+  - api automation
+  - promptql deployment
+---
+
+# Building Automation with PromptQL
+
+## Introduction
+
+PromptQL automation allows you to transform one-time conversations into reliable, repeatable business processes. Once you've built and tested a workflow in the PromptQL Playground, you can deploy it as an API endpoint that can be called programmatically or integrated into your existing systems.
+
+Perfect for scenarios like generating reports, analyzing data, classifying content, or any repetitive task that benefits from AI-powered insights.
+
+## Getting Started with Automation
+
+### Step 1: Set Up Your Project
+Ensure you have a PromptQL project with your data sources connected and properly configured. Your project should be in a working state where you can successfully query your data through the playground.
+
+### Step 2: Create Your First Automation
+
+1. **Start a new chat thread** with your newly created build
+2. **Ask a question and iterate** until you arrive at a reliable, repeatable process
+3. **Describe what you want to automate** - be specific about your input and expected output format
+4. **Ask to create an automation** for that specific task
+
+#### Example Prompts to Try:
+
+```
+"Build an automation to generate monthly sales reports from our database"
+```
+
+```
+"Create an automation that analyzes customer feedback sentiment and categorizes responses"
+```
+
+```
+"Make an automation that classifies support tickets by priority level based on content"
+```
+
+5. **Review the generated logic** - PromptQL creates and tests the automation logic automatically
+6. **Test with sample data** to ensure the automation works as expected
+7. **Click the deploy button** when you're satisfied with the results
+8. **Get your API endpoint** - you'll receive usage instructions and the HTTP API URL
+
+## Automation Use Cases
+
+### Sales Reporting Automation
+**Use Case:** Generate standardized monthly sales reports
+- **Input:** Date range, region filters
+- **Output:** Formatted report with key metrics, trends, and insights
+- **Benefits:** Consistent reporting format, automated insights, time savings
+
+### Customer Feedback Analysis
+**Use Case:** Analyze and categorize customer feedback at scale
+- **Input:** Customer feedback text, survey responses
+- **Output:** Sentiment scores, category classifications, action recommendations
+- **Benefits:** Real-time insights, consistent analysis, scalable processing
+
+### Support Ticket Classification
+**Use Case:** Automatically prioritize and route support tickets
+- **Input:** Ticket content, customer information
+- **Output:** Priority level, department routing, suggested responses
+- **Benefits:** Faster response times, consistent prioritization, improved customer satisfaction
+
+## API Integration
+
+Once deployed, your automation becomes a standard HTTP API endpoint that you can integrate into:
+
+- **Business applications** - Call from your existing software systems
+- **Workflow tools** - Integrate with tools like Zapier, Microsoft Power Automate
+- **Scheduled jobs** - Set up cron jobs or scheduled tasks to run automations
+- **Custom applications** - Build applications that leverage your automated insights
+
+### Sample API Usage
+
+```bash
+curl -X POST "https://promptql.ddn.hasura.app/playground/automations/v1/automation/run?project_id=xxx" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer your-api-key" \
+  -d '{
+    "input": "your structured input",
+  }'
+```
+
+## Next Steps
+
+1. **Start simple** - Begin with a straightforward use case to learn the process
+2. **Iterate and improve** - Refine your automation based on initial results
+3. **Scale gradually** - Add more complex logic and additional use cases over time
+
+Ready to automate your first workflow? Head to your PromptQL Playground and start building!
