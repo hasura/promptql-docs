@@ -25,7 +25,7 @@ const BOT_ROUTES = {
 };
 
 const config: Config = {
-  title: 'Hasura PromptQL Docs',
+  title: 'PromptQL Docs',
   tagline: 'Talk to all your data accurately with natural language',
   favicon: 'img/favicon.png',
 

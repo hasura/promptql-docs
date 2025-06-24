@@ -1,6 +1,6 @@
 ---
 sidebar_position: 6
-description: "Learn how to configure and use multiple authentication modes in Hasura DDN."
+description: "Learn how to configure and use multiple authentication modes with PromptQL."
 keywords:
   - hasura authentication
   - multiple auth modes
@@ -92,7 +92,7 @@ definition:
             namespace:
               claimsFormat: Json
               location: "/https:~1~1hasura.io~1jwt~1claims"
-          tokenLocation: 
+          tokenLocation:
             type: Header
             name: "Authorization"
 ```
@@ -108,8 +108,8 @@ In this example:
 ## Using Multiple Auth Modes
 
 To use a specific authentication mode when making a request to your Hasura DDN API, include the `X-Hasura-Auth-Mode`
-header with the identifier of the desired mode. You can pass this value in via the [PromptQL
-Playground](/auth/playground-auth.mdx).
+header with the identifier of the desired mode. You can pass this value in via the
+[PromptQL Playground](/auth/playground-auth.mdx).
 
 ## Use Cases
 
