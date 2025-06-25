@@ -1,0 +1,149 @@
+---
+sidebar_position: 51
+sidebar_label: With Automation
+description:
+  "Learn how to build automated workflows and processes with PromptQL for reliable, repeatable business tasks."
+keywords:
+  - promptql automation
+  - automated workflows
+  - business process automation
+  - api automation
+  - promptql deployment
+toc_max_heading_level: 4
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Building Automations with PromptQL
+
+## Introduction
+
+**Automations** allow you to transform one-time conversations into reliable, repeatable business processes. Once you've
+built and tested a workflow in the PromptQL Playground, you can deploy it as an API endpoint that can be called
+programmatically or integrated into your existing systems. That means services like Zapier, Slack, or even your internal
+systems can trigger the automation whenever it’s needed—no coding required.
+
+This is ideal for any repetitive task that benefits from AI-powered insights, like:
+
+- Generating reports
+- Analyzing data
+- Classifying content
+
+## Guide
+
+:::tip Ensure automations are enabled in your project
+
+**Automations must be enabled in your hosted PromptQL project—you cannot create them during local development.**
+
+Before continuing, make sure your project is working and you can successfully query your data in the playground.
+
+You can enable automations using your `promptql-config.hml` file:
+
+```yaml {7}
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  featureFlags:
+    enable_automations: true
+```
+
+```ddn title="Then, create a new build:"
+ddn supergraph build create
+```
+
+Either use the returned build's URL or [apply the build](/reference/cli/commands/ddn_supergraph_build_apply.mdx) to your
+project.
+
+:::
+
+### Step 1. Start a new thread
+
+From a new thread, there are a couple of options for generating your first automation: **ask a question** or **describe
+a process**.
+
+#### Ask a question
+
+If you've reached a point in your conversation with PromptQL where the exchange feels reliable and repeatable, ask
+PromptQL to turn it into an automation:
+
+```plaintext title="Just say:"
+Can you turn this into an automation? I'd like...
+```
+
+This works because PromptQL has an AI primitive called **automate** which creates a clean, consistent interface for
+running automated code based on your conversation and existing artifacts.
+
+#### Describe a process
+
+You can also start by describing a process you'd like to automate with your data.
+
+```plaintext title="As an example:"
+I'm a film industry analyst looking to understand financial patterns. I'm responsible
+for generating a report that analyzes box-office performance via processing gross
+earnings data to identify financial trends and success patterns. Help me automate this.
+```
+
+Regardless of the path you choose, be sure to include details about inputs, expected outputs, formatting requirements,
+and any other context that might help PromptQL understand your goal. This will cut down on back-and-forth iterations and
+help automate your task quicker.
+
+### Step 2. Review the automation and results
+
+PromptQL will respond with a **query plan** that includes the steps for its proposed automation. It will also create the
+automation and run an initial test.
+
+<Thumbnail src="/img/get-started/playground-automation-query-plan.png" alt="Modifiable query plan for an automation." />
+
+At this stage, you should be assessing two things and providing feedback to PromptQL:
+
+- **First: read over the query plan.**
+
+  Does it make sense? Are there things you'd do differently? This is completely modifiable using the pencil icon in the
+  top-right of PromptQL's response.
+
+- **Second: check the accuracy of the response given the input parameters.**
+
+  PromptQL will let you know your automation is ready to use with different input parameters. It will also ask you if
+  you'd like to test the automation against more data from your datasource.
+
+### Step 3. Deploy the automation
+
+When you're satisfied with the results, click `Deploy Automation` and provide a name along with an optional description.
+
+<Thumbnail src="/img/get-started/playground-automation-deploy.png" alt="Deploy an automation." />
+
+### Step 4. Test the API endpoint
+
+Once deployed, your automation becomes a standard HTTP API endpoint that you can integrate into:
+
+- **Business applications** - Call from your existing software systems.
+- **Workflow tools** - Integrate with tools like Zapier, Microsoft Power Automate.
+- **Scheduled jobs** - Set up cron jobs or scheduled tasks to run automations.
+- **Custom applications** - Build applications that leverage your automated insights.
+
+<Thumbnail src="/img/get-started/playground-automation-details.png" alt="Details of a deployed automation." />
+
+In the screenshot above, you or a developer on your team can use the POST request to test the automation. We've
+pre-loaded some testing values, but you can grab your own PromptQL API key from the project's settings and play with the
+`input` values to simulate real-world scenarios. This makes it easy to validate your integration from any external
+system.
+
+:::info Automations can be run against a specific build
+
+You can append the endpoint with a `build_id` query parameter whose value is the UUID for a particular build.
+
+```plaintext title="For example:"
+https://promptql.ddn.hasura.app/playground/automations/v1/box_office_analyzer/run?project_id=<project_id>&build_id=<build_id>
+```
+
+:::
+
+## Best practices
+
+1. **Start simple** - Begin with a straightforward use case to learn the process
+2. **Iterate and improve** - Refine your automation based on initial results
+3. **Scale gradually** - Add more complex logic and additional use cases over time
+
+Ready to automate your first workflow? Head to your PromptQL Playground and start building!
