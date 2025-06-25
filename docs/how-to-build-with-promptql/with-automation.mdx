@@ -130,6 +130,16 @@ pre-loaded some testing values, but you can grab your own PromptQL API key from 
 `input` values to simulate real-world scenarios. This makes it easy to validate your integration from any external
 system.
 
+:::info Automations can be run against a specific build
+
+You can append the endpoint with a `build_id` query parameter whose value is the UUID for a particular build.
+
+```plaintext title="For example:"
+https://promptql.ddn.hasura.app/playground/automations/v1/box_office_analyzer/run?project_id=<project_id>&build_id=<build_id>
+```
+
+:::
+
 ## Best practices
 
 1. **Start simple** - Begin with a straightforward use case to learn the process
