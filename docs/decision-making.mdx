@@ -1,0 +1,136 @@
+---
+sidebar_position: 1.5
+sidebar_label: Decision Making
+description: "Learn how you can use PrompQL for accurate AI in your decision-making processes."
+keywords:
+  - promptql
+  - accurate
+  - reliable
+  - decision making
+toc_max_heading_level: 4
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Make Decisions with PromptQL
+
+## Introduction
+
+**Decision making** with PromptQL supports deeper analysis and structured exploration across your data. You can ask
+complex, layered questions and get responses that adapt to your systems and terminology. PromptQL helps you drill into
+root causes, compare across categories, and evaluate tradeoffs—without being limited by context windows or informal
+language.
+
+This is useful for scenarios that require exploration and judgment, such as:
+
+- Investigating anomalies
+- Comparing performance across teams or regions
+- Understanding contributing factors behind trends
+
+## Guides
+
+Below, we've split out a few different use cases as examples. You can run these against the
+[public sandbox-quickstart project](#).
+
+### Q&A
+
+It would seem that asking questions about data is simple, but this is difficult because business terms often map to
+multiple systems or concepts. For example, "performance" might refer to revenue, engagement, or critical ratings,
+depending on who’s asking. Systems don’t always agree on how those values are calculated, either.
+
+Take this example:
+
+> _How did our PG-13 portfolio perform against R-rated titles during the streaming transition period?_
+
+PromptQL solves this by mapping ambiguous terms to precise system definitions and building a plan that retrieves data
+from the right sources in the correct form. The generated plan accounts for relevant time windows, content ratings, and
+distribution channels, producing a structured answer tailored to your domain.
+
+<Thumbnail src="/img/get-started/playground-dm-streaming-results.png" alt="Details of a deployed automation." />
+
+**Use this when you want direct answers that reflect your business logic and definitions.**
+
+### Interrogation
+
+PromptQL allows you to interrogate your data by following up naturally, asking for more detail, and adjusting the scope
+as you go. The system preserves your analysis trail and ensures consistency across steps.
+
+> _Looking at our 2015–2020 release slate, what's the correlation between our talent investment strategy and audience
+> retention metrics?_
+
+PromptQL solves this by generating a multi-step plan that fetches relevant datasets, applies statistical methods, and
+structures results in a way that's easy to pivot or extend. You can modify thresholds, change groupings, or backtrack to
+explore a different angle—all without losing context.
+
+<Thumbnail src="/img/get-started/playground-interrogation.png" alt="Details of a deployed automation." />
+
+**Use this when a surface-level answer isn't enough and you need to go deeper with confidence.**
+
+:::tip Edit the query plan
+
+Most AI tools are a black box: you don't know what's happening under the hood, how answers were arrived upon, or what
+data was used.
+
+With PromptQL, every response is backed by a transparent query plan that you can inspect, modify, and re-run. This gives
+you full control over the logic, data sources, and assumptions behind each result—so you can refine, extend, or validate
+the analysis as needed.
+
+:::
+
+### Deep Research
+
+You can perform deep research that explores multiple hypotheses, benchmarks external data, and evaluates internal
+patterns across time or categories.
+
+> _Can you analyze the ROI patterns of our genre-blending titles compared to pure-genre releases between 2010–2020?_
+
+PromptQL is unique because it treats research as a process—not just a query. It generates a plan that defines discovery
+phases, collects and segments relevant data, and evaluates each hypothesis systematically.
+
+<Thumbnail src="/img/get-started/playground-deep-research.png" alt="Details of a deployed automation." />
+
+**Use this when you're trying to answer open-ended questions that require context and exploration.**
+
+### Cross-Source Intelligence
+
+Since you can join any source using your semantic metadata layer, PromptQL can resolve data across structured,
+semi-structured, and unstructured systems in a single plan.
+
+> _What's the risk profile of working with first-time directors who came from our star talent pool?_
+
+PromptQL builds a plan that pulls structured records (e.g., director metadata), aggregates historical performance
+metrics, and layers in qualitative signals from reviews or production notes. Relationships that span systems—like
+casting history, sentiment, and audience reception—are captured and evaluated together.
+
+<Thumbnail src="/img/get-started/playground-cross-source.png" alt="Details of a deployed automation." />
+
+**Use this when your answers require stitching together multiple systems and surfacing insights that aren't visible in
+any single source.**
+
+### Smart Visualizations
+
+Visualizations make it easy to understand complex patterns or communicate findings across stakeholders. PromptQL
+automatically selects appropriate formats—charts, tables, or graphs—based on the type and scale of your analysis.
+
+<Thumbnail src="/img/get-started/playground-visualization-rosling.png" alt="Details of a deployed automation." />
+
+**Use this when you want to share findings with others or spot trends across segments or time periods.**
+
+## Best Practices
+
+- **Start specific, then expand.** Narrow, well-defined questions help PromptQL build better initial plans. You can
+  always widen scope through follow-ups.
+- **Use your own terms.** PromptQL is designed to understand your internal terminology, so write queries as you would
+  naturally ask a colleague.
+- **Follow the thread.** PromptQL preserves your reasoning trail—feel free to pivot, rewind, or dig deeper without
+  losing previous steps.
+- **Review the plan.** Each result is backed by a structured plan. Reviewing it helps validate how PromptQL interprets
+  your intent.
+- **Use visualizations for communication.** When sharing results, use PromptQL’s built-in visualization capabilities to
+  highlight key insights clearly.
+
+## Next Steps
+
+It's great to be able to ask questions and get accurate, reliable responses. But, what if you could turn these into
+automations? Check out how easy PromptQL makes it to [automate tasks](/automation.mdx) with the same level of accuracy
+and reliability 🚀
