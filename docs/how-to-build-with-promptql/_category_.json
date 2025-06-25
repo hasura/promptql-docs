@@ -1,6 +1,6 @@
 {
   "label": "Build with PromptQL",
-  "position": 1,
+  "position": 2,
   "className": "basics-icon",
   "customProps": {
     "sidebar_pathname": "how-to-build-with-promptql"
