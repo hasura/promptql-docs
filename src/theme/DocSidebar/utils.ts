@@ -21,6 +21,81 @@ export const getDirectoryFromPath = (path: string): string => {
 };
 
 /**
+ * Get the primary directory for an item (handles nested categories)
+ */
+export const getPrimaryDirectory = (item: PropSidebarItem): string => {
+  if (item.type === 'link') {
+    const href = (item as any).href;
+    if (href) {
+      return getDirectoryFromPath(href);
+    }
+  }
+  
+  if (item.type === 'category') {
+    // Check if the category itself has an href
+    const href = (item as any).href;
+    if (href) {
+      return getDirectoryFromPath(href);
+    }
+    
+    // Otherwise, get the directory from the first child item
+    const items = (item as any).items;
+    if (items && Array.isArray(items) && items.length > 0) {
+      return getPrimaryDirectory(items[0]);
+    }
+  }
+  
+  return '';
+};
+
+/**
+ * Recursively sort items within a category based on directory order
+ */
+export const sortItemsByDirectoryOrder = (
+  items: PropSidebarItem[],
+  directoryOrder: readonly string[],
+  exactMatch: boolean = false
+): PropSidebarItem[] => {
+  return items
+    .map(item => {
+      // If this is a category, recursively sort its children
+      if (item.type === 'category') {
+        const childItems = (item as any).items;
+        if (childItems && Array.isArray(childItems)) {
+          return {
+            ...item,
+            items: sortItemsByDirectoryOrder(childItems, directoryOrder, exactMatch)
+          };
+        }
+      }
+      return item;
+    })
+    .sort((a, b) => {
+      const aPrimaryDir = getPrimaryDirectory(a);
+      const bPrimaryDir = getPrimaryDirectory(b);
+      
+      let aIndex = -1;
+      let bIndex = -1;
+      
+      if (exactMatch) {
+        aIndex = directoryOrder.indexOf(aPrimaryDir);
+        bIndex = directoryOrder.indexOf(bPrimaryDir);
+      } else {
+        // For non-exact match, find the first directory that contains the pattern
+        aIndex = directoryOrder.findIndex(dir => aPrimaryDir.includes(dir));
+        bIndex = directoryOrder.findIndex(dir => bPrimaryDir.includes(dir));
+      }
+      
+      // Items not found in the directory order go to the end
+      if (aIndex === -1 && bIndex === -1) return 0;
+      if (aIndex === -1) return 1;
+      if (bIndex === -1) return -1;
+      
+      return aIndex - bIndex;
+    });
+};
+
+/**
  * Check if a sidebar item matches any of the given patterns
  */
 export const itemMatchesPattern = (
@@ -84,11 +159,9 @@ export const getItemsForCategory = (
   exactMatch: boolean = false
 ): PropSidebarItem[] => {
   if (!sidebar || !Array.isArray(sidebar)) return [];
-
   const matchedItems = sidebar.filter((item: PropSidebarItem) => {
     return itemMatchesPattern(item, categoryConfig, exactMatch);
   });
-
   return matchedItems;
 };
 
@@ -96,11 +169,18 @@ export const getItemsForCategory = (
  * Build categories from the configuration
  */
 export const buildCategories = (sidebar: PropSidebarItem[]): Category[] => {
-  return Object.entries(CATEGORY_CONFIG).map(([id, config]) => ({
-    id,
-    title: config.title,
-    items: getItemsForCategory(sidebar, config.directories, config.exactMatch),
-  }));
+  return Object.entries(CATEGORY_CONFIG).map(([id, config]) => {
+    const matchedItems = getItemsForCategory(sidebar, config.directories, config.exactMatch);
+    
+    // Sort items recursively by directory order
+    const sortedItems = sortItemsByDirectoryOrder(matchedItems, config.directories, config.exactMatch);
+    
+    return {
+      id,
+      title: config.title,
+      items: sortedItems,
+    };
+  });
 };
 
 /**

@@ -1,4 +1,10 @@
-export const CATEGORY_CONFIG = {
+type CategoryConfig = {
+  title: string;
+  directories: string[];
+  exactMatch: boolean;
+};
+
+export const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
   gettingStarted: {
     title: 'Getting Started',
     directories: ['quickstart', 'how-to-talk-to-promptql', 'capabilities', 'decision-making', 'automation'],
@@ -6,12 +12,12 @@ export const CATEGORY_CONFIG = {
   },
   coreConcepts: {
     title: 'Core Concepts', 
-    directories: ['data-modeling', 'data-sources', 'business-logic'],
+    directories: ['data-modeling', 'data-sources', 'business-logic', 'auth'],
     exactMatch: false,
   },
   buildingApps: {
     title: 'Building Apps',
-    directories: ['how-to-build-with-promptql', 'promptql-apis', 'promptql-playground'],
+    directories: ['project-configuration', 'how-to-build-with-promptql', 'promptql-apis', 'promptql-playground'],
     exactMatch: true,
   },
   deployment: {
@@ -29,4 +35,4 @@ export const CATEGORY_CONFIG = {
     directories: ['reference', 'billing', 'help'],
     exactMatch: true,
   },
-} as const;
+};
