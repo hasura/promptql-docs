@@ -25,6 +25,8 @@
   --main-bg-color: #ffffff;
   --sidebar-bg-color: #f9fafb;
   --sidebar-bg-color-hover: #f1f5f9;
+  --sidebar-bg-color-active: #e5e7eb;
+  --sidebar-margin-color-active: #9ca3af;
   --heading-color: #1f2937;
   --heading-color-hover: #0f172a;
   --sidebar-title-color: #374151;
@@ -122,6 +124,8 @@ html[data-theme='dark'] {
   --main-bg-color: #111827;
   --sidebar-bg-color: #060e23;
   --sidebar-bg-color-hover: #1f2937;
+  --sidebar-bg-color-active: #142046;
+  --sidebar-margin-color-active: #1f5aff;
   --heading-color: #e5e7eb;
   --heading-color-hover: #e5e7eb;
   --sidebar-title-color: #d1d5db;
