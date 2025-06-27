@@ -33,7 +33,6 @@ export const itemMatchesPattern = (
       const href = (item as any).href;
       if (href) {
         const directory = getDirectoryFromPath(href);
-        console.log(`Checking link: ${(item as any).label || 'No label'} -> ${href} -> directory: ${directory} against pattern: ${pattern}`);
         if (exactMatch) {
           return directory === pattern;
         } else {
@@ -43,12 +42,9 @@ export const itemMatchesPattern = (
     }
     
     if (item.type === 'category') {
-      console.log(`Checking category: ${(item as any).label || 'No label'}, has ${(item as any).items?.length || 0} items`);
-      
       const href = (item as any).href;
       if (href) {
         const directory = getDirectoryFromPath(href);
-        console.log(`Category href: ${href} -> directory: ${directory} against pattern: ${pattern}`);
         if (exactMatch) {
           if (directory === pattern) return true;
         } else {
@@ -117,8 +113,15 @@ export const isActiveLink = (href: string, currentPathname: string): boolean => 
 /**
  * Check if a category has any active child items
  */
-export const hasActiveChild = (items: any[], currentPathname: string): boolean => {
-  return items.some((subItem: any) => 
-    subItem.type === 'link' && subItem.href && isActiveLink(subItem.href, currentPathname)
-  );
+export const hasActiveChild = (items: PropSidebarItem[], pathname: string): boolean => {
+  return items.some(item => {
+    if (item.type === 'link') {
+      const href = (item as any).href;
+      return pathname.startsWith(href); // deep match
+    }
+    if (item.type === 'category') {
+      return hasActiveChild((item as any).items || [], pathname);
+    }
+    return false;
+  });
 };
