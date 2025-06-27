@@ -1,7 +1,7 @@
 export const CATEGORY_CONFIG = {
   gettingStarted: {
     title: 'Getting Started',
-    directories: ['quickstart', 'project-configuration'],
+    directories: ['quickstart', 'how-to-talk-to-promptql', 'capabilities', 'decision-making', 'automation'],
     exactMatch: true,
   },
   coreConcepts: {

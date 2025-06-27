@@ -1,10 +1,11 @@
 :root {
-  --doc-sidebar-width: 300px;
+  --doc-sidebar-width: 250px;
   --doc-sidebar-hidden-width: 30px;
 }
 
 .docSidebarContainer {
   display: none;
+
 }
 
 @media (min-width: 997px) {

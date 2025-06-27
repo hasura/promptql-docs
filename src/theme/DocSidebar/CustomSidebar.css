@@ -1,6 +1,6 @@
 .custom-sidebar {
   height: 100vh;
-  background: var(--sidebar-bg-color);
+  background-color: var(--sidebar-bg-color) !important;
   width: 280px;
   overflow-y: auto;
   padding-top: 5rem;
