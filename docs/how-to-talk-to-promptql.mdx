@@ -1,0 +1,91 @@
+---
+sidebar_position: 1.6
+sidebar_label: Talk to PromptQL
+description: "Learn how to talk with your data via PromptQL."
+keywords:
+  - promptql
+  - accurate
+  - reliable
+  - how to
+toc_max_heading_level: 4
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# How to Talk to PromptQL
+
+## Introduction
+
+Talking to PromptQL is like onboarding a new teammate. It starts with limited knowledge—your Day-0 analyst, engineer, or
+ops assistant—and learns quickly through the questions you ask and the feedback you provide. The more you interact with
+it, the sharper and more context-aware it becomes. Your conversations aren't just about getting answers—they’re also
+shaping how PromptQL thinks about your business, your data, and your language.
+
+## Do's
+
+PromptQL works best when you treat it like a collaborator. Ask specific questions in natural language. There's no need
+to speak in SQL or use exact technical phrases. Just describe what you’re curious about.
+
+Examples:
+
+```plaintext
+Compare signups this quarter to last.
+Show me churn by region.
+Break this down by customer type.
+```
+
+It helps to add context, especially for company-specific terms, business rules, or timeframes. PromptQL will do its best
+to infer meaning, but your clarification speeds things up and improves accuracy.
+
+As you go, don’t hold back feedback. If an answer is off, say so. Corrections make it smarter. You can say:
+
+```plaintext
+That’s not what I meant.
+Can you explain how you got this?
+Try grouping it by year instead.
+Our fiscal year starts in February.
+```
+
+The more you interact, the better PromptQL gets at understanding your definitions, your patterns, and your expectations.
+It remembers what you correct. It learns how you ask.
+
+You can also ask for visualizations, request alternate views of the same data, or specify how you'd like results
+returned:
+
+```plaintext
+Show a chart of the trend.
+Group by location and limit to the top 10.
+```
+
+If you're unsure about terminology, just ask. PromptQL can define terms or explain metrics. It’s built to clarify, not
+confuse.
+
+## Don'ts
+
+Don’t expect one-shot perfection in the beginning. PromptQL thrives in back-and-forth exchanges. It doesn't retain prior
+conversation context unless you reference it, so always restate key details when continuing a line of inquiry or use an
+artifact to start a new chat.
+
+Avoid assuming it can access anything outside of your connected schema. It can’t pull in external files, ping APIs, or
+generate real-world updates from news or financial markets...unless you've added this functionality!
+
+You _should_ use niche or complex domain terms—just be ready to explain them the first time. This helps PromptQL learn
+your vocabulary and makes future conversations smoother. If it gets something wrong:
+
+```plaintext
+That’s not what “churn risk” means for us.
+In our case, “premium” refers to the paid tier only.
+```
+
+This is how PromptQL builds context over time, adapting to your business.
+
+## Next Steps
+
+The best way to get started is to ask something simple but real. Start with a metric you track regularly, or recreate an
+analysis you've done manually before. From there, PromptQL will learn your expectations, surface useful patterns, and
+help you turn those insights into reliable, repeatable workflows.
+
+Jump into one of these use cases:
+
+- [Making decisions](/decision-making.mdx)
+- [Automating tasks](/automation.mdx)
