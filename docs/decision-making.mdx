@@ -18,7 +18,7 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 **Decision making** with PromptQL supports deeper analysis and structured exploration across your data. You can ask
 complex, layered questions and get responses that adapt to your systems and terminology. PromptQL helps you drill into
-root causes, compare across categories, and evaluate tradeoffs—without being limited by context windows or informal
+root causes, compare across categories, and evaluate tradeoffs without being limited by context windows or informal
 language.
 
 This is useful for scenarios that require exploration and judgment, such as:
@@ -29,18 +29,18 @@ This is useful for scenarios that require exploration and judgment, such as:
 
 ## Guides
 
-Below, we've split out a few different use cases as examples. You can run these against the
-[public sandbox-quickstart project](https://promptql.console.hasura.io/public/sandbox-movie-studio/playground).
+Below, we've split out a few different use cases as examples. You can run these against the `sandbox-movie-studio`
+[project](https://promptql.console.hasura.io/public/sandbox-movie-studio/playground).
 
 ### Q&A
-
-It would seem that asking questions about data is simple, but this is difficult because business terms often map to
-multiple systems or concepts. For example, "performance" might refer to revenue, engagement, or critical ratings,
-depending on who’s asking. Systems don’t always agree on how those values are calculated, either.
 
 Take this example:
 
 > _How did our PG-13 portfolio perform against R-rated titles during the streaming transition period?_
+
+It would seem that asking questions about data is simple, but this is difficult because business terms often map to
+multiple systems or concepts. For example, "performance" might refer to revenue, engagement, or critical ratings,
+depending on who’s asking. Systems don’t always agree on how those values are calculated, either.
 
 PromptQL solves this by mapping ambiguous terms to precise system definitions and building a plan that retrieves data
 from the right sources in the correct form. The generated plan accounts for relevant time windows, content ratings, and
@@ -84,8 +84,8 @@ patterns across time or categories.
 
 > _Can you analyze the ROI patterns of our genre-blending titles compared to pure-genre releases between 2010–2020?_
 
-PromptQL is unique because it treats research as a process—not just a query. It generates a plan that defines discovery
-phases, collects and segments relevant data, and evaluates each hypothesis systematically.
+PromptQL is unique because it treats research as a process and not just a query. It generates a plan that defines
+discovery phases, collects and segments relevant data, and evaluates each hypothesis systematically.
 
 <Thumbnail src="/img/get-started/playground-deep-research.png" alt="Details of a deployed automation." />
 
