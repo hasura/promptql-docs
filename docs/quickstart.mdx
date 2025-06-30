@@ -8,25 +8,34 @@ keywords:
   - getting started
   - guide
 sidebar_class_name: quickstart-icon
+toc_max_heading_level: 4
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
 
 # Quickstart with PromptQL
 
+## Introduction
+
 This guide is designed to give you a high-level overview of PromptQL and how you can use it to make better decisions
-about your business and automate tasks—all without any coding knowledge required.
+about your business and automate tasks; all without any coding knowledge required.
 
 :::info Prerequisites
 
 Before continuing, you'll need a [Hasura Cloud account](https://cloud.hasura.io/signup/new_user).
 
 If you have your own project, you can apply the information below to it. Otherwise, we have a
-[collection of sandboxes](/index.mdx#demos) which allow you to try PromptQL and get a feel for the experience.
+[collection of sandboxes](/index.mdx#demos) which allow you to try PromptQL and get a feel for the experience. Below,
+we'll use the `sandbox-gtm` example.
+
+If you're looking to build a new project from scratch, check out
+[these guides](/how-to-build-with-promptql/overview.mdx).
 
 :::
 
-## Open your project
+## Guide
+
+### Open your project
 
 Each PromptQL project can be accessed via a unique URL. You can access all your projects
 [from the PromptQL Console](https://promptql.console.hasura.io/).
@@ -42,58 +51,29 @@ ask questions about your data and create automations.
 
 <Thumbnail src="/img/get-started/pql-playground.png" alt="The PromptQL Playground." width="1000px" />
 
-## Talk to your data
+### Talk to your data
 
 Primarily, you'll interact with PromptQL in one of two ways: either by asking questions, or creating automations.
 
-### Ask a complex question
+#### Ask a complex question
 
-Using [the `sandbox-gtm` project](https://promptql.console.hasura.io/public/sandbox-gtm/playground), we're going to ask
-the following question:
+Using the `sandbox-gtm` project, we're going to ask the following question:
 
-```plaintext
-Which enterprise deals are at risk of slipping this quarter based on engagement patterns?
-```
+> _Which enterprise deals are at risk of slipping this quarter based on engagement patterns?_
 
-If you're using your own project, ask a question. Otherwise, [click here](#) to be dropped into the playground directly
-with the question pre-loaded!
+While this question seems simple, it's complex because it requires defining what qualifies as an enterprise deal,
+identifying signals that indicate a deal is at risk—such as low engagement or delayed progress—and analyzing various
+engagement patterns, including sales activities, buyer signals, and product usage, all in comparison to historical and
+successful deal benchmarks.
 
-<details>
-  <summary>
-    Why is this complex?
-  </summary>
+If you're using your own project, start by asking a similarly strategic question relevant to your data. Otherwise,
+[click here](https://promptql.console.hasura.io/share/05437507-6b31-4037-a302-0dbcec5de2ae) to be dropped into a thread
+replay.
 
-This is complex because it requires:
+##### Query plan
 
-1. Defining "enterprise deals" - Could be based on:
-
-   - Account tier/type
-   - Deal size
-   - Number of users/usage metrics
-   - Industry/vertical
-
-2. Determining "risk of slipping" by analyzing:
-
-   - Sales engagement (calls, tasks, events)
-   - Buyer engagement signals (6sense scores, successful touches)
-   - Deal velocity compared to similar won deals
-   - Current stage vs time left in quarter
-   - Historical patterns of similar deals that slipped
-
-3. Understanding "engagement patterns" through:
-
-   - Call transcripts and topics discussed
-   - Email sequence responses
-   - Product usage metrics
-   - Multiple stakeholder involvement
-   - Comparison to successful deal patterns
-
-</details>
-
-#### Query plan
-
-PromptQL will respond with a **query plan**. This is a step-by-step breakdown in plain language of how it will process
-your request, including any data retrieval, filtering, or AI operations it will perform.
+When you ask a question, PromptQL will respond with a **query plan**. This is a step-by-step breakdown in plain language
+of how it will process your request, including any data retrieval, filtering, or AI operations it will perform.
 
 <Thumbnail
   src="/img/get-started/pql-query-plan.png"
@@ -104,6 +84,9 @@ your request, including any data retrieval, filtering, or AI operations it will 
 It helps make PromptQL's approach transparent by explaining what it's going to do before it does it, including any
 assumptions it's making about the data or process.
 
+Take a look at the query plan generated for your question and see how PromptQL takes a complex question and breaks it
+down into a series of steps, just like a human would.
+
 :::tip Query plans are modifiable
 
 You can edit a query plan by clicking the pencil next to a query plan.
@@ -113,16 +96,19 @@ and self-corrects for future threads!
 
 :::
 
-#### Execution
+##### Execution
 
 The query plan is then **executed** against your data.
 
 <Thumbnail src="/img/get-started/pql-execution.png" alt="A query plan's execution of Python and SQL." width="1000px" />
 
-PromptQL writes Python code that includes SQL queries to retrieve data, and then processes that data using Python's data
-structures and the AI functions provided to it.
+PromptQL pulls the necessary data and uses AI to help make sense of it. Behind the scenes, it fetches information from
+your database and organizes it using Python, so you can focus on the insights, not the code.
 
-#### Artifacts
+If you're curious, expand the execution in your project and see the code PromptQL is executing against your datasource.
+And, just like the query plan, if you see something that should be different, let PromptQL know!
+
+##### Artifacts
 
 Typically, the execution of a query plan will result in an **artifact**.
 
@@ -135,6 +121,8 @@ Typically, the execution of a query plan will result in an **artifact**.
 Artifacts are structured outputs like tables, text, or visualizations that store the processed data or analysis results,
 which can be referenced later in the conversation, exported, or used to start new threads for further analysis.
 
+We have a more in-depth guide for making decisions with PromptQL; check it out [here](/decision-making.mdx).
+
 :::tip This is a conversation!
 
 Talking with PromptQL is like talking to a human. This means it's an iterative process wherein you ask a question, it
@@ -143,13 +131,42 @@ provide, the better the answers become.
 
 :::
 
-### Give it a task to automate
+#### Give it a task to automate
 
-TODO: After conversation with Sooraj on Monday, 23 June
+Using the same sandbox project, we'll ask PromptQL to generate an automation for us:
 
-- Reusable programs
-- Ability to export executable code and run it from an API
+> I need an automation to help me identify risky opportunities in my sales pipeline. I want to input a date range and
+> get back a list of opportunities that need attention. Specifically, I want to know which deals:
+>
+> - Haven't had any recent activity
+> - Are missing important contact relationships
+> - Show low engagement from the customer
+> - Are taking longer than expected to close
+>
+> Can you create something that gives me a risk score for each opportunity and suggests specific actions I should take?
+> I'd like the results in a format that makes it easy for me to prioritize which deals need immediate attention.
+
+This task-based prompt asks PromptQL to build an **automation**: a reusable workflow that runs against your data and
+gives you consistent, structured results. Rather than just answering a one-time question, automations are designed to
+help you monitor, score, or act on key insights regularly.
+
+<Thumbnail
+  src="/img/get-started/playground-quickstart-automation.png"
+  alt="A PromptQL-generated automation."
+  width="1000px"
+/>
+
+In this example, PromptQL will identify the relevant data, define what makes a deal “risky,” build a scoring system to
+prioritize those deals, and suggest actions—all packaged in a format that’s easy to review and reuse. Just like with
+query plans, PromptQL explains each step and lets you modify the logic, so you stay in control of the process.
+
+If you're using your own project, give PromptQL a similar task to automate. Otherwise,
+[click here](https://promptql.console.hasura.io/share/88a988ff-b44b-42b8-9859-846fa4be3f9c) to be dropped into a thread
+replay.
+
+We also have a dedicated guide to building your own automations available [here](/automation.mdx).
 
 ## Next steps
 
-- Dev mode
+Now that you've had your first set of conversations with PromptQL, we recommend checking out these docs around its
+[core capabilities](/capabilities.mdx).

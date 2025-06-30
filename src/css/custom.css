@@ -330,6 +330,7 @@ h6 code {
 
 blockquote {
   border-left: solid 2px var(--blockquote-margin);
+  font-style: italic;
 }
 
 /* -------------- TYPOGRAPHY COLORS -------------- */
