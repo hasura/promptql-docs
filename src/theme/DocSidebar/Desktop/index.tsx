@@ -1,5 +1,6 @@
 import React from 'react';
 import { useLocation } from '@docusaurus/router';
+import { useColorMode } from '@docusaurus/theme-common';
 import type { PropSidebarItem } from '@docusaurus/plugin-content-docs';
 import Link from '@docusaurus/Link';
 import {
@@ -9,6 +10,9 @@ import {
   type Category,
 } from '../utils'; 
 import '../CustomSidebar.css'; 
+import LogoLight from '@site/static/img/pql-logo-large.svg';
+import LogoDark from '@site/static/img/pql-logo-large-dark-mode.svg';
+
 
 interface ContentProps {
   path: string;
@@ -17,6 +21,7 @@ interface ContentProps {
 
 export default function Content({ sidebar }: ContentProps) {
   const location = useLocation();
+  const { colorMode } = useColorMode();
   const categories: Category[] = buildCategories(sidebar);
 
   const renderSidebarItem = (item: PropSidebarItem): React.ReactElement => {
@@ -80,6 +85,11 @@ export default function Content({ sidebar }: ContentProps) {
       role="navigation"
       aria-label="Documentation sidebar"
     >
+      <div className="custom-sidebar__logo">
+        <Link to="/index">
+           {colorMode === 'dark' ? <LogoDark /> : <LogoLight />}
+        </Link>
+      </div>
       <div className="custom-sidebar__content">
         {categories.map(renderCategory)}
       </div>

@@ -455,8 +455,8 @@ iframe {
   }
 }
 
-.theme-doc-sidebar-container [class^='sidebarLogo_'] {
   border-bottom: 1px solid var(--next-prev-border-color);
+  .theme-doc-sidebar-container [class^='sidebarLogo_'] {
   margin: 0;
 }
 
@@ -1493,6 +1493,7 @@ pre[class*='language-'] code span.token {
 /* Mobile Navigation */
 .navbar-sidebar {
   background-color: var(--main-bg-color);
+  z-index: 1000;
 }
 
 .navbar-sidebar__back {
