@@ -21,7 +21,7 @@ either webhooks or JWTs for authentication. **The AuthConfig object belongs to t
 | [Webhook](#webhook) | This allows you to use a custom webhook for authentication.                                                                            |
 
 You can learn more about Hasura's approach to using existing authentication systems in the
-[auth section](/auth/overview.mdx).
+[auth section](/auth/index.mdx).
 
 ## How AuthConfig works
 
@@ -32,7 +32,7 @@ doesn't use any auth service and doesn't allow setting session variables with AP
 default, fully public and exposed if deployed live.
 
 However, you would want update the `AuthConfig` to use a custom webhook or JWT service for authentication to restrict
-access to your API and make use of Hasura's powerful [authorization](/auth/overview.mdx) features. The metadata examples
+access to your API and make use of Hasura's powerful [authorization](/auth/index.mdx) features. The metadata examples
 below can help you configure your `AuthConfig` object to use your own custom webhook or JWT service.
 
 An AuthConfig object is required to be defined in the supergraph metadata. If not defined, any attempted builds will not
@@ -128,12 +128,12 @@ Definition of the authentication configuration used by the API server.
 
 **One of the following values:**
 
-| Value | Description |
-|-----|-----|
+| Value                                  | Description                                                                |
+| -------------------------------------- | -------------------------------------------------------------------------- |
 | [AuthConfig1](#authconfig-authconfig1) | Definition of the authentication configuration v1, used by the API server. |
 | [AuthConfig2](#authconfig-authconfig2) | Definition of the authentication configuration v2, used by the API server. |
-| [AuthConfig3](#authconfig-authconfig3) |  |
-| [AuthConfig4](#authconfig-authconfig4) |  |
+| [AuthConfig3](#authconfig-authconfig3) |                                                                            |
+| [AuthConfig4](#authconfig-authconfig4) |                                                                            |
 
 #### AuthConfig4 {#authconfig-authconfig4}
 
@@ -147,12 +147,10 @@ Definition of the authentication configuration used by the API server.
 
 Definition of the authentication configuration v4, used by the API server.
 
-| Key | Value | Required | Description |
-|-----|-----|-----|-----|
-| `mode` | [AuthModeConfigV3](#authconfig-authmodeconfigv3) | true |  |
-| `alternativeModes` | array / null | false |  |
-
-
+| Key                | Value                                            | Required | Description |
+| ------------------ | ------------------------------------------------ | -------- | ----------- |
+| `mode`             | [AuthModeConfigV3](#authconfig-authmodeconfigv3) | true     |             |
+| `alternativeModes` | array / null                                     | false    |             |
 
 #### AuthConfig3 {#authconfig-authconfig3}
 
