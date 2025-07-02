@@ -1,7 +1,9 @@
 ---
-sidebar_position: 1.8
+sidebar_position: 1.9
 sidebar_label: Architecture
-description: "Learn how to get started with PromptQL by asking complex questions and building automations."
+description:
+  "Learn about the high-level architecture of PromptQL and the importance of the semantic metadata layer in giving you
+  reliable and accurate answers to your questions."
 keywords:
   - promptql
   - architecture
@@ -11,93 +13,62 @@ keywords:
 
 ## Introduction
 
-Below, you'll find an overview of PromptQL's architecture and the key components that power it.
+Below, you'll find a functional overview of PromptQL's architecture and the key components that power it. At the heart
+of PromptQL is the **semantic metadata layer** — the intelligent foundation that makes natural language data queries
+possible.
 
-## High-Level Overview
+## High-level overview
 
 ```mermaid
-graph LR
-  subgraph "Execution Layer"
-    promptql["PromptQL Playground Server"]
-    runtime["Python Runtime"]
-    engine["Distributed Query Engine"]
-  end
 
-  subgraph "Semantic Metadata Layer"
-    metadata["Types, descriptions, permissions, relationships, etc."]
-  end
-
-  subgraph "Underlying Data Layer"
-    sql["SQL"]
-    nosql["NoSQL"]
-    gql["GraphQL"]
-    biz["Business Logic"]
-  end
-
-
-  Client <--> promptql
-  promptql <--> engine
-  promptql <--> runtime
-  promptql <--> metadata
-  engine <--> metadata
-
-  metadata <--> sql
-  metadata <--> nosql
-  metadata <--> gql
-  metadata <--> biz
+flowchart TD
+    Client[Client] --> PlaygroundServer[Playground Server]
+    Metadata[Semantic Metadata] --> PlaygroundServer
+    PlaygroundServer --> LLM[LLM-of-choice]
+    LLM --> QueryPlan[Query Plan]
+    QueryPlan --> PlaygroundServer
+    PlaygroundServer --> Runtime[Python Runtime]
+    Runtime --> Engine[Distributed Query Engine]
+    Engine --> Connectors[Data Connectors]
+    Connectors --> DataSources[Data Sources]
 ```
 
-At a glance, PromptQL's stack can be thought of as three main layers:
+## How it works
 
-- Execution
-- Semantic Metadata
-- Underlying Data Sources
+### Request initiation
 
-### Execution Layer
+When you ask PromptQL a question, the **Playground Server** receives your natural language query and combines it with
+your **semantic metadata** — the intelligent layer that describes your connected data sources, schemas, relationships,
+business logic, and access controls.
 
-The **execution layer** handles running queries, generating code, and coordinating actions across all parts of the
-system. This is where users interact directly, either through the browser interface or exposed APIs.
+This metadata layer is generated automatically when you connect a data source and evolves as you and your team use
+PromptQL.
 
-#### PromptQL Playground
+### Query plan generation
 
-The Playground has two parts:
+The Playground Server sends both your question and the semantic metadata to your chosen LLM. **This semantic context is
+what transforms a general-purpose LLM into a data expert for your specific organization.** The metadata tells the LLM
+exactly what data exists, how it's structured, what different fields mean in your business context, and how tables
+relate to each other.
 
-- A browser-based interface where users ask questions and guide automation workflows.
-- A server that builds a **query plan** for each request and coordinates the runtime, query engine, and metadata to
-  return a response.
+With this rich context, the LLM generates a precise query plan that maps your natural language request to the right data
+operations.
 
-#### Python Runtime
+### Query execution
 
-The runtime executes any code generated during query planning. This typically includes SQL for fetching data and Python
-logic for transforming results or creating a **memory artifact**.
+The Playground Server passes the query plan to PromptQL's **Python runtime**, which executes it through the
+**distributed query engine**. The engine uses **data connectors** to fetch data from your **data sources**, respecting
+all access controls and mappings defined in your metadata.
 
-#### Distributed Query Engine
+### Response delivery
 
-The engine links the playground server to the underlying data connectors. It uses the semantic metadata to generate,
-optimize, and run queries across multiple sources in a consistent and secure way.
+The retrieved data flows back through the same path: from data sources through connectors, engine, and runtime, where
+it's packaged and returned to you via the Playground Server.
 
-### Semantic Metadata Layer
+This architecture ensures that your LLM has complete context about your data landscape while maintaining security and
+performance through the distributed execution layer.
 
-The **semantic metadata layer** describes the structure, meaning, and access rules of your data. It defines types,
-relationships, permissions, and descriptions that inform how queries are built.
-
-#### Data Connectors
-
-Each data connector reads a source’s schema and converts it into a shared metadata format. When combined, these schemas
-form a unified graph that allows PromptQL to query across systems using the same logic.
-
-### Underlying Data Layer
-
-The **data layer** includes the actual systems that store or compute your data. These can be databases, APIs, or
-internal services.
-
-#### Datasources
-
-PromptQL supports SQL and NoSQL databases, along with business logic implemented in TypeScript, Go, or Python. This
-gives it broad access to both raw data and domain-specific functionality, making it easier to answer questions and
-automate tasks.
-
-## Next Steps
+## Next steps
 
 With a broad perspective of the different services powering a PromptQL application, we recommend learning more about the
 [semantic metadata layer](/data-modeling/overview.mdx) next.
