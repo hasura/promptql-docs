@@ -32,8 +32,8 @@ Before continuing, ensure you have:
 
 ### Step 1. Update subgraph config files
 
-Update the name of the subgraph in all the [subgraph config files](/project-configuration/overview.mdx) the subgraph.
-The subgraph config is typically located at `<subgraph-name>/subgraph.yaml`.
+Update the name of the subgraph in all the [subgraph config files](/project-configuration/index.mdx) the subgraph. The
+subgraph config is typically located at `<subgraph-name>/subgraph.yaml`.
 
 ```yaml title="<subgraph-name>/subgraph.yaml"
 kind: Subgraph
@@ -51,8 +51,8 @@ definition:
 
 ### Step 2. Update connector config files of the subgraph
 
-Update the reference of the subgraph in all the [connector config files](/project-configuration/overview.mdx) subgraph.
-The connector config is typically located at `<subgraph-name>/connector/<connector-name>/connector.yaml`.
+Update the reference of the subgraph in all the [connector config files](/project-configuration/index.mdx) subgraph. The
+connector config is typically located at `<subgraph-name>/connector/<connector-name>/connector.yaml`.
 
 ```yaml title="<subgraph-name>/connector/<connector-name>/connector.yaml"
 kind: Connector
@@ -69,7 +69,7 @@ definition:
 
 ### Step 3. Update compose files of connectors of the subgraph
 
-Update the name of the connector service in the [compose file](/project-configuration/overview.mdx) the connectors
+Update the name of the connector service in the [compose file](/project-configuration/index.mdx) the connectors
 belonging to the subgraph. The connector compose file is typically located at
 `<project-root>/<subgraph-name>/connector/<connector-name>/compose.yaml`.
 
@@ -96,8 +96,8 @@ typically be in:
 
 #### Step 4.1. Supergraph config files
 
-Update the path to the subgraph config files in all [supergraph config files](/project-configuration/overview.mdx)
-located at the project root, i.e., `<project-root>/supergraph.yaml`.
+Update the path to the subgraph config files in all [supergraph config files](/project-configuration/index.mdx) located
+at the project root, i.e., `<project-root>/supergraph.yaml`.
 
 ```yaml title="supergraph.yaml"
 kind: Supergraph
@@ -113,8 +113,8 @@ definition:
 
 #### Step 4.2. Engine compose file
 
-Update the path to the connector compose files included in the engine
-[compose file](/project-configuration/overview.mdx) project root, i.e., `<project-root>/compose.yaml`.
+Update the path to the connector compose files included in the engine [compose file](/project-configuration/index.mdx)
+project root, i.e., `<project-root>/compose.yaml`.
 
 ```yaml title="compose.yaml"
 include:
@@ -131,8 +131,8 @@ services:
 
 #### Step 4.3. Context config
 
-The [context config file](/project-configuration/overview.mdx) subgraph config file path saved in the context. Update
-the subgraph config path if set.
+The [context config file](/project-configuration/index.mdx) subgraph config file path saved in the context. Update the
+subgraph config path if set.
 
 ```yaml title=".hasura/context.yaml"
 kind: Context
@@ -150,4 +150,4 @@ definition:
 
 ## Learn more
 
-- [Project configuration](/project-configuration/overview.mdx)
+- [Project configuration](/project-configuration/index.mdx)
