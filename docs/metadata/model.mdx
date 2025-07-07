@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-sidebar_label: "Models read data"
+sidebar_label: "Read data"
 description: "Models make your data accessible to PromptQL, enabling accurate data interactions and insights."
 keywords:
   - model
@@ -15,7 +15,7 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import ModelCreateNativeQueryHowToPostgreSQL from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_model-create-native-query-how-to.mdx";
+import ModelCreateNativeQueryHowToPostgreSQL from "@site/docs/metadata/partials/classic-connectors/postgreSQL/_model-create-native-query-how-to.mdx";
 
 import { PqlChat, User, Pql, QueryPlanComponent } from "@site/src/components/PqlChat/PqlChat";
 
@@ -38,7 +38,7 @@ Creating models for your PromptQL's metadata layer involves the following steps:
 5. Serve your build via the packaged distributed query engine, either locally or in the cloud.
 6. Interact with your data through PromptQL in a natural, conversational way.
 
-<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
+<Thumbnail src="/img/metadata/ddn-cli-process.png" alt="Data modeling lifecycle" />
 
 ## Create a model
 
@@ -111,8 +111,7 @@ and orders.
 Or you can add custom business logic to a model like `Orders` to compute and return the current currency conversion of
 the total price, enabling PromptQL to provide real-time financial insights across different currencies.
 
-The way this is done is via a `Relationship`. Read more about
-[creating relationships here](/data-modeling/relationship.mdx).
+The way this is done is via a `Relationship`. Read more about [creating relationships here](/metadata/relationship.mdx).
 
 ## Delete a model
 

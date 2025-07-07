@@ -1,6 +1,6 @@
 ---
 sidebar_position: 4
-sidebar_label: "Commands act on data"
+sidebar_label: "Write data"
 description: "Commands allow PromptQL to act on your data in various data sources."
 toc_max_heading_level: 4
 keywords:
@@ -13,10 +13,10 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import Thumbnail from "@site/src/components/Thumbnail";
 
-import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/data-modeling/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
-import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/data-modeling/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
+import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
+import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
+import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
+import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/metadata/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
 
 # Commands Enable PromptQL to Modify Data
 
@@ -42,7 +42,7 @@ When setting up commands for use with PromptQL, follow this lifecycle:
 5. Serve your build via the packaged distributed query engine, either locally or in the cloud.
 6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
 
-<Thumbnail src="/img/data-modeling/ddn-cli-process.png" alt="Data modeling lifecycle" />
+<Thumbnail src="/img/metadata/ddn-cli-process.png" alt="Data modeling lifecycle" />
 
 ## Create a command
 

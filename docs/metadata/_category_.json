@@ -1,8 +1,8 @@
 {
   "label": "Data Modeling",
   "position": 4,
-  "className": "data-modeling",
+  "className": "metadata",
   "customProps": {
-    "sidebar_pathname": "data-modeling"
+    "sidebar_pathname": "metadata"
   }
 }
