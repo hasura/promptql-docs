@@ -5266,7 +5266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.31.1, core-js@npm:^3.38.1":
+"core-js@npm:^3.31.1":
   version: 3.42.0
   resolution: "core-js@npm:3.42.0"
   checksum: 10/07e10c475cdb45608559778c4d8d1561204aa57c937a3e77ebc7359a95a350f8acfdbeab59c6a6532eb3b47262be0d05aba150a00b79659a91bedda4f59d9d5f
@@ -6270,7 +6270,7 @@ __metadata:
     js-cookie: "npm:^3.0.5"
     markdown-to-jsx: "npm:^7.3.2"
     postcss: "npm:^8.4.31"
-    posthog-js: "npm:^1.133.0"
+    posthog-js: "npm:1.133.0"
     prism-react-renderer: "npm:^2.3.1"
     punycode: "npm:^2.3.1"
     react: "npm:^18.0.0"
@@ -11682,23 +11682,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"posthog-js@npm:^1.133.0":
-  version: 1.239.1
-  resolution: "posthog-js@npm:1.239.1"
+"posthog-js@npm:1.133.0":
+  version: 1.133.0
+  resolution: "posthog-js@npm:1.133.0"
   dependencies:
-    core-js: "npm:^3.38.1"
     fflate: "npm:^0.4.8"
     preact: "npm:^10.19.3"
-    web-vitals: "npm:^4.2.4"
-  peerDependencies:
-    "@rrweb/types": 2.0.0-alpha.17
-    rrweb-snapshot: 2.0.0-alpha.17
-  peerDependenciesMeta:
-    "@rrweb/types":
-      optional: true
-    rrweb-snapshot:
-      optional: true
-  checksum: 10/7f2b301f200d5f4e807e9c5a346f20368f667825523f79b3bae5852f0b24769073823e1e488b306feafe0acd6cbb6bd8ccfae0f7c0e4e3245578feff064918ef
+  checksum: 10/668651237240bc1628ed83ed3e61c2b100641b497fd26f99aaf4b8fc214a0f61d1a0965c1069fa8dc9b6f186905c898a5adeff4497d9e7cdecbcb1abf32af1ff
   languageName: node
   linkType: hard
 
@@ -14196,7 +14186,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-vitals@npm:^4.2.3, web-vitals@npm:^4.2.4":
+"web-vitals@npm:^4.2.3":
   version: 4.2.4
   resolution: "web-vitals@npm:4.2.4"
   checksum: 10/68cd1c2625a04b26e7eab67110623396afc6c9ef8c3a76f4e780aefe5b7d4ca1691737a0b99119e1d1ca9a463c4d468c0f0090b1875b6d784589d3a4a8503313
