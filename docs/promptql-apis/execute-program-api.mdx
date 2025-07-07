@@ -498,31 +498,24 @@ Read more about [auth with these APIs](/promptql-apis/auth.mdx).
 
 ## Notes for using the Execute Program API
 
-1. **API Version Selection**
-
-   - Use **Version 2 (v2)** for new implementations as it provides better build management and configuration
-   - Version 1 remains supported for backward compatibility but is not recommended for new projects
-   - Version 2 automatically handles LLM and PromptQL configuration from build metadata
-
-2. **Program Code**
+1. **Program Code**
 
    - Ensure your PromptQL program code is properly formatted and tested
    - You can export working programs from the PromptQL playground using the "Export as API" button
 
-3. **Build Selection (Version 2)**
+2. **Build Selection (Version 2)**
 
    - When using v2, you can specify either `build_id` or `build_version`, but not both
    - If neither is specified, the project's applied build is automatically used
-   - Use `build_version` for referencing specific supergraph build versions
-   - Use `build_id` for referencing builds by their UUID
 
-4. **Artifacts**
+3. **Artifacts**
 
    - Provide all necessary artifacts that your program needs to run
    - Make sure artifact identifiers match those referenced in your program code
    - Both text and table artifacts are supported
 
-5. **Error Handling**
+4. **Error Handling**
+
    - Always check the error field in the response
    - Implement appropriate retry logic for transient failures
    - Validate your inputs against the API schema to catch issues early
