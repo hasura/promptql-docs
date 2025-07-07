@@ -10,6 +10,8 @@ toc_max_heading_level: 4
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 
 # Execute Program API
 
@@ -101,8 +103,6 @@ As you add your own custom business logic, you're providing more specific tools 
 
 Execute a PromptQL program with your data.
 
-### Request
-
 `POST https://promptql.ddn.hasura.app/api/execute_program`
 
 :::note Private DDN Endpoint
@@ -116,16 +116,40 @@ by the control plane. For example:
 
 :::
 
-**Headers**
+### API Versions
+
+The Execute Program API supports two versions:
+
+- **Version 1 (v1)**: Uses direct DDN URL configuration with optional LLM settings
+- **Version 2 (v2)**: Uses DDN build-based configuration with settings from build metadata
+
+## Request Specifications
+
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+### Request
+
+#### Headers
 
 ```
 Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
 ```
 
-**Request Body**
+:::info Authentication
+
+Version 1 requests support both the `Authorization` header (recommended) and the deprecated `promptql_api_key` field in
+the request body. For new implementations, use the `Authorization` header with the `Bearer <your-promptql-api-key>`
+token format.
+
+:::
+
+#### Request Body
 
 ```json
 {
+  "version": "v1",
   "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
   "promptql_api_key": "<YOUR_API_KEY_HERE>",
   "ai_primitives_llm": {
@@ -139,17 +163,20 @@ Content-Type: application/json
 }
 ```
 
-**Request Body Fields**
+#### Request Body Fields
 
 | Field               | Type   | Required | Description                                              |
 | ------------------- | ------ | -------- | -------------------------------------------------------- |
+| `version`           | string | No       | Optional, must be "v1" for version 1 requests            |
 | `code`              | string | Yes      | The PromptQL program code to execute                     |
-| `promptql_api_key`  | string | Yes      | PromptQL API key created from project settings           |
+| `promptql_api_key`  | string | No*      | PromptQL API key (deprecated, use Authorization header)  |
 | `ai_primitives_llm` | object | Yes      | Configuration for the AI primitives LLM provider         |
 | `ddn`               | object | Yes      | DDN configuration including URL and headers              |
 | `artifacts`         | array  | Yes      | List of artifacts to provide as context or initial state |
 
-**LLM Provider Options**
+*Required if not using Authorization header
+
+#### LLM Provider Options
 
 The `ai_primitives_llm` field supports the following providers:
 
@@ -179,7 +206,7 @@ The `ai_primitives_llm` field supports the following providers:
 }
 ```
 
-**Artifacts**
+#### Artifacts
 
 The `artifacts` array can contain both text and table artifacts:
 
@@ -215,7 +242,137 @@ The `artifacts` array can contain both text and table artifacts:
 The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
 [auth with these APIs](/promptql-apis/auth.mdx).
 
-### Response
+</TabItem>
+<TabItem value="v2" label="Version 2">
+
+### Request
+
+Version 2 requests use supergraph build versions instead of direct DDN URLs. The `build_version` refers to the version
+of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
+using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
+
+When `build_version` is not specified in the request, the project's applied build is automatically chosen. This allows
+you to use the currently deployed build without needing to specify its version explicitly.
+
+#### Headers
+
+```
+Content-Type: application/json
+Authorization: Bearer <your-promptql-api-key>
+```
+
+:::info Authentication
+
+Version 2 requests require the PromptQL API key to be sent as a Bearer token in the Authorization header.
+
+:::
+
+#### Request Body
+
+```json
+{
+  "version": "v2",
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {}
+  },
+  "artifacts": []
+}
+```
+
+**Example using applied build (without specifying build_version):**
+
+```json
+{
+  "version": "v2",
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "headers": {}
+  },
+  "artifacts": []
+}
+```
+
+**Example using build_id instead of build_version:**
+
+```json
+{
+  "version": "v2",
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "build_id": "8ac7ccd4-7502-44d5-b2ee-ea9639b1f653",
+    "headers": {}
+  },
+  "artifacts": []
+}
+```
+
+#### Request Body Fields
+
+| Field       | Type   | Required | Description                                              |
+| ----------- | ------ | -------- | -------------------------------------------------------- |
+| `version`   | string | Yes      | Must be "v2" for version 2 requests                     |
+| `code`      | string | Yes      | The PromptQL program code to execute                     |
+| `ddn`       | object | No       | DDN configuration for build selection and headers        |
+| `artifacts` | array  | No       | List of artifacts to provide as context or initial state |
+
+#### DDN Configuration Fields
+
+| Field           | Type   | Required | Description                                                                                    |
+| --------------- | ------ | -------- | ---------------------------------------------------------------------------------------------- |
+| `build_id`      | string | No       | UUID of the DDN build. Cannot be used with `build_version`                                    |
+| `build_version` | string | No       | Version of the DDN build. Cannot be used with `build_id`                                      |
+| `headers`       | object | No       | HTTP headers that should be forwarded to DDN                                                  |
+
+:::note Build Selection
+
+- If both `build_id` and `build_version` are omitted, the project's applied build is automatically used
+- You can specify either `build_id` OR `build_version`, but not both simultaneously
+- The `build_version` refers to supergraph build versions created in your DDN project
+
+:::
+
+#### Artifacts
+
+The `artifacts` array can contain both text and table artifacts:
+
+1. Text Artifact:
+
+```json
+{
+  "identifier": "my_text",
+  "title": "My Text Document",
+  "artifact_type": "text",
+  "data": "Text content here"
+}
+```
+
+2. Table Artifact:
+
+```json
+{
+  "identifier": "my_table",
+  "title": "My Data Table",
+  "artifact_type": "table",
+  "data": [
+    {
+      "column1": "value1",
+      "column2": "value2"
+    }
+  ]
+}
+```
+
+#### Request DDN Auth
+
+The `ddn.headers` field can be used to pass any auth header information through to DDN. Read more about
+[auth with these APIs](/promptql-apis/auth.mdx).
+
+</TabItem>
+</Tabs>
+
+## Response
 
 ```json
 {
@@ -246,7 +403,7 @@ The `ddn.headers` field can be used to pass any auth header information through 
 }
 ```
 
-### Response Fields
+## Response Fields
 
 | Field                   | Type         | Description                                                      |
 | ----------------------- | ------------ | ---------------------------------------------------------------- |
@@ -256,7 +413,7 @@ The `ddn.headers` field can be used to pass any auth header information through 
 | `modified_artifacts`    | array        | List of artifacts that were created or modified during execution |
 | `llm_usages`            | array        | Details about LLM usage during execution                         |
 
-**LLM Usage Fields**
+### LLM Usage Fields
 
 | Field           | Type    | Description                                                   |
 | --------------- | ------- | ------------------------------------------------------------- |
@@ -265,7 +422,7 @@ The `ddn.headers` field can be used to pass any auth header information through 
 | `input_tokens`  | integer | Number of input tokens consumed                               |
 | `output_tokens` | integer | Number of output tokens generated                             |
 
-### Error Response
+## Error Response
 
 When the API encounters an error, it will return a 422 status code with a validation error response:
 
@@ -281,20 +438,91 @@ When the API encounters an error, it will return a 422 status code with a valida
 }
 ```
 
+## DDN Authentication
+
+Both API versions support passing authentication headers to DDN through the `ddn.headers` field.
+
+<Tabs groupId="api-version" className="api-tabs">
+<TabItem value="v1" label="Version 1">
+
+Configure headers in the `ddn.headers` object:
+
+```json
+{
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "url": "https://<PROJECT_NAME>.ddn.hasura.app/v1/sql",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="v2" label="Version 2">
+
+Configure headers in the `ddn.headers` object:
+
+```json
+{
+  "version": "v2",
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "build_version": "505331f4b2",
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+**Using applied build:**
+
+```json
+{
+  "version": "v2",
+  "code": "<YOUR_PROMPTQL_GENERATED_CODE_HERE>",
+  "ddn": {
+    "headers": {
+      "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+Read more about [auth with these APIs](/promptql-apis/auth.mdx).
+
 ## Notes for using the Execute Program API
 
-1. **Program Code**
+1. **API Version Selection**
+
+   - Use **Version 2 (v2)** for new implementations as it provides better build management and configuration
+   - Version 1 remains supported for backward compatibility but is not recommended for new projects
+   - Version 2 automatically handles LLM and PromptQL configuration from build metadata
+
+2. **Program Code**
 
    - Ensure your PromptQL program code is properly formatted and tested
    - You can export working programs from the PromptQL playground using the "Export as API" button
 
-2. **Artifacts**
+3. **Build Selection (Version 2)**
+
+   - When using v2, you can specify either `build_id` or `build_version`, but not both
+   - If neither is specified, the project's applied build is automatically used
+   - Use `build_version` for referencing specific supergraph build versions
+   - Use `build_id` for referencing builds by their UUID
+
+4. **Artifacts**
 
    - Provide all necessary artifacts that your program needs to run
    - Make sure artifact identifiers match those referenced in your program code
    - Both text and table artifacts are supported
 
-3. **Error Handling**
+5. **Error Handling**
    - Always check the error field in the response
    - Implement appropriate retry logic for transient failures
    - Validate your inputs against the API schema to catch issues early
