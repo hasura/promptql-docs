@@ -24,7 +24,29 @@ Relationships are defined in metadata from an
 models and commands are also defined with object types, you can think of relationships as being between models and/or
 commands.
 
-TODO: Example
+```yaml title="An example relationship for a users table to a sessions table:"
+kind: Relationship
+version: v1
+definition:
+  name: user
+  description: |
+    Associates a session with the user who initiated it. This relationship connects each record in the 
+    `sessions` model to a corresponding entry in the `users` model using the `userId` field. It's typically 
+    used to fetch user details—such as name, email, or role—when querying session data.
+  sourceType: sessions
+  target:
+    model:
+      name: users
+      subgraph: operations
+      relationshipType: Object
+  mapping:
+    - source:
+        fieldPath:
+          - fieldName: userId
+      target:
+        modelField:
+          - fieldName: id
+```
 
 ## Lifecycle
 
@@ -89,5 +111,7 @@ self-contained.
 
 ## Next steps
 
-You can learn more about relationships in the metadata reference
-[docs](/reference/metadata-reference/relationships.mdx).
+- If you're comfortable with relationships, check out [permissions](/metadata/permissions.mdx) next to get a better idea
+  of how to restrict access and manipulation of connected data.
+- You can learn more about relationships in the metadata reference
+  [docs](/reference/metadata-reference/relationships.mdx).

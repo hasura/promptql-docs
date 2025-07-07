@@ -11,11 +11,11 @@ toc_max_heading_level: 4
 sidebar_class_name: sidebar-divider-bottom
 ---
 
-# Permissions Protect Data
+# Protect Data
 
 ## Introduction
 
-Permissions keep data secure by allowing you to control what data can be accessed through PromptQL conversations by
+**Permissions** keep data secure by allowing you to control what data can be accessed through PromptQL conversations by
 which user roles. This ensures that when users talk to their data using PromptQL, they only see the information they're
 authorized to access.
 
@@ -33,19 +33,14 @@ the `admin` role by default.
 
 All other permissions for all other user roles must be added manually.
 
-## Create permissions
+## Create a permission
 
 ### Row access
 
 You can create a `ModelPermission` object to implement row-level security and restrict which rows a user can access
 through PromptQL.
 
-For example, to only allow users to access their own records in the `Users` table when talking to their data through
-PromptQL:
-
-```yaml title=""
----
-# e.g., Users.hml
+```yaml title="For example, to only allow users to access their own records in the Users table when talking to their data through PromptQL:"
 kind: ModelPermissions
 version: v1
 definition:
@@ -77,8 +72,6 @@ To restrict which fields can be accessed through PromptQL conversations, you can
 Below, the user role can only access the `name` field, not the `id` field which the admin role can.
 
 ```yaml title="The user role can only access their name field:"
-# e.g., Users.hml
----
 kind: TypePermissions
 version: v1
 definition:
@@ -104,8 +97,6 @@ To determine which commands can be executed by which roles when interacting with
 `CommandPermission` object.
 
 ```yaml title="In this example, we'll make it so a user can update their own record:"
-# e.g., UpdateUsersById.hml
----
 kind: CommandPermissions
 version: v1
 definition:
@@ -126,20 +117,22 @@ definition:
 When a user asks PromptQL to update their information, these permissions ensure that they can only modify their own
 records.
 
-## Update permissions
+## Update a permission
 
 Since all permissions are stored in metadata, you can use your text editor to find and update them easily.
 
 For example, to check everything which the `user` role can access when talking to data through PromptQL, search for
 `- role: user` and analyze the results.
 
-## Deleting permissions
+## Delete a permission
 
 If you no longer need a role, find all mentions of it in your metadata and remove them all.
 
 If you no longer need a particular permission, simply remove it from the relevant `ModelPermissions`, `TypePermissions`,
 or `CommandPermissions` object.
 
-## Reference
+## Next steps
 
-You can learn more about permissions in the metadata reference [docs](/reference/metadata-reference/permissions.mdx).
+- Now that you've been through the major building blocks of your semantic metadata layer, check out the
+  [business logic section](/business-logic/index.mdx) to learn how to place more tools in PromptQL's toolbox.
+- You can learn more about permissions in the metadata reference [docs](/reference/metadata-reference/permissions.mdx).
