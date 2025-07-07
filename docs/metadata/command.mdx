@@ -9,104 +9,78 @@ keywords:
   - promptql
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
-import Thumbnail from "@site/src/components/Thumbnail";
-
-import CommandCreateLambdaGoNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/go/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaPythonNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/python/_command-create-native-operation-how-to.mdx";
-import CommandCreateLambdaTypescriptNativeOperationHowTo from "@site/docs/metadata/partials/lambda-connectors/typescript/_command-create-native-operation-how-to.mdx";
-import CommandCreatePostgreSQLNativeOperationHowTo from "@site/docs/metadata/partials/classic-connectors/postgreSQL/_command-create-native-operation-how-to.mdx";
-
-# Commands Enable PromptQL to Modify Data
+# Write Data
 
 ## Introduction
 
-Commands are a crucial component that enable PromptQL to take action on your data. While PromptQL can intelligently
-query your data through natural language conversations, commands allow it to go further by modifying data (inserts,
-updates, deletes), executing complex operations, or implementing custom business logic across your connected data
-sources.
+In PromptQL, **commands** let you call custom functions or procedures from your data sources, usually to mutate data.
 
-When a user requests changes to their data through PromptQL, the system dynamically builds a query plan that
-incorporates these commands as part of its execution strategy, providing high accuracy and detailed explanations of each
-action taken.
+While commands _can_ handle reads, you’ll mostly reach for them when you need to perform write operations on your data
+source _or_ when executing custom business logic. You decide whether they're exposed as queries or mutations for
+PromptQL, based on how you configure them.
+
+```yaml title="An example command for inserting a user:"
+kind: Command
+version: v1
+definition:
+  name: create_user
+  description: |
+    Creates a new user in the system. This command is typically used when someone registers
+    for the app or is added manually by an admin. It captures core details like:
+    - name
+    - email
+    This is often the first step before establishing relationships with sessions,
+    subscriptions, or other user-linked resources.
+  outputType: action_response!
+  arguments:
+    - name: name
+      type: String!
+    - name: email
+      type: String!
+  source:
+    dataConnectorName: operations
+    dataConnectorCommand:
+      procedure: create_user
+```
 
 ## Lifecycle
 
-When setting up commands for use with PromptQL, follow this lifecycle:
+### Create a command
 
-1. Have some operation in your data source that you want to make executable via PromptQL.
-2. Introspect your data source using the CLI with the relevant data connector to fetch the operation resources.
-3. Add the command to your metadata with the CLI.
-4. Create a build with the CLI.
-5. Serve your build via the packaged distributed query engine, either locally or in the cloud.
-6. Interact with your data through PromptQL, which can now execute these commands as part of its dynamic query planning.
+To add a command you will need to have a data connector which has already introspected the data source. Follow the
+relevant tutorial in [How to Build with PromptQL](/how-to-build-with-promptql/index.mdx) to get to that point.
 
-<Thumbnail src="/img/metadata/ddn-cli-process.png" alt="Data modeling lifecycle" />
+```ddn title="Add your command by passing the connector's and command's names:"
+# Alternatively, you can add all commands: ddn command add <connector_link_name> "*"
 
-## Create a command
-
-To add a command you will need to have a data connector already set up and connected to the data source. Follow the
-[Quickstart](/quickstart.mdx) or the tutorial in [How to Build with DDN](/how-to-build-with-promptql/index.mdx) to get
-to that point.
-
-### From a source operation
-
-Some data connectors support the ability to introspect your data source to discover the commands that can be added to
-your metadata layer automatically.
-
-```ddn title="Introspect your data source:"
-ddn connector introspect <connector_name>
+ddn command add <connector_link_name> <command_name>
 ```
 
-```ddn title="Show the resources discovered from your data source:"
+:::tip Not sure which commands you have?
+
+You can see a list of all available resources using the CLI:
+
+```ddn
 ddn connector show-resources <connector_name>
 ```
 
-```ddn title="Add the command from the discovered resources to your metadata:"
-ddn command add <connector_link_name> <operation_name>
-```
+:::
 
-Or you can optionally add all the commands by specifying `"*"`.
+For each command, you'll find an HML file included in the relevant `metadata` directory for your connected data source.
 
-```ddn title="Add all commands from your data source:"
-ddn command add <connector_link_name> "*"
-```
+**Typically, a particular model will have corresponding commands for inserts, updates, and deletes.** This gives
+PromptQL the power to act as a write layer for your API, letting you execute domain-specific operations directly against
+your connected data sources.
 
-This will add commands with their accompanying metadata definitions to your metadata.
+You can now [create a build](/reference/cli/commands/ddn_supergraph_build.mdx), serve it, and begin manipulating the
+data underlying the command through PromptQL.
 
-### Via native operations {#via-native-operations-how-to}
-
-Some data connectors support the ability to add commands via native operations so that you can add any operation that is
-not supported by the automatic introspection process.
-
-For classic database connectors, this will be native query code for that source. This can be, for example, a more
-complex read operation or a way to run custom business logic, which PromptQL can incorporate into its query plan.
-
-For Lambda connectors, eg: (TypeScript, Go, Python, etc) this will be a function (read-only) or procedure (mutation or
-other side-effects) that PromptQL can use to execute specialized operations on your data.
-
-<Tabs groupId="source-preference" className="api-tabs">
-  <TabItem value="TypeScript" label="Node.js TypeScript">
-    <CommandCreateLambdaTypescriptNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Python" label="Python">
-    <CommandCreateLambdaPythonNativeOperationHowTo />
-  </TabItem>
-  <TabItem value="Go" label="Go">
-    <CommandCreateLambdaGoNativeOperationHowTo />
-  </TabItem>
-</Tabs>
-
-Once set up, PromptQL will automatically consider these commands when generating query plans based on user requests,
-enabling accurate data modifications and complex operations through natural language interactions.
-
-## Update a command
+### Update a command
 
 When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
 accuracy in its operations:
 
-```ddn title="Introspect your data source:"
+```ddn title="Re-introspect your data source:"
 ddn connector introspect <connector_name>
 ```
 
@@ -116,12 +90,18 @@ ddn command update <connector_link_name> <command_name>
 
 You will see an output which explains how new resources were added or updated in the command.
 
-After updating, PromptQL will automatically incorporate these changes into its query planning, ensuring that user
-interactions with their data remain accurate and up-to-date.
+You can now [create a build](/reference/cli/commands/ddn_supergraph_build.mdx), serve it, and continue interacting with
+the data it represents using PromptQL, which will automatically adjust its query plans based on the updated command
+definitions.
 
-You can also update the command by editing the command's metadata manually.
+:::tip You can manually edit metadata!
 
-## Delete a command
+You can also update the command by manually editing the metadata. To avoid errors, we recommend using the
+[VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to validate your changes.
+
+:::
+
+### Delete a command
 
 ```ddn title="If you no longer need a command, you can delete it:"
 ddn command remove <command_name>
@@ -130,6 +110,9 @@ ddn command remove <command_name>
 Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
 in its query planning.
 
-## Reference
+## Next steps
 
-You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
+- If you've added your first command, check out [relationships for connecting data](/metadata/relationship.mdx) next.
+- Business logic is exposed as commands written in TypeScript, Go, or Python. Learn more about adding this functionality
+  by [connecting a lambda connector](/business-logic/index.mdx).
+- You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
