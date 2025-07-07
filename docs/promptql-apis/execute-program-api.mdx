@@ -169,12 +169,12 @@ token format.
 | ------------------- | ------ | -------- | -------------------------------------------------------- |
 | `version`           | string | No       | Optional, must be "v1" for version 1 requests            |
 | `code`              | string | Yes      | The PromptQL program code to execute                     |
-| `promptql_api_key`  | string | No*      | PromptQL API key (deprecated, use Authorization header)  |
+| `promptql_api_key`  | string | No\*     | PromptQL API key (deprecated, use Authorization header)  |
 | `ai_primitives_llm` | object | Yes      | Configuration for the AI primitives LLM provider         |
 | `ddn`               | object | Yes      | DDN configuration including URL and headers              |
 | `artifacts`         | array  | Yes      | List of artifacts to provide as context or initial state |
 
-*Required if not using Authorization header
+\*Required if not using Authorization header
 
 #### LLM Provider Options
 
@@ -312,18 +312,18 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 
 | Field       | Type   | Required | Description                                              |
 | ----------- | ------ | -------- | -------------------------------------------------------- |
-| `version`   | string | Yes      | Must be "v2" for version 2 requests                     |
+| `version`   | string | Yes      | Must be "v2" for version 2 requests                      |
 | `code`      | string | Yes      | The PromptQL program code to execute                     |
 | `ddn`       | object | No       | DDN configuration for build selection and headers        |
 | `artifacts` | array  | No       | List of artifacts to provide as context or initial state |
 
 #### DDN Configuration Fields
 
-| Field           | Type   | Required | Description                                                                                    |
-| --------------- | ------ | -------- | ---------------------------------------------------------------------------------------------- |
-| `build_id`      | string | No       | UUID of the DDN build. Cannot be used with `build_version`                                    |
-| `build_version` | string | No       | Version of the DDN build. Cannot be used with `build_id`                                      |
-| `headers`       | object | No       | HTTP headers that should be forwarded to DDN                                                  |
+| Field           | Type   | Required | Description                                                |
+| --------------- | ------ | -------- | ---------------------------------------------------------- |
+| `build_id`      | string | No       | UUID of the DDN build. Cannot be used with `build_version` |
+| `build_version` | string | No       | Version of the DDN build. Cannot be used with `build_id`   |
+| `headers`       | object | No       | HTTP headers that should be forwarded to DDN               |
 
 :::note Build Selection
 
