@@ -54,7 +54,16 @@ The setup involves creating an IAM role in your AWS account that establishes a t
 <details>
 
 <summary>cloudformation.yaml</summary>
-```bash
+```yaml
+Parameters:
+  ExternalId:
+    Type: String
+    Default: hasura-cloud
+    Description: External ID for the trust relationship with Hasura Cloud
+    MinLength: 2
+    MaxLength: 1224
+    AllowedPattern: "[A-Za-z0-9+=,.@:\\/-]*"
+
 Resources:
   BootstrapRole:
     Type: AWS::IAM::Role
@@ -69,7 +78,7 @@ Resources:
             Action: sts:AssumeRole
             Condition:
               StringEquals:
-                sts:ExternalId: hasura-cloud
+                sts:ExternalId: !Ref ExternalId
   BootstrapPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -95,6 +104,8 @@ Resources:
               - ec2:DescribeTags
               - ec2:DescribeVpcAttribute
               - ec2:DescribeVpcs
+              - ec2:DescribeVpcEndpointServices
+              - ec2:DescribeVpcEndpoints
               - eks:DeleteAddon
               - eks:DescribeAddon
               - eks:DescribeCluster
@@ -103,6 +114,8 @@ Resources:
               - iam:GetRole
               - iam:GetServiceLinkedRoleDeletionStatus
               - sqs:GetQueueAttributes
+              - rds:DescribeDBInstances
+              - rds:DescribeOrderableDBInstanceOptions
             Resource: '*'
           - Effect: Allow
             Action:
@@ -116,6 +129,9 @@ Resources:
               - ec2:CreateSubnet
               - ec2:CreateTags
               - ec2:CreateVpc
+              - ec2:CreateSecurityGroup
+              - ec2:AuthorizeSecurityGroupIngress
+              - ec2:CreateVpcEndpoint
               - eks:CreateCluster
               - eks:CreateNodegroup
               - globalaccelerator:CreateAccelerator
@@ -129,6 +145,8 @@ Resources:
               - events:TagResource
               - iam:CreateOpenIDConnectProvider
               - iam:TagOpenIDConnectProvider
+              - rds:CreateDBSubnetGroup
+              - rds:CreateDBInstance
             Resource: '*'
             Condition:
               StringEquals:
@@ -161,12 +179,15 @@ Resources:
               - iam:CreateInstanceProfile
               - iam:CreatePolicy
               - iam:CreateRole
+              - iam:CreatePolicyVersion
               - iam:DeleteInstanceProfile
               - iam:DeleteOpenIDConnectProvider
               - iam:DeletePolicy
               - iam:DeleteRole
               - iam:DeleteServiceLinkedRole
               - iam:DetachRolePolicy
+              - iam:UpdateAssumeRolePolicy
+              - iam:UpdateOpenIDConnectProviderThumbprint
               - iam:GetInstanceProfile
               - iam:GetOpenIDConnectProvider
               - iam:GetPolicy
@@ -217,6 +238,7 @@ Resources:
                   - globalaccelerator.amazonaws.com
                   - eks.amazonaws.com
                   - eks-nodegroup.amazonaws.com
+                  - rds.amazonaws.com
           - Effect: Allow
             Action:
               - eks:*
@@ -224,6 +246,7 @@ Resources:
               - sqs:*
               - acm:*
               - events:*
+              - rds:*
             Resource: '*'
             Condition:
               StringEquals:
@@ -257,7 +280,8 @@ Outputs:
      aws cloudformation create-stack \
        --stack-name hasura-cloud-byoc \
        --template-body file://cloudformation.yaml \
-       --capabilities CAPABILITY_NAMED_IAM
+       --capabilities CAPABILITY_NAMED_IAM \
+       --parameters ParameterKey=ExternalId,ParameterValue=hasura-cloud
 
      # Wait for creation to complete
      aws cloudformation wait stack-create-complete \
@@ -270,7 +294,8 @@ Outputs:
      aws cloudformation update-stack \
        --stack-name hasura-cloud-byoc \
        --template-body file://cloudformation.yaml \
-       --capabilities CAPABILITY_NAMED_IAM
+       --capabilities CAPABILITY_NAMED_IAM \
+       --parameters ParameterKey=ExternalId,ParameterValue=hasura-cloud
 
      # Wait for update to complete
      aws cloudformation wait stack-update-complete \
@@ -298,6 +323,13 @@ Share the following with the Hasura team:
 
 - (Required) Role ARN (From output above)
 - (Required) AWS Region
+- (Optional) External ID
+  - The external ID used in the trust relationship between your AWS account and Hasura's AWS account
+  - This is the value you specified for the `ExternalId` parameter in the CloudFormation template
+  - If not specified, the default value "hasura-cloud" will be used
+  - Must have a minimum of 2 characters and a maximum of 1,224 characters
+  - Must be alphanumeric without white space, but can include the following symbols: plus (+), equal (=), comma (,), period (.), at (@), colon (:), forward slash (/), and hyphen (-)
+  - **Important**: Make sure to provide this value to the Hasura team if you've customized it
 - (Optional) Preferred Availability Zones
   - Use AZ IDs (e.g., use1-az1, use1-az2) instead of AZ names (us-east-1a, us-east-1b)
   - You can get the AZ IDs by running:
@@ -308,7 +340,7 @@ Share the following with the Hasura team:
     --query "AvailabilityZones[?State=='available'] | [].{ZoneName: ZoneName, ZoneId: ZoneId}"
     ```
   - If you have specific zones which you'd like to use, please pass it along. Otherwise, Hasura will assign accordingly.
-- (Optional) VPC CIDR (/16 CIDR)
+- (Optional) VPC CIDR (/16-/19 CIDR)
   - If you have a specific CIDR in mind for the VPC setup, please pass it along. If not specified, Hasura will assign 10.0.0.0/16.
   - Note: If you are planning to use VPC Peering, this CIDR should not conflict with any networks on your side.
 - (Optional) Kubernetes Service CIDR (/16-20 CIDR)
@@ -338,6 +370,8 @@ gcloud services enable \
   multiclusterservicediscovery.googleapis.com \
   trafficdirector.googleapis.com \
   multiclusteringress.googleapis.com \
+  sqladmin.googleapis.com \
+  servicenetworking.googleapis.com \
   container.googleapis.com \
   certificatemanager.googleapis.com --project ${GCP_PROJECT_ID}
 ```
@@ -391,6 +425,10 @@ gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
 
 gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
   --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
+  --role roles/cloudsql.admin
+
+gcloud projects add-iam-policy-binding ${GCP_PROJECT_ID} \
+  --member "serviceAccount:ddn-automation@hasura-ddn.iam.gserviceaccount.com" \
   --role roles/iam.workloadIdentityPoolAdmin
 ```
 </details>
@@ -403,7 +441,7 @@ Share the following with the Hasura team:
 - (Required) GCP Region
 - (Optional) Preferred Availability Zones
   - If you have specific zones which you'd like to use, please pass it along.  Otherwise, Hasura will assign accordingly.
-- (Optional) VPC CIDR (/16 CIDR)
+- (Optional) VPC CIDR (/16-/19 CIDR)
   - If you have a specific CIDR in mind for the VPC setup, please pass it along.  If not specified, Hasura will assign 10.0.0.0/16.
   - Note: If you are planning to use VPC Peering, this CIDR should not conflict with any networks on your side.
 
