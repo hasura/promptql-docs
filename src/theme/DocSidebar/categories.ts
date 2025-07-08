@@ -12,7 +12,7 @@ export const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
   },
   coreConcepts: {
     title: 'Core Concepts', 
-    directories: ['architecture', 'data-sources', 'metadata', 'business-logic', 'auth'],
+    directories: ['architecture', 'data-sources', 'metadata', 'ai-primitives', 'business-logic', 'auth'],
     exactMatch: false,
   },
   buildingApps: {

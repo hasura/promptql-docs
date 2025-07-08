@@ -1,0 +1,38 @@
+---
+title: AI Primitives
+sidebar_position: 1
+description: "Learn about the set of AI primitives available to PromptQL when working with your data."
+keywords:
+  - ai
+  - primitive
+  - ai primitives
+  - tools
+  - toolbox
+---
+
+# AI Primitives
+
+## Introduction
+
+Under the hood, PromptQL utilizes a set of built-in primitives, in conjunction with any
+[custom business logic](/business-logic/index.mdx) you've provided, to create small programs on top of your data.
+
+These primitives pair relevant data or artifacts—represented as `inputs` or `data`—from your application with on-the-fly
+and context-aware `instructions` based on the thread between the user and PromptQL.
+
+The built-in primitives available are:
+
+- [Summarize](/ai-primitives/summarize.mdx)
+- [Classify](/ai-primitives/classify.mdx)
+- [Extract](/ai-primitives/extract.mdx)
+- [Visualize](/ai-primitives/visualize.mdx)
+
+:::info Think of this as a toolbox 🧰
+
+Each primitive is a specialized tool designed to perform a specific task on your data. They're flexible, composable, and
+context-aware, letting you build intelligent workflows by combining natural language instructions with structured input.
+
+As you [add your own custom business logic](/business-logic/index.mdx), you're providing more specific tools to PromptQL
+that it can compose and use to solve your business problems.
+
+:::

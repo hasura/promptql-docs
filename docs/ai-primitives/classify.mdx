@@ -1,0 +1,56 @@
+---
+title: Classify
+sidebar_position: 2
+description: "See how PromptQL can classify unstructured data."
+sidebar_label: Classify
+keywords:
+  - ai
+  - primitive
+  - ai primitives
+  - tools
+  - toolbox
+---
+
+# Classify
+
+## Introduction
+
+The classify function leverages PromptQL's deep understanding of context to automatically sort content into meaningful
+categories. While you can provide category lists and basic guidance, PromptQL intelligently recognizes subtle
+distinctions and nuances that determine classification. It understands context-specific signals - like what makes a
+restaurant "fine dining" versus "casual," or what distinguishes different cuisine types - without requiring exhaustive
+rules or criteria.
+
+## Example
+
+If you ask a question like:
+
+> "Can you help me organize my list of restaurants? I need to know which ones are fancy versus casual, and what kind of
+> food they serve.
+
+Here's an example showing how PromptQL handles restaurant classification with minimal instruction:
+
+```python
+classifications = executor.classify(
+    instructions="""
+    Categorize each restaurant based on its name and any available description.
+    A restaurant can belong to multiple categories.
+    Consider both the dining style (Fine Dining, Casual) and cuisine type.
+    Examples:
+    - A high-end Italian restaurant would be both "Fine Dining" and "Italian"
+    - A casual American pub would be both "Casual Dining" and "American"
+    """,
+    categories=categories,
+    allow_multiple=True,
+    inputs=unique_restaurants
+)
+```
+
+Notice how the instructions provide just basic examples - PromptQL automatically understands the many signals that
+indicate dining style (like price points, menu complexity, atmosphere) and cuisine authenticity, making sophisticated
+classification decisions without needing detailed criteria for each category.
+
+## Next steps
+
+Classification pairs well with PromptQL's ability to [extract](/ai-primitives/extract.mdx) information and structure it
+in a way that makes it easier to draw insights.
