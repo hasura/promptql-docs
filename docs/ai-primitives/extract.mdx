@@ -26,6 +26,10 @@ nuts" and "nut allergy" represent the same dietary restriction, or that "celebra
 
 Here's an example showing how PromptQL handles reservation notes with minimal guidance:
 
+> "I need to go through all these reservation notes and pull out any special requests - you know, like if people have
+> food allergies, if they're celebrating something, or if they want specific tables. Can you help me organize all that
+> information?"
+
 ```python
 extracted_info = executor.extract(
         json_schema=json_schema,
