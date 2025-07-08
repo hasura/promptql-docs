@@ -1,0 +1,53 @@
+---
+title: Extract
+sidebar_position: 3
+description:
+  "Learn how PromptQL can pull specific pieces of information from text, like getting character names and locations from
+  movie descriptions or prices and dates from receipts."
+sidebar_label: Extract
+keywords:
+  - ai
+  - primitive
+  - ai primitives
+  - tools
+  - toolbox
+---
+
+# Extract
+
+## Introduction
+
+The extract function demonstrates PromptQL's ability to intelligently identify and structure relevant information from
+text, even when that information appears in different forms or contexts. While you provide a basic schema of what you're
+interested in, PromptQL automatically recognizes various ways information might be expressed - understanding that "no
+nuts" and "nut allergy" represent the same dietary restriction, or that "celebrating our 10th" implies an anniversary.
+
+## Example
+
+Here's an example showing how PromptQL handles reservation notes with minimal guidance:
+
+```python
+extracted_info = executor.extract(
+        json_schema=json_schema,
+        instructions="""
+        Extract any mentioned dietary requirements, special occasions, or seating preferences from the reservation notes.
+        For dietary requirements, include any allergies, restrictions, or preferences mentioned.
+        For special occasions, look for mentions of birthdays, anniversaries, celebrations etc.
+        For seating preferences, identify if they specifically requested indoor, outdoor, bar seating etc.
+        If any field is not mentioned, omit it from the output.
+        """,
+        inputs=notes_to_extract
+    )
+```
+
+In this example, the instructions outline basic categories without having to specify every possible way information
+might be phrased. PromptQL automatically handles variations in language, implied information, and contextual clues -
+understanding that "by the window" is a seating preference or that "gluten-free" belongs under dietary requirements,
+even without explicit mapping of these terms.
+
+## Next steps
+
+Once PromptQL has extracted structured information, it can
+[automatically visualize patterns and trends in that data](/ai-primitives/visualize.mdx) - for example, turning
+extracted dietary requirements and seating preferences into interactive charts that reveal popular accommodations or
+seasonal trends in special occasion bookings.

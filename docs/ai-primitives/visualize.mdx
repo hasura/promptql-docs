@@ -1,0 +1,53 @@
+---
+title: Visualize
+sidebar_position: 4
+description:
+  "Learn how PromptQL can take your data — and any questions asked on it — to create stunning, dynamic visualizations."
+sidebar_label: Visualize
+keywords:
+  - ai
+  - primitive
+  - ai primitives
+  - tools
+  - toolbox
+---
+
+# Visualize
+
+## Introduction
+
+The visualize function illustrates PromptQL's ability to transform data into meaningful visual insights without
+requiring technical visualization expertise. While you can provide styling preferences, PromptQL automatically
+determines the most effective way to represent your data - choosing appropriate chart types, scales, and interactive
+features based on the data's structure and the insights you're seeking.
+
+## Example
+
+Here's an example showing how PromptQL creates an interactive visualization of restaurant categories:
+
+```python
+viz_result = executor.visualize(
+    instructions="""
+    Create an interactive bar chart showing the distribution of restaurant categories.
+    Requirements:
+    - Use a horizontal bar chart for better readability of category names
+    - Sort bars by count in descending order
+    - Use a pleasant color scheme (preferably blues or teals)
+    - Include hover tooltips showing exact count
+    - Add a clear title 'Restaurant Categories Distribution'
+    - Make the chart responsive to container width
+    - Include total number of restaurants in each category
+    """,
+    data=viz_data
+)
+```
+
+The instructions focus on the desired outcome rather than technical specifications. PromptQL automatically handles the
+complexity of creating responsive, interactive visualizations - managing details like proper data scaling, axis
+formatting, and mobile responsiveness while ensuring the resulting visualization effectively communicates your data's
+story.
+
+## Next steps
+
+If you've explored all the built-in primitives which PromptQL can access, it's time to check out how to
+[add your own custom business logic](/business-logic/index.mdx) and extend what PromptQL can do!

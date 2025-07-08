@@ -1,0 +1,44 @@
+---
+title: Summarize
+sidebar_position: 1
+description: "See how PromptQL can summarize larger chunks of text and data into an easy-to-read format."
+sidebar_label: Summarize
+keywords:
+  - ai
+  - primitive
+  - ai primitives
+  - tools
+  - toolbox
+---
+
+# Summarize
+
+## Introduction
+
+If you're dealing with lengthy content and need the key points, PromptQL automatically engages the summarize primitive
+to create concise versions that capture what matters. You don't need to explicitly request summarization; it recognizes
+when condensing information would be helpful.
+
+## Example
+
+The summarize function doesn't just condense text - it intelligently determines what information is most relevant based
+on context. While you can guide the summarization with specific instructions, PromptQL automatically identifies
+important details, relationships, and key points that should be preserved. In this restaurant reservation example,
+PromptQL knows to maintain crucial booking details even without being explicitly told about every field:
+
+```python
+summaries = executor.summarize(
+    instructions="""
+    Create a concise summary of each reservation focusing on:
+    - The restaurant name
+    - Any special notes or important details
+    Keep each summary to 1-2 sentences.
+    """,
+    inputs=reservation_texts
+)
+```
+
+## Next steps
+
+Now that you know more about how PromptQL can summarize large bodies of text and data, learn how it can intelligently
+[classify](/ai-primitives/classify.mdx) data into categories.
