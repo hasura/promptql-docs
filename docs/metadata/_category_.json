@@ -1,0 +1,8 @@
+{
+  "label": "Semantic Metadata",
+  "position": 4,
+  "className": "metadata",
+  "customProps": {
+    "sidebar_pathname": "metadata"
+  }
+}

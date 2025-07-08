@@ -1,0 +1,118 @@
+---
+sidebar_position: 4
+sidebar_label: "Write data"
+description: "Commands allow PromptQL to act on your data in various data sources."
+toc_max_heading_level: 4
+keywords:
+  - command
+  - data modeling
+  - promptql
+---
+
+# Write Data
+
+## Introduction
+
+In PromptQL, **commands** let you call custom functions or procedures from your data sources, usually to mutate data.
+
+While commands _can_ handle reads, you’ll mostly reach for them when you need to perform write operations on your data
+source _or_ when executing custom business logic. You decide whether they're exposed as queries or mutations for
+PromptQL, based on how you configure them.
+
+```yaml title="An example command for inserting a user:"
+kind: Command
+version: v1
+definition:
+  name: create_user
+  description: |
+    Creates a new user in the system. This command is typically used when someone registers
+    for the app or is added manually by an admin. It captures core details like:
+    - name
+    - email
+    This is often the first step before establishing relationships with sessions,
+    subscriptions, or other user-linked resources.
+  outputType: action_response!
+  arguments:
+    - name: name
+      type: String!
+    - name: email
+      type: String!
+  source:
+    dataConnectorName: operations
+    dataConnectorCommand:
+      procedure: create_user
+```
+
+## Lifecycle
+
+### Create a command
+
+To add a command you will need to have a data connector which has already introspected the data source. Follow the
+relevant tutorial in [How to Build with PromptQL](/how-to-build-with-promptql/index.mdx) to get to that point.
+
+```ddn title="Add your command by passing the connector's and command's names:"
+# Alternatively, you can add all commands: ddn command add <connector_link_name> "*"
+
+ddn command add <connector_link_name> <command_name>
+```
+
+:::tip Not sure which commands you have?
+
+You can see a list of all available resources using the CLI:
+
+```ddn
+ddn connector show-resources <connector_name>
+```
+
+:::
+
+For each command, you'll find an HML file included in the relevant `metadata` directory for your connected data source.
+
+**Typically, a particular model will have corresponding commands for inserts, updates, and deletes.** This gives
+PromptQL the power to act as a write layer for your API, letting you execute domain-specific operations directly against
+your connected data sources.
+
+You can now [create a build](/reference/cli/commands/ddn_supergraph_build.mdx), serve it, and begin manipulating the
+data underlying the command through PromptQL.
+
+### Update a command
+
+When your underlying data source changes, you'll need to update the commands available to PromptQL to ensure continued
+accuracy in its operations:
+
+```ddn title="Re-introspect your data source:"
+ddn connector introspect <connector_name>
+```
+
+```ddn title="Then, update your existing command:"
+ddn command update <connector_link_name> <command_name>
+```
+
+You will see an output which explains how new resources were added or updated in the command.
+
+You can now [create a build](/reference/cli/commands/ddn_supergraph_build.mdx), serve it, and continue interacting with
+the data it represents using PromptQL, which will automatically adjust its query plans based on the updated command
+definitions.
+
+:::tip You can manually edit metadata!
+
+You can also update the command by manually editing the metadata. To avoid errors, we recommend using the
+[VS Code extension](https://marketplace.visualstudio.com/items?itemName=HasuraHQ.hasura) to validate your changes.
+
+:::
+
+### Delete a command
+
+```ddn title="If you no longer need a command, you can delete it:"
+ddn command remove <command_name>
+```
+
+Along with the command itself, the associated metadata is also removed, and PromptQL will no longer include this command
+in its query planning.
+
+## Next steps
+
+- If you've added your first command, check out [relationships for connecting data](/metadata/relationship.mdx) next.
+- Business logic is exposed as commands written in TypeScript, Go, or Python. Learn more about adding this functionality
+  by [connecting a lambda connector](/business-logic/index.mdx).
+- You can learn more about commands in the metadata reference [docs](/reference/metadata-reference/commands.mdx).
