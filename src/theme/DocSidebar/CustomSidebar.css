@@ -131,9 +131,8 @@
   list-style: none;
 }
 
-/* when shouldExpand === true */
 .custom-sidebar__subitems--active {
-  max-height: 500px;       /* large enough for your lists */
+  max-height: 50000px;
   opacity: 1;
 }
 
