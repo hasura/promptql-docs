@@ -86,7 +86,7 @@ The instruction clearly defines the assistant's role:
 - **Purpose:** Answer questions using real sales and revenue data
 - **Data sources:** Salesforce, Clari, and a custom Postgres database
 
-This helps the model stay on track and understand the boundaries of its role.
+This helps the application stay on track and understand the boundaries of its role.
 
 ### Helpful context, not redundancy
 
@@ -94,9 +94,9 @@ Rather than repeating obvious schema facts (e.g., “This column stores city nam
 
 - Common question types (e.g., forecast accuracy, pipeline health)
 - Real-world examples of each category
-- Situations where the model should ask for clarification
+- Situations where the application should ask for clarification
 
-This context improves the quality of model outputs and helps it better understand ambiguous queries.
+This context improves the quality of the application's outputs and helps it better understand ambiguous queries.
 
 ### Global guidance is in the right place
 
@@ -121,18 +121,18 @@ This makes the guidance both human-readable and model-optimized.
 
 ### Guidelines
 
-When writing system instructions, your goal is to **narrow the model's focus** and **reduce ambiguity**. Here are some
+When writing system instructions, your goal is to **narrow PromptQL's focus** and **reduce ambiguity**. Here are some
 guidelines.
 
-- **Be clear and concise:** The model performs better when instructions are direct and avoid unnecessary complexity.
-- **Define the role and audience:** Tell the model who it is (e.g., a sales analyst, a support bot) and who it is
+- **Be clear and concise:** PromptQL performs better when instructions are direct and avoid unnecessary complexity.
+- **Define the role and audience:** Tell the agent who it is (e.g., a sales analyst, a support bot) and who it is
   helping.
-- **Specify sources of knowledge:** Mention any data sources, systems, or domains the model should rely on when
+- **Specify sources of knowledge:** Mention any data sources, systems, or domains PromptQL should rely on when
   answering.
 - **Encourage appropriate behavior:** Highlight priorities like brevity, clarity, formality, creativity, or
   error-handling.
 - **Provide code patterns or examples:** You can include sample Python functions, formulas, or logic patterns to guide
-  how the model generates its own code. These are not backend functions to call, but templates for the LLM to adapt and
+  how PromptQL generates its own code. These are not backend functions to call, but templates for the LLM to adapt and
   build from.
 - **Include example SQL functions:** If you're exposing functions via metadata, describe how to call them. Include
   argument names, data types, and a sample use case. For example:
@@ -140,7 +140,7 @@ guidelines.
   > Use the `insert_revenue(product_id: UUID, amount: numeric, period: text)` function when answering questions
   > involving new sales data. This records revenue per product for a specific period.
 
-- **Anticipate ambiguity:** If the model might face unclear inputs, instruct it on when and how to ask for
+- **Anticipate ambiguity:** If the application might face unclear inputs, instruct it on when and how to ask for
   clarification.
 - **Set limits if needed:** If certain topics, behaviors, or types of output should be avoided, explicitly mention them.
-- **Test and iterate:** Start simple, evaluate outputs, and refine your instructions based on observed model behavior.
+- **Test and iterate:** Start simple, evaluate outputs, and refine your instructions based on observed behavior.
