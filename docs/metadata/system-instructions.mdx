@@ -1,0 +1,146 @@
+---
+sidebar_position: 6
+sidebar_label: System Instructions
+description: Learn how to configure your PromptQL application via metadata.
+keywords:
+  - hasura
+  - hasura ddn
+  - project
+  - promptql-config
+  - config
+---
+
+# System Instructions
+
+## Introduction
+
+Custom system instructions provide flexibility to fine-tune your PromptQL experience. This configuration allows you to
+tailor the application's behavior to your specific needs. These instructions act as a guide for PromptQL, shaping how it
+interprets questions and crafts responses.
+
+:::warning System Instructions shape behavior
+
+As outlined below, system instructions shape the _behavior_ of a PromptQL application.
+
+However, through connecting data sources and writing your own custom business logic, you're actively providing new tools
+which PromptQL can use. While context in the form of system instructions is helpful, you can explain with greater
+detail—and with much tighter scope—what each tools does using metadata descriptions.
+
+Learn more about the available metadata objects [here](/metadata/index.mdx).
+
+:::
+
+## How to write system instructions
+
+### Example
+
+Consider this example where we set the system instructions for a GTM-focused PromptQL application.
+
+```yaml title="globals/metadata/promptql-config.hml"
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+    systemInstructions: |
+
+      You are an AI assistant that helps go-to-market teams make data-driven decisions.
+
+      You have access to:
+      - Salesforce (opportunities, accounts, leads)
+      - Clari (forecast categories, pipeline movement)
+      - Postgres (custom product and revenue data)
+
+      Use this data to answer questions about:
+      - Sales performance (e.g. win rate, top reps)
+      - Forecast accuracy (e.g. projected vs actual)
+      - Pipeline health (e.g. stalled deals, pipeline coverage)
+      - Rep activity (e.g. activity count, call volume)
+      - Account trends (e.g. expansion opportunities, churn risk)
+
+      When inserting new sales records, use the function:
+      insert_revenue(product_id UUID, amount numeric, period text)
+
+      Example usage:
+      insert_revenue('123e4567-e89b-12d3-a456-426614174000', 4500.00, '2024-Q4')
+
+      Prioritize clarity, brevity, and business relevance in your answers.
+
+      If the question is ambiguous or missing key context (e.g. time range, owner name, stage), ask for clarification before proceeding.
+
+      Do not speculate. Stick to facts available in the data.
+
+      Output results in simple, easy-to-read text. Use bullet points, summaries, and key metrics where helpful. Avoid verbose explanations.
+
+      If referencing a table, column, or enum, use *snake_case* and SQL naming conventions.
+```
+
+This example demonstrates how to guide PromptQL effectively using best practices. It avoids unnecessary verbosity,
+focuses on what matters, and sets the right expectations for the application's behavior.
+
+### Clear scope and purpose
+
+The instruction clearly defines the assistant's role:
+
+- **Audience:** Go-to-market teams
+- **Purpose:** Answer questions using real sales and revenue data
+- **Data sources:** Salesforce, Clari, and a custom Postgres database
+
+This helps the application stay on track and understand the boundaries of its role.
+
+### Helpful context, not redundancy
+
+Rather than repeating obvious schema facts (e.g., “This column stores city names”), the system instruction provides:
+
+- Common question types (e.g., forecast accuracy, pipeline health)
+- Real-world examples of each category
+- Situations where the application should ask for clarification
+
+This context improves the quality of the application's outputs and helps it better understand ambiguous queries.
+
+### Global guidance is in the right place
+
+Important global behaviors are captured here instead of scattered across metadata:
+
+- Stick to **facts**—don’t speculate
+- Ask for clarification if details are missing
+- Use **snake_case** and SQL naming conventions
+- Prioritize **clarity and brevity** in outputs
+
+System instructions are the best place to capture these global rules.
+
+### Structured, prescriptive, and precise
+
+The instructions are written in a simple, structured format:
+
+- Bulleted lists for data sources and use cases
+- Clear formatting expectations; markdown is acceptable
+- No filler or LLM-generated fluff
+
+This makes the guidance both human-readable and model-optimized.
+
+### Guidelines
+
+When writing system instructions, your goal is to **narrow PromptQL's focus** and **reduce ambiguity**. Here are some
+guidelines.
+
+- **Be clear and concise:** PromptQL performs better when instructions are direct and avoid unnecessary complexity.
+- **Define the role and audience:** Tell the agent who it is (e.g., a sales analyst, a support bot) and who it is
+  helping.
+- **Specify sources of knowledge:** Mention any data sources, systems, or domains PromptQL should rely on when
+  answering.
+- **Encourage appropriate behavior:** Highlight priorities like brevity, clarity, formality, creativity, or
+  error-handling.
+- **Provide code patterns or examples:** You can include sample Python functions, formulas, or logic patterns to guide
+  how PromptQL generates its own code. These are not backend functions to call, but templates for the LLM to adapt and
+  build from.
+- **Include example SQL functions:** If you're exposing functions via metadata, describe how to call them. Include
+  argument names, data types, and a sample use case. For example:
+
+  > Use the `insert_revenue(product_id: UUID, amount: numeric, period: text)` function when answering questions
+  > involving new sales data. This records revenue per product for a specific period.
+
+- **Anticipate ambiguity:** If the application might face unclear inputs, instruct it on when and how to ask for
+  clarification.
+- **Set limits if needed:** If certain topics, behaviors, or types of output should be avoided, explicitly mention them.
+- **Test and iterate:** Start simple, evaluate outputs, and refine your instructions based on observed behavior.
