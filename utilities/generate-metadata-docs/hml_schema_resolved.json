@@ -90,7 +90,7 @@
                   "description": "Definition of the authentication configuration used by the API server.",
                   "oneOf": [
                     {
-                      "title": "AuthConfigV1",
+                      "title": "AuthConfig1",
                       "description": "Definition of the authentication configuration v1, used by the API server.",
                       "type": "object",
                       "required": ["definition", "kind", "version"],
@@ -703,7 +703,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/AuthConfigV2",
-                          "title": "AuthConfigV2",
+                          "title": "AuthConfig2",
                           "description": "Definition of the authentication configuration v2, used by the API server.",
                           "type": "object",
                           "required": ["mode"],
@@ -732,7 +732,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/AuthConfigV3",
-                          "title": "AuthConfigV3",
+                          "title": "AuthConfig3",
                           "description": "Definition of the authentication configuration v3, used by the API server.",
                           "type": "object",
                           "required": ["mode"],
@@ -1066,7 +1066,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/AuthConfigV4",
-                          "title": "AuthConfigV4",
+                          "title": "AuthConfig4",
                           "description": "Definition of the authentication configuration v4, used by the API server.",
                           "type": "object",
                           "required": ["mode"],
@@ -8057,7 +8057,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV1",
-                          "title": "ModelV1",
+                          "title": "Model1",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations.",
                           "type": "object",
                           "required": ["name", "objectType", "orderableFields"],
@@ -8558,7 +8558,7 @@
                         },
                         "definition": {
                           "$id": "https://hasura.io/jsonschemas/metadata/ModelV2",
-                          "title": "ModelV2",
+                          "title": "Model2",
                           "description": "The definition of a data model. A data model is a collection of objects of a particular type. Models can support one or more CRUD operations. ModelV2 implements the changes described in rfcs/open-dd-expression-type-changes.md.",
                           "type": "object",
                           "required": ["name", "objectType"],
