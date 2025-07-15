@@ -64,6 +64,8 @@ Definition of the configuration of PromptQL for the project
 | `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | Configuration of the LLM to be used for PromptQL |
 | `aiPrimitivesLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc |
 | `overrideAiPrimitivesLlm` | [[AiPrimitivesLlmConfig](#promptqlconfigv2-aiprimitivesllmconfig)] | false | Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc |
+| `threadTitleGeneration` | [ThreadTitleGenerationConfig](#promptqlconfigv2-threadtitlegenerationconfig) / null | false | Configure title generation for threads in the PromptQL playground |
+| `maxAssistantActions` | integer / null | false | Maximum number of assistant actions that can be performed autonomously before the process is interrupted |
 | `featureFlags` | [PromptQlFeatureFlags](#promptqlconfigv2-promptqlfeatureflags) / null | false | Feature flags to be used for PromptQL to enable and disable experimental features |
 
 
@@ -78,6 +80,17 @@ Feature flags to be used for PromptQL to enable and disable experimental feature
 | `enable_visualizations` | boolean / null | false | Enable the experimental visualizations feature |
 | `enable_visualizations_v2` | boolean / null | false | Enable the experimental visualizations v2 feature |
 | `<customKey>` |  | false |  |
+
+
+
+#### ThreadTitleGenerationConfig {#promptqlconfigv2-threadtitlegenerationconfig}
+
+Configure title generation for threads in the PromptQL playground
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `enable` | boolean | true | Whether or not to enable thread title generation (default: true) |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The LLM configuration to use for thread title generation. If not specified, the summarize AI primitive LLM is used. |
 
 
 
@@ -129,6 +142,7 @@ Configuration settings for an AWS Bedrock-provided LLM
 | `regionName` | string | true | The specific AWS Bedrock region to use. |
 | `awsAccessKeyId` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The AWS access key ID to use for the AWS Bedrock API |
 | `awsSecretAccessKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The AWS secret access key to use for the AWS Bedrock API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the AWS Bedrock API is unavailable |
 
 
 
@@ -142,6 +156,7 @@ Configuration settings for a Gemini LLM
 | `model` | string / null | false | The specific Gemini model to use. If not specified, the default model will be used. |
 | `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Gemini API |
 | `safetySettings` | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false | Safety settings for the Gemini API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Gemini API is unavailable |
 
 
 
@@ -186,6 +201,7 @@ Configuration settings for an Azure-provided LLM
 | `model` | string / null | false | The specific Azure model to use. If not specified, the default model will be used. |
 | `endpoint` | string | true | The endpoint to use for the Azure LLM API |
 | `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Azure API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Azure API is unavailable |
 
 
 
@@ -199,6 +215,7 @@ Configuration settings for an Anthropic LLM
 | `model` | string / null | false | The specific Anthropic model to use. If not specified, the default model will be used. |
 | `baseUrl` | string / null | false | The base URL to use for the Anthropic API. If not specified, the default URL will be used. |
 | `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Anthropic API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Anthropic API is unavailable |
 
 
 
@@ -212,6 +229,7 @@ Configuration settings for an OpenAI LLM
 | `model` | string / null | false | The specific OpenAI model to use. If not specified, the default model will be used. |
 | `baseUrl` | string / null | false | The base URL to use for the OpenAI API. If not specified, the default URL will be used. |
 | `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the OpenAI API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the OpenAI API is unavailable |
 
 
 
@@ -236,3 +254,5 @@ Configuration settings for the Hasura-configured LLM
 | Key | Value | Required | Description |
 |-----|-----|-----|-----|
 | `provider` | `hasura` | true |  |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Hasura API is unavailable |
+| `specificLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false |  |
