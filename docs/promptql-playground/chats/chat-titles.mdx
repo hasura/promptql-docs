@@ -2,7 +2,8 @@
 sidebar_position: 3
 sidebar_label: Chat Titles
 description:
-  "Learn about thread title functionality in the PromptQL Playground - automatic generation and manual editing"
+  "Learn about thread title functionality in the PromptQL Playground - automatic generation, customization, and manual
+  editing"
 keywords:
   - hasura
   - promptql
@@ -10,6 +11,9 @@ keywords:
   - thread titles
   - edit title
   - auto generation
+  - title generation config
+  - llm configuration
+  - promptql config
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
@@ -22,7 +26,7 @@ Chat titles in the PromptQL Playground help you organize and identify your conve
 both automatic title generation and manual editing capabilities to ensure your chats are properly labeled and easy to
 find.
 
-## Titles are automatically generated
+## Title Generation
 
 When you start a new conversation, the PromptQL Playground automatically generates meaningful titles using large
 language models. This happens after the first exchange between you and the assistant, replacing the initial default
@@ -33,18 +37,78 @@ title (which is a truncated version of your first message).
 The automatic title generation:
 
 1. **Analyzes your conversation context** including:
-
-   - Your initial user message
+   - Your first message
    - The assistant's response
    - The query plan (execution steps the agent will perform)
 
 2. **Creates concise, descriptive titles** (maximum 7 words) that accurately summarize:
-
    - The core data request or analysis goal
    - Key entities like datasets, columns, or metrics
    - Primary data operations being performed
 
 3. **Occurs automatically** after the first assistant action in a new chat
+
+The system automatically selects an LLM for title generation in the following order:
+
+1. **[Summarize AI primitive LLM](/project-configuration/promptql-config/providers.mdx#overrideaiprimitivesllm)** (if
+   provided)
+2. **[Main PromptQL LLM](/project-configuration/promptql-config/providers.mdx#llm)** (fallback)
+
+:::note Customization
+
+You can override this default LLM selection by configuring a specific LLM for title generation. See the
+[Configuration](#configuration) section below for details.
+
+:::
+
+### Configuration
+
+While title generation works automatically, you can customize this behavior by adding the
+[`threadTitleGeneration`](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-threadtitlegenerationconfig)
+section to your project's [`promptql-config.hml`](/project-configuration/promptql-config/index.mdx) file.
+
+#### Disable title generation
+
+You can disable title generation and revert to the default behavior of using the first few characters of your first
+message. Set `enable` to `false` in the `threadTitleGeneration`:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  threadTitleGeneration:
+    enable: false
+```
+
+#### Specify an LLM
+
+To override the default LLM selection, specify a different
+[LLM](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-llmconfig) for title generation. Set `llm` to
+the desired LLM configuration in the `threadTitleGeneration`:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  threadTitleGeneration:
+    enable: true
+    llm:
+      provider: gemini
+      model: gemini-2.5-flash
+      apiKey:
+        valueFromEnv: GEMINI_API_KEY
+```
+
+:::tip Model recommendations
+
+Choose faster, cost-effective models for title generation since titles are short and don't require complex reasoning
+capabilities of larger models.
+
+:::
 
 ## Edit titles
 
