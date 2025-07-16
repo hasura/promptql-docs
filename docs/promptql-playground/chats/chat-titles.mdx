@@ -69,7 +69,7 @@ section to your project's [`promptql-config.hml`](/project-configuration/promptq
 
 #### Disable title generation
 
-You can disable title generation and revert to the default behavior of using the first few characters of your first
+You can disable title generation and revert to the default behavior of using the first few characters from your first
 message. Set `enable` to `false` in the `threadTitleGeneration`:
 
 ```yaml
@@ -85,8 +85,8 @@ definition:
 #### Specify an LLM
 
 To override the default LLM selection, specify a different
-[LLM](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-llmconfig) for title generation. Set `llm` to
-the desired LLM configuration in the `threadTitleGeneration`:
+[LLM](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-llmconfig) configuration for title generation.
+Set the `llm` field to the desired LLM configuration in the `threadTitleGeneration` section:
 
 ```yaml
 kind: PromptQlConfig
@@ -105,7 +105,7 @@ definition:
 
 :::tip Model recommendations
 
-Choose faster, cost-effective models for title generation since titles are short and don't require complex reasoning
+Choose faster, cost-effective models for title generation since titles are short and don't require the complex reasoning
 capabilities of larger models.
 
 :::
