@@ -12,3 +12,40 @@ keywords:
 import Config from "@site/docs/reference/connectors/_jdbcConfig.mdx";
 
 <Config />
+
+## Client Certificate Configuration
+
+When using SSL client certificates with PostgreSQL, the JDBC driver requires specific certificate formats and
+configuration.
+
+### Certificate Requirements
+
+- **Client certificate**: Must be in PEM format (`.crt` or `.pem`)
+- **Client private key**: Must be in PKCS#8 format (`.pk8`)
+- **Root CA certificate**: Must be in PEM format for server verification
+
+### JDBC URL Parameters
+
+```
+jdbc:postgresql://host:port/database?ssl=true&sslmode=require&sslcert=/path/to/client.crt&sslkey=/path/to/client.pk8&sslrootcert=/path/to/ca.crt
+```
+
+### Key Format Conversion
+
+Convert your private key to PKCS#8 format:
+
+```bash
+openssl pkcs8 -topk8 -inform PEM -outform PEM -nocrypt -in client.key -out client.pk8
+```
+
+### SSL Mode Options
+
+- `sslmode=require` - Requires SSL but doesn't verify server certificate
+- `sslmode=verify-ca` - Requires SSL and verifies server certificate against CA
+- `sslmode=verify-full` - Requires SSL, verifies certificate, and checks hostname
+
+### Troubleshooting
+
+- Ensure certificate files are readable by the application
+- Verify certificate chain is complete
+- Check that client certificate CN matches database username (if using cert authentication)
