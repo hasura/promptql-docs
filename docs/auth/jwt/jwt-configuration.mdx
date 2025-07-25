@@ -153,6 +153,38 @@ claimsConfig:
 The `location` field indicates the location of the namespace object that uses
 [RFC 6901 JSON Pointer](https://datatracker.ietf.org/doc/html/rfc6901) string syntax.
 
+**JSON Pointer Path Escaping**
+
+Since paths use JSON Pointer syntax as defined in [RFC 6901](https://datatracker.ietf.org/doc/html/rfc6901#section-3),
+certain characters must be escaped:
+
+- `/` (forward slash) must be escaped as `~1`
+- `~` (tilde) must be escaped as `~0`
+
+This escaping is **required** by the JSON Pointer specification. This is particularly important when dealing with URLs
+in your JWT claim names.
+
+**Example with URL-based claim names:**
+
+```yaml
+# For a JWT payload containing:
+# {
+#   "https://promptql.hasura.io": {
+#     "user-info": {
+#       "email": "user@example.com"
+#     }
+#   }
+# }
+
+claimsConfig:
+  locations:
+    x-hasura-user-email:
+      path:
+        path: /https:~1~1promptql.hasura.io/user-info/email
+```
+
+**Common mistake:** Using unescaped paths like `/https://promptql.hasura.io/user-info/email` will not work correctly.
+
 The `claimsFormat` field indicates whether the Hasura-specific claims are a regular JSON object or a stringified JSON.
 The following possible values are allowed: `Json`, `StringifiedJson`.
 
