@@ -68,7 +68,7 @@ html[data-theme='dark'] .feedback {
 
 .form h3 {
   font-size: 1.25rem;
-  color: var(--primary-neutral-200);
+  color: var(--heading-color);
   margin-bottom: 0.5rem;
 }
 
@@ -85,11 +85,11 @@ html[data-theme='dark'] .feedback {
   font-size: 0.875rem;
   padding: 0.75rem;
   line-height: 1.5rem;
-  color: var(--primary-neutral-200);
+  color: var(--heading-color);
   margin-top: 1rem;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.2);
   width: 100%;
-  background-color: var(--primary-dark);
+  background-color: var(--main-bg-color);
 }
 
 .form input::placeholder,
@@ -132,7 +132,7 @@ html[data-theme='dark'] .feedback {
 
 .textAreaLabel p {
   margin-bottom: 0.5rem;
-  color: var(--primary-neutral-300);
+  color: var(--body-text-color);
 }
 
 .buttonDisabled {
@@ -146,13 +146,9 @@ html[data-theme='dark'] .feedback {
 
 html[data-theme='dark'] .form input,
 html[data-theme='dark'] .form textarea {
-  border: 1px solid var(--header-border-bottom);
-}
-
-html[data-theme='dark'] .feedback input,
-html[data-theme='dark'] .feedback textarea {
-  background-color: var(--color-gray-74);
-  color: white;
+  border: 1px solid var(--primary-neutral-600);
+  background-color: var(--primary-neutral-800);
+  color: var(--primary-neutral-200);
 }
 
 .successMessage {
@@ -166,7 +162,7 @@ html[data-theme='dark'] .feedback textarea {
 
 .successMessage p {
   margin-bottom: 0.5rem !important;
-  color: var(--primary-neutral-300);
+  color: var(--body-text-color);
 }
 
 .successMessage a {
