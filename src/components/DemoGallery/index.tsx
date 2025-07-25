@@ -12,49 +12,49 @@ import Box from '@site/static/icons/general/box.svg';
 const DEMOS: DemoCardProps[] = [
   {
     title: 'GTM',
-    href: 'https://promptql.console.hasura.io/public/sandbox-gtm/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-gtm/playground?pg=docs&utm_campaign=sandbox-gtm',
     description:
       'See how sales and marketing teams leverage PromptQL to understand customer journeys, analyze pipeline data, and drive strategic business decisions.',
     IconComponent: Handshake,
   },
   {
     title: 'Healthcare',
-    href: 'https://promptql.console.hasura.io/public/sandbox-healthcare/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-healthcare/playground?pg=docs&utm_campaign=sandbox-healthcare',
     description:
       'Discover how healthcare providers use PromptQL to analyze patient data, optimize care pathways, and improve operational efficiency while maintaining compliance.',
     IconComponent: Healthcare,
   },
   {
     title: 'AML',
-    href: 'https://promptql.console.hasura.io/public/sandbox-aml/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-aml/playground?pg=docs&utm_campaign=sandbox-aml',
     description:
       'Explore how financial institutions use PromptQL to streamline anti-money laundering (AML) efforts by analyzing transaction data, uncovering suspicious patterns, and enhancing compliance.',
     IconComponent: Banking,
   },
   {
     title: 'Telco',
-    href: 'https://promptql.console.hasura.io/public/sandbox-telco/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-telco/playground?pg=docs&utm_campaign=sandbox-telco',
     description:
       'Take a look at the global network of a telecommunications provider and see how customers, call logs, service requests, devices, and support ticketing are all orchestrated into a single, capable agent.',
     IconComponent: CellTower,
   },
   {
     title: 'SCO',
-    href: 'https://promptql.console.hasura.io/public/sandbox-supplychain/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-supplychain/playground?pg=docs&utm_campaign=sandbox-supplychain',
     description:
       'Learn how supply chain organizations use PromptQL to optimize inventory management, track shipments across multiple vendors, and enhance operational visibility throughout complex logistics networks.',
     IconComponent: Truck,
   },
   {
     title: 'Diligence',
-    href: 'https://promptql.console.hasura.io/public/sandbox-diligence/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-diligence/playground?pg=docs&utm_campaign=sandbox-diligence',
     description:
       'See how investment firms and M&A teams leverage PromptQL to streamline due diligence processes by analyzing financial data, assessing risks, and accelerating deal evaluation workflows.',
     IconComponent: Calculator,
   },
   {
     title: 'CPG',
-    href: 'https://promptql.console.hasura.io/public/sandbox-cpg/readme',
+    href: 'https://promptql.console.hasura.io/public/sandbox-cpg/playground?pg=docs&utm_campaign=sandbox-cpg',
     description:
       'Discover how consumer packaged goods companies use PromptQL to analyze market trends, optimize product performance, and make data-driven decisions across retail channels and consumer touchpoints.',
     IconComponent: Box,
