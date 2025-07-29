@@ -295,6 +295,56 @@ Configuration for a lifecycle plugin hook.
 | Key | Value | Required | Description |
 |-----|-----|-----|-----|
 | `request` | [LifecyclePreResponsePluginHookConfigRequest](#lifecyclepluginhook-lifecyclepreresponsepluginhookconfigrequest) | true | Configuration for the request to the lifecycle plugin hook. |
+| `mode` | [LifecyclePreResponsePluginHookMode](#lifecyclepluginhook-lifecyclepreresponsepluginhookmode) / null | false | Configuration for the mode of the plugin hook (synchronous or asynchronous) If not specified, the default is asynchronous. |
+
+
+
+#### LifecyclePreResponsePluginHookMode {#lifecyclepluginhook-lifecyclepreresponsepluginhookmode}
+
+Configuration for the mode of the plugin hook (synchronous or asynchronous)
+
+
+**One of the following values:**
+
+| Value | Description |
+|-----|-----|
+| [LifecyclePreResponsePluginHookSynchronousModeConfig](#lifecyclepluginhook-lifecyclepreresponsepluginhooksynchronousmodeconfig) | Synchronous mode. The engine will wait for the plugin hook to respond before continuing. |
+| [LifecyclePreResponsePluginHookAsynchronousModeConfig](#lifecyclepluginhook-lifecyclepreresponsepluginhookasynchronousmodeconfig) | Asynchronous mode. The engine will not wait for the plugin hook to respond before continuing. |
+
+
+
+#### LifecyclePreResponsePluginHookAsynchronousModeConfig {#lifecyclepluginhook-lifecyclepreresponsepluginhookasynchronousmodeconfig}
+
+Asynchronous mode. The engine will not wait for the plugin hook to respond before continuing.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `asynchronous` | true |  |
+
+
+
+#### LifecyclePreResponsePluginHookSynchronousModeConfig {#lifecyclepluginhook-lifecyclepreresponsepluginhooksynchronousmodeconfig}
+
+Synchronous mode. The engine will wait for the plugin hook to respond before continuing.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `synchronous` | true |  |
+| `onPluginFailure` | [OnPluginFailure](#lifecyclepluginhook-onpluginfailure) | false | Configuration for the on-plugin-failure behavior of the plugin hook (default: fail). |
+
+
+
+#### OnPluginFailure {#lifecyclepluginhook-onpluginfailure}
+
+Configuration for the on-plugin-failure behavior of the plugin hook.
+
+
+**One of the following values:**
+
+| Value | Description |
+|-----|-----|
+| `fail` | Fail the request if the plugin hook fails. |
+| `continue` | Continue with the request if the plugin hook fails. |
 
 
 
