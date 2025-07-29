@@ -62,6 +62,7 @@ Definition of the configuration of PromptQL for the project
 |-----|-----|-----|-----|
 | `systemInstructions` | string / null | false | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
 | `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | Configuration of the LLM to be used for PromptQL |
+| `schemaSelector` | [SchemaSelectorConfig](#promptqlconfigv2-schemaselectorconfig) / null | false | The configuration for schema selection. Defaults to including all tables and columns. |
 | `aiPrimitivesLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc |
 | `overrideAiPrimitivesLlm` | [[AiPrimitivesLlmConfig](#promptqlconfigv2-aiprimitivesllmconfig)] | false | Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc |
 | `threadTitleGeneration` | [ThreadTitleGenerationConfig](#promptqlconfigv2-threadtitlegenerationconfig) / null | false | Configure title generation for threads in the PromptQL playground |
@@ -111,6 +112,89 @@ The name of an LLM primitive, such as `classify`, `summarize`, `extract` and `vi
 
 
 **Value:** string
+
+
+#### SchemaSelectorConfig {#promptqlconfigv2-schemaselectorconfig}
+
+Configuration for schema selection in PromptQL
+
+
+**One of the following values:**
+
+| Value | Description |
+|-----|-----|
+| [SchemaSelector](#promptqlconfigv2-schemaselector) | LLM-based schema selector configuration |
+| [FixedSchema](#promptqlconfigv2-fixedschema) | Fixed schema selector configuration |
+| [AllSchema](#promptqlconfigv2-allschema) | All schema selector configuration (includes all available schemas) |
+
+
+
+#### AllSchema {#promptqlconfigv2-allschema}
+
+All schema selector configuration (includes all available schemas)
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `all` | true |  |
+
+
+
+#### FixedSchema {#promptqlconfigv2-fixedschema}
+
+Fixed schema selector configuration
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `fixed` | true |  |
+| `tables` | [[FixedSchemaTable](#promptqlconfigv2-fixedschematable)] | true | List of tables to include with their specific columns |
+
+
+
+#### FixedSchemaTable {#promptqlconfigv2-fixedschematable}
+
+Configuration for a fixed schema table with specific columns
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `schemaName` | string | true | The name of the schema |
+| `tableName` | string | true | The name of the table |
+| `columns` | [string] | true | List of column names to include. If empty, all columns are included. |
+
+
+
+#### SchemaSelector {#promptqlconfigv2-schemaselector}
+
+LLM-based schema selector configuration
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `llm_selector` | true |  |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | LLM configuration to use for schema selection |
+| `maxItems` | integer / null | false | Maximum number of items to select |
+| `instructions` | string / null | false | Custom instructions for the LLM selector |
+| `alwaysInclude` | [SchemaSelection](#promptqlconfigv2-schemaselection) / null | false | Schema items to always include in the selection |
+
+
+
+#### SchemaSelection {#promptqlconfigv2-schemaselection}
+
+Schema selection configuration specifying tables and functions to include
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `tables` | [undefined](#promptqlconfigv2-undefined) | false | Schemas in the database. The key is the schema name. Values are lists of table names in the schema. |
+| `functions` | [string] | false | Functions in the database. Values are the function names. |
+
+
+
+#### undefined {#promptqlconfigv2-undefined}
+
+Schemas in the database. The key is the schema name. Values are lists of table names in the schema.
+
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `<customKey>` | [string] | false |  |
+
 
 
 #### LlmConfig {#promptqlconfigv2-llmconfig}
