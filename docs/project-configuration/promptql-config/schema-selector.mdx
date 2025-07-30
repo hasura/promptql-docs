@@ -1,7 +1,9 @@
 ---
 sidebar_position: 3
 sidebar_label: Schema Selector
-description: Learn how to configure schema selection to optimize PromptQL performance and control which DDN metadata is available to the LLM.
+description:
+  Learn how to configure schema selection to optimize PromptQL performance and control which DDN metadata is available
+  to the LLM.
 keywords:
   - hasura
   - hasura ddn
@@ -17,7 +19,9 @@ toc_max_heading_level: 4
 
 ## Overview
 
-The Schema Selector controls which DDN metadata (models, columns, and commands) are available to PromptQL. For large schemas, this optimizes performance, reduces costs, and improves accuracy by limiting the schema context sent to the LLM.
+The Schema Selector controls which DDN metadata (models, columns, and commands) are available to PromptQL. For large
+schemas, this optimizes performance, reduces costs, and improves accuracy by limiting the schema context sent to the
+LLM.
 
 PromptQL provides three schema selection strategies:
 
@@ -32,7 +36,8 @@ schemaSelector:
   type: all
 ```
 
-For complete configuration details, see [AllSchema reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-allschema).
+For complete configuration details, see
+[AllSchema reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-allschema).
 
 ### Fixed Schema
 
@@ -42,24 +47,26 @@ Explicitly specify which models and columns to include.
 schemaSelector:
   type: fixed
   tables:
-    - schemaName: app  # Subgraph name
-      tableName: users  # Model name
+    - schemaName: app # Subgraph name
+      tableName: users # Model name
       columns: [id, name, email, created_at]
     - schemaName: app
       tableName: orders
       columns: [id, user_id, total, status, created_at]
-    - schemaName: analytics  # Different subgraph
+    - schemaName: analytics # Different subgraph
       tableName: user_metrics
       columns: [] # Empty array includes all columns
 ```
 
 **Note:** `schemaName` refers to the subgraph name, `tableName` refers to the model name.
 
-For complete configuration details, see [FixedSchema reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-fixedschema).
+For complete configuration details, see
+[FixedSchema reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-fixedschema).
 
 ### LLM-Assisted Schema Selection
 
-Uses an LLM to intelligently select relevant schema elements for each user interaction. The selected schema is then provided to the PromptQL agent to fulfill the user's query.
+Uses an LLM to intelligently select relevant schema elements for each user interaction. The selected schema is then
+provided to the PromptQL agent to fulfill the user's query.
 
 ```yaml title="LLM-assisted schema selector configuration"
 schemaSelector:
@@ -73,18 +80,21 @@ schemaSelector:
   instructions: Focus on user-related models and analytics commands
   alwaysInclude:
     tables:
-      app: [users, accounts]  # Subgraph: [model names]
-    functions: [calculate_user_stats]  # Command names
+      app: [users, accounts] # Subgraph: [model names]
+    functions: [calculate_user_stats] # Command names
 ```
 
 **Configuration options:**
+
 - **`maxItems`**: Maximum number of models and commands to select (default: 25)
 - **`instructions`**: Custom guidance for the LLM selector
 - **`alwaysInclude`**: Schema elements to always include
 
-For complete configuration details, see [SchemaSelector reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-schemaselector).
+For complete configuration details, see
+[SchemaSelector reference](/reference/metadata-reference/promptql-config.mdx#promptqlconfigv2-schemaselector).
 
-This approach is ideal for large schemas where query patterns are unpredictable. It provides automatic optimization by dynamically selecting the most relevant schema elements for each user interaction.
+This approach is ideal for large schemas where query patterns are unpredictable. It provides automatic optimization by
+dynamically selecting the most relevant schema elements for each user interaction.
 
 :::info LLM Context Requirements
 
