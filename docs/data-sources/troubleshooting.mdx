@@ -146,6 +146,13 @@ ddn model remove <table>
 ddn supergraph build <local|create>
 ```
 
+:::tip Optimize performance with Schema Selector
+
+For large schemas, consider using PromptQL's [Schema Selector](/project-configuration/promptql-config/schema-selector.mdx) feature to control which DDN metadata is available to the LLM.
+This can significantly improve performance of the PromptQL agent and reduce costs by limiting the schema context sent to the LLM.
+
+:::
+
 :::info I need all of my tables
 
 If all tracked tables are needed, and you're running into build issues, [raise a ticket](/help/index.mdx).
