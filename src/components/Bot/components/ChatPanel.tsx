@@ -8,7 +8,7 @@ interface ChatPanelProps {
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
-  const { theme, brandColor, position, startNewConversation, isLoading } = useChatWidget();
+  const { theme, brandColor, position, startNewConversation, isLoading, isConnected } = useChatWidget();
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   // Handle window resize
@@ -169,7 +169,19 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
       <div style={panelStyle} data-chat-widget>
         {/* Header */}
         <div style={headerStyle}>
-          <h3 style={titleStyle}>DocsBot</h3>
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            <h3 style={titleStyle}>DocsBot</h3>
+            <div
+              style={{
+                width: "8px",
+                height: "8px",
+                borderRadius: "50%",
+                backgroundColor: isConnected ? "#22c55e" : "#ef4444",
+                transition: "background-color 0.3s ease",
+              }}
+              title={isConnected ? "Connected" : "Disconnected"}
+            />
+          </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button
               onClick={startNewConversation}

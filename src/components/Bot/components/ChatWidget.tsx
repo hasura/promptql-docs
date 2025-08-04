@@ -99,7 +99,7 @@ export const ChatWidget: React.FC<ChatWidgetProps> = (props) => {
           ) : (
             <ChatBubble
               onClick={() => setIsExpanded(true)}
-              hasUnread={false} // Will be connected to context
+              hasUnread={false}
             />
           )}
         </>,

@@ -14,6 +14,10 @@ export interface Message {
   content: string;
   timestamp: Date;
   streaming: boolean;
+  status?: "sending" | "retrying" | "streaming" | "completed" | "failed" | "cancelled";
+  retryAttempt?: number;
+  canRetry?: boolean;
+  originalContent?: string;
   chunks?: {
     plan?: string;
     code?: string;
