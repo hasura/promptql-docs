@@ -41,15 +41,17 @@ export const InputField: React.FC = () => {
       e.preventDefault();
       handleSubmit();
     }
+    // Allow Shift+Enter for new lines - this already works!
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
 
-    // Auto-resize textarea
+    // Auto-resize textarea with better multi-line support
     const textarea = e.target;
     textarea.style.height = "auto";
-    textarea.style.height = Math.min(textarea.scrollHeight, 120) + "px";
+    // Increase max height for large pastes
+    textarea.style.height = Math.min(textarea.scrollHeight, 200) + "px";
   };
 
   const containerStyle: React.CSSProperties = {
@@ -61,7 +63,7 @@ export const InputField: React.FC = () => {
   const textareaStyle: React.CSSProperties = {
     flex: 1,
     minHeight: "40px",
-    maxHeight: "120px",
+    maxHeight: "200px", // Increased for multi-line content
     padding: "10px 12px",
     border: theme === "dark" ? "1px solid #333" : "1px solid #e1e5e9",
     borderRadius: "20px",
@@ -74,6 +76,7 @@ export const InputField: React.FC = () => {
     fontFamily: "inherit",
     scrollbarWidth: "none", // Firefox
     msOverflowStyle: "none", // IE/Edge
+    whiteSpace: "pre-wrap", // Ensure line breaks are preserved
   };
 
   const buttonStyle: React.CSSProperties = {
@@ -141,7 +144,18 @@ export const InputField: React.FC = () => {
           marginTop: "8px",
           lineHeight: "1.3",
         }}>
-        DocsBot can make mistakes. Always verify important information by consulting the docs directly.
+        <a 
+          href="https://github.com/hasura/pql-docs-bot" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          style={{ 
+            color: theme === "dark" ? "#4a9eff" : "#007acc",
+            textDecoration: "none"
+          }}
+        >
+          DocsBot
+        </a>{" "} can make mistakes. Always verify important information by consulting the docs
+        directly.
       </div>
     </div>
   );

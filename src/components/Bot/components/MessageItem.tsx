@@ -50,7 +50,14 @@ export const MessageItem: React.FC<MessageItemProps> = ({ message }) => {
     <div style={messageStyle}>
       <div style={bubbleStyle}>
         {isUser ? (
-          message.content
+          <pre style={{ 
+            margin: 0, 
+            fontFamily: 'inherit', 
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word'
+          }}>
+            {message.content}
+          </pre>
         ) : (
           <MarkdownRenderer content={message.content} />
         )}

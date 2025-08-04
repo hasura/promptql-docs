@@ -161,7 +161,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
   useEffect(() => {
     checkConnection(); // Initial check
     
-    healthCheckIntervalRef.current = setInterval(checkConnection, 30000); // Every 30 seconds
+    healthCheckIntervalRef.current = setInterval(checkConnection, 5000);
     
     return () => {
       if (healthCheckIntervalRef.current) {
