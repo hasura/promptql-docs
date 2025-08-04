@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { MarkdownRenderer } from './MarkdownRenderer';
 import { useChatWidget } from '../context/ChatWidgetContext';
 import type { Message } from '../types';
@@ -8,7 +8,29 @@ interface StreamingMessageProps {
 }
 
 export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) => {
-  const { theme } = useChatWidget();
+  const { theme, brandColor } = useChatWidget();
+  const [lastUpdate, setLastUpdate] = useState(Date.now());
+  const [showThinking, setShowThinking] = useState(false);
+
+  // Track when content updates
+  useEffect(() => {
+    setLastUpdate(Date.now());
+  }, [message.content, message.chunks?.message]);
+
+  // Show thinking indicator if no updates for 2 seconds
+  useEffect(() => {
+    
+    const timer = setTimeout(() => {
+      if (message.streaming) {
+        setShowThinking(true);
+      }
+    }, 2000);
+
+    return () => {
+      clearTimeout(timer);
+      setShowThinking(false);
+    };
+  }, [lastUpdate, message.streaming]);
 
   const messageStyle: React.CSSProperties = {
     display: 'flex',
@@ -27,6 +49,13 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
     fontSize: '14px',
     lineHeight: '1.4',
     position: 'relative',
+    boxShadow: showThinking && message.streaming 
+      ? `0 0 20px ${brandColor || '#007acc'}40` 
+      : 'none',
+    animation: showThinking && message.streaming 
+      ? 'thinkingPulse 2s infinite ease-in-out' 
+      : 'none',
+    transition: 'box-shadow 0.3s ease',
   };
 
   const typingIndicatorStyle: React.CSSProperties = {
@@ -45,15 +74,30 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
     animation: 'typing 1.4s infinite ease-in-out',
   };
 
-  // Show current content or typing indicator
+  const thinkingTextStyle: React.CSSProperties = {
+    fontSize: '12px',
+    color: theme === 'dark' ? '#888' : '#666',
+    marginTop: '4px',
+    marginLeft: '16px',
+    fontStyle: 'italic',
+    opacity: 0.8,
+  };
+
   const hasContent = message.content || (message.chunks?.message);
   const displayContent = message.content || message.chunks?.message || '';
 
   return (
     <>
-      {/* CSS for typing animation */}
       <style>
         {`
+          @keyframes thinkingPulse {
+            0%, 100% { 
+              box-shadow: 0 0 10px ${brandColor || '#007acc'}20;
+            }
+            50% { 
+              box-shadow: 0 0 30px ${brandColor || '#007acc'}60;
+            }
+          }
           @keyframes typing {
             0%, 60%, 100% { transform: translateY(0); }
             30% { transform: translateY(-10px); }
@@ -61,6 +105,10 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
           .typing-dot-1 { animation-delay: 0s; }
           .typing-dot-2 { animation-delay: 0.2s; }
           .typing-dot-3 { animation-delay: 0.4s; }
+          @keyframes thinkingDots {
+            0%, 60%, 100% { opacity: 0.3; }
+            30% { opacity: 1; }
+          }
         `}
       </style>
 
@@ -77,6 +125,20 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
             </div>
           )}
         </div>
+        {hasContent && message.streaming && (
+          <div style={{
+            ...thinkingTextStyle,
+            opacity: showThinking ? 0.8 : 0,
+            transition: 'opacity 0.3s ease'
+          }}>
+            🧠 DocsBot is thinking
+            <span style={{ display: 'inline-block' }}>
+              <span style={{ animation: 'thinkingDots 1.5s infinite' }}>.</span>
+              <span style={{ animation: 'thinkingDots 1.5s infinite 0.5s' }}>.</span>
+              <span style={{ animation: 'thinkingDots 1.5s infinite 1s' }}>.</span>
+            </span>
+          </div>
+        )}
       </div>
     </>
   );
