@@ -90,6 +90,69 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
   const abortControllersRef = useRef<Map<string, AbortController>>(new Map());
   const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Add polling mechanism for incomplete messages
+  const pollForCompletion = useCallback(async (messageId: string) => {
+    const maxPolls = 10;
+    let polls = 0;
+    
+    while (polls < maxPolls) {
+      try {
+        const response = await fetch(`${config.apiEndpoint}/chat/conversations/${conversationId}/messages/${messageId}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+        
+        if (response.ok) {
+          const messageData = await response.json();
+          if (messageData.status === 'completed') {
+            setMessages(prev => prev.map(msg => 
+              msg.id === messageId 
+                ? { ...msg, content: messageData.content, status: 'completed', streaming: false }
+                : msg
+            ));
+            return;
+          }
+        }
+      } catch (error) {
+        console.warn("Polling failed:", error);
+      }
+      
+      polls++;
+      await sleep(3000); // Poll every 3 seconds
+    }
+  }, [config.apiEndpoint, conversationId]);
+
+  // Add recovery mechanism for background-processed requests
+  const checkForBackgroundCompletion = useCallback(async (messageId: string) => {
+    try {
+      const response = await fetch(`${config.apiEndpoint}/chat/conversations/${conversationId}/messages/${messageId}/status`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.status === 'completed' && data.content) {
+          setMessages(prev => prev.map(msg => 
+            msg.id === messageId 
+              ? { 
+                  ...msg, 
+                  content: data.content, 
+                  status: 'completed', 
+                  streaming: false,
+                  chunks: data.chunks || {}
+                }
+              : msg
+          ));
+          return true;
+        }
+      }
+    } catch (error) {
+      console.warn("Background completion check failed:", error);
+    }
+    return false;
+  }, [config.apiEndpoint, conversationId]);
+
   // Initialize conversation ID and load messages on mount
   useEffect(() => {
     const initializeConversation = () => {
@@ -129,7 +192,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
       const response = await fetch(`${config.apiEndpoint}/health`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
-        signal: AbortSignal.timeout(5000), // 5 second timeout for health checks
+        signal: AbortSignal.timeout(5000),
       });
       
       const wasConnected = isConnected;
@@ -138,13 +201,24 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
       setIsConnected(nowConnected);
       setConnectionStatus(nowConnected ? "connected" : "disconnected");
       
-      // If we just reconnected, process queued messages
-      if (!wasConnected && nowConnected && queuedMessages.length > 0) {
-        const messagesToProcess = [...queuedMessages];
-        setQueuedMessages([]);
+      // Check for incomplete streaming messages on reconnect
+      if (!wasConnected && nowConnected) {
+        const incompleteMessages = messages.filter(msg => 
+          msg.streaming || msg.status === 'sending' || msg.status === 'retrying'
+        );
         
-        for (const message of messagesToProcess) {
-          await sendMessage(message);
+        for (const msg of incompleteMessages) {
+          pollForCompletion(msg.id);
+        }
+        
+        // Process queued messages
+        if (queuedMessages.length > 0) {
+          const messagesToProcess = [...queuedMessages];
+          setQueuedMessages([]);
+          
+          for (const message of messagesToProcess) {
+            await sendMessage(message);
+          }
         }
       }
       
@@ -155,7 +229,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
       setConnectionStatus("disconnected");
       return false;
     }
-  }, [config.apiEndpoint, isConnected, queuedMessages]);
+  }, [config.apiEndpoint, isConnected, queuedMessages, messages, pollForCompletion]);
 
   // Start periodic health checks
   useEffect(() => {
@@ -172,29 +246,17 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
 
   const sendMessageWithRetry = useCallback(
     async (content: string, messageId: string, maxRetries = 3): Promise<void> => {
-      let lastError: any;
-      
-      for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          // Update message status
-          if (attempt > 0) {
-            setMessages((prev) =>
-              prev.map((msg) =>
-                msg.id === messageId
-                  ? { ...msg, retryAttempt: attempt, status: "retrying" }
-                  : msg
-              )
-            );
-            
-            const delay = getRetryDelay(attempt - 1);
-            await sleep(delay);
-          }
-
           // Create abort controller for this attempt
           const abortController = new AbortController();
           abortControllersRef.current.set(messageId, abortController);
           
-          const timeoutId = setTimeout(() => abortController.abort(), 120000);
+          // Extended timeout for PromptQL processing
+          const timeoutId = setTimeout(() => {
+            console.warn(`Request timeout after 5 minutes for message ${messageId}`);
+            abortController.abort();
+          }, 300000);
 
           const history = messages
             .filter((msg) => !msg.streaming && msg.status !== "failed")
@@ -204,10 +266,10 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: content, history }),
-            signal: abortController.signal,
+            signal: abortController.signal, // Only for user cancellation
           });
 
-          clearTimeout(timeoutId);
+          clearTimeout(timeoutId); // Remove this line too
           abortControllersRef.current.delete(messageId);
 
           if (!response.ok) {
@@ -266,43 +328,32 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
           } catch (streamError) {
             console.warn("Stream interrupted:", streamError);
             
-            // If we got some content but stream was interrupted, try to get final response
-            if (hasReceivedContent && attempt < maxRetries) {
-              console.log("Attempting to recover final response...");
-              await sleep(2000); // Wait a bit for server to finish processing
-              
-              try {
-                // Try to get the conversation state to find the latest message
-                const stateResponse = await fetch(`${config.apiEndpoint}/chat/conversations/${conversationId}/state`, {
-                  method: "GET",
-                  headers: { "Content-Type": "application/json" },
-                });
-                
-                if (stateResponse.ok) {
-                  const stateData = await stateResponse.json();
-                  // Assuming the state returns messages array, get the last assistant message
-                  const lastAssistantMessage = stateData.messages?.findLast((msg: any) => msg.role === 'assistant');
-                  
-                  if (lastAssistantMessage && lastAssistantMessage.content) {
-                    setMessages((prev) =>
-                      prev.map((msg) =>
-                        msg.id === messageId
-                          ? { ...msg, content: lastAssistantMessage.content, streaming: false, status: "completed" }
-                          : msg
-                      )
-                    );
-                    return; // Success!
-                  }
-                }
-              } catch (recoveryError) {
-                console.warn("Failed to recover final response:", recoveryError);
-              }
-            }
+            // Mark as processing in background
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === messageId
+                  ? { 
+                      ...msg, 
+                      content: "Processing your request in the background...", 
+                      status: "streaming",
+                      streaming: true 
+                    }
+                  : msg
+              )
+            );
             
-            // If no content received or recovery failed, treat as error for retry
-            if (!hasReceivedContent) {
-              throw streamError;
-            }
+            // Start polling for background completion
+            const pollInterval = setInterval(async () => {
+              const completed = await checkForBackgroundCompletion(messageId);
+              if (completed) {
+                clearInterval(pollInterval);
+              }
+            }, 5000);
+            
+            // Stop polling after 10 minutes
+            setTimeout(() => clearInterval(pollInterval), 600000);
+            
+            return; // Don't throw error
           }
 
           // Mark as complete
@@ -314,15 +365,20 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
             )
           );
           
-          return; // Success!
+          return; // Success, exit retry loop
           
         } catch (error) {
-          lastError = error;
           abortControllersRef.current.delete(messageId);
+          
+          // Only retry on network errors, not user cancellations
+          if (error.name === 'AbortError') {
+            console.log(`Request aborted for message ${messageId}`);
+            return; // Don't retry aborted requests
+          }
           
           const errorInfo = isRetryableError(error);
           
-          if (attempt === maxRetries || !errorInfo.shouldRetry) {
+          if (attempt === maxRetries - 1 || !errorInfo.shouldRetry) {
             // Final failure
             setMessages((prev) =>
               prev.map((msg) =>
@@ -348,7 +404,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
         }
       }
     },
-    [config.apiEndpoint, conversationId, messages]
+    [config.apiEndpoint, conversationId, messages, checkConnection, pollForCompletion]
   );
 
   const getErrorMessage = (error: any, errorInfo: RetryableError): string => {
