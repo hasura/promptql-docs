@@ -32,16 +32,16 @@ export const useMessaging = (
         const data = await response.json();
         console.log(`📋 Poll response data:`, data);
         
-        const targetMessage = data.messages?.find((msg: any) => msg.id === messageId);
-        if (targetMessage && targetMessage.status === 'completed' && targetMessage.content) {
+        // Check if the response indicates completion
+        if (data.isComplete && data.messageContent) {
           setMessages(prev => prev.map(msg => 
             msg.id === messageId 
               ? { 
                   ...msg, 
-                  content: targetMessage.content, 
+                  content: data.messageContent, 
                   status: 'completed', 
                   streaming: false,
-                  chunks: targetMessage.chunks || {}
+                  chunks: data.chunks || {}
                 }
               : msg
           ));
@@ -109,7 +109,10 @@ export const useMessaging = (
 
           const response = await fetch(`${config.apiEndpoint}/chat/conversations/${conversationId}/messages`, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { 
+              "Content-Type": "application/json",
+              "Connection": "keep-alive"
+            },
             body: JSON.stringify({ message: content, history }),
             signal: abortController.signal,
           });
@@ -181,10 +184,19 @@ export const useMessaging = (
             }
           } catch (streamError) {
             console.error(`❌ Stream error for messageId: ${messageId}:`, streamError);
+            console.error(`❌ Stream error details:`, {
+              name: streamError.name,
+              message: streamError.message,
+              stack: streamError.stack,
+              aborted: abortController.signal.aborted
+            });
             
             if (abortController.signal.aborted) {
+              console.log(`🔄 Stream aborted for messageId: ${messageId}`);
               return;
             }
+            
+            console.warn(`🔄 Falling back to background polling for messageId: ${messageId}`);
             
             setMessages((prev) =>
               prev.map((msg) =>

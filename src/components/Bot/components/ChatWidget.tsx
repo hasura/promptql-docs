@@ -6,7 +6,7 @@ import { ChatWidgetProvider } from "../context/ChatWidgetContext";
 import { useDocusaurusTheme } from "../hooks/useDocusaurusTheme";
 import type { ChatWidgetConfig } from "../types";
 
-export interface ChatWidgetProps extends ChatWidgetConfig {
+export interface ChatWidgetProps extends Omit<ChatWidgetConfig, 'theme'> {
   theme?: "light" | "dark" | "auto";
 }
 
@@ -94,13 +94,18 @@ export const ChatWidget: React.FC<ChatWidgetProps> = (props) => {
             />
           )}
 
-          {isExpanded ? (
+          <ChatBubble
+            onClick={() => setIsExpanded(true)}
+            hasUnread={false}
+            style={{
+              opacity: isExpanded ? 0 : 1,
+              pointerEvents: isExpanded ? "none" : "auto",
+              transition: "opacity 0.3s ease",
+            }}
+          />
+
+          {isExpanded && (
             <ChatPanel onClose={() => setIsExpanded(false)} />
-          ) : (
-            <ChatBubble
-              onClick={() => setIsExpanded(true)}
-              hasUnread={false}
-            />
           )}
         </>,
         portalContainer

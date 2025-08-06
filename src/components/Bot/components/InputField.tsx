@@ -2,7 +2,7 @@ import React, { useState, useRef, KeyboardEvent, useEffect } from "react";
 import { useChatWidget } from "../context/ChatWidgetContext";
 
 export const InputField: React.FC = () => {
-  const { theme, placeholder, sendMessage, isConnected } = useChatWidget();
+  const { theme, placeholder, sendMessage, isConnected, brandColor } = useChatWidget();
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -84,7 +84,7 @@ export const InputField: React.FC = () => {
     height: "40px",
     borderRadius: "50%",
     border: "none",
-    backgroundColor: !input.trim() || isLoading || !isConnected ? (theme === "dark" ? "#333" : "#e1e5e9") : "#007acc",
+    backgroundColor: !input.trim() || isLoading || !isConnected ? (theme === "dark" ? "#333" : "#e1e5e9") : (brandColor || "#007acc"),
     color: !input.trim() || isLoading || !isConnected ? (theme === "dark" ? "#666" : "#999") : "#ffffff",
     cursor: !input.trim() || isLoading || !isConnected ? "not-allowed" : "pointer",
     display: "flex",

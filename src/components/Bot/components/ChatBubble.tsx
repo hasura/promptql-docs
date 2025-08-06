@@ -3,10 +3,11 @@ import { useChatWidget } from "../context/ChatWidgetContext";
 
 interface ChatBubbleProps {
   onClick: () => void;
-  hasUnread?: boolean; // Optional override
+  hasUnread?: boolean;
+  style?: React.CSSProperties;
 }
 
-export const ChatBubble: React.FC<ChatBubbleProps> = ({ onClick, hasUnread: hasUnreadOverride }) => {
+export const ChatBubble: React.FC<ChatBubbleProps> = ({ onClick, hasUnread: hasUnreadOverride, style }) => {
   const { brandColor, position, theme, hasUnread: contextHasUnread, markAsRead } = useChatWidget();
 
   const hasUnread = hasUnreadOverride ?? contextHasUnread;
@@ -39,6 +40,7 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ onClick, hasUnread: hasU
     transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
     pointerEvents: "auto",
     zIndex: 1000,
+    ...style,
   };
 
   const iconStyle: React.CSSProperties = {
@@ -69,22 +71,22 @@ export const ChatBubble: React.FC<ChatBubbleProps> = ({ onClick, hasUnread: hasU
             50% { transform: scale(1.1); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
           }
+          
+          .chat-bubble {
+            transition: all 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+          }
+          
+          .chat-bubble:hover {
+            transform: scale(1.05);
+            box-shadow: ${theme === "dark" ? "0 6px 25px rgba(0, 0, 0, 0.5)" : "0 6px 25px rgba(0, 0, 0, 0.2)"};
+          }
         `}
       </style>
 
       <button
+        className="chat-bubble"
         style={bubbleStyle}
         onClick={handleClick}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = "scale(1.1)";
-          e.currentTarget.style.boxShadow =
-            theme === "dark" ? "0 6px 25px rgba(0, 0, 0, 0.5)" : "0 6px 25px rgba(0, 0, 0, 0.2)";
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = "scale(1)";
-          e.currentTarget.style.boxShadow =
-            theme === "dark" ? "0 4px 20px rgba(0, 0, 0, 0.4)" : "0 4px 20px rgba(0, 0, 0, 0.15)";
-        }}
         aria-label="Open chat">
         {/* Chat icon SVG */}
         <svg style={iconStyle} viewBox="0 0 24 24">
