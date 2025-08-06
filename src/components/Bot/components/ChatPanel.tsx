@@ -178,6 +178,9 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
                 borderRadius: "50%",
                 backgroundColor: isConnected ? "#22c55e" : "#ef4444",
                 transition: "background-color 0.3s ease",
+                flexShrink: 0,
+                minWidth: "8px",
+                minHeight: "8px",
               }}
               title={isConnected ? "Connected" : "Disconnected"}
             />

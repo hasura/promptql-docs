@@ -153,7 +153,7 @@ export const InputField: React.FC = () => {
             textDecoration: "none"
           }}
         >
-          DocsBot
+          DocsQL
         </a>{" "} can make mistakes. Always verify important information by consulting the docs
         directly.
       </div>

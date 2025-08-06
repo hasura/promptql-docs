@@ -233,31 +233,48 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
 
   // Start periodic health checks
   useEffect(() => {
+    console.log('🏥 Setting up health check interval');
+    
+    // Clear any existing interval first
+    if (healthCheckIntervalRef.current) {
+      console.log('🧹 Clearing existing health check interval');
+      clearInterval(healthCheckIntervalRef.current);
+    }
+    
     checkConnection(); // Initial check
     
-    healthCheckIntervalRef.current = setInterval(checkConnection, 5000);
+    healthCheckIntervalRef.current = setInterval(() => {
+      console.log('🏥 Running scheduled health check');
+      checkConnection();
+    }, 10000); // Increase to 10 seconds to reduce spam
     
     return () => {
+      console.log('🧹 Cleaning up health check interval');
       if (healthCheckIntervalRef.current) {
         clearInterval(healthCheckIntervalRef.current);
       }
     };
-  }, [checkConnection]);
+  }, []); // Remove checkConnection from dependencies to prevent recreation
 
   const sendMessageWithRetry = useCallback(
     async (content: string, messageId: string, maxRetries = 3): Promise<void> => {
+      console.log(`🚀 Starting request for messageId: ${messageId}`);
+      
       for (let attempt = 0; attempt < maxRetries; attempt++) {
         try {
-          // Create abort controller for this attempt
           const abortController = new AbortController();
           abortControllersRef.current.set(messageId, abortController);
           
-          // Extended timeout for PromptQL processing
-          const timeoutId = setTimeout(() => {
-            console.warn(`Request timeout after 5 minutes for message ${messageId}`);
-            abortController.abort();
-          }, 300000);
+          // Log when abort signal changes
+          abortController.signal.addEventListener('abort', () => {
+            console.log(`⚠️ AbortController aborted for messageId: ${messageId}`, {
+              reason: abortController.signal.reason,
+              stack: new Error().stack
+            });
+          });
 
+          console.log(`📡 Making fetch request for messageId: ${messageId}, attempt: ${attempt + 1}`);
+          
           const history = messages
             .filter((msg) => !msg.streaming && msg.status !== "failed")
             .map((msg) => ({ role: msg.role, content: msg.content }));
@@ -269,13 +286,8 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
             signal: abortController.signal, // Only for user cancellation
           });
 
-          clearTimeout(timeoutId); // Remove this line too
-          abortControllersRef.current.delete(messageId);
-
-          if (!response.ok) {
-            throw response;
-          }
-
+          console.log(`✅ Fetch successful for messageId: ${messageId}`);
+          
           // Success - handle streaming response
           const reader = response.body?.getReader();
           if (!reader) {
@@ -368,6 +380,13 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
           return; // Success, exit retry loop
           
         } catch (error) {
+          console.log(`❌ Request failed for messageId: ${messageId}:`, {
+            errorName: error.name,
+            errorMessage: error.message,
+            isAbortError: error.name === 'AbortError',
+            signalAborted: abortController?.signal.aborted
+          });
+          
           abortControllersRef.current.delete(messageId);
           
           // Only retry on network errors, not user cancellations
@@ -520,11 +539,31 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
   );
 
   const cancelMessage = useCallback((messageId: string) => {
+    console.group(`🚫 cancelMessage called for messageId: ${messageId}`);
+    console.log('Stack trace:', new Error().stack);
+    console.log('Current time:', new Date().toISOString());
+    
     const abortController = abortControllersRef.current.get(messageId);
+    console.log('AbortController found:', !!abortController);
+    console.log('AbortController already aborted:', abortController?.signal.aborted);
+    
     if (abortController) {
+      console.log('Aborting controller...');
       abortController.abort();
       abortControllersRef.current.delete(messageId);
+      console.log('Controller deleted from map');
+    } else {
+      console.warn('No AbortController found for messageId:', messageId);
     }
+
+    // Log current message state before update
+    const currentMessage = messages.find(m => m.id === messageId);
+    console.log('Current message state:', {
+      id: currentMessage?.id,
+      status: currentMessage?.status,
+      streaming: currentMessage?.streaming,
+      content: currentMessage?.content?.substring(0, 50) + '...'
+    });
 
     setMessages((prev) =>
       prev.map((msg) =>
@@ -538,7 +577,10 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
           : msg
       )
     );
-  }, []);
+    
+    console.log('Message state updated to cancelled');
+    console.groupEnd();
+  }, [messages]);
 
   const markAsRead = useCallback(() => {
     setHasUnread(false);
