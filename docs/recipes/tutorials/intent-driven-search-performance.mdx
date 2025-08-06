@@ -1,0 +1,181 @@
+---
+sidebar_position: 12
+sidebar_label: Intent-Driven Search Performance
+description: "Learn how to optimize search performance using intent-driven architecture patterns with PromptQL"
+keywords:
+  - promptql
+  - search performance
+  - intent-driven architecture
+  - query optimization
+  - semantic search
+---
+
+# Intent-Driven Search Performance Optimization
+
+This guide demonstrates how to implement intent-driven architecture patterns to dramatically improve search performance
+and accuracy in PromptQL applications through strategic system instructions configuration.
+
+We'll walk through the actual architecture used in PromptQL's DocsBot, which reduced response times by 3-5x while
+improving answer accuracy through targeted validation - all configured through system instructions in
+[`promptql-config.hml`](/project-configuration/promptql-config/index.mdx).
+
+:::tip This guide builds on the
+
+[Add Vector Search to PostgreSQL](/recipes/tutorials/add-vector-search-to-postgresql) tutorial. If you haven't set up
+vector search yet, complete that tutorial first to get the most out of these performance optimizations.
+
+:::
+
+## Architecture Overview
+
+### Intent Classification Through Instructions
+
+Instead of building custom classification logic, we teach PromptQL to recognize different query types through structured
+system instructions. The LLM automatically classifies and routes queries based on these instructions.
+
+### Query Routing Strategy
+
+Based on the system instructions, PromptQL automatically routes queries through different processing pathways:
+
+- **Direct response**: Simple conceptual questions answered from model knowledge
+- **Validated retrieval**: Technical queries that require checking authoritative sources
+- **Complex analysis**: Multi-step queries needing data retrieval and processing
+
+### Performance Optimization Patterns
+
+The key insight is teaching PromptQL when to use expensive operations versus when to respond directly, all through
+configuration rather than custom code.
+
+## Tutorial
+
+### Step 1. Analyze Your Query Patterns
+
+Before configuring intent-driven architecture, understand your users' query patterns by analyzing your existing traces:
+
+**Common query categories:**
+
+- "What is X?" - Conceptual questions
+- "How do I Y?" - Procedural guidance
+- "Show me an example of Z" - Example requests
+- "Why isn't X working?" - Troubleshooting
+
+**What this does:** Understanding your query distribution helps you optimize for the most common patterns. If 70% of
+your queries are simple conceptual questions, you want those to be lightning-fast. If users frequently ask for specific
+examples, you need robust validation for technical accuracy.
+
+**For your application:** Audit your user interactions over the past month. What are the top 10 question types? Which
+queries currently take the longest to answer? Which ones result in follow-up questions because the initial response
+wasn't helpful? Use this data to design your intent classification categories and response patterns.
+
+### Step 2. Configure Intent Classification
+
+Add intent classification instructions to your `promptql-config.hml`:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  systemInstructions: |
+    <query_classification>
+    Before responding, classify the question:
+    - General Information: Conceptual questions, "what is", "how does", "why" - Answer directly, offer follow-up
+    - Guide Request: "how do I", "show me how", "walk me through" - Requires CLI validation
+    - Example Request: "show me an example", "what does X look like" - Requires metadata validation
+    - Troubleshooting: Error messages, "not working" - May require validation depending on solution
+    </query_classification>
+```
+
+**What this does**: This classification system teaches PromptQL to recognize different types of user intent before
+deciding how to respond. Instead of treating every query the same way, it creates distinct pathways based on what the
+user actually needs.
+
+**For your application**: Map your users' common question patterns to processing requirements. What percentage of your
+queries are simple definitions versus complex technical requests? Create categories that reflect your actual usage
+patterns and the different levels of validation or processing each type requires.
+
+### Step 3. Add Validation Protocols
+
+Configure validation instructions for technical accuracy:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  systemInstructions: |
+    <cli_validation_process>
+     Before providing any CLI command information to users, validate the command exists:
+     1. Check command existence: Query app.pql_docs_doc_content for pages with URLs matching:
+       https://promptql.io/docs/reference/cli/commands/ddn_[command]_[subcommand]/
+       - Commands use underscores in URLs (e.g., ddn_connector_init)
+       - Commands use spaces in actual CLI usage (e.g., ddn connector init)
+       - ALWAYS include a trailing slash
+     2. Extract exact usage and flags from the documentation page
+     3. Include placeholders for required arguments: ddn connector init <my_connector> -i
+     4. Never invent CLI commands or flags
+     </cli_validation_process>
+     <metadata_validation_process>
+     Before discussing metadata objects, validate they exist and have examples:
+     1. Check object existence: Query app.pql_docs_doc_content for pages with URLs matching:
+       https://promptql.io/docs/reference/metadata-reference/[object-name]/
+       - Objects use hyphens in URLs (e.g., boolean-expressions, data-connector-links)
+       - ALWAYS include a trailing slash
+     2. Extract YAML/JSON examples and configuration options
+     3. Never generate configuration syntax from memory
+     </metadata_validation_process>
+```
+
+**What this does**: These validation protocols prevent hallucination by requiring PromptQL to check authoritative
+sources before providing technical details. When users ask for CLI commands or configuration examples, the system
+queries the _actual_ documentation rather than generating potentially incorrect information from the model's training
+data.
+
+**For your application**: Identify your "sources of truth" - whether that's API documentation, configuration schemas, or
+command references. Create validation protocols that query these authoritative sources directly. Consider what technical
+details users frequently ask about that must be 100% accurate, and build validation steps for those specific domains.
+
+### Step 4. Optimize Response Patterns
+
+Structure your instructions for better parsing and routing:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: hasura
+  systemInstructions: |
+    <response_patterns>
+    <general_information_pattern>
+    For conceptual questions about PromptQL:
+    1. Answer directly using natural language knowledge
+    2. Keep response concise (1-3 sentences + key points as bullets if needed)
+    3. ALWAYS end with: "Would you like me to show you how to set this up, or would you prefer to see a specific example?"
+    4. NO data queries unless user requests guide/example in follow-up
+    </general_information_pattern>
+    <guide_request_pattern>
+    When user requests "how to" or setup guide:
+    1. Query documentation using CLI validation protocols
+    2. Provide step-by-step commands with validation
+    3. Include relevant links
+    </guide_request_pattern>
+    <example_request_pattern>
+    When user requests examples or "what does X look like":
+    1. Query documentation using metadata validation protocols  
+    2. Provide validated YAML/JSON examples
+    3. Include relevant links
+    </example_request_pattern>
+    </response_patterns>
+```
+
+**What this does**: These response patterns create a performance optimization by matching response complexity to user
+needs. Simple conceptual questions get fast, direct answers without expensive operations, while technical requests
+trigger the appropriate validation workflows. The structured approach ensures consistent behavior across different query
+types.
+
+**For your application**: Design response patterns that reflect your performance priorities. What queries can be
+answered instantly from model knowledge? Which ones require database lookups or API calls? Create patterns that minimize
+expensive operations for common, simple queries while ensuring accuracy for complex technical requests.
