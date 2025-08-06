@@ -170,7 +170,7 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
         {/* Header */}
         <div style={headerStyle}>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <h3 style={titleStyle}>DocsBot</h3>
+            <h3 style={titleStyle}>DocsQL</h3>
             <div
               style={{
                 width: "8px",

@@ -131,7 +131,7 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
             opacity: showThinking ? 0.8 : 0,
             transition: 'opacity 0.3s ease'
           }}>
-            🧠 DocsBot is thinking
+            🧠 DocsQL is thinking
             <span style={{ display: 'inline-block' }}>
               <span style={{ animation: 'thinkingDots 1.5s infinite' }}>.</span>
               <span style={{ animation: 'thinkingDots 1.5s infinite 0.5s' }}>.</span>
