@@ -32,4 +32,5 @@ export interface ChatWidgetConfig {
   position?: "bottom-right" | "bottom-left";
   placeholder?: string;
   welcomeMessage?: string;
+  allowFullscreen?: boolean;
 }

@@ -8,7 +8,7 @@ interface ChatPanelProps {
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
-  const { theme, brandColor, position, startNewConversation, isLoading, isConnected } = useChatWidget();
+  const { theme, brandColor, position, startNewConversation, isLoading, isConnected, isFullscreen, toggleFullscreen } = useChatWidget();
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   // Handle window resize
@@ -25,6 +25,20 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
   const isTablet = windowSize.width > 768 && windowSize.width <= 1024;
 
   const getPositionStyles = () => {
+    if (isFullscreen) {
+      return {
+        position: "fixed" as const,
+        top: "0",
+        left: "0",
+        right: "0",
+        bottom: "0",
+        width: "100vw",
+        height: "100vh",
+        borderRadius: "0",
+        zIndex: 10000,
+      };
+    }
+
     if (isMobile) {
       return {
         bottom: "0",
@@ -123,6 +137,17 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
     paddingBottom: isMobile ? "calc(12px + env(safe-area-inset-bottom))" : "16px",
   };
 
+  const newChatButtonStyle: React.CSSProperties = {
+    background: "none",
+    border: theme === "dark" ? "1px solid #333" : "1px solid #e1e5e9",
+    color: theme === "dark" ? "#ffffff" : "#666666",
+    cursor: isLoading ? "not-allowed" : "pointer",
+    padding: "6px 12px",
+    borderRadius: "6px",
+    fontSize: "12px",
+    opacity: isLoading ? 0.5 : 1,
+    transition: "all 0.2s ease",
+  };
 
   const chatWidgetStyles = `
     [data-chat-widget] a {
@@ -182,44 +207,24 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
                 minWidth: "8px",
                 minHeight: "8px",
               }}
-              title={isConnected ? "Connected" : "Disconnected"}
             />
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
             <button
+              style={newChatButtonStyle}
               onClick={startNewConversation}
-              disabled={isLoading}
-              style={{
-                background: "none",
-                border: theme === "dark" ? "1px solid #333" : "1px solid #e1e5e9",
-                color: theme === "dark" ? "#ffffff" : "#666666",
-                cursor: isLoading ? "not-allowed" : "pointer",
-                padding: "6px 12px",
-                borderRadius: "6px",
-                fontSize: "12px",
-                opacity: isLoading ? 0.5 : 1,
-                transition: "all 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                if (!isLoading) {
-                  e.currentTarget.style.backgroundColor = theme === "dark" ? "#333" : "#f0f0f0";
-                }
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
               title="Start new conversation">
               New Chat
             </button>
             <button
+              style={newChatButtonStyle}
+              onClick={toggleFullscreen}
+              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
+              {isFullscreen ? '⤓' : '⤢'}
+            </button>
+            <button
               style={closeButtonStyle}
               onClick={onClose}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = theme === "dark" ? "#333" : "#f0f0f0";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = "transparent";
-              }}
               aria-label="Close chat">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />

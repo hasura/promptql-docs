@@ -9,6 +9,7 @@ interface ChatWidgetContextType {
   placeholder: string;
   welcomeMessage: string;
   apiEndpoint: string;
+  allowFullscreen: boolean;
 
   // State
   messages: Message[];
@@ -17,6 +18,7 @@ interface ChatWidgetContextType {
   isLoading: boolean;
   connectionStatus: "connected" | "disconnected" | "reconnecting";
   queuedMessages: string[];
+  isFullscreen: boolean;
 
   // Actions
   sendMessage: (content: string) => Promise<void>;
@@ -25,6 +27,7 @@ interface ChatWidgetContextType {
   markAsRead: () => void;
   clearMessages: () => void;
   startNewConversation: () => void;
+  toggleFullscreen: () => void;
 }
 
 interface RetryableError {
@@ -86,9 +89,14 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
   const [isLoading, setIsLoading] = useState(true);
   const [connectionStatus, setConnectionStatus] = useState<"connected" | "disconnected" | "reconnecting">("disconnected");
   const [queuedMessages, setQueuedMessages] = useState<string[]>([]);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   
   const abortControllersRef = useRef<Map<string, AbortController>>(new Map());
   const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  const toggleFullscreen = useCallback(() => {
+    setIsFullscreen(prev => !prev);
+  }, []);
 
   // Add polling mechanism for incomplete messages
   const pollForCompletion = useCallback(async (messageId: string) => {
@@ -384,7 +392,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
             errorName: error.name,
             errorMessage: error.message,
             isAbortError: error.name === 'AbortError',
-            signalAborted: abortController?.signal.aborted
+            signalAborted: abortControllersRef.current.get(messageId)?.signal.aborted
           });
           
           abortControllersRef.current.delete(messageId);
@@ -609,6 +617,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
     placeholder: config.placeholder || "Type your message...",
     welcomeMessage: config.welcomeMessage || "Hi! How can I help you today?",
     apiEndpoint: config.apiEndpoint,
+    allowFullscreen: config.allowFullscreen || false,
 
     // State
     messages,
@@ -617,6 +626,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
     isLoading,
     connectionStatus,
     queuedMessages,
+    isFullscreen,
 
     // Actions
     sendMessage,
@@ -625,6 +635,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
     markAsRead,
     clearMessages,
     startNewConversation,
+    toggleFullscreen,
   };
 
   // Persist messages to localStorage
