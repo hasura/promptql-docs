@@ -43,7 +43,7 @@
   --sidebar-divider: var(--button-drop-shadow);
 
   /* Chat Widget Colors */
-  --chat-user-bg: var(--body-link-color);
+  --chat-user-bg: #1f5f3f;
   --chat-user-text: #ffffff;
   --chat-bot-bg: var(--sidebar-bg-color);
   --chat-bot-text: var(--body-text-color);
@@ -191,8 +191,8 @@ html[data-theme='dark'] {
   --next-prev-border-color: #1f2937;
 
   /* Chat Widget Colors - Dark Mode */
-  --chat-user-bg: var(--body-link-color);
-  --chat-user-text: #ffffff;
+  --chat-user-bg: #22c55e;
+  --chat-user-text: #000000;
   --chat-bot-bg: var(--sidebar-bg-color);
   --chat-bot-text: var(--body-text-color);
   --chat-container-bg: var(--main-bg-color);
