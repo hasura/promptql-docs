@@ -261,7 +261,7 @@ export const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) =
 
 // Copy button component for code blocks
 const CopyButton: React.FC<{ content: string }> = ({ content }) => {
-  const { colorMode } = useColorMode(); // Use Docusaurus theme instead of chat widget theme
+  const { colorMode } = useColorMode();
   const [copied, setCopied] = React.useState(false);
 
   const handleCopy = async () => {

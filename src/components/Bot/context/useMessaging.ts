@@ -26,19 +26,8 @@ export const useMessaging = (
         headers: { "Content-Type": "application/json" },
       });
       
-      console.log(`📊 Poll response status: ${response.status}`);
-      
       if (response.ok) {
         const data = await response.json();
-        console.log(`📋 Poll response data:`, data);
-        
-        // More detailed logging to debug the issue
-        console.log(`🔍 Checking completion conditions:`, {
-          isComplete: data.isComplete,
-          hasMessageContent: !!data.messageContent,
-          messageContentLength: data.messageContent?.length || 0,
-          messageContentPreview: data.messageContent?.substring(0, 50) || 'empty'
-        });
         
         // Check if the response indicates completion
         if (data.isComplete && data.messageContent) {
