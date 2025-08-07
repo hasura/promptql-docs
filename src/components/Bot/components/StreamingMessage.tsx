@@ -17,11 +17,20 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
     setLastUpdate(Date.now());
   }, [message.content, message.chunks?.message]);
 
+  // Log when streaming starts/ends
+  useEffect(() => {
+    if (message.streaming) {
+      console.log(`🚀 Message stream started for ID: ${message.id}`);
+    } else {
+      console.log(`✅ Message stream ended for ID: ${message.id}`);
+    }
+  }, [message.streaming, message.id]);
+
   // Show thinking indicator if no updates for 2 seconds
   useEffect(() => {
-    
     const timer = setTimeout(() => {
       if (message.streaming) {
+        console.log(`🧠 Thinking indicator shown for message ID: ${message.id}`);
         setShowThinking(true);
       }
     }, 2000);
@@ -30,7 +39,15 @@ export const StreamingMessage: React.FC<StreamingMessageProps> = ({ message }) =
       clearTimeout(timer);
       setShowThinking(false);
     };
-  }, [lastUpdate, message.streaming]);
+  }, [lastUpdate, message.streaming, message.id]);
+
+  useEffect(() => {
+    console.log(`📊 Message ${message.id} state:`, {
+      streaming: message.streaming,
+      status: message.status,
+      hasContent: !!(message.content || message.chunks?.message)
+    });
+  }, [message.streaming, message.status, message.content, message.chunks?.message, message.id]);
 
   const messageStyle: React.CSSProperties = {
     display: 'flex',

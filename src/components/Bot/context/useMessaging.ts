@@ -34,6 +34,7 @@ export const useMessaging = (
         
         // Check if the response indicates completion
         if (data.isComplete && data.messageContent) {
+          console.log(`✅ Background completion found for messageId: ${messageId}`);
           setMessages(prev => prev.map(msg => 
             msg.id === messageId 
               ? { 
@@ -131,7 +132,9 @@ export const useMessaging = (
           let hasReceivedContent = false;
 
           try {
-            while (true) {
+            let streamComplete = false;
+            
+            while (true && !streamComplete) {
               if (abortController.signal.aborted) {
                 reader.cancel();
                 return;
@@ -144,6 +147,12 @@ export const useMessaging = (
                 throw new Error("Connection dropped during streaming");
               }
               
+              if (done && !streamComplete) {
+                console.warn(`⚠️ Stream ended unexpectedly for messageId: ${messageId} - no completion signal received`);
+                // Stream ended without completion signal - likely disconnected
+                throw new Error("Stream disconnected without completion signal");
+              }
+              
               if (done) break;
 
               buffer += decoder.decode(value, { stream: true });
@@ -154,6 +163,15 @@ export const useMessaging = (
                 if (line.startsWith("data: ")) {
                   try {
                     const data = JSON.parse(line.slice(6));
+                    
+                    // Handle completion signal
+                    if (data.done) {
+                      console.log(`✅ Received completion signal for messageId: ${messageId}`);
+                      hasReceivedContent = true;
+                      streamComplete = true; // Flag to exit main loop cleanly
+                      break; // Exit the parsing loop
+                    }
+                    
                     if (data.success && data.message) {
                       hasReceivedContent = true;
                       setMessages((prev) =>
@@ -196,14 +214,14 @@ export const useMessaging = (
               return;
             }
             
-            console.warn(`🔄 Falling back to background polling for messageId: ${messageId}`);
+            console.warn(`🔄 Stream disconnected for messageId: ${messageId}, starting background polling immediately`);
             
             setMessages((prev) =>
               prev.map((msg) =>
                 msg.id === messageId
                   ? { 
                       ...msg, 
-                      content: "Processing your request in the background...", 
+                      content: hasReceivedContent ? msg.content : "Connection lost, checking for completion...", 
                       status: "streaming",
                       streaming: true 
                     }
@@ -211,14 +229,15 @@ export const useMessaging = (
               )
             );
             
+            // Start polling immediately and more frequently
             const pollInterval = setInterval(async () => {
               const completed = await checkForBackgroundCompletion(messageId);
               if (completed) {
                 clearInterval(pollInterval);
               }
-            }, 5000);
+            }, 2000); // Poll every 2 seconds instead of 5
             
-            setTimeout(() => clearInterval(pollInterval), 600000);
+            setTimeout(() => clearInterval(pollInterval), 120000); // 2 minutes max
             return;
           }
 

@@ -77,7 +77,8 @@ export default function DocRootLayout({ children }) {
         <DocRootLayoutMain hiddenSidebarContainer={hiddenSidebarContainer}>{children}</DocRootLayoutMain>
       </div>
       <ChatWidget
-        apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
+        // apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
+        apiEndpoint=" https://c31ce5e9e76b.ngrok.app"
         theme={colorMode}
         brandColor="var(--chat-bubble-brand)"
         placeholder="Ask me about PromptQL..."
