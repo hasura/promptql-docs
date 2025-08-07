@@ -111,7 +111,7 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
   useHealthCheck(stableRefs, setIsConnected, setConnectionStatus, setQueuedMessages);
 
   // Messaging hook
-  const { sendMessage, pollForCompletion, cancelMessage, retryMessage } = useMessaging(
+  const { sendMessage, pollForCompletion, cancelMessage, retryMessage, abortControllersRef, activeStreamingRequest } = useMessaging(
     config,
     conversationId,
     stableRefs,
@@ -159,6 +159,8 @@ export const ChatWidgetProvider: React.FC<ChatWidgetProviderProps> = ({ children
     clearMessages,
     startNewConversation,
     markAsRead,
+    abortControllersRef,
+    activeStreamingRequest,
   };
 
   return (

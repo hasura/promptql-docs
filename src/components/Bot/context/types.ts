@@ -51,6 +51,8 @@ export interface ChatWidgetContextType {
   clearMessages: () => void;
   startNewConversation: () => void;
   markAsRead: () => void;
+  abortControllersRef: React.MutableRefObject<Map<string, AbortController>>;
+  activeStreamingRequest: React.MutableRefObject<string | null>;
 }
 
 export interface RetryableError {

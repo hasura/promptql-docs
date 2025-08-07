@@ -2,13 +2,25 @@ import React, { useEffect, useState } from "react";
 import { MessageList } from "./MessageList";
 import { InputField } from "./InputField";
 import { useChatWidget } from "../context/ChatWidgetContext";
+import { TestControls } from "./TestControls";
 
 interface ChatPanelProps {
   onClose: () => void;
 }
 
 export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
-  const { theme, brandColor, position, startNewConversation, isLoading, isConnected, isFullscreen, toggleFullscreen } = useChatWidget();
+  const { 
+    theme, 
+    brandColor, 
+    position, 
+    startNewConversation, 
+    isLoading, 
+    isConnected, 
+    isFullscreen, 
+    toggleFullscreen,
+    abortControllersRef,
+    activeStreamingRequest
+  } = useChatWidget();
   const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
 
   // Handle window resize
@@ -242,6 +254,10 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
         <div style={inputAreaStyle}>
           <InputField />
         </div>
+        <TestControls 
+          activeStreamingRequest={activeStreamingRequest}
+          abortControllersRef={abortControllersRef}
+        />
       </div>
     </>
   );

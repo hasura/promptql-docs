@@ -32,6 +32,14 @@ export const useMessaging = (
         const data = await response.json();
         console.log(`📋 Poll response data:`, data);
         
+        // More detailed logging to debug the issue
+        console.log(`🔍 Checking completion conditions:`, {
+          isComplete: data.isComplete,
+          hasMessageContent: !!data.messageContent,
+          messageContentLength: data.messageContent?.length || 0,
+          messageContentPreview: data.messageContent?.substring(0, 50) || 'empty'
+        });
+        
         // Check if the response indicates completion
         if (data.isComplete && data.messageContent) {
           console.log(`✅ Background completion found for messageId: ${messageId}`);
@@ -47,6 +55,11 @@ export const useMessaging = (
               : msg
           ));
           return true;
+        }
+        
+        // If isComplete is true but no messageContent, there might be a server issue
+        if (data.isComplete && !data.messageContent) {
+          console.warn(`⚠️ Server says complete but no content for messageId: ${messageId}`);
         }
       }
     } catch (error) {
@@ -209,7 +222,12 @@ export const useMessaging = (
               aborted: abortController.signal.aborted
             });
             
-            if (abortController.signal.aborted) {
+            // For testing: treat manual aborts as network disconnects in development
+            const isTestingDisconnect = process.env.NODE_ENV === 'development' && 
+                                        streamError.name === 'AbortError' && 
+                                        streamError.message.includes('BodyStreamBuffer was aborted');
+            
+            if (abortController.signal.aborted && !isTestingDisconnect) {
               console.log(`🔄 Stream aborted for messageId: ${messageId}`);
               return;
             }
