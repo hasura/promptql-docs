@@ -42,6 +42,15 @@
   --body-list-item-color: var(--heading-color);
   --sidebar-divider: var(--button-drop-shadow);
 
+  /* Chat Widget Colors */
+  --chat-user-bg: #1f5f3f;
+  --chat-user-text: #ffffff;
+  --chat-bot-bg: var(--sidebar-bg-color);
+  --chat-bot-text: var(--body-text-color);
+  --chat-container-bg: var(--main-bg-color);
+  --chat-container-border: var(--inline-code-border);
+  --chat-bubble-brand: var(--body-link-color);
+
   /* Admonition Colors */
   --admonition-text-color: #4b5563;
 
@@ -180,6 +189,15 @@ html[data-theme='dark'] {
   --ifm-color-primary: #b6fc34;
   --docsearch-primary-color: #f1f5f9 !important;
   --next-prev-border-color: #1f2937;
+
+  /* Chat Widget Colors - Dark Mode */
+  --chat-user-bg: #22c55e;
+  --chat-user-text: #000000;
+  --chat-bot-bg: var(--sidebar-bg-color);
+  --chat-bot-text: var(--body-text-color);
+  --chat-container-bg: var(--main-bg-color);
+  --chat-container-border: var(--inline-code-border);
+  --chat-bubble-brand: var(--body-link-color);
 }
 
 .thumbnail-small {
@@ -376,6 +394,14 @@ pre code,
 p code {
   background-color: var(--codeblock-bg);
   border: 1px solid var(--codeblock-border);
+}
+
+div[style*="position: fixed"] pre,
+div[style*="position: fixed"] pre code,
+div[style*="border-radius: 12px"] pre,
+div[style*="border-radius: 12px"] pre code {
+  border: none !important;
+  background: transparent !important;
 }
 
 #hasura-promptql-docs-main-button {
@@ -1732,4 +1758,9 @@ pre[class*='language-'] code span.token {
 .sidebar-icon svg circle,
 .sidebar-icon svg rect {
   transition: stroke 0.2s;
+}
+
+/* Hide scrollbar on chat widget textarea */
+div[style*="position: fixed"] textarea::-webkit-scrollbar {
+  display: none;
 }
