@@ -228,12 +228,14 @@ export const ChatPanel: React.FC<ChatPanelProps> = ({ onClose }) => {
               title="Start new conversation">
               New Chat
             </button>
-            <button
-              style={newChatButtonStyle}
-              onClick={toggleFullscreen}
-              title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
-              {isFullscreen ? '⤓' : '⤢'}
-            </button>
+            {!isMobile && (
+              <button
+                style={newChatButtonStyle}
+                onClick={toggleFullscreen}
+                title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}>
+                {isFullscreen ? '⤓' : '⤢'}
+              </button>
+            )}
             <button
               style={closeButtonStyle}
               onClick={onClose}
