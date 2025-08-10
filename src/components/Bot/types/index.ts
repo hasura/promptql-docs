@@ -23,6 +23,7 @@ export interface Message {
     code?: string;
     message?: string;
   };
+  isPolling?: boolean;
 }
 
 export interface ChatWidgetConfig {

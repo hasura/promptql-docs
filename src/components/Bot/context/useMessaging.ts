@@ -39,7 +39,8 @@ export const useMessaging = (
                   content: data.messageContent, 
                   status: 'completed', 
                   streaming: false,
-                  chunks: data.chunks || {}
+                  chunks: data.chunks || {},
+                  isPolling: false
                 }
               : msg
           ));
@@ -230,7 +231,8 @@ export const useMessaging = (
                       ...msg, 
                       content: hasReceivedContent ? msg.content : "Connection lost, checking for completion...", 
                       status: "streaming",
-                      streaming: true 
+                      streaming: true,
+                      isPolling: true
                     }
                   : msg
               )
