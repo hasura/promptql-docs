@@ -28,6 +28,8 @@
     "@docusaurus/theme-mermaid": "^3.7.0",
     "@mdx-js/react": "^3.0.0",
     "@openreplay/tracker": "^15.0.3",
+    "@sentry/react": "^10.3.0",
+    "@sentry/tracing": "^7.120.4",
     "autoprefixer": "^10.4.16",
     "clsx": "^1.2.1",
     "dompurify": "^3.1.5",

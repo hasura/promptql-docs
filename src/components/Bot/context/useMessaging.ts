@@ -1,6 +1,8 @@
 import { useCallback, useRef } from 'react';
 import type { Message, ChatConfig, StableRefs } from './types';
 import { sleep, isRetryableError, getRetryDelay, getErrorMessage } from './utils';
+import * as Sentry from '@sentry/react';
+
 
 export const useMessaging = (
   config: ChatConfig,
@@ -54,6 +56,7 @@ export const useMessaging = (
       }
     } catch (error) {
       console.error("Background completion check failed:", error);
+      Sentry.captureException(error);
     }
     return false;
   }, [setMessages, stableRefs]);
@@ -84,6 +87,7 @@ export const useMessaging = (
         }
       } catch (error) {
         console.error("Polling failed:", error);
+        Sentry.captureException(error);
       }
       
       polls++;
@@ -211,6 +215,13 @@ export const useMessaging = (
               stack: streamError.stack,
               aborted: abortController.signal.aborted
             });
+            Sentry.captureException(streamError, {
+              tags: {
+                operation: 'stream_disconnect',
+                errorType: streamError.name,
+                hasReceivedContent: hasReceivedContent.toString()
+              }
+            });
             
             // For testing: treat manual aborts as network disconnects in development
             const isTestingDisconnect = process.env.NODE_ENV === 'development' && 
@@ -272,6 +283,10 @@ export const useMessaging = (
           const errorInfo = isRetryableError(error);
           
           if (attempt === maxRetries - 1 || !errorInfo.shouldRetry) {
+            Sentry.captureException(error, {
+              tags: { messageId, operation: 'send_message', finalAttempt: true },
+              extra: { attempt, maxRetries, errorInfo }
+            });
             abortControllersRef.current.delete(messageId);
             setMessages((prev) =>
               prev.map((msg) =>
@@ -312,7 +327,11 @@ export const useMessaging = (
       }
 
       if (!conversationId) {
-        throw new Error("No conversation ID available");
+        const error = new Error("No conversation ID available");
+        Sentry.captureException(error, {
+          tags: { operation: 'send_message_validation' }
+        });
+        throw error;
       }
 
       const userMessage: Message = {

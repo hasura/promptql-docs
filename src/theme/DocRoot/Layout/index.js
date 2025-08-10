@@ -10,6 +10,7 @@ import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
 import { ChatWidget } from '@site/src/components/Bot';
 import { useColorMode } from '@docusaurus/theme-common';
+import * as Sentry from '@sentry/react';
 
 export default function DocRootLayout({ children }) {
   const { colorMode } = useColorMode();
@@ -22,6 +23,14 @@ export default function DocRootLayout({ children }) {
 
   useEffect(() => {
     if (isBrowser && !hasInitialized) {
+      Sentry.init({
+        dsn: "https://5f0380cc3f997fa07e9b8bfd46ce87b7@o417608.ingest.us.sentry.io/4508382452318208",
+        environment: process.env.NODE_ENV,
+        tracesSampleRate: 0.1,
+        beforeSend(event) {
+          return event;
+        },
+      });
       (async () => {
         try {
           await initOpenReplay();
