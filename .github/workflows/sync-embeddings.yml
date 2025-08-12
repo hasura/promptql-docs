@@ -1,0 +1,188 @@
+name: Sync Documentation Embeddings
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  update-embeddings:
+    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    
+    env:
+      PROMPTQL_API_KEY: ${{ secrets.PROMPTQL_API_KEY }}
+      PQL_BOT_ADMIN_JWT: ${{ secrets.PQL_BOT_ADMIN_JWT }}
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "Event name: ${{ github.event_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          
+          # Debug what's in the current commit
+          echo "Files changed in current commit:"
+          git show --name-status HEAD
+          
+          echo "Files in docs directory:"
+          ls -la docs/ || echo "docs directory not found"
+          
+          echo "Looking for .md/.mdx files:"
+          find . -name "*.md" -o -name "*.mdx" | head -10
+          
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "Using push logic..."
+            # Try different approaches for force push
+            if git show --name-status HEAD | grep -E '^[AMD]\s+docs/.*\.(mdx?|md)$'; then
+              CHANGED_FILES=$(git show --name-status HEAD | grep -E '^[AMD]\s+docs/.*\.(mdx?|md)$')
+            else
+              # Fallback: check if HEAD~1 exists
+              if git rev-parse --verify HEAD~1 >/dev/null 2>&1; then
+                CHANGED_FILES=$(git diff --name-status HEAD~1 HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+              else
+                echo "No previous commit found, checking all docs files..."
+                CHANGED_FILES=$(find docs/ -name "*.md" -o -name "*.mdx" | sed 's/^/A\t/')
+              fi
+            fi
+          else
+            echo "Using PR logic..."
+            MERGE_BASE=$(git merge-base HEAD~1 HEAD)
+            CHANGED_FILES=$(git diff --name-status $MERGE_BASE HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+          fi
+          
+          echo "changed-files<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          
+          echo "Detected changed files:"
+          echo "$CHANGED_FILES"
+      
+      - name: Process changed documentation files
+        run: |
+          echo "${{ steps.changed-files.outputs.changed-files }}" | while IFS=$'\t' read -r status file; do
+            if [[ ! "$file" =~ ^docs/ ]]; then
+              continue
+            fi
+            
+            # Convert file path to URL path
+            url_path=$(echo "$file" | sed 's|^docs/||' | sed 's|\.mdx$||' | sed 's|\.md$||' | sed 's|/index$||')
+            page_url="https://promptql.io/docs/${url_path}/"
+            
+            # Extract frontmatter and content
+            if [ -f "$file" ]; then
+              # Use node to parse frontmatter and content
+              node -e "
+                const fs = require('fs');
+                const content = fs.readFileSync('$file', 'utf8');
+                const lines = content.split('\n');
+                
+                let frontmatter = {};
+                let bodyContent = content;
+                
+                if (lines[0] === '---') {
+                  const endIndex = lines.findIndex((line, i) => i > 0 && line === '---');
+                  if (endIndex > 0) {
+                    const fmLines = lines.slice(1, endIndex);
+                    bodyContent = lines.slice(endIndex + 1).join('\n');
+                    
+                    let currentKey = null;
+                    let currentArray = [];
+                    
+                    fmLines.forEach(line => {
+                      const trimmed = line.trim();
+                      if (trimmed.startsWith('- ')) {
+                        // YAML array item
+                        if (currentKey) {
+                          currentArray.push(trimmed.substring(2).trim());
+                        }
+                      } else {
+                        // Save previous array if exists
+                        if (currentKey && currentArray.length > 0) {
+                          frontmatter[currentKey] = currentArray;
+                          currentArray = [];
+                        }
+                        
+                        const match = trimmed.match(/^(\w+):\s*(.*)$/);
+                        if (match) {
+                          const key = match[1];
+                          let value = match[2].trim();
+                          
+                          if (value === '') {
+                            // Empty value, might be start of array
+                            currentKey = key;
+                          } else {
+                            // Regular key-value
+                            value = value.replace(/^[\"']|[\"']$/g, '');
+                            frontmatter[key] = value;
+                            currentKey = null;
+                          }
+                        }
+                      }
+                    });
+                    
+                    // Handle last array
+                    if (currentKey && currentArray.length > 0) {
+                      frontmatter[currentKey] = currentArray;
+                    }
+                  }
+                }
+                
+                const payload = {
+                  title: (frontmatter.title || frontmatter.sidebar_label || '').replace(/'/g, \"''\"),
+                  content: bodyContent.trim().replace(/'/g, \"''\"),
+                  keywords: Array.isArray(frontmatter.keywords) ? frontmatter.keywords.map(k => k.replace(/'/g, \"''\")) : [],
+                  page_url: '$page_url',
+                  description: (frontmatter.description || '').replace(/'/g, \"''\")
+                };
+                
+                console.log(JSON.stringify(payload));
+              " > /tmp/payload.json
+            fi
+            
+            case "$status" in
+              "A")
+                echo "Creating new page: $page_url"
+                echo "Payload being sent:"
+                cat /tmp/payload.json
+                echo ""
+                
+                # Create the full request payload properly
+                PAYLOAD_CONTENT=$(cat /tmp/payload.json)
+                REQUEST_PAYLOAD=$(echo "{\"input\": [$PAYLOAD_CONTENT], \"ddn_headers\": {\"authorization\": \"Bearer $PQL_BOT_ADMIN_JWT\"}}")
+                
+                echo "Full request payload:"
+                echo "$REQUEST_PAYLOAD"
+                echo ""
+                
+                curl -X POST "https://pql-docs.ddn.hasura.app/promptql/automations/v1/insert_new_page/run" \
+                  -H "Content-Type: application/json" \
+                  -H "authorization: api-key $PROMPTQL_API_KEY" \
+                  -d "$REQUEST_PAYLOAD"
+                ;;
+              "M")
+                echo "Updating existing page: $page_url"
+                curl -X POST "https://pql-docs.ddn.hasura.app/promptql/automations/v1/update_page/run" \
+                  -H "Content-Type: application/json" \
+                  -H "authorization: api-key $PROMPTQL_API_KEY" \
+                  -d "{\"input\": [$(cat /tmp/payload.json)], \"ddn_headers\": {\"authorization\": \"Bearer $PQL_BOT_ADMIN_JWT\"}}"
+                ;;
+              "D")
+                echo "Deleting page: $page_url"
+                curl -X POST "https://pql-docs.ddn.hasura.app/promptql/automations/v1/delete_page/run" \
+                  -H "Content-Type: application/json" \
+                  -H "authorization: api-key $PROMPTQL_API_KEY" \
+                  -d "{\"input\": [{\"page_url\": \"$page_url\"}], \"ddn_headers\": {\"authorization\": \"Bearer $PQL_BOT_ADMIN_JWT\"}}"
+                ;;
+            esac
+          done
