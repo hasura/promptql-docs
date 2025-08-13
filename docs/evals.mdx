@@ -1,129 +1,109 @@
 ---
 sidebar_position: 3
-sidebar_label: Evals
+sidebar_label: Evaluate Accuracy
 description:
   "Learn how to evaluate and test AI capabilities in PromptQL using custom prompts and evaluation frameworks."
 keywords:
   - promptql
   - evals
+  - accuracy
   - evaluation
   - testing
   - ai capabilities
   - prompts
-toc_max_heading_level: 4
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
 
-# Evals
+# Evaluate Accuracy
 
 ## Introduction
 
-Evals in PromptQL provide a systematic way to test and evaluate AI capabilities against custom prompts and datasets.
-Similar to how you might test code with unit tests, evals help you measure the performance, accuracy, and reliability of
-your AI-powered workflows.
+**Evals** in PromptQL provide a systematic way to test and evaluate the accuracy of your domain-specific agent against
+custom prompts and datasets. Think of evals like quality checks for your agent: they help you measure how well PromptQL
+understands your business and delivers accurate, reliable results.
 
-Whether you're creating new supergraph builds, comparing different AI models, or ensuring consistent performance after
-changes to the underlying data models, evals give you the tools to make data-driven decisions about your AI
-implementations.
-
-## What are Evals?
-
-Evals (evaluations) are structured tests that allow you to:
-
-- **Test AI responses** against known good outputs
-- **Compare different prompts** to find the most effective approach
-- **Measure performance** across various scenarios and edge cases
-- **Track improvements** over time as you refine your prompts
-- **Ensure consistency** in AI behavior across different inputs
-
-Think of evals as your quality assurance system for AI capabilities—they help you build confidence that your AI-powered
-features will work reliably in production.
+Whether you're testing a new version of your assistant, comparing different approaches, or validating changes to your
+data setup, evals give you the tools to make confident decisions. Since PromptQL works with immutable builds—meaning
+each update creates a new, testable version—you can consistently measure the impact of your changes and roll back if
+needed.
 
 ## Core Components
 
-### Test Cases
+### Creating Test Cases
 
-Each eval set consists of multiple test cases (eval items) that define:
+Each eval consists of four key components:
 
-- **Input prompts** - The questions or instructions you want to test
-- **Evaluation criteria** - How to measure success (exact match, semantic similarity, custom scoring)
-- **Business impact** - How important is it to get this right
-- **Tags** - Metadata to help you organize and filter test cases
+| Field               | Description                                                                                                      |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **Prompt**          | The specific question or instruction you want to test against your PromptQL agent                                |
+| **Tags**            | Key-value pairs to organize and filter related test cases (e.g., "category: customer-support", "priority: high") |
+| **Eval Criteria**   | Your success criteria, such as "Completeness, Efficiency, Readability" or custom scoring rubrics                 |
+| **Business Impact** | A description of why this test matters to your business operations                                               |
 
-### Evaluation Metrics
+Use tags to create logical groupings of your test cases:
 
-PromptQL supports various evaluation approaches:
+- **Regression tests** - `type: regression` to ensure existing functionality doesn't break with updates
+- **Edge case testing** - `category: edge-case` to validate behavior with unusual or boundary conditions
+- **Performance benchmarks** - `benchmark: performance` to compare different model configurations or approaches
+- **Domain-specific tests** - `domain: finance` or `domain: healthcare` to test industry-specific knowledge and behavior
 
-| Metric Type           | Description                            | Use Case                           |
-| --------------------- | -------------------------------------- | ---------------------------------- |
-| Human Review          | Manual evaluation for subjective tasks | Creative content, nuanced analysis |
-| Auto Scoring using AI | coming soon                            | Coming soon                        |
+### Evaluation Process
 
-### Datasets
+PromptQL's evaluation workflow is designed around your defined criteria and business context. After creating your eval
+items, you can run them against your agent to assess how well the responses meet your requirements. The evaluation
+process considers business-critical factors—like factual accuracy, data completeness, and domain-specific
+requirements—ensuring that results align with your specific use case and quality standards.
 
-Organize your test cases into datasets for different scenarios (use tags for organization):
+## Guide
 
-- **Regression tests** - Ensure existing functionality doesn't break
-- **Edge case testing** - Handle unusual or boundary conditions
-- **Performance benchmarks** - Compare different approaches
-- **Domain-specific tests** - Validate industry or use-case specific behavior
+### Step 1. Create an Eval Item
 
-## Getting Started
-
-### Creating Your First Eval
-
-1. Go to the Evals tab in the console and click on `Add an Eval Item`. Add the `prompt`, `tags`, `Eval Criteria`, and
-   `Business Impact` fields.
+Go to the Evals tab in the console and click on `Add an Eval Item`. Add the `prompt`, `tags`, `Eval Criteria`, and
+`Business Impact` fields.
 
 <Thumbnail src="/img/evals/eval-1.png" alt="Adding an eval item in the console." />
 
-<br/ >
+### Step 2. Run the Eval
 
-2. You should be able to see the list of eval items in the table once it's added.
+You should be able to see the list of eval items in the table once it's added. From here, you can run each eval item
+against your agent to see how it performs.
+
+TODO: Update screenshot to match step
 
 <Thumbnail src="/img/evals/eval-2.png" alt="List of eval items in the console table." />
-<br />
 
-**Coming Soon**: We will have the functionality to run these evals in batches and view the results, and then a human
-evaluator can judge the response.
+### Step 3. Review the Results
 
-## Use Cases
-
-### Prompt Engineering
-
-Use evals to systematically improve your user and system prompts:
-
-- Test different phrasings and instructions
-- Compare various prompt templates
-- Optimize for specific output formats
-- Find the right balance between creativity and consistency
-
-### Model Comparison
-
-Evaluate different AI models or configurations:
-
-- Compare accuracy across different model versions
-- Test performance on domain-specific tasks
-- Measure response time and resource usage
-- Assess cost-effectiveness of different options
-
-### Quality Assurance
-
-Ensure reliable AI behavior in production:
-
-- Validate outputs meet business requirements
-- Test for bias or inappropriate responses
-- Verify consistency across similar inputs
-- Monitor performance degradation over time
+TODO...
 
 ## Next Steps
 
 Ready to start evaluating your AI capabilities? Here are some recommended next steps:
 
-1. **Identify a use case** - Choose a specific AI task you want to improve
-2. **Create test data** - Develop a small set of representative examples
-3. **Set up your first eval** - Start with simple criteria to judge success
+1. **Identify a use case** - Choose a specific AI task you want to improve (e.g., customer support ticket
+   classification, financial report analysis, or product recommendation accuracy)
+
+2. **Create test data** - Develop a small set of representative examples that cover typical scenarios, edge cases, and
+   potential failure modes
+
+3. **Set up your first eval** - Start with simple, measurable criteria like "Does the response answer the question
+   accurately?" or "Are the calculations correct?"
+
+4. **Run and iterate** - Execute your eval against your current agent, review the results, and refine your criteria or
+   test cases based on what you learn
+
+### Example: Customer Support Eval
+
+Here's a practical example to get you started:
+
+- **Prompt**: "A customer is asking for a refund on a product they bought 45 days ago. Our return policy is 30 days. How
+  should we respond?"
+- **Tags**: `category: customer-support`, `scenario: policy-exception`, `priority: medium`
+- **Eval Criteria**: "Response provides accurate policy information, explains reasoning clearly, offers appropriate
+  alternatives"
+- **Business Impact**: "Ensures consistent, accurate responses to policy exception requests that maintain customer
+  trust"
 
 Evals are most effective when integrated into your regular development workflow, helping you build more reliable and
 effective AI-powered applications.
