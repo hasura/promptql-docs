@@ -1,0 +1,129 @@
+---
+sidebar_position: 3
+sidebar_label: Evals
+description:
+  "Learn how to evaluate and test AI capabilities in PromptQL using custom prompts and evaluation frameworks."
+keywords:
+  - promptql
+  - evals
+  - evaluation
+  - testing
+  - ai capabilities
+  - prompts
+toc_max_heading_level: 4
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Evals
+
+## Introduction
+
+Evals in PromptQL provide a systematic way to test and evaluate AI capabilities against custom prompts and datasets.
+Similar to how you might test code with unit tests, evals help you measure the performance, accuracy, and reliability of
+your AI-powered workflows.
+
+Whether you're creating new supergraph builds, comparing different AI models, or ensuring consistent performance after
+changes to the underlying data models, evals give you the tools to make data-driven decisions about your AI
+implementations.
+
+## What are Evals?
+
+Evals (evaluations) are structured tests that allow you to:
+
+- **Test AI responses** against known good outputs
+- **Compare different prompts** to find the most effective approach
+- **Measure performance** across various scenarios and edge cases
+- **Track improvements** over time as you refine your prompts
+- **Ensure consistency** in AI behavior across different inputs
+
+Think of evals as your quality assurance system for AI capabilities—they help you build confidence that your AI-powered
+features will work reliably in production.
+
+## Core Components
+
+### Test Cases
+
+Each eval-set consists of multiple test cases (eval items) that define:
+
+- **Input prompts** - The questions or instructions you want to test
+- **Evaluation criteria** - How to measure success (exact match, semantic similarity, custom scoring)
+- **Business impact** - How important is it to get this right
+- **Tags** - Metadata to help you organize and filter test cases
+
+### Evaluation Metrics
+
+PromptQL supports various evaluation approaches:
+
+| Metric Type           | Description                            | Use Case                           |
+| --------------------- | -------------------------------------- | ---------------------------------- |
+| Human Review          | Manual evaluation for subjective tasks | Creative content, nuanced analysis |
+| Auto Scoring using AI | coming soon                            | Coming soon                        |
+
+### Datasets
+
+Organize your test cases into datasets for different scenarios (use tags for organization):
+
+- **Regression tests** - Ensure existing functionality doesn't break
+- **Edge case testing** - Handle unusual or boundary conditions
+- **Performance benchmarks** - Compare different approaches
+- **Domain-specific tests** - Validate industry or use-case specific behavior
+
+## Getting Started
+
+### Creating Your First Eval
+
+1. Go to the evals tab in the console and click on `Add an Eval Item`. Add the `prompt`, `tags`, `Eval Criteria` and
+   `Business Impact` fields.
+
+<Thumbnail src="/img/evals/eval-1.png" alt="Adding an eval item in the console." />
+
+<br/ >
+
+2. You should be able to see the list of eval items in the table once its added.
+
+<Thumbnail src="/img/evals/eval-2.png" alt="List of eval items in the console table." />
+<br />
+
+**Coming Soon**: We will have the functionality to be able to run these evals in batches and view the results, and then
+a human evaluator can judge the response.
+
+## Use Cases
+
+### Prompt Engineering
+
+Use evals to systematically improve your user and system prompts:
+
+- Test different phrasings and instructions
+- Compare various prompt templates
+- Optimize for specific output formats
+- Find the right balance between creativity and consistency
+
+### Model Comparison
+
+Evaluate different AI models or configurations:
+
+- Compare accuracy across different model versions
+- Test performance on domain-specific tasks
+- Measure response time and resource usage
+- Assess cost-effectiveness of different options
+
+### Quality Assurance
+
+Ensure reliable AI behavior in production:
+
+- Validate outputs meet business requirements
+- Test for bias or inappropriate responses
+- Verify consistency across similar inputs
+- Monitor performance degradation over time
+
+## Next Steps
+
+Ready to start evaluating your AI capabilities? Here are some recommended next steps:
+
+1. **Identify a use case** - Choose a specific AI task you want to improve
+2. **Create test data** - Develop a small set of representative examples
+3. **Set up your first eval** - Start with simple criteria to judge success
+
+Evals are most effective when integrated into your regular development workflow, helping you build more reliable and
+effective AI-powered applications.
