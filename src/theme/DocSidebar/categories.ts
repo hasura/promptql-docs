@@ -7,7 +7,7 @@ type CategoryConfig = {
 export const CATEGORY_CONFIG: Record<string, CategoryConfig> = {
   gettingStarted: {
     title: 'Getting Started',
-    directories: ['quickstart', 'capabilities', 'how-to-talk-to-promptql', 'decision-making', 'automation'],
+    directories: ['quickstart', 'capabilities', 'how-to-talk-to-promptql', 'decision-making', 'automation', 'evals'],
     exactMatch: true,
   },
   coreConcepts: {
