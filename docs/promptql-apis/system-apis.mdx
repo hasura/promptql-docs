@@ -1,0 +1,228 @@
+---
+sidebar_position: 5
+sidebar_label: System APIs
+description: "System utility endpoints for health checks, version information, and capability discovery."
+keywords:
+  - hasura ddn
+  - system apis
+  - health check
+  - version
+  - capabilities
+toc_max_heading_level: 3
+---
+
+# System APIs
+
+## Introduction
+
+The System APIs provide utility endpoints for monitoring, debugging, and discovering the capabilities of your PromptQL
+instance. These endpoints are useful for health monitoring, version tracking, and understanding what features are
+available.
+
+## Base URL
+
+System endpoints use the following base URL:
+
+`https://promptql.ddn.hasura.app/`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
+by the control plane. For example:
+
+`https://promptql.<FQDN>/`
+
+**You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
+
+:::
+
+## Health Check
+
+Check if the PromptQL service is running and healthy.
+
+`GET /healthz`
+
+### Response
+
+**Content-Type:** `text/plain`
+
+```
+OK
+```
+
+### Status Codes
+
+- `200 OK` - Service is healthy and running
+- `5xx` - Service is experiencing issues
+
+### Usage
+
+This endpoint is ideal for:
+
+- Load balancer health checks
+- Monitoring system integration
+- Basic service availability testing
+
+## Configuration Check
+
+Verify that the PromptQL service configuration is valid.
+
+`GET /config-check`
+
+### Response
+
+**Content-Type:** `text/plain`
+
+```
+Configuration is valid
+```
+
+### Status Codes
+
+- `200 OK` - Configuration is valid and service is properly configured
+- `5xx` - Configuration issues detected
+
+### Usage
+
+This endpoint helps with:
+
+- Deployment validation
+- Configuration troubleshooting
+- Service readiness checks
+
+## Version Information
+
+Get the current version of the PromptQL service.
+
+`GET /version`
+
+### Response
+
+**Content-Type:** `application/json`
+
+```json
+{
+  "version": "1.2.3",
+  "build": "abc123def",
+  "build_date": "2024-01-15T10:30:00Z",
+  "git_commit": "a1b2c3d4e5f6",
+  "environment": "production"
+}
+```
+
+### Response Fields
+
+| Field         | Type   | Description                          |
+| ------------- | ------ | ------------------------------------ |
+| `version`     | string | Semantic version of the service      |
+| `build`       | string | Build identifier                     |
+| `build_date`  | string | ISO 8601 timestamp of build creation |
+| `git_commit`  | string | Git commit hash of the build         |
+| `environment` | string | Deployment environment               |
+
+### Usage
+
+Version information is useful for:
+
+- Debugging and support requests
+- Tracking deployments
+- API compatibility verification
+
+## Capabilities
+
+Discover what features and capabilities are available in the current PromptQL instance.
+
+`GET /capabilities`
+
+### Response
+
+**Content-Type:** `application/json`
+
+```json
+{
+  "features": {
+    "natural_language_api": {
+      "enabled": true,
+      "versions": ["v1", "v2"]
+    },
+    "execute_program_api": {
+      "enabled": true,
+      "versions": ["v1", "v2"]
+    },
+    "automations_api": {
+      "enabled": true,
+      "versions": ["v1"]
+    },
+    "threads_api": {
+      "enabled": true,
+      "features": ["sharing", "feedback", "evaluation", "pinning"]
+    },
+    "streaming": {
+      "enabled": true,
+      "protocols": ["sse"]
+    }
+  },
+  "limits": {
+    "max_request_size": "10MB",
+    "max_response_size": "50MB",
+    "rate_limit": {
+      "requests_per_minute": 100,
+      "burst_limit": 20
+    }
+  },
+  "supported_llm_providers": ["hasura", "openai", "anthropic"],
+  "supported_artifact_types": ["text", "table"]
+}
+```
+
+### Response Fields
+
+| Field                      | Type   | Description                                 |
+| -------------------------- | ------ | ------------------------------------------- |
+| `features`                 | object | Available features and their configurations |
+| `limits`                   | object | Service limits and constraints              |
+| `supported_llm_providers`  | array  | List of supported LLM providers             |
+| `supported_artifact_types` | array  | List of supported artifact types            |
+
+### Feature Objects
+
+Each feature object may contain:
+
+| Field      | Type    | Description                            |
+| ---------- | ------- | -------------------------------------- |
+| `enabled`  | boolean | Whether the feature is enabled         |
+| `versions` | array   | Supported API versions for the feature |
+| `features` | array   | Sub-features available                 |
+
+### Usage
+
+Capabilities discovery helps with:
+
+- Client application configuration
+- Feature availability checking
+- API version compatibility
+- Rate limiting awareness
+
+## Authentication
+
+System APIs do not require authentication, making them suitable for health checks and monitoring systems. These
+endpoints are designed to be accessible for operational monitoring and service discovery.
+
+## Error Responses
+
+System APIs use standard HTTP status codes:
+
+- `200 OK` - Request successful
+- `404 Not Found` - Endpoint not available
+- `500 Internal Server Error` - Service error
+- `503 Service Unavailable` - Service temporarily unavailable
+
+Error responses typically return plain text for health/config endpoints and JSON for information endpoints:
+
+```json
+{
+  "error": "Service temporarily unavailable",
+  "code": "SERVICE_UNAVAILABLE",
+  "timestamp": "2024-01-15T10:30:00Z"
+}
+```
