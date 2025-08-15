@@ -1,0 +1,348 @@
+---
+sidebar_position: 4
+sidebar_label: Automations API
+description:
+  "Learn how to create, manage, and execute automations with simplified input formats for automated workflows."
+keywords:
+  - hasura ddn
+  - automations
+  - apis
+  - workflows
+toc_max_heading_level: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Automations API
+
+## Introduction
+
+The Automations API allows you to create, manage, and execute automated workflows that can process table data with
+simplified input formats. This API is perfect for building data processing pipelines, automated reports, and other
+workflows that need to run programmatically.
+
+Unlike the Execute Program API which requires you to manage artifacts manually, the Automations API automatically
+creates a TableArtifact with identifier "input" from your table data, making it easier to work with structured data.
+
+## Base URL
+
+All automation endpoints use the following base URL:
+
+`https://promptql.ddn.hasura.app/automations/v1/`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
+by the control plane. For example:
+
+`https://promptql.<FQDN>/automations/v1/`
+
+**You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
+
+:::
+
+## Authentication
+
+Automation endpoints use two different authentication models:
+
+### User-Scoped Operations (JWT Bearer Token Required)
+
+Automation management operations require JWT authentication:
+
+```
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+**Endpoints:**
+
+- List automations (`GET /automations/v1/`)
+- Create automation (`POST /automations/v1/`)
+- Get automation (`GET /automations/v1/{automation_name}`)
+- Delete automation (`DELETE /automations/v1/{automation_name}`)
+
+### Project-Scoped Operations (API Key Required)
+
+Automation execution accepts PromptQL API keys:
+
+```
+Authorization: Bearer <your-promptql-api-key>
+Content-Type: application/json
+```
+
+**Endpoints:**
+
+- Run automation (`POST /automations/v1/{automation_name}/run`)
+
+## List Automations
+
+Get all automations for a project.
+
+`GET /automations/v1/`
+
+### Response
+
+```json
+{
+  "automations": [
+    {
+      "automation_name": "data_processor",
+      "description": "Processes customer data and generates insights",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Error Responses
+
+- `404 Not Found` - Project not found or user doesn't have access
+
+## Create Automation
+
+Create a new automation with specified name and code.
+
+`POST /automations/v1/`
+
+### Request Body
+
+```json
+{
+  "automation_name": "my_automation",
+  "code": "# Your PromptQL automation code here\nprint('Processing data...')",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "result": {
+        "type": "string"
+      }
+    }
+  },
+  "description": "Processes input data and returns results",
+  "override_existing": false
+}
+```
+
+### Request Fields
+
+| Field               | Type    | Required | Description                                              |
+| ------------------- | ------- | -------- | -------------------------------------------------------- |
+| `automation_name`   | string  | Yes      | Unique name for the automation                           |
+| `code`              | string  | Yes      | PromptQL code to execute                                 |
+| `input_schema`      | object  | No       | JSON schema defining expected input structure            |
+| `output_schema`     | object  | No       | JSON schema defining expected output structure           |
+| `description`       | string  | No       | Human-readable description of the automation             |
+| `override_existing` | boolean | No       | Whether to override existing automation (default: false) |
+
+### Response
+
+```json
+{
+  "automation_name": "my_automation",
+  "status": "created",
+  "message": "Automation created successfully"
+}
+```
+
+### Error Responses
+
+- `404 Not Found` - Project not found or user doesn't have admin access
+- `422 Validation Error` - Invalid request body or automation name already exists
+
+## Get Automation
+
+Retrieve a specific automation by name.
+
+`GET /automations/v1/{automation_name}`
+
+### Path Parameters
+
+| Parameter         | Type   | Required | Description                   |
+| ----------------- | ------ | -------- | ----------------------------- |
+| `automation_name` | string | Yes      | Name of the automation to get |
+
+### Response
+
+```json
+{
+  "automation_name": "my_automation",
+  "code": "# Your PromptQL automation code here\nprint('Processing data...')",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": {
+          "type": "object"
+        }
+      }
+    }
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "result": {
+        "type": "string"
+      }
+    }
+  },
+  "description": "Processes input data and returns results",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z"
+}
+```
+
+### Error Responses
+
+- `404 Not Found` - Automation not found or user doesn't have access
+- `422 Validation Error` - Invalid automation name format
+
+## Delete Automation
+
+Delete an automation. Requires project admin access.
+
+`DELETE /automations/v1/{automation_name}`
+
+### Path Parameters
+
+| Parameter         | Type   | Required | Description                      |
+| ----------------- | ------ | -------- | -------------------------------- |
+| `automation_name` | string | Yes      | Name of the automation to delete |
+
+### Response
+
+```json
+{
+  "automation_name": "my_automation",
+  "status": "deleted",
+  "message": "Automation deleted successfully"
+}
+```
+
+### Error Responses
+
+- `404 Not Found` - Automation not found or user doesn't have admin access
+- `422 Validation Error` - Invalid automation name format
+
+## Run Automation
+
+Execute an automation with simplified input format. The input data is automatically converted to a TableArtifact with
+identifier "input".
+
+`POST /automations/v1/{automation_name}/run`
+
+### Path Parameters
+
+| Parameter         | Type   | Required | Description                   |
+| ----------------- | ------ | -------- | ----------------------------- |
+| `automation_name` | string | Yes      | Name of the automation to run |
+
+### Headers
+
+You can optionally specify a build ID for the automation execution:
+
+```
+x-ddn-build-id: <build-id>
+```
+
+### Request Body
+
+```json
+{
+  "ddn_headers": {
+    "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>"
+  },
+  "input": [
+    {
+      "id": 1,
+      "name": "John Doe",
+      "email": "john@example.com"
+    },
+    {
+      "id": 2,
+      "name": "Jane Smith",
+      "email": "jane@example.com"
+    }
+  ]
+}
+```
+
+### Request Fields
+
+| Field         | Type   | Required | Description                                       |
+| ------------- | ------ | -------- | ------------------------------------------------- |
+| `ddn_headers` | object | No       | Headers to pass through to DDN for authentication |
+| `input`       | array  | No       | Array of objects representing table data          |
+
+### Response
+
+```json
+{
+  "output": {
+    "processed_count": 2,
+    "results": [
+      {
+        "id": 1,
+        "status": "processed",
+        "insights": "Customer profile complete"
+      },
+      {
+        "id": 2,
+        "status": "processed",
+        "insights": "Customer profile complete"
+      }
+    ]
+  },
+  "execution_time_ms": 1250,
+  "status": "success"
+}
+```
+
+### Response Fields
+
+| Field               | Type    | Description                                |
+| ------------------- | ------- | ------------------------------------------ |
+| `output`            | object  | The automation's output data               |
+| `execution_time_ms` | integer | Time taken to execute the automation in ms |
+| `status`            | string  | Execution status ("success" or "error")    |
+
+### Error Responses
+
+- `404 Not Found` - Automation not found or user doesn't have access
+- `422 Validation Error` - Invalid request body or automation execution failed
+
+## DDN Authentication
+
+The `ddn_headers` field allows you to pass authentication headers to your DDN endpoint, similar to other PromptQL APIs.
+This enables you to use any DDN-compatible authentication strategy with the Automations API.
+
+```json
+{
+  "ddn_headers": {
+    "x-hasura-ddn-token": "<YOUR_DDN_AUTH_TOKEN>",
+    "x-hasura-role": "user"
+  },
+  "input": [...]
+}
+```
+
+:::info Authentication Strategies
+
+The headers you need to include depend on your DDN project's authentication configuration. For comprehensive information
+about setting up authentication modes and understanding which headers to use, refer to our
+[Authentication in APIs](/promptql-apis/auth.mdx) documentation.
+
+:::
