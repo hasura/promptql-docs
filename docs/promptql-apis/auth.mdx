@@ -12,11 +12,78 @@ keywords:
 
 ## Introduction
 
-PromptQL endpoints accept a `ddn` object which contains details like your project's URL and what headers to pass along.
-These endpoints accept all DDN-compatible authentication strategies; learn more about these in our
-[auth docs](/auth/index.mdx).
+PromptQL APIs use different authentication models depending on the operation type. Understanding these models is crucial
+for accessing the right endpoints with the appropriate credentials.
 
-## Modes
+## Authentication Models
+
+PromptQL APIs use two distinct authentication approaches:
+
+### User-Scoped Operations (JWT Bearer Token Required)
+
+These operations manage user-owned resources and require JWT authentication:
+
+- **Threads API**: Thread management, sharing, and pinned threads
+- **Automations API**: Automation management (create, list, get, delete)
+
+**Authentication Method**: JWT Bearer token obtained through the PromptQL token refresh endpoint
+
+### Project-Scoped Operations (API Key Accepted)
+
+These operations access shared project resources and accept PromptQL API keys:
+
+- **Natural Language API**: Conversational queries
+- **Execute Program API**: Program execution
+- **Threads API**: Reading threads and feedback (when using API key)
+- **Automations API**: Running automations
+
+**Authentication Method**: PromptQL API key as Bearer token
+
+## Getting JWT Tokens for User-Scoped Operations
+
+For user-scoped operations (like managing threads and automations), you need to obtain a JWT token using the PromptQL
+token refresh endpoint.
+
+### Prerequisites
+
+Before you can obtain a JWT token, ensure you have:
+
+- A [Personal Access Token (PAT)](/reference/cli/commands/ddn_auth_print-access-token.mdx) or
+  [Project Service Account Token](/project-configuration//project-management/service-accounts.mdx) from your Hasura DDN
+  project
+- Your project ID (UUID)
+
+### Token Acquisition Process
+
+The JWT token is obtained by making a POST request to the token refresh endpoint with your PAT and project ID.
+
+#### Bash Example
+
+```bash title="Get JWT token"
+JWT_TOKEN=$(curl -s -X POST "https://auth.pro.hasura.io/ddn/promptql/token" \
+  -H "Authorization: pat <YOUR_PAT_OR_SERVICE_ACCOUNT_TOKEN>" \
+  -H "x-hasura-project-id: <YOUR_PROJECT_ID>" \
+  -H "Content-Type: application/json" \
+  | jq -r '.token')
+```
+
+```bash title="Use the token for user-scoped operations"
+curl -X GET "https://promptql.ddn.hasura.app/threads" \
+  -H "Authorization: Bearer ${JWT_TOKEN}" \
+  -H "Content-Type: application/json"
+```
+
+:::info Token Expiration
+
+JWT tokens have a limited lifespan. Implement token refresh logic in your applications to automatically obtain new
+tokens when needed.
+
+:::
+
+## DDN Data Source Authentication
+
+The examples below show how to authenticate with your DDN data sources when using PromptQL APIs. These are separate from
+the PromptQL API authentication described above.
 
 ### Default
 
