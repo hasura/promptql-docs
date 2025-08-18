@@ -84,14 +84,14 @@ Retrieve a list of threads with optional filtering.
 
 #### Query Parameters
 
-| Parameter         | Type     | Required | Description                                   |
-| ----------------- | -------- | -------- | --------------------------------------------- |
-| `project_id`      | string   | No       | Filter threads by project UUID                |
-| `build_id`        | string   | No       | Filter threads by build UUID                  |
-| `user_id`         | string   | No       | Filter threads by user UUID                   |
-| `from_created_at` | datetime | No       | Filter threads created after this timestamp   |
-| `to_created_at`   | datetime | No       | Filter threads created before this timestamp  |
-| `title_contains`  | string   | No       | Filter threads where title contains this text |
+| Parameter         | Type     | Required | Description                                                                                                |
+| ----------------- | -------- | -------- | ---------------------------------------------------------------------------------------------------------- |
+| `project_id`      | string   | No       | Filter threads by project UUID                                                                             |
+| `build_id`        | string   | No       | Filter threads by build UUID. If not provided, threads from the project's production endpoint are returned |
+| `user_id`         | string   | No       | Filter threads by user UUID                                                                                |
+| `from_created_at` | datetime | No       | Filter threads created after this timestamp                                                                |
+| `to_created_at`   | datetime | No       | Filter threads created before this timestamp                                                               |
+| `title_contains`  | string   | No       | Filter threads where title contains this text                                                              |
 
 #### Response
 
@@ -297,7 +297,7 @@ Remove sharing access for a thread.
 
 ## API Threads
 
-API threads are threads created through API interactions rather than the web interface.
+API threads are threads created through API interactions rather than the Playground.
 
 ### Get API Threads
 

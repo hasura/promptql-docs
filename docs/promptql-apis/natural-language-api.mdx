@@ -211,8 +211,8 @@ Version 2 requests use supergraph build versions instead of direct DDN URLs. The
 of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
 using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
 
-When `build_version` is not specified in the request, the project's applied build is automatically chosen. This allows
-you to use the currently deployed build without needing to specify its version explicitly.
+When `build_version` is not specified in the request, the project's applied build (production endpoint) is automatically
+chosen. This allows you to use the currently deployed build without needing to specify its version explicitly.
 
 #### Headers
 
@@ -258,7 +258,7 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 }
 ```
 
-**Example using applied build (without specifying build_version):**
+**Example using applied build (production endpoint, without specifying build_version):**
 
 ```json
 {
@@ -285,7 +285,7 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 | Field          | Type    | Required | Description                                                                                                                                                                                                                                                                                       |
 | -------------- | ------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `version`      | string  | Yes      | Must be set to "v2"                                                                                                                                                                                                                                                                               |
-| `ddn`          | object  | Yes      | DDN configuration including optional `build_version` and headers. If `build_version` is not specified, the project's applied build is used                                                                                                                                                        |
+| `ddn`          | object  | Yes      | DDN configuration including optional `build_version` and headers. If `build_version` is not specified, the project's applied build (production endpoint) is used                                                                                                                                  |
 | `artifacts`    | array   | No       | List of existing artifacts to provide context                                                                                                                                                                                                                                                     |
 | `timezone`     | string  | Yes      | IANA timezone for interpreting time-based queries                                                                                                                                                                                                                                                 |
 | `interactions` | array   | Yes      | List of message interactions, including user messages and assistant responses. Each interaction contains a `user_message` object with the user's text and an optional `assistant_actions` array containing previous assistant responses with their messages, plans, code executions, and outputs. |
@@ -300,7 +300,7 @@ body. Instead, these PromptQL settings are automatically inferred from the super
 
 1. **Build-level PromptQL Config**: Settings are first retrieved from the
    [PromptQL configuration](/project-configuration/promptql-config/) associated with the specified `build_version` (or
-   the applied build if `build_version` is not specified)
+   the applied build/production endpoint if `build_version` is not specified)
 2. **Project-level Fallback**: For older builds that don't have PromptQL config included, the system falls back to the
    PromptQL configuration saved in the project settings
 
@@ -359,7 +359,7 @@ Configure headers in the `ddn.headers` object:
 }
 ```
 
-**Using applied build:**
+**Using applied build (production endpoint):**
 
 ```json
 {

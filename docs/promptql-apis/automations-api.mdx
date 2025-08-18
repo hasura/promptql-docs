@@ -258,6 +258,13 @@ You can optionally specify a build ID for the automation execution:
 x-ddn-build-id: <build-id>
 ```
 
+:::note Build Selection
+
+If the `x-ddn-build-id` header is not provided, the automation will execute against the project's production endpoint
+(applied build).
+
+:::
+
 ### Request Body
 
 ```json
