@@ -17,7 +17,8 @@ Add a new Connector.
 
 ## Synopsis
 
-For each data source you wish to connect to your project and eventually expose via your API, you'll need to initialize a new data connector.
+For each data source you wish to connect to your project and eventually expose via your API, you'll need to initialize a
+new data connector.
 
 ```bash
 ddn connector init [connector-name] --hub-connector <connector-type> [flags]
@@ -30,13 +31,13 @@ ddn connector init [connector-name] --hub-connector <connector-type> [flags]
  ddn connector init -i
 
 # Initialize a Postgres Connector "mydb" in the Subgraph "app"
- ddn connector init mydb --subgraph ./app/subgraph.yaml --hub-connector hasura/postgres
+ ddn connector init mydb --subgraph ./app/subgraph.yaml --hub-connector hasura/postgres-promptql
 
 # Initialize a Postgres Connector "mydb" inside the directory ./connector
- ddn connector init mydb --dir ./connector --hub-connector hasura/postgres
+ ddn connector init mydb --dir ./connector --hub-connector hasura/postgres-promptql
 
 # Initialize a NodeJS Connector "mylambda" in the Subgraph "app" on port 8765
- ddn connector init mylambda --subgraph ./app/subgraph.yaml  --hub-connector hasura/nodejs --configure-port 8765 
+ ddn connector init mylambda --subgraph ./app/subgraph.yaml  --hub-connector hasura/nodejs --configure-port 8765
 ```
 
 ## Options
