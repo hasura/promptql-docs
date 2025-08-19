@@ -4,6 +4,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export default function CopyLLM() {
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [urlStatus, setUrlStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [isOpen, setIsOpen] = useState(false);
   const [fileContent, setFileContent] = useState<string | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -131,6 +132,23 @@ export default function CopyLLM() {
     }
   }
 
+  async function handleCopyUrl() {
+    const fullUrl = 'https://promptql.io/docs/llms-full.txt';
+    try {
+      await copyToClipboard(fullUrl);
+      setUrlStatus('success');
+      setTimeout(() => {
+        setUrlStatus('idle');
+      }, 2000);
+    } catch (err) {
+      console.error(err);
+      setUrlStatus('error');
+      setTimeout(() => {
+        setUrlStatus('idle');
+      }, 2000);
+    }
+  }
+
   return (
     <div className={styles.container} ref={containerRef}>
       <button className={styles.ellipsisButton} onClick={() => setIsOpen(!isOpen)} aria-label="Document actions">
@@ -154,6 +172,13 @@ export default function CopyLLM() {
           </button>
           <button className={styles.dropdownItem} onClick={handleDownload}>
             Download docs content
+          </button>
+          <button className={styles.dropdownItem} onClick={handleCopyUrl} disabled={status === 'loading' || urlStatus === 'loading'}>
+            {urlStatus === 'success'
+              ? '✅ URL Copied!'
+              : urlStatus === 'error'
+              ? 'Failed to copy URL'
+              : 'Copy URL to docs file'}
           </button>
         </div>
       )}
