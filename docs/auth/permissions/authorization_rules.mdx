@@ -32,6 +32,11 @@ Rules are declared under a rulesBased array. Each rule uses a condition that ref
 
 Conditions can be composed from helpers like `contains` and `equal`. The left side typically reads a session variable; the right side is a literal value or list.
 
+## Important notes
+
+- Rules are evaluated per request using the provided session variables.
+- Multiple rules can apply and "deny" rules take precedence; actions are combined: e.g., `allowFields` then `denyFields` further restricts what’s visible, multiple `filter`s are combined with `and`.
+
 ## Examples 
 
 ### Output `TypePermissions` 
