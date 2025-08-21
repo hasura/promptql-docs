@@ -37,7 +37,56 @@ requests. Even if the Control Plane becomes unavailable, the Data Plane continue
 
 :::
 
-<Thumbnail src="/img/deployment/private_ddn_byoc.png" alt="Private DDN Architecture BYOC " />
+```mermaid
+flowchart TD
+  %% Layout hints
+  %% Top-to-bottom: PromptQL Infra (top), Customer Infra (bottom)
+
+  %% ===== PromptQL Infrastructure =====
+  subgraph pqlInfra[PromptQL Infrastructure]
+    direction TB
+    subgraph control[Control Plane]
+      cp_api[API Explorer]
+      cp_obs[Observability]
+      cp_builds[Builds & Deployments]
+      cp_auth[Auth/SSO<br/>Access Control]
+    end
+  end
+
+  %% ===== Customer Infrastructure =====
+  subgraph custInfra[Customer Infrastructure]
+    direction TB
+
+    %% --- Data Plane ---
+    subgraph dp[Data Plane]
+      pql_engine[[PromptQL]]
+      dp_conn[Connectors]
+    end
+
+    %% --- Sources ---
+    subgraph src[Sources]
+      src_db[Databases]
+      src_api[Other APIs]
+      src_conn[Connectors]
+    end
+  end
+
+  %% ===== External User =====
+  user(Users)
+
+  %% ===== Relationships =====
+  user -- "PromptQL APIs" --> pql_engine
+
+  %% Data plane -> sources
+  pql_engine --> dp_conn
+  dp_conn --> src
+
+  %% Control plane to data plane (management/ops)
+  cp_api -.-> pql_engine
+  cp_obs -.-> pql_engine
+  cp_builds -.-> pql_engine
+  cp_auth -.-> pql_engine
+```
 
 ## Data Flow and security
 

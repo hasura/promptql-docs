@@ -31,7 +31,56 @@ Gateway, or any other equivalent connectivity option offered by the cloud provid
 
 Please reach out to us if you need support for another cloud or configuration that is not mentioned here.
 
-<Thumbnail src="/img/deployment/private_ddn_hasura_hosted.png" alt="Private DDN Architecture Hasura Hosted" />
+```mermaid
+flowchart TD
+  %% Layout hints
+  %% Top-to-bottom: PromptQL Infra with Dedicated VPC (top), Customer Infra (bottom)
+
+  %% ===== PromptQL Infrastructure =====
+  subgraph pqlInfra[PromptQL Infrastructure]
+    direction TB
+    subgraph dedicatedVPC[Dedicated VPC]
+      direction TB
+      subgraph control[Control Plane]
+        cp_api[API Explorer]
+        cp_obs[Observability]
+        cp_builds[Builds & Deployments]
+        cp_auth[Auth/SSO<br/>Access Control]
+      end
+
+      subgraph dp[Data Plane]
+        pql_engine[[PromptQL]]
+        dp_conn[Connectors]
+      end
+    end
+  end
+
+  %% ===== Customer Infrastructure =====
+  subgraph custInfra[Customer Infrastructure]
+    direction TB
+    subgraph src[Sources]
+      src_db[Databases]
+      src_api[Other APIs]
+      src_conn[Connectors]
+    end
+  end
+
+  %% ===== External User =====
+  user(Users)
+
+  %% ===== Relationships =====
+  user -- "PromptQL APIs" --> pql_engine
+
+  %% Data plane -> sources (with private network annotation)
+  pql_engine --> dp_conn
+  dp_conn -- "Traffic over private network" --> src
+
+  %% Control plane to data plane (management/ops)
+  cp_api -.-> pql_engine
+  cp_obs -.-> pql_engine
+  cp_builds -.-> pql_engine
+  cp_auth -.-> pql_engine
+```
 
 ## Get started
 
