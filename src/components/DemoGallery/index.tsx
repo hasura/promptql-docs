@@ -67,7 +67,7 @@ export default function DemoGallery() {
   return (
     <>
       <p>
-        Each demo below will take you to a README outlining the connected data sources and
+        Each sandbox below will take you to a README outlining the connected data sources and
         give you a feel for how PromptQL works by suggesting some questions to ask.
       </p>
       <div className={`homepage-demo-container ${isExpanded ? 'expanded' : ''}`}>
