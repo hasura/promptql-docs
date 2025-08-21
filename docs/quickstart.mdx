@@ -8,7 +8,7 @@ keywords:
   - getting started
   - guide
 sidebar_class_name: quickstart-icon
-toc_max_heading_level: 4
+toc_max_heading_level: 5
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
@@ -120,7 +120,20 @@ Typically, the execution of a query plan will result in an **artifact**.
 Artifacts are structured outputs like tables, text, or visualizations that store the processed data or analysis results,
 which can be referenced later in the conversation, exported, or used to start new threads for further analysis.
 
-We have a more in-depth guide for making decisions with PromptQL; check it out [here](/decision-making.mdx).
+##### Reliability Score
+
+Each response from your agent is assigned a reliability score. This score is based on a number of factors, including the
+complexity of the query, the accuracy of the data, and the confidence of your AI model.
+
+<Thumbnail
+  src="/img/promptql-playground/reliability-score-good.png"
+  alt="A strong reliability score with rhetoric."
+  width="1000px"
+/>
+
+PromptQL will signal its confidence to you and provide reasoning behind the score; if your agent is _not_ confident in
+the response, **you can teach it** so that it better understands your business context, terminology, and processes. Your
+agent will then remember your feedback and self-correct for future threads!
 
 :::tip This is a conversation!
 
