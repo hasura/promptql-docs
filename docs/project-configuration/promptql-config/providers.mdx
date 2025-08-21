@@ -110,6 +110,97 @@ following have been tested with PromptQL:
 - `gemini-1.5-flash`
 - `gemini-2.0-flash`
 
+
+### Google Vertex AI
+
+To use Google Vertex AI, set the `provider` to `vertex`. You must provide a publisher-prefixed `modelId`:
+
+- `google/<gemini-model>` (e.g., `google/gemini-2.0-flash-001`, `google/gemini-2.5-flash`)
+- `anthropic/<claude-model>` (e.g., `anthropic/claude-3-7-sonnet`)
+
+Notes:
+- `modelId` must be publisher-prefixed (`google/...` or `anthropic/...`)
+- `googleLocation` is required; use a supported region (e.g., `global`, `us-central1`, `europe-west4`). Location references:
+  - Google models: https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#google_model_endpoint_locations
+  - Partner models (e.g., Anthropic): https://cloud.google.com/vertex-ai/generative-ai/docs/learn/locations#genai-partner-models
+- `googleProject` is required and must be a valid Google Cloud project ID.
+
+
+Example configuration:
+
+```yaml title="Example Vertex (Google)"
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: vertex
+    modelId: google/gemini-2.5-flash
+    googleProject: my-gcp-project   # required
+    googleLocation: us-central1     # required region
+    googleServiceAccountKeyJson:
+      valueFromEnv: GOOGLE_SERVICE_ACCOUNT_KEY_JSON
+```
+
+```yaml title="Example Vertex (Anthropic)"
+kind: PromptQlConfig
+version: v2
+definition:
+  llm:
+    provider: vertex
+    modelId: anthropic/claude-3-7-sonnet
+    googleProject: my-gcp-project
+    googleLocation: us-east5
+    googleServiceAccountKeyJson:
+      valueFromEnv: GOOGLE_SERVICE_ACCOUNT_KEY_JSON
+```
+
+:::warning Service account credentials
+- The `googleServiceAccountKeyJson` must be a JSON string for the Google service account key, not a file path.
+- Store the entire JSON in an environment variable and reference it via `valueFromEnv`.
+- Remember to map the env var in your `globals/subgraph.yaml` `envMapping`.
+:::
+
+#### Required permissions (IAM roles)
+
+To call Vertex AI from PromptQL, the Google service account must have sufficient permissions.
+
+Recommended:
+- Production (least privilege): create a custom role with only predict permissions
+- Development/trials: grant the broader roles/aiplatform.user for simplicity
+
+Minimum permissions (only if you invoke Endpoints):
+- Endpoints (custom/managed online prediction):
+  - aiplatform.endpoints.predict
+
+
+Create a custom predict-only role and bind it to your service account:
+
+```bash
+# Create a custom role (add/remove permissions as needed)
+gcloud iam roles create vertexPredictor \
+  --project=YOUR_PROJECT \
+  --title="Vertex Predictor" \
+  --permissions="aiplatform.endpoints.predict" \
+  --stage=GA
+
+# Grant the custom role to your service account
+gcloud projects add-iam-policy-binding YOUR_PROJECT \
+  --member="serviceAccount:SA_NAME@YOUR_PROJECT.iam.gserviceaccount.com" \
+  --role="projects/YOUR_PROJECT/roles/vertexPredictor"
+```
+
+Alternatively, grant the broader built-in role (not least-privilege):
+
+```bash
+gcloud projects add-iam-policy-binding YOUR_PROJECT \
+  --member="serviceAccount:SA_NAME@YOUR_PROJECT.iam.gserviceaccount.com" \
+  --role="roles/aiplatform.user"
+```
+
+Note:
+- Grant in the project from which you invoke Vertex AI (the project associated with your credentials).
+- Ensure your googleLocation is a supported region; see links above for region availability.
+
 ### Hasura
 
 With Hasura—used as the default provider—there is **no specific model necessary** in your configuration.
@@ -139,6 +230,13 @@ been tested with PromptQL:
 
 When using the `hasura` provider, the default model is `claude-3-5-sonnet-latest`. This is the recommended model for
 PromptQL program generation.
+
+:::tip Troubleshooting
+If you see “model not supported in streamGenerateContent”, ensure:
+- `modelId` uses the publisher prefix (`google/...` or `anthropic/...`)
+- `googleLocation` is valid for the chosen model (see location references above)
+:::
+
 
 :::
 
