@@ -57,8 +57,8 @@ jobs:
             fi
           else
             echo "Using PR logic..."
-            # Get all changes from the merged PR by comparing with the base branch
-            CHANGED_FILES=$(git diff --name-status origin/main HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+            MERGE_BASE=$(git merge-base HEAD~1 HEAD)
+            CHANGED_FILES=$(git diff --name-status $MERGE_BASE HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
           fi
           
           echo "changed-files<<EOF" >> $GITHUB_OUTPUT
