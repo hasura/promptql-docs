@@ -176,8 +176,8 @@ Version 2 requests use supergraph build versions instead of direct DDN URLs. The
 of supergraph builds created in your DDN project. Users can view build details in the DDN console or fetch information
 using the [`ddn supergraph build get`](/reference/cli/commands/ddn_supergraph_build_get) command.
 
-When `build_version` is not specified in the request, the project's applied build is automatically chosen. This allows
-you to use the currently deployed build without needing to specify its version explicitly.
+When `build_version` is not specified in the request, the project's applied build (production endpoint) is automatically
+chosen. This allows you to use the currently deployed build without needing to specify its version explicitly.
 
 #### Headers
 
@@ -206,7 +206,7 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 }
 ```
 
-**Example using applied build (without specifying build_version):**
+**Example using applied build (production endpoint, without specifying build_version):**
 
 ```json
 {
@@ -252,7 +252,8 @@ Version 2 requests require the PromptQL API key to be sent as a Bearer token in 
 
 :::note Build Selection
 
-- If both `build_id` and `build_version` are omitted, the project's applied build is automatically used
+- If both `build_id` and `build_version` are omitted, the project's applied build (production endpoint) is automatically
+  used
 - You can specify either `build_id` OR `build_version`, but not both simultaneously
 - The `build_version` refers to supergraph build versions created in your DDN project
 
@@ -402,7 +403,7 @@ Configure headers in the `ddn.headers` object:
 }
 ```
 
-**Using applied build:**
+**Using applied build (production endpoint):**
 
 ```json
 {
@@ -431,7 +432,7 @@ Read more about [auth with these APIs](/promptql-apis/auth.mdx).
 2. **Build Selection (Version 2)**
 
    - When using v2, you can specify either `build_id` or `build_version`, but not both
-   - If neither is specified, the project's applied build is automatically used
+   - If neither is specified, the project's applied build (production endpoint) is automatically used
 
 3. **Artifacts**
 
