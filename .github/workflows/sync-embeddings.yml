@@ -41,9 +41,13 @@ jobs:
           echo "Looking for .md/.mdx files:"
           find . -name "*.md" -o -name "*.mdx" | head -10
           
-          if [ "${{ github.event_name }}" = "push" ]; then
-            echo "Using push logic..."
-            # Try different approaches for force push
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ github.event.pull_request.merged }}" = "true" ]; then
+            if [ "${{ github.event_name }}" = "push" ]; then
+              echo "Using push logic..."
+            else
+              echo "Using merged PR logic..."
+            fi
+            # Try different approaches for force push or merged PR
             if git show --name-status HEAD | grep -E '^[AMD]\s+docs/.*\.(mdx?|md)$'; then
               CHANGED_FILES=$(git show --name-status HEAD | grep -E '^[AMD]\s+docs/.*\.(mdx?|md)$')
             else
@@ -57,8 +61,17 @@ jobs:
             fi
           else
             echo "Using PR logic..."
-            MERGE_BASE=$(git merge-base HEAD~1 HEAD)
-            CHANGED_FILES=$(git diff --name-status $MERGE_BASE HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+            # For PRs, compare against the base branch (main)
+            echo "Finding merge base with origin/main..."
+            if MERGE_BASE=$(git merge-base origin/main HEAD 2>/dev/null); then
+              echo "Merge base: $MERGE_BASE"
+              echo "Getting changed files between $MERGE_BASE and HEAD..."
+              CHANGED_FILES=$(git diff --name-status $MERGE_BASE HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+            else
+              echo "Could not find merge base with origin/main, trying alternative approach..."
+              # Fallback: compare with the previous commit
+              CHANGED_FILES=$(git diff --name-status HEAD~1 HEAD -- 'docs/**/*.mdx' 'docs/**/*.md')
+            fi
           fi
           
           echo "changed-files<<EOF" >> $GITHUB_OUTPUT
