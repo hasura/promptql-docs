@@ -167,7 +167,7 @@ To call Vertex AI from PromptQL, the Google service account must have sufficient
 
 Recommended:
 
-- Production (least privilege): create a custom role with only predict permissions
+- Production (least privilege): create a custom role with only `aiplatform.endpoints.predict` permissions
 - Development/trials: grant the broader roles/aiplatform.user for simplicity
 
 Minimum permissions (only if you invoke Endpoints):
