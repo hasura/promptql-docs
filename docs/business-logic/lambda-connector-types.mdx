@@ -123,7 +123,7 @@ export function transformData(data: sdk.JSONValue): sdk.JSONValue {
 
 ### Parallel execution
 
-If functions are involved remote relationships in your Hasura metadata, then they may be queried in a batch-based fashion. In this situation, any async functions that are marked with the `@readonly` JSDoc tag may be executed in parallel. The default degree of parallelism per query request to the connector is 10, but you may customise this by using the `@paralleldegree` JSDoc tag on your function.
+If functions are involved remote relationships in your semantic metadata, then they may be queried in a batch-based fashion. In this situation, any async functions that are marked with the `@readonly` JSDoc tag may be executed in parallel. The default degree of parallelism per query request to the connector is 10, but you may customise this by using the `@paralleldegree` JSDoc tag on your function.
 
 ``` typescript
 /**
