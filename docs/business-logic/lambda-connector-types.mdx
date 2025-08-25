@@ -121,6 +121,24 @@ export function transformData(data: sdk.JSONValue): sdk.JSONValue {
 }
 ```
 
+### Parallel execution
+
+If functions are involved in remote relationships in your semantic metadata, they may be queried in a batch-based fashion. In this situation, any async functions that are marked with the `@readonly` JSDoc tag may be executed in parallel. The default degree of parallelism per query request to the connector is 10, but you may customize this by using the `@paralleldegree` JSDoc tag on your function.
+
+``` typescript
+/**
+ * This function will only run up to 5 http requests in parallel per query
+ *
+ * @readonly
+ * @paralleldegree 5
+ */
+export async function test(statusCode: number): Promise<string> {
+  const result = await fetch("http://httpstat.us/${statusCode}")
+  const responseBody = await result.json() as any;
+  return responseBody.description;
+}
+```
+
 ### Error handling
 
 You can throw custom errors for better error handling:
