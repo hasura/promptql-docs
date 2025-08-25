@@ -1,0 +1,161 @@
+name: Weekly DocsQL Usage Report
+
+on:
+  schedule:
+    # Run every Monday at 9:00 AM UTC
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+    inputs:
+      slack_channel:
+        description: 'Slack channel to post the report to'
+        required: false
+        default: 'team-docs'
+        type: string
+      days_back:
+        description: 'Number of days to look back for the report'
+        required: false
+        default: '7'
+        type: string
+
+jobs:
+  generate-weekly-report:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Load secrets from 1Password
+        uses: 1password/load-secrets-action@v1
+        with:
+          export-env: true
+        env:
+          OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
+          PAT: "op://Product ACT/pql-docs-bot/autograph-pat"
+          PROJECT_ID: "op://Product ACT/pql-docs-bot/docsql-project-id"
+          PROMPTQL_API_KEY: "op://Product ACT/pql-docs-bot/autograph-pql-api-key"
+      
+      - name: Generate JWT Token
+        id: generate-jwt
+        run: |
+          echo "Generating JWT token..."
+          JWT_TOKEN=$(curl -s -X POST "https://auth.pro.hasura.io/ddn/promptql/token" \
+            -H "Authorization: pat $PAT" \
+            -H "x-hasura-project-id: $PROJECT_ID" \
+            -H "Content-Type: application/json" \
+            | jq -r '.token')
+          
+          if [ "$JWT_TOKEN" = "null" ] || [ -z "$JWT_TOKEN" ]; then
+            echo "Failed to generate JWT token"
+            exit 1
+          fi
+          
+          echo "JWT token generated successfully"
+          echo "jwt_token=$JWT_TOKEN" >> $GITHUB_OUTPUT
+      
+      - name: Calculate Date Range
+        id: date-range
+        run: |
+          # Get current date in YYYY-MM-DD format
+          TO_DATE=$(date -u +%Y-%m-%d)
+          
+          # Calculate date 7 days ago (or custom days from input)
+          DAYS_BACK="${{ github.event.inputs.days_back || '7' }}"
+          
+          if [[ "$OSTYPE" == "darwin"* ]]; then
+            # macOS date command
+            FROM_DATE=$(date -u -v-${DAYS_BACK}d +%Y-%m-%d)
+          else
+            # Linux date command
+            FROM_DATE=$(date -u -d "${DAYS_BACK} days ago" +%Y-%m-%d)
+          fi
+          
+          echo "Date range: $FROM_DATE to $TO_DATE"
+          echo "from_date=$FROM_DATE" >> $GITHUB_OUTPUT
+          echo "to_date=$TO_DATE" >> $GITHUB_OUTPUT
+      
+      - name: Generate Weekly Report
+        id: generate-report
+        run: |
+          SLACK_CHANNEL="${{ github.event.inputs.slack_channel || 'team-docs' }}"
+          FROM_DATE="${{ steps.date-range.outputs.from_date }}"
+          TO_DATE="${{ steps.date-range.outputs.to_date }}"
+          JWT_TOKEN="${{ steps.generate-jwt.outputs.jwt_token }}"
+          
+          echo "Generating weekly report for $FROM_DATE to $TO_DATE"
+          echo "Posting to Slack channel: $SLACK_CHANNEL"
+          
+          # Create the request payload
+          REQUEST_PAYLOAD=$(cat <<EOF
+          {
+            "input": [{
+              "to_date": "$TO_DATE",
+              "from_date": "$FROM_DATE",
+              "slack_channel": "$SLACK_CHANNEL"
+            }],
+            "ddn_headers": {
+              "authorization": "Bearer $JWT_TOKEN",
+              "x-hasura-autograph-project-id": "$PROJECT_ID"
+            }
+          }
+          EOF
+          )
+
+          echo "Request payload:"
+          echo "$REQUEST_PAYLOAD"
+          
+          # Make the request to generate the report
+          RESPONSE=$(curl -s -X POST "https://auto-graph-68c82f4a.ddn.pro.hasura.io/promptql/automations/v1/weekly_conversation_report_generator/run" \
+            -H "Content-Type: application/json" \
+            -H "authorization: api-key $PROMPTQL_API_KEY" \
+            -d "$REQUEST_PAYLOAD")
+          
+          echo "Response:"
+          echo "$RESPONSE"
+          
+          # Check if the request was successful
+          STATUS=$(echo "$RESPONSE" | jq -r '.status // "unknown"')
+          ERROR=$(echo "$RESPONSE" | jq -r '.error // null')
+          
+          if [ "$STATUS" = "completed" ] && [ "$ERROR" = "null" ]; then
+            echo "✅ Weekly report generated successfully!"
+            
+            # Extract report details
+            TOTAL_CONVERSATIONS=$(echo "$RESPONSE" | jq -r '.output.data[0].total_conversations // 0')
+            TOTAL_MESSAGES=$(echo "$RESPONSE" | jq -r '.output.data[0].total_messages // 0')
+            SLACK_MESSAGE_ID=$(echo "$RESPONSE" | jq -r '.output.data[0].slack_message_id // "unknown"')
+            
+            echo "📊 Report Summary:"
+            echo "- Total Conversations: $TOTAL_CONVERSATIONS"
+            echo "- Total Messages: $TOTAL_MESSAGES"
+            echo "- Slack Message ID: $SLACK_MESSAGE_ID"
+            
+            # Save summary to output
+            echo "success=true" >> $GITHUB_OUTPUT
+            echo "total_conversations=$TOTAL_CONVERSATIONS" >> $GITHUB_OUTPUT
+            echo "total_messages=$TOTAL_MESSAGES" >> $GITHUB_OUTPUT
+            echo "slack_message_id=$SLACK_MESSAGE_ID" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Failed to generate weekly report"
+            echo "Status: $STATUS"
+            echo "Error: $ERROR"
+            echo "success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: Report Summary
+        if: always()
+        run: |
+          if [ "${{ steps.generate-report.outputs.success }}" = "true" ]; then
+            echo "🎉 Weekly Documentation Report Generated Successfully!"
+            echo ""
+            echo "📅 Report Period: ${{ steps.date-range.outputs.from_date }} to ${{ steps.date-range.outputs.to_date }}"
+            echo "📊 Total Conversations: ${{ steps.generate-report.outputs.total_conversations }}"
+            echo "💬 Total Messages: ${{ steps.generate-report.outputs.total_messages }}"
+            echo "💬 Slack Channel: ${{ github.event.inputs.slack_channel || 'team-docs' }}"
+            echo "🔗 Slack Message ID: ${{ steps.generate-report.outputs.slack_message_id }}"
+            echo ""
+            echo "The detailed report has been posted to the specified Slack channel."
+          else
+            echo "❌ Weekly report generation failed. Please check the logs above for details."
+          fi
