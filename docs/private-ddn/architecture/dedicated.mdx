@@ -51,6 +51,7 @@ flowchart TD
       subgraph dp[Data Plane]
         pql_engine[[PromptQL]]
         dp_conn[Connectors]
+        dp_artifacts[Artifact Storage]
       end
     end
   end
@@ -74,6 +75,9 @@ flowchart TD
   %% Data plane -> sources (with private network annotation)
   pql_engine --> dp_conn
   dp_conn -- "Traffic over private network" --> src
+
+  %% PromptQL engine -> artifacts storage
+  pql_engine --> dp_artifacts
 
   %% Control plane to data plane (management/ops)
   cp_api -.-> pql_engine
