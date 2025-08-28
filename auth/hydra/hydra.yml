@@ -1,0 +1,37 @@
+serve:
+  public:
+    port: 4444
+    host: 0.0.0.0
+    cors:
+      enabled: true
+      allowed_origins:
+        - http://localhost:3001
+      allowed_methods:
+        - POST
+        - GET
+        - PUT
+        - PATCH
+        - DELETE
+      allowed_headers:
+        - Authorization
+        - Content-Type
+      allow_credentials: true
+  admin:
+    port: 4445
+    host: 0.0.0.0
+
+urls:
+  self:
+    issuer: http://localhost:4444
+  consent: http://localhost:3000/consent
+  login: http://localhost:3000/login
+
+secrets:
+  system:
+    - youReallyNeedToChangeThis
+
+oauth2:
+  expose_internal_errors: true
+
+log:
+  level: debug
