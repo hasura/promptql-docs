@@ -38,8 +38,8 @@ echo ""
 echo "✅ Authentication services are ready!"
 echo ""
 
-echo "🏗️  Building Docusaurus for production..."
-npx docusaurus build
+echo "🏗️  Building Docusaurus for local testing..."
+DOCUSAURUS_BUILD_TYPE=local npx docusaurus build
 
 if [ $? -ne 0 ]; then
     echo "❌ Build failed!"

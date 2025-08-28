@@ -47,6 +47,6 @@ echo "🚀 Starting Docusaurus development server..."
 echo ""
 
 # Start Docusaurus in the foreground so we can see logs and stop with Ctrl+C
-npx docusaurus start --port 3001 --host 0.0.0.0
+NODE_ENV=development npx docusaurus start --port 3001 --host 0.0.0.0
 
 # The cleanup function will be called automatically when the script exits

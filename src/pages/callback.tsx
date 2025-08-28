@@ -80,7 +80,7 @@ const AuthCallback: React.FC = () => {
       <div className="auth-error-details">
         {error}
       </div>
-      <a href="/login" className="auth-button">
+      <a href="/docs/login" className="auth-button">
         Try Again
       </a>
     </div>

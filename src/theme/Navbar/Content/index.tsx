@@ -40,7 +40,7 @@ ${JSON.stringify(item, null, 2)}`,
 }
 
 function AuthStatus(): ReactNode {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
 
   if (!isAuthenticated) {
     return null;
@@ -48,9 +48,6 @@ function AuthStatus(): ReactNode {
 
   return (
     <div className="auth-status">
-      <span className="auth-status-email">
-        {user?.email}
-      </span>
       <button
         onClick={logout}
         className="auth-logout-button"
