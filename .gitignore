@@ -47,3 +47,5 @@ yarn-error.log*
 
 /static/docs-schema.json
 /docs-schema.json
+
+auth/

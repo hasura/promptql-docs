@@ -8,6 +8,7 @@ import NavbarMobileSidebarToggle from '@theme/Navbar/MobileSidebar/Toggle';
 import NavbarLogo from '@theme/Navbar/Logo';
 import NavbarSearch from '@theme/Navbar/Search';
 import CopyLLM from '@site/src/components/CopyLlmText';
+import { useAuth } from '@site/src/contexts/AuthContext';
 
 import styles from './styles.module.css';
 
@@ -38,6 +39,28 @@ ${JSON.stringify(item, null, 2)}`,
   );
 }
 
+function AuthStatus(): ReactNode {
+  const { user, isAuthenticated, logout } = useAuth();
+
+  if (!isAuthenticated) {
+    return null;
+  }
+
+  return (
+    <div className="auth-status">
+      <span className="auth-status-email">
+        {user?.email}
+      </span>
+      <button
+        onClick={logout}
+        className="auth-logout-button"
+      >
+        Logout
+      </button>
+    </div>
+  );
+}
+
 function NavbarContentLayout({ left, right }: { left: ReactNode; right: ReactNode }) {
   return (
     <div className="navbar__inner">
@@ -54,6 +77,7 @@ export default function NavbarContent(): ReactNode {
   const [leftItems, rightItems] = splitNavbarItems(items);
 
   const searchBarItem = items.find(item => item.type === 'search');
+  const { isAuthenticated } = useAuth();
 
   return (
     <NavbarContentLayout
@@ -69,10 +93,11 @@ export default function NavbarContent(): ReactNode {
         // TODO stop hardcoding items?
         // Ask the user to add the respective navbar items => more flexible
         <>
-          <NavbarItems items={rightItems} />
-          <CopyLLM />
+          {isAuthenticated && <NavbarItems items={rightItems} />}
+          <AuthStatus />
+          {isAuthenticated && <CopyLLM />}
           <NavbarColorModeToggle className={styles.colorModeToggle} />
-          {!searchBarItem && (
+          {isAuthenticated && !searchBarItem && (
             <NavbarSearch>
               <SearchBar />
             </NavbarSearch>
