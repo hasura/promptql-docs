@@ -46,10 +46,10 @@ The docs will open at `http://localhost:3001` with hot reloading and full authen
 yarn build
 
 # Test the production build locally (with authentication)
-yarn build-local
+yarn build:local
 ```
 
-The `build` command generates static files in the `build` directory, ready for any static hosting service. The `build-local` command builds the site and serves it locally with the full authentication system for testing.
+The `build` command generates static files in the `build` directory, ready for any static hosting service. The `build:local` command builds the site and serves it locally with the full authentication system for testing.
 
 
 ## Need Help?

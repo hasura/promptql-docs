@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",
-    "start": "./dev.sh",
-    "dev:stop": "./stop-dev.sh",
-    "build-local": "./build-local.sh",
+    "start": "./scripts/dev.sh",
+    "dev:stop": "./scripts/stop-dev.sh",
+    "build:local": "./scripts/build-local.sh",
     "build": "node ./custom-build-script.cjs",
     "swizzle": "docusaurus swizzle",
     "deploy": "docusaurus deploy",

@@ -1,5 +1,17 @@
 #!/bin/bash
 
+# Function to cleanup services on exit
+cleanup() {
+    echo ""
+    echo "🛑 Shutting down services..."
+    docker compose -f auth/compose.yml down
+    echo "✅ Local testing environment stopped."
+    exit 0
+}
+
+# Set up trap to catch Ctrl+C and other exit signals
+trap cleanup SIGINT SIGTERM EXIT
+
 echo "🏗️  Building PromptQL Docs for Local Testing"
 echo "============================================="
 
@@ -31,8 +43,6 @@ npx docusaurus build
 
 if [ $? -ne 0 ]; then
     echo "❌ Build failed!"
-    echo "🛑 Shutting down services..."
-    docker compose -f auth/compose.yml down
     exit 1
 fi
 
@@ -54,8 +64,4 @@ echo ""
 # Start the production server in the foreground
 npx docusaurus serve --port 3001
 
-echo ""
-echo "🛑 Shutting down services..."
-docker compose -f auth/compose.yml down
-
-echo "✅ Local testing environment stopped."
+# The cleanup function will be called automatically when the script exits

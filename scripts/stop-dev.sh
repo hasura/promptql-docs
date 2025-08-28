@@ -8,4 +8,4 @@ docker compose -f auth/compose.yml down
 
 echo "✅ Development environment stopped."
 echo ""
-echo "💡 To start again, run: yarn dev"
+echo "💡 To start again, run: yarn start"

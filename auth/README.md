@@ -17,7 +17,7 @@ This directory contains the mock authentication setup for the PromptQL documenta
 
 3. **Test production build locally:**
    ```bash
-   yarn build-local
+   yarn build:local
    ```
 
 ## Architecture Overview
@@ -166,7 +166,7 @@ yarn start
 yarn dev:stop
 
 # Test production build locally
-yarn build-local
+yarn build:local
 
 # Manual service management (if needed)
 docker compose -f auth/compose.yml logs -f    # View logs
