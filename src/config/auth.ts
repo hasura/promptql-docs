@@ -53,7 +53,7 @@ const getOAuthConfig = () => {
     hydraAuthUrl: 'https://oauth.pro.arusah.com/oauth2/auth',
     hydraTokenUrl: 'https://oauth.pro.arusah.com/oauth2/token',
     clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
-    redirectUri: 'https://robdominguez-doc-3117-create.promptql-docs.pages.dev/docs/callback',
+    redirectUri: 'https://promptql.io/docs/callback',
     scope: 'openid offline'
   };
 };
