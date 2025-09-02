@@ -21,9 +21,9 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
   try {
     const response = await fetch(authConfig.graphqlEndpoint, {
       method: 'POST',
-      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
         'Hasura-Client-Name': 'promptql-docs',
       },
       body: JSON.stringify({
