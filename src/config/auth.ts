@@ -19,6 +19,14 @@ export const getEnvironmentContext = () => {
                        // Fallback: detect development by checking if we're on localhost
                        (typeof window !== 'undefined' && window.location.hostname === 'localhost');
   const isLocalBuild = typeof process !== 'undefined' && process.env?.DOCUSAURUS_BUILD_TYPE === 'local';
+  
+  // Hostname-based environment detection
+  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
+  const isStaging = (typeof process !== 'undefined' && process.env?.release_mode === 'staging') ||
+                    hostname === 'stage.promptql.io';
+  const isProduction = (typeof process !== 'undefined' && process.env?.release_mode === 'production') ||
+                       hostname === 'promptql.io';
+  
   const releaseMode = typeof process !== 'undefined' ? process.env?.release_mode : undefined;
 
   // Get PR preview status from Docusaurus customFields (set at build time)
@@ -59,8 +67,8 @@ export const getEnvironmentContext = () => {
     isDevelopment,
     isLocalBuild,
     isPRPreview,
-    isProduction: releaseMode === 'production',
-    isStaging: releaseMode === 'staging',
+    isProduction,
+    isStaging,
     releaseMode
   };
 };
