@@ -54,8 +54,8 @@ const getOAuthConfig = () => {
     : 'https://stage.promptql.io';
 
   return {
-    hydraAuthUrl: 'https://oauth.pro.arusah.io/oauth2/auth',
-    hydraTokenUrl: 'https://oauth.pro.arusah.io/oauth2/token',
+    hydraAuthUrl: 'https://oauth.pro.arusah.com/oauth2/auth',
+    hydraTokenUrl: 'https://oauth.pro.arusah.com/oauth2/token',
     clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
     redirectUri: `${baseUrl}/docs/callback`,
     scope: 'openid offline'
