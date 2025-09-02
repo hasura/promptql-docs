@@ -20,6 +20,7 @@ steps:
       - '-c'
       - |
         sed -i 's|latest|${SHORT_SHA}|g' ./k8s-manifest/k8s/deployment.yaml
+        sed -i 's|RELEASE_MODE_PLACEHOLDER|${_RELEASE_MODE}|g' ./k8s-manifest/k8s/deployment.yaml
 
   #deploy kubernetes manifest
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -41,5 +42,6 @@ timeout: 3600s
 substitutions:
   _REGION: us-west2
   _CLUSTERNAME: prod-website-cloud-us-we2-gke-01
+  _RELEASE_MODE: staging
 options:
   workerPool: 'projects/websitecloud-352908/locations/us-west2/workerPools/gke-vpn-pool'

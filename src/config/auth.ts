@@ -21,11 +21,44 @@ export const getEnvironmentContext = () => {
   const isLocalBuild = typeof process !== 'undefined' && process.env?.DOCUSAURUS_BUILD_TYPE === 'local';
   const releaseMode = typeof process !== 'undefined' ? process.env?.release_mode : undefined;
 
-  console.log('Environment detection:', { isDevelopment, isLocalBuild, releaseMode, hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A' });
+  // Get PR preview status from Docusaurus customFields (set at build time)
+  // This is much more reliable than runtime detection
+  let isPRPreview = false;
+
+  if (typeof window !== 'undefined') {
+    try {
+      // Access the Docusaurus site config that's available globally
+      const siteConfig = (window as any).docusaurus?.siteConfig;
+      const customFields = siteConfig?.customFields;
+      isPRPreview = customFields?.isPreviewPR === true;
+
+      // Debug logging to see what's actually available
+      console.log('CustomFields debug:', {
+        hasDocusaurus: !!(window as any).docusaurus,
+        hasSiteConfig: !!siteConfig,
+        hasCustomFields: !!customFields,
+        isPreviewPR: customFields?.isPreviewPR,
+        allCustomFields: customFields
+      });
+    } catch (e) {
+      console.log('Error accessing customFields:', e);
+      // Fallback to false if customFields not available
+      isPRPreview = false;
+    }
+  }
+
+  console.log('Environment detection:', {
+    isDevelopment,
+    isLocalBuild,
+    isPRPreview,
+    releaseMode,
+    hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A'
+  });
 
   return {
     isDevelopment,
     isLocalBuild,
+    isPRPreview,
     isProduction: releaseMode === 'production',
     isStaging: releaseMode === 'staging',
     releaseMode
@@ -48,12 +81,23 @@ const getOAuthConfig = () => {
     };
   }
 
-  // Staging/Production configuration (using Control Plan Services OAuth)
+  // Staging configuration
+  if (env.isStaging) {
+    return {
+      hydraAuthUrl: 'https://oauth.pro.arusah.com/oauth2/auth',
+      hydraTokenUrl: 'https://oauth.pro.arusah.com/oauth2/token',
+      clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
+      redirectUri: 'https://stage.promptql.io/docs/callback',
+      scope: 'openid offline'
+    };
+  }
+
+  // Production configuration
   return {
-    hydraAuthUrl: 'https://oauth.pro.arusah.com/oauth2/auth',
-    hydraTokenUrl: 'https://oauth.pro.arusah.com/oauth2/token',
+    hydraAuthUrl: 'https://oauth.pro.hasura.io/oauth2/auth',
+    hydraTokenUrl: 'https://oauth.pro.hasura.io/oauth2/token',
     clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
-    redirectUri: 'https://robdominguez-doc-3117-create.promptql-docs.pages.dev/docs/callback',
+    redirectUri: 'https://promptql.io/docs/callback',
     scope: 'openid offline'
   };
 };
@@ -62,6 +106,17 @@ const getOAuthConfig = () => {
 export const getAuthConfig = (): AuthConfig => {
   const env = getEnvironmentContext();
   const oauth = getOAuthConfig();
+
+  // Completely disable auth for PR preview environments
+  if (env.isPRPreview) {
+    console.log('PR preview environment detected - disabling auth completely');
+    return {
+      useMockUserAccess: true,
+      graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
+      enableUserAccessCheck: false, // Completely disable auth checks
+      oauth
+    };
+  }
 
   // Use mock for development and local builds
   if (env.isDevelopment || env.isLocalBuild) {
@@ -74,7 +129,18 @@ export const getAuthConfig = (): AuthConfig => {
     };
   }
 
-  // Production/staging configuration
+  // Staging configuration
+  if (env.isStaging) {
+    console.log('Using staging auth config with real GraphQL queries');
+    return {
+      useMockUserAccess: false,
+      graphqlEndpoint: 'https://data.pro.arusah.com/v1/graphql',
+      enableUserAccessCheck: true,
+      oauth
+    };
+  }
+
+  // Production configuration
   console.log('Using production auth config with real GraphQL queries');
   return {
     useMockUserAccess: false,
@@ -85,7 +151,7 @@ export const getAuthConfig = (): AuthConfig => {
 };
 
 // GraphQL query for checking user access
-// The API will identify the user from the Authorization header token since we've configured a webhook on the Hasura side of things
+// The API will identify the user from cookie since we've configured a webhook on the Hasura side of things that will be forwarded cookies
 export const USER_ACCESS_QUERY = `
   query CheckUserAccess {
     ddn_promptql_enabled_users {
