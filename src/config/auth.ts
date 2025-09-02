@@ -49,15 +49,11 @@ const getOAuthConfig = () => {
   }
 
   // Staging/Production configuration (using Control Plan Services OAuth)
-  const baseUrl = env.isProduction
-    ? 'https://promptql.io'
-    : 'https://stage.promptql.io';
-
   return {
     hydraAuthUrl: 'https://oauth.pro.arusah.com/oauth2/auth',
     hydraTokenUrl: 'https://oauth.pro.arusah.com/oauth2/token',
     clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
-    redirectUri: `${baseUrl}/docs/callback`,
+    redirectUri: 'https://robdominguez-doc-3117-create.promptql-docs.pages.dev/docs/callback',
     scope: 'openid offline'
   };
 };
