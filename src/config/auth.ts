@@ -6,7 +6,7 @@ export interface AuthConfig {
     hydraAuthUrl: string;
     hydraTokenUrl: string;
     clientId: string;
-    clientSecret: string;
+    clientSecret?: string;
     redirectUri: string;
     scope: string;
   };
@@ -54,10 +54,9 @@ const getOAuthConfig = () => {
     : 'https://stage.promptql.io';
 
   return {
-    hydraAuthUrl: 'https://auth.hasura.io/oauth2/auth',
-    hydraTokenUrl: 'https://auth.hasura.io/oauth2/token',
+    hydraAuthUrl: 'https://oauth.pro.hasura.io/oauth2/auth',
+    hydraTokenUrl: 'https://oauth.pro.hasura.io/oauth2/token',
     clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
-    clientSecret: '', // Public client - no secret needed (token_endpoint_auth_method: "none")
     redirectUri: `${baseUrl}/docs/callback`,
     scope: 'openid offline'
   };
