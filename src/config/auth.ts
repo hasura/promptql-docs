@@ -32,15 +32,36 @@ export const getEnvironmentContext = () => {
   };
 };
 
-// OAuth2 configuration - can be environment-specific if needed
-const getOAuthConfig = () => ({
-  hydraAuthUrl: 'http://localhost:4444/oauth2/auth',
-  hydraTokenUrl: 'http://localhost:4444/oauth2/token',
-  clientId: 'docusaurus-client',
-  clientSecret: 'docusaurus-super-secret',
-  redirectUri: 'http://localhost:3001/docs/callback',
-  scope: 'openid email'
-});
+// OAuth2 configuration - environment-specific
+const getOAuthConfig = () => {
+  const env = getEnvironmentContext();
+
+  // Development/local configuration (using local Hydra)
+  if (env.isDevelopment || env.isLocalBuild) {
+    return {
+      hydraAuthUrl: 'http://localhost:4444/oauth2/auth',
+      hydraTokenUrl: 'http://localhost:4444/oauth2/token',
+      clientId: 'docusaurus-client',
+      clientSecret: 'docusaurus-super-secret',
+      redirectUri: 'http://localhost:3001/docs/callback',
+      scope: 'openid email'
+    };
+  }
+
+  // Staging/Production configuration (using Control Plan Services OAuth)
+  const baseUrl = env.isProduction
+    ? 'https://promptql.io'
+    : 'https://stage.promptql.io';
+
+  return {
+    hydraAuthUrl: 'https://auth.hasura.io/oauth2/auth',
+    hydraTokenUrl: 'https://auth.hasura.io/oauth2/token',
+    clientId: 'caba4e74-7d83-441f-88c1-c56a79d5bb87',
+    clientSecret: '', // Public client - no secret needed (token_endpoint_auth_method: "none")
+    redirectUri: `${baseUrl}/docs/callback`,
+    scope: 'openid offline'
+  };
+};
 
 // Get auth configuration based on environment
 export const getAuthConfig = (): AuthConfig => {

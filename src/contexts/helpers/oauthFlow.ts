@@ -51,17 +51,27 @@ export const handleAuthCallback = async (code: string, state: string): Promise<s
     console.log('Exchanging code:', code);
     console.log('Redirect URI:', authConfig.oauth.redirectUri);
 
+    // Prepare headers and body based on client authentication method
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    };
+
+    const bodyParams = new URLSearchParams({
+      grant_type: 'authorization_code',
+      code,
+      redirect_uri: authConfig.oauth.redirectUri,
+      client_id: authConfig.oauth.clientId,
+    });
+
+    // Only add Authorization header if client secret is provided (for local development)
+    if (authConfig.oauth.clientSecret) {
+      headers['Authorization'] = `Basic ${btoa(`${authConfig.oauth.clientId}:${authConfig.oauth.clientSecret}`)}`;
+    }
+
     const tokenResponse = await fetch(authConfig.oauth.hydraTokenUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': `Basic ${btoa(`${authConfig.oauth.clientId}:${authConfig.oauth.clientSecret}`)}`,
-      },
-      body: new URLSearchParams({
-        grant_type: 'authorization_code',
-        code,
-        redirect_uri: authConfig.oauth.redirectUri,
-      }),
+      headers,
+      body: bodyParams,
     });
 
     if (!tokenResponse.ok) {
