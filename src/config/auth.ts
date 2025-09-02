@@ -78,7 +78,7 @@ export const getAuthConfig = (): AuthConfig => {
   console.log('Using production auth config with real GraphQL queries');
   return {
     useMockUserAccess: false,
-    graphqlEndpoint: 'https://data.pro.arusah.io/v1/graphql',
+    graphqlEndpoint: 'https://data.pro.arusah.com/v1/graphql',
     enableUserAccessCheck: true,
     oauth
   };
