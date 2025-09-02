@@ -1,0 +1,62 @@
+import Cookies from 'js-cookie';
+import { checkUserAccess } from './userAccess';
+
+export interface User {
+  id: string;
+  email: string;
+  name?: string;
+}
+
+/**
+ * Initialize authentication state from stored session
+ */
+export const initializeAuthFromSession = async (): Promise<User | null> => {
+  try {
+    const accessToken = Cookies.get('hasura-lux');
+
+    if (accessToken) {
+      const hasAccess = await checkUserAccess(accessToken);
+
+      if (hasAccess) {
+        // Return a minimal user object - we don't need actual user data
+        return { id: 'authenticated', email: 'authenticated' };
+      } else {
+        // Clear invalid session
+        clearSession();
+        return null;
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('Error initializing auth from session:', error);
+    // Clear potentially corrupted session
+    clearSession();
+    return null;
+  }
+};
+
+/**
+ * Store user session data
+ */
+export const storeSession = (accessToken: string): void => {
+  Cookies.set('hasura-lux', accessToken, { expires: 1 }); // 1 day
+  // We no longer store user_info - the GraphQL API identifies users from the token
+};
+
+/**
+ * Clear user session data
+ */
+export const clearSession = (): void => {
+  Cookies.remove('hasura-lux');
+  // No longer need to remove user_info cookie
+};
+
+/**
+ * Perform logout and redirect
+ */
+export const performLogout = (): void => {
+  clearSession();
+  // Redirect to docs index page
+  window.location.href = '/docs/index/';
+};
