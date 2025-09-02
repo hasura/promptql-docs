@@ -238,11 +238,13 @@ Configuration settings for a Google Vertex AI LLM
 | Key | Value | Required | Description |
 |-----|-----|-----|-----|
 | `provider` | `vertex` | true |  |
-| `modelId` | string | true | The publisher-prefixed model ID, e.g., `google/gemini-2.5-flash` or `anthropic/claude-3-7-sonnet`. |
-| `googleProject` | string | true | The Google Cloud project ID to use. |
-| `googleLocation` | string | true | The Vertex AI region (e.g., `global`, `us-central1`, `europe-west4`). Must be valid for the chosen model. |
-| `googleServiceAccountKeyJson` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | JSON for the Google service account key. Store as an env var and reference with `valueFromEnv`. |
-| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if Vertex AI is unavailable |
+| `modelId` | string | true | The specific Gemini/Vertex model to use |
+| `googleProject` | string | true | The GCP project ID used for Vertex AI |
+| `googleLocation` | string | true | The Vertex AI location (e.g., us-central1) |
+| `googleServiceAccountKeyJson` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The Google service account key JSON to authenticate to Vertex AI |
+| `safetySettings` | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false | Safety settings for Gemini-compatible models on Vertex |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if Vertex is unavailable |
+
 
 
 #### GeminiLlmConfig {#promptqlconfigv2-geminillmconfig}
