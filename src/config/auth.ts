@@ -12,63 +12,37 @@ export interface AuthConfig {
   };
 }
 
+// Import the generated Docusaurus config
+import siteConfig from '@generated/docusaurus.config';
+
 // Environment detection utilities
 export const getEnvironmentContext = () => {
-  // Use typeof check to safely access process in browser environment
-  const isDevelopment = (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') ||
-                       // Fallback: detect development by checking if we're on localhost
-                       (typeof window !== 'undefined' && window.location.hostname === 'localhost');
-  const isLocalBuild = typeof process !== 'undefined' && process.env?.DOCUSAURUS_BUILD_TYPE === 'local';
-  
-  // Hostname-based environment detection
-  const hostname = typeof window !== 'undefined' ? window.location.hostname : '';
-  const isStaging = (typeof process !== 'undefined' && process.env?.release_mode === 'staging') ||
-                    hostname === 'stage.promptql.io';
-  const isProduction = (typeof process !== 'undefined' && process.env?.release_mode === 'production') ||
-                       hostname === 'promptql.io';
-  
-  const releaseMode = typeof process !== 'undefined' ? process.env?.release_mode : undefined;
+  // Get release mode and other config from Docusaurus customFields
+  const releaseMode = siteConfig.customFields?.releaseMode as string | undefined;
+  const isPreviewPR = (siteConfig.customFields?.isPreviewPR as boolean) || false;
 
-  // Get PR preview status from Docusaurus customFields (set at build time)
-  // This is much more reliable than runtime detection
-  let isPRPreview = false;
-
-  if (typeof window !== 'undefined') {
-    try {
-      // Access the Docusaurus site config that's available globally
-      const siteConfig = (window as any).docusaurus?.siteConfig;
-      const customFields = siteConfig?.customFields;
-      isPRPreview = customFields?.isPreviewPR === true;
-
-      // Debug logging to see what's actually available
-      console.log('CustomFields debug:', {
-        hasDocusaurus: !!(window as any).docusaurus,
-        hasSiteConfig: !!siteConfig,
-        hasCustomFields: !!customFields,
-        isPreviewPR: customFields?.isPreviewPR,
-        allCustomFields: customFields
-      });
-    } catch (e) {
-      console.log('Error accessing customFields:', e);
-      // Fallback to false if customFields not available
-      isPRPreview = false;
-    }
-  }
+  // Environment detection based purely on build-time configuration
+  const isDevelopment = releaseMode === 'development';
+  const isLocalBuild = false; 
+  const isPRPreview = isPreviewPR;
+  const isStaging = releaseMode === 'staging';
+  const isProduction = releaseMode === 'production';
 
   console.log('Environment detection:', {
     isDevelopment,
     isLocalBuild,
     isPRPreview,
     releaseMode,
-    hostname: typeof window !== 'undefined' ? window.location.hostname : 'N/A'
+    isStaging,
+    isProduction
   });
 
   return {
     isDevelopment,
     isLocalBuild,
     isPRPreview,
-    isProduction,
     isStaging,
+    isProduction,
     releaseMode
   };
 };

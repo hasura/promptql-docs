@@ -3,8 +3,9 @@
 #Modifying this will trigger deployment without a code change
 FROM --platform=linux/amd64 node:18.14.2
 
+ARG RELEASE_MODE=production
 ENV PORT=8080
-ENV release_mode="production"
+ENV release_mode=${RELEASE_MODE}
 ENV BUILD_VERSION="3.0"
 
 # Create app directory
