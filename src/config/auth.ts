@@ -2,6 +2,7 @@ export interface AuthConfig {
   useMockUserAccess: boolean;
   graphqlEndpoint: string;
   enableUserAccessCheck: boolean;
+  isAuthDisabled: boolean;
   oauth: {
     hydraAuthUrl: string;
     hydraTokenUrl: string;
@@ -96,6 +97,7 @@ export const getAuthConfig = (): AuthConfig => {
       useMockUserAccess: true,
       graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
       enableUserAccessCheck: false, // Completely disable auth checks
+      isAuthDisabled: true, // Hide auth UI completely
       oauth
     };
   }
@@ -107,6 +109,7 @@ export const getAuthConfig = (): AuthConfig => {
       useMockUserAccess: true,
       graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
       enableUserAccessCheck: true,
+      isAuthDisabled: false, // Auth UI enabled for development
       oauth
     };
   }
@@ -118,6 +121,7 @@ export const getAuthConfig = (): AuthConfig => {
       useMockUserAccess: false,
       graphqlEndpoint: 'https://data.pro.arusah.com/v1/graphql',
       enableUserAccessCheck: true,
+      isAuthDisabled: false, // Auth UI enabled for staging
       oauth
     };
   }
@@ -128,6 +132,7 @@ export const getAuthConfig = (): AuthConfig => {
     useMockUserAccess: false,
     graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
     enableUserAccessCheck: true,
+    isAuthDisabled: false, // Auth UI enabled for production
     oauth
   };
 };

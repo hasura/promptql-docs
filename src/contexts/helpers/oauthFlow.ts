@@ -15,9 +15,16 @@ export const generateState = (): string => {
  */
 export const initiateLogin = () => {
   const authConfig = getAuthConfig();
+
+  // Don't initiate OAuth flow if auth is disabled (e.g., PR previews)
+  if (authConfig.isAuthDisabled) {
+    console.log('Auth is disabled - skipping OAuth flow');
+    return;
+  }
+
   const state = generateState();
   sessionStorage.setItem('oauth_state', state);
-  
+
   // Store the current path to redirect back after login
   const currentPath = window.location.pathname;
   if (currentPath !== '/docs/login/') {

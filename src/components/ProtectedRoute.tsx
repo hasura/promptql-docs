@@ -1,6 +1,7 @@
 import React, { ReactNode, useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
 import { useAuth } from '../contexts/AuthContext';
+import { getAuthConfig } from '../config/auth';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -10,6 +11,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   const { isAuthenticated, isLoading, login } = useAuth();
   const location = useLocation();
   const [showLoader, setShowLoader] = useState(false);
+  const authConfig = getAuthConfig();
 
   // Set up timer for delayed loader
   useEffect(() => {
@@ -29,6 +31,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   // Allow callback path to pass through without authentication
   if (location.pathname === '/docs/callback') {
+    return <>{children}</>;
+  }
+
+  // If auth is disabled (e.g., PR previews), allow access without authentication
+  if (authConfig.isAuthDisabled) {
     return <>{children}</>;
   }
 
