@@ -160,6 +160,9 @@ html[data-theme='dark'] {
   --body-list-item-color: var(--heading-color);
   --sidebar-divider: #1f2937;
 
+  /* Authentication Colors - Dark Mode */
+  --auth-button-text: #1f2937;
+
   --note-bg: #1f2937;
   --note-border: #374151;
   --note-code-border: #475569;
@@ -1827,10 +1830,15 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-required {
-  text-align: center;
+  display: grid;
+  place-items: center;
+  min-height: 60vh;
   padding: 2rem;
+}
+
+.auth-required > div {
+  text-align: left;
   max-width: 600px;
-  margin: 0 auto;
 }
 
 .auth-required h1 {
@@ -1839,8 +1847,9 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-required p {
-  color: var(--body-text-color);
+  color: var(--button-text);
   margin-bottom: 2rem;
+  font-size: 0.95rem;
 }
 
 .auth-button {
