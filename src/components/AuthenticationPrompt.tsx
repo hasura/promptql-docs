@@ -4,7 +4,6 @@ import { getAuthConfig } from '../config/auth';
 
 interface AuthenticationPromptProps {
   title?: string;
-  description?: string;
   className?: string;
 }
 
@@ -14,7 +13,6 @@ interface AuthenticationPromptProps {
  */
 export const AuthenticationPrompt: React.FC<AuthenticationPromptProps> = ({
   title = "Access Full Documentation",
-  description = "Sign in to access the complete PromptQL documentation and interactive features.",
   className = ""
 }) => {
   const { isAuthenticated, isLoading, login } = useAuth();
@@ -34,13 +32,24 @@ export const AuthenticationPrompt: React.FC<AuthenticationPromptProps> = ({
     <div className={`auth-prompt-container ${className}`}>
       <div className="auth-prompt-card">
         <h3>{title}</h3>
-        <p>{description}</p>
+        <p>
+          Already a PromptQL user? Sign in to continue. Not a user yet?{' '}
+          <a
+            href="https://promptql.io/book-demo?utm_source=docs&utm_medium=auth_prompt&utm_campaign=documentation"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="auth-inline-link"
+          >
+            Reach out to sales
+          </a>
+          .
+        </p>
         <button
           onClick={login}
           className="auth-button auth-prompt-button"
         >
           <span>🔐</span>
-          Sign In with Hasura Cloud
+          Sign In with PromptQL
         </button>
       </div>
     </div>

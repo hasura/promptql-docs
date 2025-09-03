@@ -14,8 +14,8 @@ interface AccessDeniedProps {
  */
 export const AccessDenied: React.FC<AccessDeniedProps> = ({
   title = "Access Not Available",
-  message = "While you have a Hasura Cloud account, it looks like you don't have access to PromptQL yet.",
-  contactInfo = "Please contact your AI strategist to allowlist your email for reading through the documentation and for creating PromptQL projects.",
+  message = "Thanks for signing in. It looks like you’re not a PromptQL user yet.",
+  contactInfo = "Please contact your AI strategist to grant you access for reading through the documentation and for creating PromptQL projects.",
   className = ""
 }) => {
   const { logout } = useAuth();
@@ -56,13 +56,13 @@ export const AccessDenied: React.FC<AccessDeniedProps> = ({
           <p>
             Need help? Visit our{' '}
             <a
-              href="https://promptql.io/support"
+              href="https://forum.promptql.io/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              support page
+              PromptQL Forum
             </a>{' '}
-            or contact your team administrator.
+            or contact your sales representative.
           </p>
         </div>
       </div>
