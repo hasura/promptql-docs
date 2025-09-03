@@ -129,8 +129,8 @@
   font-family: 'Inter', sans-serif;
 
   /* Authentication Colors */
-  --auth-button-bg: var(--body-link-color);
-  --auth-button-bg-hover: var(--body-link-color-hover);
+  --auth-button-bg: var(--primary-neutral-800);
+  --auth-button-bg-hover: var(--primary-neutral-700);
   --auth-button-text: #ffffff;
   --auth-error-bg: var(--danger-bg);
   --auth-error-border: var(--danger-border);
@@ -161,7 +161,9 @@ html[data-theme='dark'] {
   --sidebar-divider: #1f2937;
 
   /* Authentication Colors - Dark Mode */
-  --auth-button-text: #1f2937;
+  --auth-button-bg: var(--primary-neutral-100);
+  --auth-button-bg-hover: var(--primary-neutral-200);
+  --auth-button-text: var(--primary-neutral-800);
 
   --note-bg: #1f2937;
   --note-border: #374151;
