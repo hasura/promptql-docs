@@ -1832,15 +1832,10 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-required {
-  display: grid;
-  place-items: center;
-  min-height: 60vh;
+  text-align: center;
   padding: 2rem;
-}
-
-.auth-required > div {
-  text-align: left;
   max-width: 600px;
+  margin: 0 auto;
 }
 
 .auth-required h1 {
@@ -1849,9 +1844,8 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-required p {
-  color: var(--button-text);
+  color: var(--body-text-color);
   margin-bottom: 2rem;
-  font-size: 0.95rem;
 }
 
 .auth-button {

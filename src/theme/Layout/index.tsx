@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
 import OriginalLayout from '@theme-original/Layout';
 import { useAuth } from '../../contexts/AuthContext';
+import ProtectedRoute from '../../components/ProtectedRoute';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -69,8 +70,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     return <OriginalLayout>{children}</OriginalLayout>;
   }
 
-  // For all other paths, render normally - protection is now handled at the content level
-  return <OriginalLayout>{children}</OriginalLayout>;
+  // For all other paths (including callback), use ProtectedRoute which handles callback internally
+  return (
+    <OriginalLayout>
+      <ProtectedRoute>
+        {children}
+      </ProtectedRoute>
+    </OriginalLayout>
+  );
 };
 
 export default Layout;

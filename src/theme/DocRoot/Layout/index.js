@@ -10,20 +10,16 @@ import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
 import { ChatWidget } from '@site/src/components/Bot';
 import { useColorMode } from '@docusaurus/theme-common';
-import { useAuth } from '@site/src/contexts/AuthContext';
-import { getAuthConfig } from '@site/src/config/auth';
 import * as Sentry from '@sentry/react';
 
 export default function DocRootLayout({ children }) {
   const { colorMode } = useColorMode();
-  const { isAuthenticated } = useAuth();
   const sidebar = useDocsSidebar();
   const location = useLocation();
   const isBrowser = useIsBrowser();
   const [hiddenSidebarContainer, setHiddenSidebarContainer] = useState(false);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [hasInitializedOpenReplay, setHasInitializedOpenReplay] = useState(false);
-  const authConfig = getAuthConfig();
 
   useEffect(() => {
     if (isBrowser && !hasInitialized) {
@@ -76,26 +72,6 @@ export default function DocRootLayout({ children }) {
     getUser();
   }, [location]);
 
-  // Define public paths that don't require authentication
-  const publicPaths = [
-    '/',           // Landing page
-    '/docs/',      // Landing page with docs prefix
-    '/login',      // Login page
-  ];
-
-  // Check if current path is public or callback
-  const isPublicPath = publicPaths.some(path => {
-    if (path === '/' || path === '/docs/') {
-      return location.pathname === '/' || location.pathname === '/docs/';
-    }
-    return location.pathname.startsWith(path);
-  });
-
-  const isCallbackPath = location.pathname === '/docs/callback';
-
-  // Show ChatWidget if auth is disabled, on public paths, or if user is authenticated
-  const shouldShowChatWidget = authConfig.isAuthDisabled || isPublicPath || isCallbackPath || isAuthenticated;
-
   return (
     <div className={styles.docsWrapper}>
       <BackToTopButton />
@@ -109,15 +85,13 @@ export default function DocRootLayout({ children }) {
         )}
         <DocRootLayoutMain hiddenSidebarContainer={hiddenSidebarContainer}>{children}</DocRootLayoutMain>
       </div>
-      {shouldShowChatWidget && (
-        <ChatWidget
-          apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
-          theme={colorMode}
-          brandColor="var(--chat-bubble-brand)"
-          placeholder="Ask me about PromptQL..."
-          welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
-        />
-      )}
+      <ChatWidget
+        apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
+        theme={colorMode}
+        brandColor="var(--chat-bubble-brand)"
+        placeholder="Ask me about PromptQL..."
+        welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
+      />
     </div>
   );
 }
