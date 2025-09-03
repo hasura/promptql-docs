@@ -1,8 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { AccessDeniedError } from '../contexts/helpers/oauthFlow';
+import AccessDenied from '../components/AccessDenied';
 
 const AuthCallback: React.FC = () => {
-  const [status, setStatus] = useState<'loading' | 'error'>('loading');
+  const [status, setStatus] = useState<'loading' | 'error' | 'access_denied'>('loading');
   const [error, setError] = useState<string>('');
   const [showLoader, setShowLoader] = useState(false);
   const { handleAuthCallback } = useAuth();
@@ -43,7 +45,14 @@ const AuthCallback: React.FC = () => {
       } catch (err) {
         console.error('Auth callback error:', err);
         setError(err instanceof Error ? err.message : 'Unknown error');
-        setStatus('error');
+
+        // Check if this is an access denied error
+        if (err instanceof AccessDeniedError) {
+          setStatus('access_denied');
+        } else {
+          setStatus('error');
+        }
+
         clearTimeout(loaderTimer); // Clear timer on error
       }
     };
@@ -71,6 +80,10 @@ const AuthCallback: React.FC = () => {
         </div>
       </div>
     );
+  }
+
+  if (status === 'access_denied') {
+    return <AccessDenied />;
   }
 
   return (

@@ -1,15 +1,18 @@
 import React, { ReactNode, useState, useEffect } from 'react';
 import { useLocation } from '@docusaurus/router';
 import { useAuth } from '../contexts/AuthContext';
+import { getAuthConfig } from '../config/auth';
+import DocsIndexContent from './DocsIndexContent';
 
 interface ProtectedRouteProps {
   children: ReactNode;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  const { isAuthenticated, isLoading, login } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
   const location = useLocation();
   const [showLoader, setShowLoader] = useState(false);
+  const authConfig = getAuthConfig();
 
   // Set up timer for delayed loader
   useEffect(() => {
@@ -32,6 +35,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
     return <>{children}</>;
   }
 
+  // If auth is disabled (e.g., PR previews), allow access without authentication
+  if (authConfig.isAuthDisabled) {
+    return <>{children}</>;
+  }
+
   if (isLoading) {
     if (!showLoader) {
       return null;
@@ -51,16 +59,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
 
   if (!isAuthenticated) {
     return (
-      <div className="auth-required">
-        <h1>Authentication Required</h1>
-        <p>You need to be authenticated to access the PromptQL documentation.</p>
-        <button
-          onClick={login}
-          className="auth-button"
-        >
-          <span>🔐</span>
-          Sign In with Hasura Cloud
-        </button>
+      <div className="container margin-vert--lg">
+        <DocsIndexContent showSidebarController={false} showTitle={true} />
       </div>
     );
   }

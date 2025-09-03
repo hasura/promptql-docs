@@ -10,10 +10,14 @@ import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
 import { ChatWidget } from '@site/src/components/Bot';
 import { useColorMode } from '@docusaurus/theme-common';
+import { useAuth } from '@site/src/contexts/AuthContext';
+import { getAuthConfig } from '@site/src/config/auth';
 import * as Sentry from '@sentry/react';
 
 export default function DocRootLayout({ children }) {
   const { colorMode } = useColorMode();
+  const { isAuthenticated, isLoading } = useAuth();
+  const authConfig = getAuthConfig();
   const sidebar = useDocsSidebar();
   const location = useLocation();
   const isBrowser = useIsBrowser();
@@ -85,13 +89,16 @@ export default function DocRootLayout({ children }) {
         )}
         <DocRootLayoutMain hiddenSidebarContainer={hiddenSidebarContainer}>{children}</DocRootLayoutMain>
       </div>
-      <ChatWidget
-        apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
-        theme={colorMode}
-        brandColor="var(--chat-bubble-brand)"
-        placeholder="Ask me about PromptQL..."
-        welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
-      />
+      {/* Only show chatbot for authenticated users or when auth is disabled */}
+      {(isAuthenticated || authConfig.isAuthDisabled) && !isLoading && (
+        <ChatWidget
+          apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
+          theme={colorMode}
+          brandColor="var(--chat-bubble-brand)"
+          placeholder="Ask me about PromptQL..."
+          welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
+        />
+      )}
     </div>
   );
 }

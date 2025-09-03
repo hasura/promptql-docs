@@ -3,6 +3,16 @@ import { getAuthConfig } from '../../config/auth';
 import { checkUserAccess } from './userAccess';
 
 /**
+ * Custom error for access denied scenarios
+ */
+export class AccessDeniedError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'AccessDeniedError';
+  }
+}
+
+/**
  * Generate random state for OAuth2 security
  */
 export const generateState = (): string => {
@@ -15,9 +25,16 @@ export const generateState = (): string => {
  */
 export const initiateLogin = () => {
   const authConfig = getAuthConfig();
+
+  // Don't initiate OAuth flow if auth is disabled (e.g., PR previews)
+  if (authConfig.isAuthDisabled) {
+    console.log('Auth is disabled - skipping OAuth flow');
+    return;
+  }
+
   const state = generateState();
   sessionStorage.setItem('oauth_state', state);
-  
+
   // Store the current path to redirect back after login
   const currentPath = window.location.pathname;
   if (currentPath !== '/docs/login/') {
@@ -92,7 +109,7 @@ export const handleAuthCallback = async (code: string, state: string): Promise<s
     // The GraphQL API will identify the user from the Authorization header
     const hasAccess = await checkUserAccess(accessToken);
     if (!hasAccess) {
-      throw new Error(`While you have a Hasura Cloud account, it looks like you don't have access to PromptQL. Please contact your AI strategist to allowlist your email for reading through the documentation and for creating PromptQL projects.`);
+      throw new AccessDeniedError(`While you have a Hasura Cloud account, it looks like you don't have access to PromptQL. Please contact your AI strategist to allowlist your email for reading through the documentation and for creating PromptQL projects.`);
     }
 
     return accessToken;
