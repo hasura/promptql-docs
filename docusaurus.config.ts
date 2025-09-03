@@ -91,7 +91,6 @@ const config: Config = {
       {
         docs: {
           routeBasePath: '/',
-          editUrl: ({ docPath }) => `https://github.com/hasura/promptql-docs/edit/main/docs/${docPath}`,
           breadcrumbs: true,
           // showLastUpdateAuthor: true,
           // showLastUpdateTime: true,

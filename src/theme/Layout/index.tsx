@@ -34,6 +34,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const publicPaths = [
     '/',           // Landing page
     '/docs/',      // Landing page with docs prefix
+    '/docs/index', // Main docs index page (with embedded auth prompt)
     '/login',      // Login page
   ];
 
@@ -41,6 +42,9 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   const isPublicPath = publicPaths.some(path => {
     if (path === '/' || path === '/docs/') {
       return location.pathname === '/' || location.pathname === '/docs/';
+    }
+    if (path === '/docs/index') {
+      return location.pathname === '/docs/index' || location.pathname === '/docs/index/';
     }
     return location.pathname.startsWith(path);
   });

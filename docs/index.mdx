@@ -16,6 +16,7 @@ sidebar_class_name: hidden-sidebar-item
 sidebar_position: 0
 slug: index
 hide_table_of_contents: true
+hide_sidebar: true
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
@@ -27,8 +28,12 @@ import Introduction from "@site/static/icons/award-02.svg";
 import { OverviewIconCard } from "@site/src/components/OverviewIconCard";
 import Link from "@docusaurus/Link";
 import DemoGallery from "@site/src/components/DemoGallery";
+import AuthenticationPrompt from "@site/src/components/AuthenticationPrompt";
+import IndexPageSidebarController from "@site/src/components/IndexPageSidebarController";
 
 # PromptQL Documentation
+
+<IndexPageSidebarController />
 
 <div className={'front-matter'}>
   <div>
@@ -53,3 +58,8 @@ import DemoGallery from "@site/src/components/DemoGallery";
     </div>
   </div>
 </div>
+
+<AuthenticationPrompt
+  title="Access Full Documentation"
+  description="Sign in to access the complete PromptQL documentation, interactive features, and advanced tutorials."
+/>
