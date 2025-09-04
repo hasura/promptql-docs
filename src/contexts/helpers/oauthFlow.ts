@@ -54,7 +54,7 @@ export const initiateLogin = () => {
 /**
  * Handle OAuth callback and complete authentication
  */
-export const handleAuthCallback = async (code: string, state: string): Promise<string> => {
+export const handleAuthCallback = async (code: string, state: string): Promise<{ accessToken: string; refreshToken?: string }> => {
   const authConfig = getAuthConfig();
 
   try {
@@ -100,6 +100,7 @@ export const handleAuthCallback = async (code: string, state: string): Promise<s
     const tokenData = await tokenResponse.json();
     console.log('Token data received:', tokenData);
     const accessToken = tokenData.access_token;
+    const refreshToken = tokenData.refresh_token;
 
     if (!accessToken) {
       throw new Error('No access token received from token exchange');
@@ -112,7 +113,7 @@ export const handleAuthCallback = async (code: string, state: string): Promise<s
       throw new AccessDeniedError(`While you have a Hasura Cloud account, it looks like you don't have access to PromptQL. Please contact your AI strategist to allowlist your email for reading through the documentation and for creating PromptQL projects.`);
     }
 
-    return accessToken;
+    return { accessToken, refreshToken };
 
   } catch (error) {
     console.error('Auth callback error:', error);
@@ -123,9 +124,12 @@ export const handleAuthCallback = async (code: string, state: string): Promise<s
 /**
  * Complete the authentication process after successful callback
  */
-export const completeAuthentication = (accessToken: string) => {
+export const completeAuthentication = (accessToken: string, refreshToken?: string) => {
   // Store access token in cookies - this is all we need for GraphQL API requests
-  Cookies.set('hasura-lux', accessToken, { expires: 1 }); 
+  Cookies.set('hasura-lux', accessToken, { expires: 1 });
+  if (refreshToken) {
+    Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
+  }
 
   // Clean up session storage
   sessionStorage.removeItem('oauth_state');

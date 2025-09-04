@@ -77,10 +77,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const handleAuthCallbackWrapper = async (code: string, state: string): Promise<void> => {
     try {
-      const accessToken = await handleAuthCallback(code, state);
+      const { accessToken, refreshToken } = await handleAuthCallback(code, state);
 
-      // Store just the access token - we don't need user data
-      storeSession(accessToken);
+      // Store both access and refresh tokens
+      storeSession(accessToken, refreshToken);
 
       // Set a minimal user object to indicate authentication
       setUser({ id: 'authenticated', email: 'authenticated' });
