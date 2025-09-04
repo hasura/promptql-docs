@@ -64,7 +64,6 @@ This directory contains the mock authentication setup for the PromptQL documenta
 
 ### OAuth2 Settings
 - **Client ID:** `docusaurus-client`
-- **Client Secret:** `docusaurus-super-secret`
 - **Redirect URI:** `http://localhost:3001/docs/callback`
 - **Scopes:** `openid email`
 
@@ -97,17 +96,19 @@ All other routes require authentication.
 
 ### Development (Current Setup)
 - Mock Hydra server with in-memory storage and CORS enabled
-- Mock login/consent interface
+- Mock login/consent interface configured as public client (no client secret)
 - User access check always returns `true`
-- Tokens stored in browser cookies with 1-day expiration
+- Access tokens stored in browser cookies (`hasura-lux`) with 1-day expiration
+- Tokens are retrieved from cookies and sent as Authorization Bearer headers to GraphQL API
 - Delayed loading animations (5-second threshold)
 - Brand-consistent styling across light/dark themes
 
 ### Production (Future)
 - Real Hydra endpoints: `https://oauth.pro.hasura.io/*`
-- Real Hasura Cloud login interface
+- Real Hasura Cloud login interface configured as public client
 - GraphQL API check against `ddn_promptql_enabled_users` table
-- Secure httpOnly cookies
+- Secure httpOnly cookies for token storage
+- Tokens sent as Authorization Bearer headers to GraphQL API
 - Proper error handling and security headers
 
 ## Troubleshooting

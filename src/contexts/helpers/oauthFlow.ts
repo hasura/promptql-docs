@@ -28,7 +28,6 @@ export const initiateLogin = () => {
 
   // Don't initiate OAuth flow if auth is disabled (e.g., PR previews)
   if (authConfig.isAuthDisabled) {
-    console.log('Auth is disabled - skipping OAuth flow');
     return;
   }
 
@@ -65,10 +64,8 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
     }
 
     // Exchange authorization code for access token
-    console.log('Exchanging code:', code);
-    console.log('Redirect URI:', authConfig.oauth.redirectUri);
 
-    // Prepare headers and body based on client authentication method
+    // Prepare headers and body for public client (no client secret)
     const headers: Record<string, string> = {
       'Content-Type': 'application/x-www-form-urlencoded',
     };
@@ -80,11 +77,6 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
       client_id: authConfig.oauth.clientId,
     });
 
-    // Only add Authorization header if client secret is provided (for local development)
-    if (authConfig.oauth.clientSecret) {
-      headers['Authorization'] = `Basic ${btoa(`${authConfig.oauth.clientId}:${authConfig.oauth.clientSecret}`)}`;
-    }
-
     const tokenResponse = await fetch(authConfig.oauth.hydraTokenUrl, {
       method: 'POST',
       headers,
@@ -92,13 +84,10 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
     });
 
     if (!tokenResponse.ok) {
-      const errorText = await tokenResponse.text();
-      console.error('Token exchange error:', errorText);
       throw new Error(`Token exchange failed: ${tokenResponse.statusText}`);
     }
 
     const tokenData = await tokenResponse.json();
-    console.log('Token data received:', tokenData);
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
 
@@ -125,7 +114,6 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
  * Complete the authentication process after successful callback
  */
 export const completeAuthentication = (accessToken: string, refreshToken?: string) => {
-  // Store access token in cookies - this is all we need for GraphQL API requests
   Cookies.set('hasura-lux', accessToken, { expires: 1 });
   if (refreshToken) {
     Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
