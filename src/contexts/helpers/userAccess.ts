@@ -9,13 +9,11 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
   
   // Use mock for development and local builds
   if (authConfig.useMockUserAccess) {
-    console.log('Using mock user access check (development/local build)');
     return true;
   }
   
   // For production/staging, use GraphQL query
   if (!authConfig.enableUserAccessCheck) {
-    console.log('User access check disabled');
     return true;
   }
   
@@ -39,7 +37,6 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
 
     // If the request failed with 401 (unauthorized), try to refresh the token
     if (response.status === 401) {
-      console.log('Access token expired, attempting to refresh...');
       const newToken = await refreshAccessToken();
 
       if (newToken) {
@@ -59,13 +56,11 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
           })
         });
       } else {
-        console.error('Failed to refresh access token');
         return false;
       }
     }
 
     if (!response.ok) {
-      console.error('GraphQL query failed:', response.statusText);
       // Fail closed - deny access if we can't verify
       return false;
     }
@@ -73,18 +68,15 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
     const data = await response.json();
 
     if (data.errors) {
-      console.error('GraphQL errors:', data.errors);
       return false;
     }
 
     const enabledUsers = data.data?.ddn_promptql_enabled_users || [];
     const hasAccess = enabledUsers.length > 0;
 
-    console.log(`User access check result: ${hasAccess}`);
     return hasAccess;
     
   } catch (error) {
-    console.error('Error checking user access:', error);
     // Fail closed - deny access on error
     return false;
   }

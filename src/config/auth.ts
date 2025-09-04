@@ -7,7 +7,6 @@ export interface AuthConfig {
     hydraAuthUrl: string;
     hydraTokenUrl: string;
     clientId: string;
-    clientSecret?: string;
     redirectUri: string;
     scope: string;
   };
@@ -29,14 +28,7 @@ export const getEnvironmentContext = () => {
   const isStaging = releaseMode === 'staging';
   const isProduction = releaseMode === 'production';
 
-  console.log('Environment detection:', {
-    isDevelopment,
-    isLocalBuild,
-    isPRPreview,
-    releaseMode,
-    isStaging,
-    isProduction
-  });
+
 
   return {
     isDevelopment,
@@ -58,7 +50,6 @@ const getOAuthConfig = () => {
       hydraAuthUrl: 'http://localhost:4444/oauth2/auth',
       hydraTokenUrl: 'http://localhost:4444/oauth2/token',
       clientId: 'docusaurus-client',
-      clientSecret: 'docusaurus-super-secret',
       redirectUri: 'http://localhost:3001/docs/callback',
       scope: 'openid email'
     };
@@ -92,7 +83,6 @@ export const getAuthConfig = (): AuthConfig => {
 
   // Completely disable auth for PR preview environments
   if (env.isPRPreview) {
-    console.log('PR preview environment detected - disabling auth completely');
     return {
       useMockUserAccess: true,
       graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
@@ -104,7 +94,6 @@ export const getAuthConfig = (): AuthConfig => {
 
   // Use mock for development and local builds
   if (env.isDevelopment || env.isLocalBuild) {
-    console.log('Using development/local auth config with mock user access');
     return {
       useMockUserAccess: true,
       graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
@@ -116,7 +105,6 @@ export const getAuthConfig = (): AuthConfig => {
 
   // Staging configuration
   if (env.isStaging) {
-    console.log('Using staging auth config with real GraphQL queries');
     return {
       useMockUserAccess: false,
       graphqlEndpoint: 'https://data.pro.arusah.com/v1/graphql',
@@ -127,7 +115,6 @@ export const getAuthConfig = (): AuthConfig => {
   }
 
   // Production configuration
-  console.log('Using production auth config with real GraphQL queries');
   return {
     useMockUserAccess: false,
     graphqlEndpoint: 'https://data.pro.hasura.io/v1/graphql',
@@ -138,7 +125,7 @@ export const getAuthConfig = (): AuthConfig => {
 };
 
 // GraphQL query for checking user access
-// The API will identify the user from cookie since we've configured a webhook on the Hasura side of things that will be forwarded cookies
+// The API will identify the user from the Authorization Bearer header
 export const USER_ACCESS_QUERY = `
   query CheckUserAccess {
     ddn_promptql_enabled_users {

@@ -45,7 +45,6 @@ export const storeSession = (accessToken: string, refreshToken?: string): void =
   if (refreshToken) {
     Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
   }
-  // We no longer store user_info - the GraphQL API identifies users from the token
 };
 
 /**
@@ -54,7 +53,6 @@ export const storeSession = (accessToken: string, refreshToken?: string): void =
 export const clearSession = (): void => {
   Cookies.remove('hasura-lux');
   Cookies.remove('hasura-lux-refresh');
-  // No longer need to remove user_info cookie
 };
 
 /**
@@ -64,7 +62,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
   const refreshToken = Cookies.get('hasura-lux-refresh');
 
   if (!refreshToken) {
-    console.log('No refresh token available');
     return null;
   }
 
@@ -81,11 +78,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
       client_id: authConfig.oauth.clientId,
     });
 
-    // Only add Authorization header if client secret is provided (for local development)
-    if (authConfig.oauth.clientSecret) {
-      headers['Authorization'] = `Basic ${btoa(`${authConfig.oauth.clientId}:${authConfig.oauth.clientSecret}`)}`;
-    }
-
     const tokenResponse = await fetch(authConfig.oauth.hydraTokenUrl, {
       method: 'POST',
       headers,
@@ -93,7 +85,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     });
 
     if (!tokenResponse.ok) {
-      console.error('Token refresh failed:', tokenResponse.statusText);
       // Clear invalid tokens
       clearSession();
       return null;
@@ -104,7 +95,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     const newRefreshToken = tokenData.refresh_token;
 
     if (!newAccessToken) {
-      console.error('No access token received from refresh');
       clearSession();
       return null;
     }
@@ -114,7 +104,6 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
     return newAccessToken;
   } catch (error) {
-    console.error('Error refreshing token:', error);
     clearSession();
     return null;
   }
