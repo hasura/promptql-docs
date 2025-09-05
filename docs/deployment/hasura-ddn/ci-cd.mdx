@@ -1,106 +1,127 @@
 ---
 sidebar_position: 3
 title: CI/CD
-description: "Set up CI/CD for PromptQL projects using any CI/CD platform"
+description: "Set up CI/CD for PromptQL projects using GitHub Actions"
 ---
 
 # CI/CD
 
-Because the DDN CLI plays the central role in controlling and managing metadata builds and connector deployments, it
-allows developers to easily create effective CI/CD pipelines for managing PromptQL projects, creating and applying
-builds or promoting them to another environment.
+Setting up CI/CD for PromptQL projects is now streamlined with the `pql-ci-cd` CLI tool. This tool automatically
+generates GitHub Actions workflows and syncs your environment secrets to GitHub repository secrets.
 
-## Generic CI/CD Setup
+## Quick Setup
 
-You should follow these generic implementation steps which we will go through below when setting up CI/CD for your
-Hasura DDN projects.
+The fastest way to set up CI/CD for your PromptQL project is using the `pql-ci-cd` package:
 
-1. Prepare a service account access token.
-2. Use a linux environment to run the DDN CLI.
-3. Install and login to the DDN CLI.
-4. Clone the repo with the DDN supergraph metadata.
-5. Check context or use flags.
-6. Run DDN CLI commands.
-
-### Step 1. Prepare a service account access token
-
-See the [service account access token section](/project-configuration/project-management/service-accounts.mdx) to learn
-how to create a service account access token.
-
-### Step 2. Use a Linux environment to run the DDN CLI
-
-Any service which can provide a Linux environment will work, e.g., GitHub Actions, GitLab CI, CircleCI, etc.
-
-Indeed, a Windows or macOS environment will work and run the DDN CLI but for CI/CD pipelines, we recommend using a Linux
-environment for speed, availability and convenience.
-
-### Step 3. Install and login to the DDN CLI
-
-```sh
-curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/v4/get.sh | bash
+```bash
+npx pql-ci-cd
 ```
 
-:::info curl
+That's it! The tool will:
 
-Your environment should already have `curl` installed. If not, you can install it using your package manager.
+- ✅ Generate GitHub Actions workflows (create-build.yml + apply-build.yml)
+- ✅ Sync secrets to GitHub (if GitHub credentials are in .env.cloud)
+- ✅ Provide clear next steps
 
-```sh title="E.g."
-sudo apt update && sudo apt upgrade
-sudo apt install curl
-curl --version
+## Prerequisites
+
+### 1. PromptQL Project Structure
+
+Your project must contain a `.hasura` directory to be recognized as a valid PromptQL project:
+
 ```
+your-promptql-project/
+├── .hasura/           # Required - validates this is a PromptQL project
+├── .env.cloud         # Required - your environment variables AND GitHub credentials
+└── ...
+```
+
+### 2. Environment Configuration
+
+You must have a `.env.cloud` file in your project root with your actual environment variables and GitHub credentials:
+
+```bash
+# .env.cloud (should already exist with real values)
+HASURA_DDN_PAT=ddn_pat_1234567890abcdef
+PQL_GITHUB_TOKEN=ghp_your_github_personal_access_token
+PQL_GITHUB_OWNER=your_github_username_or_org
+PQL_GITHUB_REPO=your_repository_name
+DATABASE_URL=your_database_url
+API_KEY=your_api_key
+```
+
+:::info GitHub Credentials
+
+We use `PQL_GITHUB_*` prefixes to avoid conflicts with GitHub's reserved `GITHUB_*` environment variables. The tool
+reads these values and syncs them to GitHub repository secrets.
 
 :::
 
-### Step 4. Clone the repo with the metadata
+## What the Tool Does
 
-Clone (or checkout) the repository that contains all of your DDN supergraph metadata.
+### 1. Generates GitHub Actions Workflows
 
-```sh title="For example, if you have a public GitHub repository, run:"
-git clone https://github.com/<your-org>/<your-repo>.git
+The tool creates two workflow files:
+
+#### Create Build Workflow (`.github/workflows/create-build.yml`)
+
+- Triggers on pull requests
+- Sets up PromptQL CLI
+- Uses your existing `.env.cloud` file (via GitHub repository secrets)
+- Creates PromptQL builds
+- Comments build results on PRs
+
+#### Apply Build Workflow (`.github/workflows/apply-build.yml`)
+
+- Triggers when PRs are merged to main
+- Extracts build version from PR comments
+- Applies the build to production
+- Confirms successful deployment
+
+### 2. Syncs Environment Secrets
+
+Reads your existing `.env.cloud` file and uploads the variables as encrypted GitHub repository secrets, making them
+available to your workflows.
+
+## Complete Workflow Example
+
+```bash
+# 1. Navigate to your PromptQL project (must have .hasura directory)
+cd my-promptql-project
+
+# 2. Generate .env.cloud with your secrets using the DDN CLI
+ddn supergraph build create # This generates .env.cloud file with your secrets
+
+# 3. Add GitHub credentials to .env.cloud
+echo "HASURA_DDN_PAT=ddn_pat_1234567890abcdef" >> .env.cloud
+echo "PQL_GITHUB_TOKEN=ghp_your_github_personal_access_token" >> .env.cloud
+echo "PQL_GITHUB_OWNER=your_github_username_or_org" >> .env.cloud
+echo "PQL_GITHUB_REPO=your_repository_name" >> .env.cloud
+
+# 4. Run the CI/CD setup tool
+npx pql-ci-cd
+
+# 5. Commit and push the generated workflows
+git add .
+git commit -m "Add PromptQL CI/CD workflows"
+git push
+
+# 6. Create a pull request to test the create-build workflow
+# 7. Merge the PR to test the apply-build workflow
 ```
 
-If your repository is private, you may need a
-[GitHub personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens)
-or similar for your git provider to clone it.
+## Manual Setup (Advanced)
 
-```sh
-git clone https://username:<pat>@github.com/<your-account-or-org>/<repo>.git
-```
+If you prefer to set up CI/CD manually or need to customize the workflows, you can follow the generic implementation
+steps:
 
-### Step 5. Check context or use flags
-
-Make sure your context is set properly to reference the correct projects, subgraphs, etc., or use the correct flags in
-your DDN CLI commands.
-
-You can set your context using the `ddn context set-current-context <context-name>` command. Read more about
-[contexts](/project-configuration/project-management/manage-environments.mdx).
-
-You can also of course use specific flags in your DDN CLI commands eg: `--project`, `--supergraph`,
-`--base-supergraph-version`, `--log-level`, `--out` to make your commands more explicit.
-
-### Step 6. Run DDN CLI commands
-
-You can now run any DDN CLI commands required in the CI/CD workflow. You will likely be creating builds and applying
-them to projects.
-
-```ddn
-ddn supergraph build create
-```
-
-```ddn
-ddn supergraph build apply <build-id>
-```
-
-:::tip Optimize your CI/CD pipeline
-
-For a more efficient CI/CD workflow, you can create and apply the supergraph build in a single command using
-`ddn supergraph build create --apply` This reduces the number of CLI commands needed and simplifies your automation
-scripts.
-
-:::
-
-## GitHub Actions Setup
-
-We have a GitHub Action that you can use to deploy your Hasura DDN projects.
-[See here](https://github.com/hasura/ddn-deployment).
+1. **Prepare a service account access token** - See the
+   [service account access token section](/project-configuration/project-management/service-accounts.mdx)
+2. **Use a Linux environment** - GitHub Actions, GitLab CI, CircleCI, etc.
+3. **Install and login to the DDN CLI**:
+   ```sh
+   curl -L https://graphql-engine-cdn.hasura.io/ddn/cli/v4/get.sh | bash
+   ```
+4. **Clone your repository** with the DDN supergraph metadata
+5. **Set context or use flags** for your DDN CLI commands
+6. **Run DDN CLI commands** like `ddn supergraph build create` and `ddn supergraph build apply`
