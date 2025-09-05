@@ -79,8 +79,10 @@ const config: Config = {
     })(),
     hasuraVersion: "promptql",
     DEV_TOKEN: process.env.DEV_TOKEN,
+    isPreviewPR: process.env.CF_PAGES === '1' && process.env.release_mode !== 'production' && process.env.release_mode !== 'staging',
     openReplayIngestPoint: 'https://analytics-openreplay.hasura-app.io/ingest',
     openReplayProjectKey: 'x5WnKn7RdPjizi93Vp5I',
+    releaseMode: process.env.release_mode || 'development',
   },
 
   presets: [
@@ -89,7 +91,6 @@ const config: Config = {
       {
         docs: {
           routeBasePath: '/',
-          editUrl: ({ docPath }) => `https://github.com/hasura/promptql-docs/edit/main/docs/${docPath}`,
           breadcrumbs: true,
           // showLastUpdateAuthor: true,
           // showLastUpdateTime: true,
