@@ -1,5 +1,5 @@
 {
-  "label": "Business Logic",
+  "label": "Add Custom Business Logic",
   "position": 3.5,
   "className": "logic-icon",
   "customProps": {
