@@ -1,0 +1,243 @@
+---
+sidebar_position: 6
+sidebar_label: Schedules API
+description: "Learn how to create and manage scheduled automations and recurring tasks."
+keywords:
+  - hasura ddn
+  - schedules
+  - apis
+  - automation
+  - cron
+toc_max_heading_level: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Schedules API
+
+## Introduction
+
+The Schedules API allows you to create and manage scheduled executions of automations and other recurring tasks. This API enables you to set up automated workflows that run at specific times or intervals, perfect for data processing pipelines, report generation, and other time-based operations.
+
+## Base URL
+
+Schedule endpoints use the following base URL:
+
+`https://promptql.ddn.hasura.app/schedules`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned by the control plane. For example:
+
+`https://promptql.<FQDN>/schedules`
+
+**You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
+
+:::
+
+## Authentication
+
+Schedule endpoints require JWT authentication for all operations:
+
+```
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+:::info Getting JWT Tokens
+
+For information on obtaining JWT tokens, see the [Authentication guide](/promptql-apis/auth.mdx#obtaining-jwt-tokens).
+
+:::
+
+## List Schedules
+
+Retrieve all schedules for your project.
+
+`GET /schedules`
+
+### Response
+
+```json
+[
+  {
+    "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+    "name": "Daily Report Generation",
+    "description": "Generate daily analytics report",
+    "cron_expression": "0 9 * * *",
+    "automation_name": "generate_daily_report",
+    "enabled": true,
+    "created_at": "2024-01-15T10:30:00Z",
+    "updated_at": "2024-01-15T10:30:00Z",
+    "next_run": "2024-01-16T09:00:00Z",
+    "last_run": "2024-01-15T09:00:00Z",
+    "last_run_status": "success"
+  }
+]
+```
+
+### Response Fields
+
+| Field             | Type    | Description                                    |
+| ----------------- | ------- | ---------------------------------------------- |
+| `schedule_id`     | string  | Unique identifier for the schedule             |
+| `name`            | string  | Human-readable name for the schedule           |
+| `description`     | string  | Optional description of what the schedule does |
+| `cron_expression` | string  | Cron expression defining when to run           |
+| `automation_name` | string  | Name of the automation to execute              |
+| `enabled`         | boolean | Whether the schedule is currently active       |
+| `created_at`      | string  | ISO 8601 timestamp of creation                 |
+| `updated_at`      | string  | ISO 8601 timestamp of last update             |
+| `next_run`        | string  | ISO 8601 timestamp of next scheduled run      |
+| `last_run`        | string  | ISO 8601 timestamp of last execution          |
+| `last_run_status` | string  | Status of the last execution                   |
+
+## Create Schedule
+
+Create a new scheduled task.
+
+`POST /schedules`
+
+### Request Body
+
+```json
+{
+  "name": "Daily Report Generation",
+  "description": "Generate daily analytics report at 9 AM",
+  "cron_expression": "0 9 * * *",
+  "automation_name": "generate_daily_report",
+  "enabled": true,
+  "input_data": {
+    "report_type": "daily",
+    "include_charts": true
+  }
+}
+```
+
+### Request Fields
+
+| Field             | Type    | Required | Description                                    |
+| ----------------- | ------- | -------- | ---------------------------------------------- |
+| `name`            | string  | Yes      | Human-readable name for the schedule           |
+| `description`     | string  | No       | Optional description of what the schedule does |
+| `cron_expression` | string  | Yes      | Cron expression defining when to run           |
+| `automation_name` | string  | Yes      | Name of the automation to execute              |
+| `enabled`         | boolean | No       | Whether the schedule should be active (default: true) |
+| `input_data`      | object  | No       | Optional input data to pass to the automation |
+
+### Cron Expression Format
+
+The cron expression follows the standard 5-field format:
+
+```
+* * * * *
+│ │ │ │ │
+│ │ │ │ └─── Day of week (0-7, Sunday = 0 or 7)
+│ │ │ └───── Month (1-12)
+│ │ └─────── Day of month (1-31)
+│ └───────── Hour (0-23)
+└─────────── Minute (0-59)
+```
+
+**Common Examples:**
+- `0 9 * * *` - Every day at 9:00 AM
+- `0 */6 * * *` - Every 6 hours
+- `0 9 * * 1` - Every Monday at 9:00 AM
+- `30 14 1 * *` - First day of every month at 2:30 PM
+
+### Response
+
+```json
+{
+  "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Daily Report Generation",
+  "description": "Generate daily analytics report at 9 AM",
+  "cron_expression": "0 9 * * *",
+  "automation_name": "generate_daily_report",
+  "enabled": true,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+  "next_run": "2024-01-16T09:00:00Z"
+}
+```
+
+### Error Responses
+
+- `400 Bad Request` - Invalid cron expression or automation name
+- `404 Not Found` - Referenced automation does not exist
+- `422 Unprocessable Entity` - Validation errors in request body
+
+## Get Schedule
+
+Retrieve a specific schedule by its ID.
+
+`GET /schedules/{schedule_id}`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                          |
+| ------------- | ------ | -------- | ------------------------------------ |
+| `schedule_id` | string | Yes      | UUID of the schedule to retrieve     |
+
+### Response
+
+```json
+{
+  "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Daily Report Generation",
+  "description": "Generate daily analytics report at 9 AM",
+  "cron_expression": "0 9 * * *",
+  "automation_name": "generate_daily_report",
+  "enabled": true,
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+  "next_run": "2024-01-16T09:00:00Z",
+  "last_run": "2024-01-15T09:00:00Z",
+  "last_run_status": "success",
+  "input_data": {
+    "report_type": "daily",
+    "include_charts": true
+  },
+  "execution_history": [
+    {
+      "execution_id": "exec-uuid-1",
+      "started_at": "2024-01-15T09:00:00Z",
+      "completed_at": "2024-01-15T09:02:30Z",
+      "status": "success",
+      "output": {
+        "report_generated": true,
+        "records_processed": 1250
+      }
+    }
+  ]
+}
+```
+
+### Error Responses
+
+- `404 Not Found` - Schedule not found or access denied
+- `422 Unprocessable Entity` - Invalid schedule ID format
+
+## Best Practices
+
+### Cron Expression Guidelines
+
+1. **Use specific times**: Avoid scheduling all tasks at common times like midnight or top of the hour
+2. **Consider timezone**: All times are in UTC unless specified otherwise
+3. **Test expressions**: Use online cron expression validators to verify your schedule
+4. **Avoid overlapping**: Ensure your automation can complete before the next scheduled run
+
+### Automation Requirements
+
+1. **Idempotent operations**: Design automations to handle multiple executions safely
+2. **Error handling**: Include proper error handling in your automation code
+3. **Resource limits**: Be mindful of resource usage for frequently scheduled tasks
+4. **Monitoring**: Regularly check execution history for failed runs
+
+### Performance Considerations
+
+1. **Batch operations**: Group related tasks into single automations when possible
+2. **Off-peak scheduling**: Schedule resource-intensive tasks during low-usage periods
+3. **Timeout handling**: Set appropriate timeouts for long-running automations
+4. **Cleanup**: Regularly review and remove unused schedules

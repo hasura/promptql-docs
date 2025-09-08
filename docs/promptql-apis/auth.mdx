@@ -1,5 +1,5 @@
 ---
-sidebar_position: 7
+sidebar_position: 9
 sidebar_label: Authentication in APIs
 description: ""
 keywords:
@@ -23,8 +23,11 @@ PromptQL APIs use two distinct authentication approaches:
 
 These operations manage user-owned resources and require JWT authentication:
 
-- **Threads API**: Thread management, sharing, and pinned threads
+- **Threads API**: Thread management, sharing, pinned threads, and v2 endpoints
 - **Automations API**: Automation management (create, list, get, delete)
+- **Schedules API**: Schedule management (create, list, get, update, delete)
+- **User Artifacts API**: File upload, management, and download operations
+- **Autograph Requests API**: Approval workflow management
 
 **Authentication Method**: JWT Bearer token obtained through the PromptQL token refresh endpoint
 

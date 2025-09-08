@@ -1,0 +1,298 @@
+---
+sidebar_position: 7
+sidebar_label: User Artifacts API
+description: "Learn how to upload, manage, and download files and artifacts in your PromptQL projects."
+keywords:
+  - hasura ddn
+  - user artifacts
+  - apis
+  - file upload
+  - file management
+toc_max_heading_level: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# User Artifacts API
+
+## Introduction
+
+The User Artifacts API allows you to upload, manage, and download files and artifacts within your PromptQL projects.
+This API supports binary data upload with metadata, versioning, visibility controls, and comprehensive file management
+capabilities.
+
+## Base URL
+
+User Artifacts endpoints use the following base URL:
+
+`https://promptql.ddn.hasura.app/user-artifacts/v1/`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
+by the control plane. For example:
+
+`https://promptql.<FQDN>/user-artifacts/v1/`
+
+**You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
+
+:::
+
+## Authentication
+
+User Artifacts endpoints require JWT authentication for all operations:
+
+```
+Authorization: Bearer <jwt-token>
+Content-Type: multipart/form-data (for upload endpoints)
+Content-Type: application/json (for metadata endpoints)
+```
+
+:::info Getting JWT Tokens
+
+For information on obtaining JWT tokens, see the [Authentication guide](/promptql-apis/auth.mdx#obtaining-jwt-tokens).
+
+:::
+
+## Create User Artifact
+
+Upload a new artifact with binary data and metadata.
+
+`POST /user-artifacts/v1/`
+
+### Request Body (multipart/form-data)
+
+| Field        | Type   | Required | Description                                                  |
+| ------------ | ------ | -------- | ------------------------------------------------------------ |
+| `file`       | file   | Yes      | Binary file data to upload                                   |
+| `name`       | string | Yes      | Human-readable name for the artifact                         |
+| `visibility` | string | No       | Visibility level: "private" or "public" (default: "private") |
+| `metadata`   | string | No       | JSON string containing additional metadata                   |
+
+### Example Request
+
+```bash
+curl -X POST "https://promptql.ddn.hasura.app/user-artifacts/v1/" \
+  -H "Authorization: Bearer <jwt-token>" \
+  -F "file=@/path/to/your/file.pdf" \
+  -F "name=Project Documentation" \
+  -F "visibility=private" \
+  -F "metadata={\"category\":\"documentation\",\"version\":\"1.0\"}"
+```
+
+### Response
+
+```json
+{
+  "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Project Documentation",
+  "visibility": "private",
+  "file_size": 2048576,
+  "content_type": "application/pdf",
+  "created_at": "2024-01-15T10:30:00Z",
+  "version": 1,
+  "metadata": {
+    "category": "documentation",
+    "version": "1.0"
+  }
+}
+```
+
+### Error Responses
+
+- `400 Bad Request` - Invalid file format or missing required fields
+- `403 Access Denied` - Insufficient permissions
+- `413 Payload Too Large` - File size exceeds limits
+- `422 Unprocessable Entity` - Validation errors
+
+## List User Artifacts
+
+Retrieve artifacts in a project with filtering and pagination.
+
+`GET /user-artifacts/v1/`
+
+### Query Parameters
+
+| Parameter    | Type    | Required | Description                                    |
+| ------------ | ------- | -------- | ---------------------------------------------- |
+| `visibility` | string  | No       | Filter by visibility: "private" or "public"    |
+| `limit`      | integer | No       | Maximum number of results (1-100, default: 50) |
+| `offset`     | integer | No       | Number of results to skip (default: 0)         |
+
+### Response
+
+```json
+{
+  "artifacts": [
+    {
+      "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+      "name": "Project Documentation",
+      "visibility": "private",
+      "file_size": 2048576,
+      "content_type": "application/pdf",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z",
+      "version": 1,
+      "metadata": {
+        "category": "documentation",
+        "version": "1.0"
+      }
+    }
+  ],
+  "total_count": 1,
+  "has_more": false
+}
+```
+
+## Get Artifact Metadata
+
+Retrieve artifact metadata without downloading the binary data.
+
+`GET /user-artifacts/v1/{artifact_id}/metadata`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                      |
+| ------------- | ------ | -------- | -------------------------------- |
+| `artifact_id` | string | Yes      | UUID of the artifact to retrieve |
+
+### Response
+
+```json
+{
+  "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Project Documentation",
+  "visibility": "private",
+  "file_size": 2048576,
+  "content_type": "application/pdf",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+  "version": 1,
+  "metadata": {
+    "category": "documentation",
+    "version": "1.0"
+  },
+  "versions": [
+    {
+      "version": 1,
+      "created_at": "2024-01-15T10:30:00Z",
+      "file_size": 2048576,
+      "content_type": "application/pdf"
+    }
+  ]
+}
+```
+
+## Download Artifact Data
+
+Download the binary data of an artifact.
+
+`GET /user-artifacts/v1/{artifact_id}/data`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                      |
+| ------------- | ------ | -------- | -------------------------------- |
+| `artifact_id` | string | Yes      | UUID of the artifact to download |
+
+### Query Parameters
+
+| Parameter | Type    | Required | Description                  |
+| --------- | ------- | -------- | ---------------------------- |
+| `version` | integer | No       | Specific version to download |
+
+### Response
+
+Returns the binary file data with appropriate `Content-Type` and `Content-Disposition` headers.
+
+### Example Request
+
+```bash
+curl -X GET "https://promptql.ddn.hasura.app/user-artifacts/v1/123e4567-e89b-12d3-a456-426614174000/data" \
+  -H "Authorization: Bearer <jwt-token>" \
+  -o downloaded-file.pdf
+```
+
+## Update Artifact
+
+Update an artifact with new data, metadata, name, and/or visibility.
+
+`PUT /user-artifacts/v1/{artifact_id}`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                    |
+| ------------- | ------ | -------- | ------------------------------ |
+| `artifact_id` | string | Yes      | UUID of the artifact to update |
+
+### Request Body (multipart/form-data)
+
+| Field        | Type   | Required | Description                                |
+| ------------ | ------ | -------- | ------------------------------------------ |
+| `file`       | file   | No       | New binary file data (creates new version) |
+| `name`       | string | No       | Updated name for the artifact              |
+| `visibility` | string | No       | Updated visibility level                   |
+| `metadata`   | string | No       | Updated metadata as JSON string            |
+
+### Response
+
+```json
+{
+  "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Updated Project Documentation",
+  "visibility": "public",
+  "file_size": 2148576,
+  "content_type": "application/pdf",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T14:30:00Z",
+  "version": 2,
+  "metadata": {
+    "category": "documentation",
+    "version": "2.0"
+  }
+}
+```
+
+## Delete Artifact
+
+Soft delete an artifact and all its versions.
+
+`DELETE /user-artifacts/v1/{artifact_id}`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                    |
+| ------------- | ------ | -------- | ------------------------------ |
+| `artifact_id` | string | Yes      | UUID of the artifact to delete |
+
+### Response
+
+```json
+{
+  "artifact_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "deleted",
+  "message": "Artifact and all versions have been deleted successfully"
+}
+```
+
+## Best Practices
+
+### File Organization
+
+1. **Use descriptive names**: Choose clear, descriptive names for your artifacts
+2. **Leverage metadata**: Use metadata to categorize and tag your files
+3. **Version control**: Update existing artifacts rather than creating duplicates
+4. **Visibility settings**: Use appropriate visibility levels for security
+
+### Performance
+
+1. **Optimize file sizes**: Compress files when possible to reduce upload/download times
+2. **Batch operations**: Group related file operations when possible
+3. **Cache metadata**: Cache artifact metadata to reduce API calls
+
+### Security
+
+1. **Private by default**: Keep sensitive files private unless sharing is necessary
+2. **Access control**: Regularly review artifact visibility settings
+3. **Cleanup**: Remove unused artifacts to maintain security and organization
