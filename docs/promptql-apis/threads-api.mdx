@@ -20,7 +20,8 @@ import TabItem from "@theme/TabItem";
 
 The Threads API provides comprehensive thread management capabilities for PromptQL conversations. This includes
 creating, retrieving, updating, and deleting threads, as well as advanced features like thread sharing, feedback
-collection, evaluation, and pinned threads management.
+collection, evaluation, pinned threads management, and the new v2 endpoints with enhanced artifact handling and user
+confirmation workflows.
 
 ## Base URL
 
@@ -300,6 +301,189 @@ Remove sharing access for a thread.
   "thread_id": "123e4567-e89b-12d3-a456-426614174000",
   "status": "unshared",
   "message": "Thread sharing removed successfully"
+}
+```
+
+## Threads v2 API
+
+The v2 Threads API provides enhanced functionality with improved artifact handling, user confirmation workflows, and
+better thread management capabilities.
+
+### Start Thread v2
+
+Create a new thread using the v2 API with enhanced features.
+
+`POST /threads/v2/start`
+
+#### Response
+
+```json
+{
+  "thread_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "started",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+### Continue Thread v2
+
+Continue an existing thread conversation with enhanced artifact support.
+
+`POST /threads/v2/{thread_id}/continue`
+
+#### Path Parameters
+
+| Parameter   | Type   | Required | Description                    |
+| ----------- | ------ | -------- | ------------------------------ |
+| `thread_id` | string | Yes      | UUID of the thread to continue |
+
+#### Response
+
+```json
+{
+  "thread_id": "123e4567-e89b-12d3-a456-426614174000",
+  "interaction_id": "interaction-uuid",
+  "status": "continued",
+  "artifacts_created": ["artifact-1", "artifact-2"]
+}
+```
+
+### Get Thread v2
+
+Retrieve a thread with enhanced metadata and artifact information.
+
+`GET /threads/v2/{thread_id}`
+
+#### Path Parameters
+
+| Parameter   | Type   | Required | Description                    |
+| ----------- | ------ | -------- | ------------------------------ |
+| `thread_id` | string | Yes      | UUID of the thread to retrieve |
+
+#### Response
+
+```json
+{
+  "thread_id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Data Analysis Thread",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T11:00:00Z",
+  "artifacts": [
+    {
+      "artifact_id": "artifact-uuid",
+      "identifier": "analysis_results",
+      "type": "table",
+      "created_at": "2024-01-15T10:45:00Z"
+    }
+  ],
+  "interactions": [
+    {
+      "interaction_id": "interaction-uuid",
+      "user_message": "Analyze the sales data",
+      "assistant_response": "Here's the analysis...",
+      "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Get Thread Artifact
+
+Retrieve a specific artifact from a thread by its identifier.
+
+`GET /threads/v2/{thread_id}/artifacts/{artifact_identifier}`
+
+#### Path Parameters
+
+| Parameter             | Type   | Required | Description                |
+| --------------------- | ------ | -------- | -------------------------- |
+| `thread_id`           | string | Yes      | UUID of the thread         |
+| `artifact_identifier` | string | Yes      | Identifier of the artifact |
+
+#### Response
+
+```json
+{
+  "artifact_id": "artifact-uuid",
+  "identifier": "analysis_results",
+  "type": "table",
+  "metadata": {
+    "rows": 150,
+    "columns": 8,
+    "created_by": "data_analysis_program"
+  },
+  "created_at": "2024-01-15T10:45:00Z"
+}
+```
+
+### Get Thread Artifact Data
+
+Download the actual data content of a thread artifact.
+
+`GET /threads/v2/{thread_id}/artifacts/{artifact_identifier}/data`
+
+#### Path Parameters
+
+| Parameter             | Type   | Required | Description                |
+| --------------------- | ------ | -------- | -------------------------- |
+| `thread_id`           | string | Yes      | UUID of the thread         |
+| `artifact_identifier` | string | Yes      | Identifier of the artifact |
+
+#### Response
+
+Returns the artifact data in its native format (CSV, JSON, etc.) with appropriate content headers.
+
+### Cancel Thread Interaction
+
+Cancel an ongoing thread interaction.
+
+`POST /threads/v2/{thread_id}/cancel`
+
+#### Path Parameters
+
+| Parameter   | Type   | Required | Description        |
+| ----------- | ------ | -------- | ------------------ |
+| `thread_id` | string | Yes      | UUID of the thread |
+
+#### Response
+
+```json
+{
+  "thread_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "cancelled",
+  "message": "Thread interaction cancelled successfully"
+}
+```
+
+### Submit User Confirmation
+
+Submit a user confirmation response for workflows requiring approval.
+
+`POST /threads/v2/{thread_id}/user-confirmation/{user_confirmation_id}`
+
+#### Path Parameters
+
+| Parameter              | Type   | Required | Description                      |
+| ---------------------- | ------ | -------- | -------------------------------- |
+| `thread_id`            | string | Yes      | UUID of the thread               |
+| `user_confirmation_id` | string | Yes      | UUID of the confirmation request |
+
+#### Request Body
+
+```json
+{
+  "confirmed": true,
+  "notes": "Approved for processing"
+}
+```
+
+#### Response
+
+```json
+{
+  "confirmation_id": "123e4567-e89b-12d3-a456-426614174000",
+  "status": "confirmed",
+  "processed_at": "2024-01-15T10:30:00Z"
 }
 ```
 
