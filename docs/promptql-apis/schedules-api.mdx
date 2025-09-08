@@ -22,6 +22,22 @@ The Schedules API allows you to create and manage scheduled executions of automa
 API enables you to set up automated workflows that run at specific times or intervals, perfect for data processing
 pipelines, report generation, and other time-based operations.
 
+:::info To enable schedules you must enable the flag in metadata
+
+In your `promptql-config.hml` file, add the following:
+
+```yaml
+kind: PromptQlConfig
+version: v2
+definition:
+  featureFlags:
+    enable_scheduled_automations: true
+```
+
+Additionally, while you can currently _schedule_ automations, you cannot yet _run_ them. This feature is coming soon.
+
+:::
+
 ## Base URL
 
 Schedule endpoints use the following base URL:
@@ -223,26 +239,3 @@ Retrieve a specific schedule by its ID.
 
 - `404 Not Found` - Schedule not found or access denied
 - `422 Unprocessable Entity` - Invalid schedule ID format
-
-## Best Practices
-
-### Cron Expression Guidelines
-
-1. **Use specific times**: Avoid scheduling all tasks at common times like midnight or top of the hour
-2. **Consider timezone**: All times are in UTC unless specified otherwise
-3. **Test expressions**: Use online cron expression validators to verify your schedule
-4. **Avoid overlapping**: Ensure your automation can complete before the next scheduled run
-
-### Automation Requirements
-
-1. **Idempotent operations**: Design automations to handle multiple executions safely
-2. **Error handling**: Include proper error handling in your automation code
-3. **Resource limits**: Be mindful of resource usage for frequently scheduled tasks
-4. **Monitoring**: Regularly check execution history for failed runs
-
-### Performance Considerations
-
-1. **Batch operations**: Group related tasks into single automations when possible
-2. **Off-peak scheduling**: Schedule resource-intensive tasks during low-usage periods
-3. **Timeout handling**: Set appropriate timeouts for long-running automations
-4. **Cleanup**: Regularly review and remove unused schedules
