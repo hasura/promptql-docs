@@ -213,6 +213,23 @@ html[data-theme='dark'] {
   --chat-bubble-brand: var(--body-link-color);
 }
 
+/* Dark mode override for auth-prompt-card */
+html[data-theme='dark'] .auth-prompt-card {
+  background: var(--primary-neutral-900);
+}
+
+/* Dark mode overrides for auth-button-secondary */
+html[data-theme='dark'] .auth-button-secondary {
+  color: var(--primary-neutral-300);
+  border-color: var(--primary-neutral-600);
+}
+
+html[data-theme='dark'] .auth-button-secondary:hover {
+  background: var(--primary-neutral-800);
+  color: var(--primary-neutral-100);
+  border-color: var(--primary-neutral-500);
+}
+
 .thumbnail-small {
   display: block;
   margin: 0 auto;
@@ -464,7 +481,6 @@ img {
 iframe {
   height: 400px;
   width: 100%;
-  max-width: 600px;
 }
 
 /* -------------- HEADER & NAVIGATION -------------- */
@@ -1515,12 +1531,26 @@ pre[class*='language-'] code span.token {
 .front-matter {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   grid-gap: 80px;
+}
+
+/* Single column layout when user is authenticated (no auth prompt shown) */
+body[data-index-page-auth="true"] .front-matter,
+body.show-sidebar-authenticated .front-matter {
+  grid-template-columns: 1fr;
+}
+
+.video-wrapper {
+  display: grid;
+  margin-top: 2rem;
+  width: 100%;
 }
 
 .video-wrapper .video-aspect-ratio {
   position: relative;
   padding-bottom: 56.2%;
+  width: 100%;
 }
 
 .video-wrapper iframe {
@@ -1544,7 +1574,7 @@ pre[class*='language-'] code span.token {
 
 /* -------------- RESPONSIVE STYLES -------------- */
 
-@media (max-width: 1150px) {
+@media (max-width: 1150px) and (min-width: 769px) {
   .container > div > div:first-child {
     padding-left: 2.5rem !important;
     padding-right: 2.5rem !important;
@@ -1552,6 +1582,32 @@ pre[class*='language-'] code span.token {
     padding-bottom: 2.5rem !important;
   }
 
+  .front-matter {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .front-matter > div {
+    width: 100%;
+  }
+
+  .front-matter .auth-prompt-card {
+    max-width: none;
+  }
+
+  .front-matter .video-wrapper {
+    max-width: none;
+    width: 100%;
+  }
+
+  .front-matter .video-wrapper iframe {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
   .front-matter {
     grid-template-columns: 1fr;
     grid-gap: 8px;
@@ -1564,6 +1620,16 @@ pre[class*='language-'] code span.token {
     padding-right: 1rem !important;
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
+  }
+
+  .auth-prompt-container {
+    margin: 4rem 0;
+    margin-top: 0;
+    padding: 2rem 0;
+  }
+
+  .auth-prompt-card {
+    padding: 2.5rem 1.5rem;
   }
 }
 
@@ -1963,9 +2029,14 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 
 /* Authentication prompt styles for embedded component */
 .auth-prompt-container {
-  margin: 3rem 0;
+  margin: 4rem 0;
   padding: 2rem 0;
-  border-top: 1px solid var(--border-color);
+}
+
+/* Authentication prompt in sidebar context (within front-matter grid) */
+.front-matter .auth-prompt-container {
+  margin: 0;
+  padding: 0;
 }
 
 .auth-prompt-card {
@@ -1973,9 +2044,8 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
   max-width: 600px;
   margin: 0 auto;
   padding: 2rem;
-  border: 1px solid var(--border-color);
   border-radius: 12px;
-  background: var(--main-bg-color);
+  background: var(--sidebar-bg-color) !important;
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
 }
 
@@ -2005,11 +2075,49 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
   align-items: center;
 }
 
+.auth-prompt-separator {
+  position: relative;
+  color: var(--body-text-color);
+  font-size: 1rem;
+  opacity: 0.7;
+  margin: 1.5rem 0;
+  text-align: center;
+  width: 100%;
+}
+
+.auth-prompt-separator::before,
+.auth-prompt-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--body-text-color);
+  opacity: 0.3;
+}
+
+.auth-prompt-separator::before {
+  left: 0;
+}
+
+.auth-prompt-separator::after {
+  right: 0;
+}
+
+.auth-prompt-subtitle {
+  margin-top: 2rem !important;
+  margin-bottom: 0 !important;
+  font-size: 0.9rem !important;
+  color: var(--body-text-color);
+  opacity: 0.8;
+  line-height: 1.5 !important;
+}
+
 .auth-button-secondary {
   padding: 12px 24px;
   background: transparent;
-  color: var(--body-link-color);
-  border: 1px solid var(--body-link-color);
+  color: var(--primary-neutral-600);
+  border: 1px solid var(--primary-neutral-400);
   border-radius: 6px;
   font-size: 16px;
   font-weight: 500;
@@ -2023,8 +2131,9 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-button-secondary:hover {
-  background: var(--body-link-color);
-  color: var(--main-bg-color);
+  background: var(--primary-neutral-100);
+  color: var(--primary-neutral-800);
+  border-color: var(--primary-neutral-500);
   text-decoration: none;
 }
 
@@ -2033,12 +2142,7 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
   outline-offset: 2px;
 }
 
-@media (min-width: 640px) {
-  .auth-prompt-buttons {
-    flex-direction: row;
-    justify-content: center;
-  }
-}
+
 
 .auth-inline-link {
   color: var(--body-link-color);
@@ -2175,6 +2279,42 @@ body.show-sidebar-authenticated[data-page="docs_index"] [class*="docSidebarConta
 body.show-sidebar-authenticated.docs-doc-id-index aside[class*="docSidebarContainer"],
 body.show-sidebar-authenticated.docs-doc-id-index .theme-doc-sidebar-container,
 body.show-sidebar-authenticated.docs-doc-id-index [class*="docSidebarContainer"] {
+  display: block !important;
+}
+
+/* Hide mobile sidebar on index page for unauthenticated users */
+.docs-doc-id-index .navbar-sidebar,
+[data-page="docs_index"] .navbar-sidebar {
+  display: none !important;
+}
+
+/* Hide mobile hamburger menu button on index page for unauthenticated users */
+.docs-doc-id-index .navbar__toggle,
+.docs-doc-id-index [class*="toggle"],
+.docs-doc-id-index button[class*="toggle"],
+[data-page="docs_index"] .navbar__toggle,
+[data-page="docs_index"] [class*="toggle"],
+[data-page="docs_index"] button[class*="toggle"] {
+  display: none !important;
+}
+
+/* Only show mobile sidebar on index page when user is authenticated */
+body[data-index-page-auth="true"] .navbar-sidebar,
+body.show-sidebar-authenticated[data-page="docs_index"] .navbar-sidebar,
+body.show-sidebar-authenticated.docs-doc-id-index .navbar-sidebar {
+  display: block !important;
+}
+
+/* Only show mobile hamburger menu button on index page when user is authenticated */
+body[data-index-page-auth="true"] .navbar__toggle,
+body[data-index-page-auth="true"] [class*="toggle"],
+body[data-index-page-auth="true"] button[class*="toggle"],
+body.show-sidebar-authenticated[data-page="docs_index"] .navbar__toggle,
+body.show-sidebar-authenticated[data-page="docs_index"] [class*="toggle"],
+body.show-sidebar-authenticated[data-page="docs_index"] button[class*="toggle"],
+body.show-sidebar-authenticated.docs-doc-id-index .navbar__toggle,
+body.show-sidebar-authenticated.docs-doc-id-index [class*="toggle"],
+body.show-sidebar-authenticated.docs-doc-id-index button[class*="toggle"] {
   display: block !important;
 }
 

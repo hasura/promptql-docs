@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { AccessDeniedError } from '../contexts/helpers/oauthFlow';
-import AccessDenied from '../components/AccessDenied';
 
 const AuthCallback: React.FC = () => {
   const [status, setStatus] = useState<'loading' | 'error' | 'access_denied'>('loading');
@@ -48,7 +47,10 @@ const AuthCallback: React.FC = () => {
 
         // Check if this is an access denied error
         if (err instanceof AccessDeniedError) {
-          setStatus('access_denied');
+          // Mark access denied in session and redirect to index without query params
+          try { sessionStorage.setItem('access_denied', '1'); } catch {}
+          window.location.replace('/docs/index/');
+          return;
         } else {
           setStatus('error');
         }
@@ -82,9 +84,8 @@ const AuthCallback: React.FC = () => {
     );
   }
 
-  if (status === 'access_denied') {
-    return <AccessDenied />;
-  }
+  // If access was denied, we redirect to the docs index with a flag above.
+  // This branch is intentionally removed.
 
   return (
     <div className="auth-error-container">
