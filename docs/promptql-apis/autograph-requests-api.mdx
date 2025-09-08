@@ -1,0 +1,253 @@
+---
+sidebar_position: 8
+sidebar_label: Autograph Requests API
+description: "Learn how to manage approval workflows and autograph requests for sensitive operations."
+keywords:
+  - hasura ddn
+  - autograph requests
+  - apis
+  - approval workflow
+  - permissions
+toc_max_heading_level: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# Autograph Requests API
+
+## Introduction
+
+The Autograph Requests API provides approval workflow functionality for sensitive operations that require administrative
+approval before execution. This API allows collaborators to request permissions for specific actions and enables
+administrators to review, approve, or deny these requests.
+
+## Base URL
+
+Autograph Requests endpoints use the following base URL:
+
+`https://promptql.ddn.hasura.app/autograph-requests/`
+
+:::note Private DDN Endpoint
+
+For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
+by the control plane. For example:
+
+`https://promptql.<FQDN>/autograph-requests/`
+
+**You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
+
+:::
+
+## Authentication
+
+Autograph Requests endpoints require JWT authentication for all operations:
+
+```
+Authorization: Bearer <jwt-token>
+Content-Type: application/json
+```
+
+:::info Getting JWT Tokens
+
+For information on obtaining JWT tokens, see the
+[Authentication guide](/promptql-apis/auth.mdx#getting-jwt-tokens-for-user-scoped-operations).
+
+:::
+
+## Access Control
+
+The Autograph Requests API implements role-based access control:
+
+### Admin Users
+
+- Can view all requests for the project
+- Can approve or deny requests
+- Can update request status and add admin notes
+
+### Collaborator Users
+
+- Can only view their own requests
+- Cannot update request status
+- Can create new requests (through other APIs that trigger approval workflows)
+
+## List Autograph Requests
+
+Retrieve autograph requests with optional filtering.
+
+`GET /autograph-requests/`
+
+### Query Parameters
+
+| Parameter           | Type   | Required | Description                                       |
+| ------------------- | ------ | -------- | ------------------------------------------------- |
+| `thread_id`         | string | No       | Filter by thread ID (UUID format)                 |
+| `status`            | string | No       | Filter by status: "pending", "approved", "denied" |
+| `requestor_user_id` | string | No       | Filter by requestor user ID (admin only)          |
+| `updated_by`        | string | No       | Filter by user who updated the request            |
+
+### Response
+
+```json
+{
+  "requests": [
+    {
+      "autograph_request_id": "123e4567-e89b-12d3-a456-426614174000",
+      "thread_id": "thread-uuid",
+      "requestor_user_id": "user-uuid",
+      "status": "pending",
+      "request_type": "data_modification",
+      "description": "Request to modify customer data",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-01-15T10:30:00Z",
+      "updated_by": null,
+      "admin_notes": null
+    }
+  ],
+  "total_count": 1
+}
+```
+
+### Response Fields
+
+| Field                  | Type   | Description                                     |
+| ---------------------- | ------ | ----------------------------------------------- |
+| `autograph_request_id` | string | Unique identifier for the request               |
+| `thread_id`            | string | Associated thread ID                            |
+| `requestor_user_id`    | string | ID of the user who made the request             |
+| `status`               | string | Current status: "pending", "approved", "denied" |
+| `request_type`         | string | Type of operation being requested               |
+| `description`          | string | Human-readable description of the request       |
+| `created_at`           | string | ISO 8601 timestamp of creation                  |
+| `updated_at`           | string | ISO 8601 timestamp of last update               |
+| `updated_by`           | string | ID of admin who last updated the request        |
+| `admin_notes`          | string | Optional notes from the reviewing admin         |
+
+### Error Responses
+
+- `403 Forbidden` - User lacks access to the project
+- `404 Not Found` - Project not found
+
+## Get Autograph Request
+
+Retrieve a specific autograph request by its ID.
+
+`GET /autograph-requests/{autograph_request_id}`
+
+### Path Parameters
+
+| Parameter              | Type   | Required | Description                     |
+| ---------------------- | ------ | -------- | ------------------------------- |
+| `autograph_request_id` | string | Yes      | UUID of the request to retrieve |
+
+### Response
+
+```json
+{
+  "autograph_request_id": "123e4567-e89b-12d3-a456-426614174000",
+  "thread_id": "thread-uuid",
+  "requestor_user_id": "user-uuid",
+  "status": "pending",
+  "request_type": "data_modification",
+  "description": "Request to modify customer data in the analytics table",
+  "request_details": {
+    "table_name": "customer_analytics",
+    "operation": "UPDATE",
+    "affected_rows": 150,
+    "columns": ["last_login", "status"]
+  },
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+  "updated_by": null,
+  "admin_notes": null,
+  "requestor_info": {
+    "user_id": "user-uuid",
+    "email": "user@example.com",
+    "name": "John Doe"
+  }
+}
+```
+
+### Error Responses
+
+- `403 Forbidden` - User lacks access to this request
+- `404 Not Found` - Request not found
+
+## Update Autograph Request
+
+Update the status of an autograph request (admin only).
+
+`PATCH /autograph-requests/{autograph_request_id}`
+
+### Path Parameters
+
+| Parameter              | Type   | Required | Description                   |
+| ---------------------- | ------ | -------- | ----------------------------- |
+| `autograph_request_id` | string | Yes      | UUID of the request to update |
+
+### Request Body
+
+```json
+{
+  "status": "approved",
+  "admin_notes": "Approved after reviewing the data modification requirements. Please proceed with caution."
+}
+```
+
+### Request Fields
+
+| Field         | Type   | Required | Description                            |
+| ------------- | ------ | -------- | -------------------------------------- |
+| `status`      | string | Yes      | New status: "approved" or "denied"     |
+| `admin_notes` | string | No       | Optional notes explaining the decision |
+
+### Response
+
+```json
+{
+  "autograph_request_id": "123e4567-e89b-12d3-a456-426614174000",
+  "thread_id": "thread-uuid",
+  "requestor_user_id": "user-uuid",
+  "status": "approved",
+  "request_type": "data_modification",
+  "description": "Request to modify customer data in the analytics table",
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T14:30:00Z",
+  "updated_by": "admin-user-uuid",
+  "admin_notes": "Approved after reviewing the data modification requirements. Please proceed with caution."
+}
+```
+
+### Error Responses
+
+- `403 Forbidden` - User lacks admin access to update requests
+- `404 Not Found` - Request not found
+- `422 Unprocessable Entity` - Invalid status or validation errors
+
+## Request Types
+
+The following request types are supported:
+
+### Data Modification
+
+- **Type**: `data_modification`
+- **Description**: Requests to modify, insert, or delete data
+- **Common scenarios**: Updating customer records, bulk data changes
+
+### Schema Changes
+
+- **Type**: `schema_modification`
+- **Description**: Requests to modify database schema
+- **Common scenarios**: Adding columns, creating tables, altering constraints
+
+### Sensitive Operations
+
+- **Type**: `sensitive_operation`
+- **Description**: Operations that require special approval
+- **Common scenarios**: Data exports, system configuration changes
+
+### Custom Operations
+
+- **Type**: `custom`
+- **Description**: Project-specific operations requiring approval
+- **Common scenarios**: Custom workflows, integrations
