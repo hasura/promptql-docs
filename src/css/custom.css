@@ -2064,8 +2064,9 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
 }
 
 .auth-prompt-button {
-  font-size: 1.1rem;
-  padding: 0.75rem 2rem;
+  /* Match secondary button sizing for uniform height */
+  font-size: 16px;
+  padding: 12px 24px;
 }
 
 .auth-prompt-buttons {
@@ -2073,6 +2074,19 @@ div[style*="position: fixed"] textarea::-webkit-scrollbar {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+}
+
+/* Make auth prompt buttons full width */
+.auth-prompt-buttons .auth-button,
+.auth-prompt-buttons .auth-button-secondary {
+  width: 100%;
+  justify-content: center;
+  line-height: 1.25;
+}
+
+/* Normalize primary button border to match secondary for equal height */
+.auth-prompt-buttons .auth-button {
+  border: 1px solid transparent;
 }
 
 .auth-prompt-separator {
