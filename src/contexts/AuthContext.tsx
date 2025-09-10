@@ -77,10 +77,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const handleAuthCallbackWrapper = async (code: string, state: string): Promise<void> => {
     try {
-      const { accessToken, refreshToken } = await handleAuthCallback(code, state);
+      const { accessToken, refreshToken, expiresIn } = await handleAuthCallback(code, state);
 
-      // Store both access and refresh tokens
-      storeSession(accessToken, refreshToken);
+      // Store both access and refresh tokens, aligning access cookie expiry with token lifetime
+      storeSession(accessToken, refreshToken, expiresIn);
 
       // Set a minimal user object to indicate authentication
       setUser({ id: 'authenticated', email: 'authenticated' });

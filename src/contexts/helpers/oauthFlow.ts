@@ -53,7 +53,7 @@ export const initiateLogin = () => {
 /**
  * Handle OAuth callback and complete authentication
  */
-export const handleAuthCallback = async (code: string, state: string): Promise<{ accessToken: string; refreshToken?: string }> => {
+export const handleAuthCallback = async (code: string, state: string): Promise<{ accessToken: string; refreshToken?: string; expiresIn?: number }> => {
   const authConfig = getAuthConfig();
 
   try {
@@ -90,6 +90,7 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
     const tokenData = await tokenResponse.json();
     const accessToken = tokenData.access_token;
     const refreshToken = tokenData.refresh_token;
+    const expiresIn = tokenData.expires_in; // seconds
 
     if (!accessToken) {
       throw new Error('No access token received from token exchange');
@@ -102,28 +103,10 @@ export const handleAuthCallback = async (code: string, state: string): Promise<{
       throw new AccessDeniedError(`While you have a Hasura Cloud account, it looks like you don't have access to PromptQL. Please contact your AI strategist to allowlist your email for reading through the documentation and for creating PromptQL projects.`);
     }
 
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken, expiresIn };
 
   } catch (error) {
     console.error('Auth callback error:', error);
     throw error;
   }
-};
-
-/**
- * Complete the authentication process after successful callback
- */
-export const completeAuthentication = (accessToken: string, refreshToken?: string) => {
-  Cookies.set('hasura-lux', accessToken, { expires: 1 });
-  if (refreshToken) {
-    Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
-  }
-
-  // Clean up session storage
-  sessionStorage.removeItem('oauth_state');
-
-  // Redirect to original destination or home
-  const redirectPath = sessionStorage.getItem('redirect_after_login') || '/docs/index/';
-  sessionStorage.removeItem('redirect_after_login');
-  window.location.href = redirectPath;
 };
