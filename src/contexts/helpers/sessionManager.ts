@@ -40,8 +40,18 @@ export const initializeAuthFromSession = async (): Promise<User | null> => {
 /**
  * Store user session data
  */
-export const storeSession = (accessToken: string, refreshToken?: string): void => {
-  Cookies.set('hasura-lux', accessToken, { expires: 1 }); // 1 day
+export const storeSession = (
+  accessToken: string,
+  refreshToken?: string,
+  accessTokenExpiresInSeconds?: number
+): void => {
+  // Align cookie expiry with the token's actual lifetime (fallback to 1 day)
+  const accessTokenExpires: number | Date =
+    typeof accessTokenExpiresInSeconds === 'number' && isFinite(accessTokenExpiresInSeconds) && accessTokenExpiresInSeconds > 0
+      ? new Date(Date.now() + accessTokenExpiresInSeconds * 1000)
+      : 1; // days
+
+  Cookies.set('hasura-lux', accessToken, { expires: accessTokenExpires });
   if (refreshToken) {
     Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
   }
@@ -93,14 +103,15 @@ export const refreshAccessToken = async (): Promise<string | null> => {
     const tokenData = await tokenResponse.json();
     const newAccessToken = tokenData.access_token;
     const newRefreshToken = tokenData.refresh_token;
+    const expiresIn = tokenData.expires_in; // seconds
 
     if (!newAccessToken) {
       clearSession();
       return null;
     }
 
-    // Store the new tokens
-    storeSession(newAccessToken, newRefreshToken);
+    // Store the new tokens and align cookie expiry with access token lifetime
+    storeSession(newAccessToken, newRefreshToken, expiresIn);
 
     return newAccessToken;
   } catch (error) {
