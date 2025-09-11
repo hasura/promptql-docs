@@ -98,7 +98,7 @@ All other routes require authentication.
 - Mock Hydra server with in-memory storage and CORS enabled
 - Mock login/consent interface configured as public client (no client secret)
 - User access check always returns `true`
-- Access tokens stored in browser cookies (`hasura-lux`) with 1-day expiration
+- Access tokens stored in browser cookies (`pql-docs-access`) with 1-day expiration; refresh tokens in (`pql-docs-refresh`)
 - Tokens are retrieved from cookies and sent as Authorization Bearer headers to GraphQL API
 - Delayed loading animations (5-second threshold)
 - Brand-consistent styling across light/dark themes

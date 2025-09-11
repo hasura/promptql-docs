@@ -2,6 +2,9 @@ import Cookies from 'js-cookie';
 import { checkUserAccess } from './userAccess';
 import { getAuthConfig } from '../../config/auth';
 
+const ACCESS_COOKIE = 'pql-docs-access';
+const REFRESH_COOKIE = 'pql-docs-refresh';
+
 export interface User {
   id: string;
   email: string;
@@ -13,9 +16,10 @@ export interface User {
  */
 export const initializeAuthFromSession = async (): Promise<User | null> => {
   try {
-    const accessToken = Cookies.get('hasura-lux');
+    const accessToken = Cookies.get(ACCESS_COOKIE);
 
     if (accessToken) {
+
       const hasAccess = await checkUserAccess(accessToken);
 
       if (hasAccess) {
@@ -51,9 +55,9 @@ export const storeSession = (
       ? new Date(Date.now() + accessTokenExpiresInSeconds * 1000)
       : 1; // days
 
-  Cookies.set('hasura-lux', accessToken, { expires: accessTokenExpires });
+  Cookies.set(ACCESS_COOKIE, accessToken, { expires: accessTokenExpires });
   if (refreshToken) {
-    Cookies.set('hasura-lux-refresh', refreshToken, { expires: 7 }); // 7 days
+    Cookies.set(REFRESH_COOKIE, refreshToken, { expires: 7 }); // 7 days
   }
 };
 
@@ -61,15 +65,15 @@ export const storeSession = (
  * Clear user session data
  */
 export const clearSession = (): void => {
-  Cookies.remove('hasura-lux');
-  Cookies.remove('hasura-lux-refresh');
+  Cookies.remove(ACCESS_COOKIE);
+  Cookies.remove(REFRESH_COOKIE);
 };
 
 /**
  * Refresh the access token using the refresh token
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
-  const refreshToken = Cookies.get('hasura-lux-refresh');
+  const refreshToken = Cookies.get(REFRESH_COOKIE);
 
   if (!refreshToken) {
     return null;
