@@ -3827,7 +3827,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/js-cookie@npm:^3":
+"@types/js-cookie@npm:^3.0.6":
   version: 3.0.6
   resolution: "@types/js-cookie@npm:3.0.6"
   checksum: 10/272d551687547445cb210213c73e72e0e5d58ad73e2e444a65d688b8ff9425529779ee0cd6492aaa1f070161916d4254ef2b1a76d64179100437f60749d094ef
@@ -6430,7 +6430,7 @@ __metadata:
     "@sentry/react": "npm:^10.3.0"
     "@sentry/tracing": "npm:^7.120.4"
     "@types/dompurify": "npm:^3"
-    "@types/js-cookie": "npm:^3"
+    "@types/js-cookie": "npm:^3.0.6"
     "@types/punycode": "npm:^2"
     "@types/react-syntax-highlighter": "npm:^15"
     "@types/react-transition-group": "npm:^4"

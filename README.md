@@ -27,11 +27,11 @@ git clone https://github.com/hasura/promptql-docs.git
 cd promptql-docs
 yarn
 
-# Start the dev server
+# Start the development environment
 yarn start
 ```
 
-The docs will open at `http://localhost:3001` with hot reloading - edit away and see changes instantly.
+The docs will open at `http://localhost:3001` with hot reloading and full authentication - edit away and see changes instantly.
 
 ### Making Changes
 
@@ -45,11 +45,11 @@ The docs will open at `http://localhost:3001` with hot reloading - edit away and
 # Build for production
 yarn build
 
-# Test the build locally
-yarn serve
+# Test the production build locally (with authentication)
+yarn build:local
 ```
 
-The build generates static files in the `build` directory, ready for any static hosting service.
+The `build` command generates static files in the `build` directory, ready for any static hosting service. The `build:local` command builds the site and serves it locally with the full authentication system for testing.
 
 
 ## Need Help?

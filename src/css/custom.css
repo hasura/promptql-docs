@@ -127,6 +127,14 @@
   --color-promptQLScore: #b6fc34;
 
   font-family: 'Inter', sans-serif;
+
+  /* Authentication Colors */
+  --auth-button-bg: var(--primary-neutral-800);
+  --auth-button-bg-hover: var(--primary-neutral-700);
+  --auth-button-text: #ffffff;
+  --auth-error-bg: var(--danger-bg);
+  --auth-error-border: var(--danger-border);
+  --auth-error-text: var(--admonition-text-color);
 }
 
 html[data-theme='dark'] {
@@ -151,6 +159,11 @@ html[data-theme='dark'] {
   --admonition-inline-text-color: #374151;
   --body-list-item-color: var(--heading-color);
   --sidebar-divider: #1f2937;
+
+  /* Authentication Colors - Dark Mode */
+  --auth-button-bg: var(--primary-neutral-100);
+  --auth-button-bg-hover: var(--primary-neutral-200);
+  --auth-button-text: var(--primary-neutral-800);
 
   --note-bg: #1f2937;
   --note-border: #374151;
@@ -198,6 +211,23 @@ html[data-theme='dark'] {
   --chat-container-bg: var(--main-bg-color);
   --chat-container-border: var(--inline-code-border);
   --chat-bubble-brand: var(--body-link-color);
+}
+
+/* Dark mode override for auth-prompt-card */
+html[data-theme='dark'] .auth-prompt-card {
+  background: var(--primary-neutral-900);
+}
+
+/* Dark mode overrides for auth-button-secondary */
+html[data-theme='dark'] .auth-button-secondary {
+  color: var(--primary-neutral-300);
+  border-color: var(--primary-neutral-600);
+}
+
+html[data-theme='dark'] .auth-button-secondary:hover {
+  background: var(--primary-neutral-800);
+  color: var(--primary-neutral-100);
+  border-color: var(--primary-neutral-500);
 }
 
 .thumbnail-small {
@@ -451,7 +481,6 @@ img {
 iframe {
   height: 400px;
   width: 100%;
-  max-width: 600px;
 }
 
 /* -------------- HEADER & NAVIGATION -------------- */
@@ -1502,12 +1531,26 @@ pre[class*='language-'] code span.token {
 .front-matter {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  align-items: start;
   grid-gap: 80px;
+}
+
+/* Single column layout when user is authenticated (no auth prompt shown) */
+body[data-index-page-auth="true"] .front-matter,
+body.show-sidebar-authenticated .front-matter {
+  grid-template-columns: 1fr;
+}
+
+.video-wrapper {
+  display: grid;
+  margin-top: 2rem;
+  width: 100%;
 }
 
 .video-wrapper .video-aspect-ratio {
   position: relative;
   padding-bottom: 56.2%;
+  width: 100%;
 }
 
 .video-wrapper iframe {
@@ -1531,7 +1574,7 @@ pre[class*='language-'] code span.token {
 
 /* -------------- RESPONSIVE STYLES -------------- */
 
-@media (max-width: 1150px) {
+@media (max-width: 1150px) and (min-width: 769px) {
   .container > div > div:first-child {
     padding-left: 2.5rem !important;
     padding-right: 2.5rem !important;
@@ -1539,6 +1582,32 @@ pre[class*='language-'] code span.token {
     padding-bottom: 2.5rem !important;
   }
 
+  .front-matter {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+  }
+
+  .front-matter > div {
+    width: 100%;
+  }
+
+  .front-matter .auth-prompt-card {
+    max-width: none;
+  }
+
+  .front-matter .video-wrapper {
+    max-width: none;
+    width: 100%;
+  }
+
+  .front-matter .video-wrapper iframe {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
   .front-matter {
     grid-template-columns: 1fr;
     grid-gap: 8px;
@@ -1551,6 +1620,16 @@ pre[class*='language-'] code span.token {
     padding-right: 1rem !important;
     padding-top: 1rem !important;
     padding-bottom: 1rem !important;
+  }
+
+  .auth-prompt-container {
+    margin: 4rem 0;
+    margin-top: 0;
+    padding: 2rem 0;
+  }
+
+  .auth-prompt-card {
+    padding: 2.5rem 1.5rem;
   }
 }
 
@@ -1763,4 +1842,544 @@ pre[class*='language-'] code span.token {
 /* Hide scrollbar on chat widget textarea */
 div[style*="position: fixed"] textarea::-webkit-scrollbar {
   display: none;
+}
+
+/* Authentication Styles */
+.auth-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+  flex-direction: column;
+}
+
+.auth-loading-spinner {
+  margin-bottom: 2rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.auth-loading-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--body-link-color);
+  animation: auth-loading-bounce 1.4s ease-in-out infinite both;
+}
+
+.auth-loading-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.auth-loading-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.auth-loading-dot:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes auth-loading-bounce {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+}
+
+.auth-loading p {
+  color: var(--body-text-color);
+  font-size: 1rem;
+  margin: 0;
+}
+
+.auth-required {
+  text-align: center;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.auth-required h1 {
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+}
+
+.auth-required p {
+  color: var(--body-text-color);
+  margin-bottom: 2rem;
+}
+
+.auth-button {
+  padding: 12px 24px;
+  background: var(--auth-button-bg);
+  color: var(--auth-button-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  text-decoration: none;
+}
+
+.auth-button:hover {
+  background: var(--auth-button-bg-hover);
+  color: var(--auth-button-text);
+  text-decoration: none;
+}
+
+.auth-button:focus {
+  outline: 2px solid var(--auth-button-bg);
+  outline-offset: 2px;
+}
+
+.auth-login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  padding: 2rem;
+}
+
+.auth-login-card {
+  text-align: center;
+  max-width: 500px;
+  padding: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  background-color: var(--main-bg-color);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.auth-login-card h1 {
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+}
+
+.auth-login-card p {
+  color: var(--body-text-color);
+  margin-bottom: 2rem;
+}
+
+.auth-login-footer {
+  margin-top: 2rem;
+  font-size: 14px;
+  color: var(--body-text-color);
+}
+
+.auth-login-footer a {
+  color: var(--body-link-color);
+  text-decoration: none;
+}
+
+.auth-login-footer a:hover {
+  color: var(--body-link-color-hover);
+  text-decoration: underline;
+}
+
+.auth-error-container {
+  text-align: center;
+  padding: 2rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.auth-error-container h2 {
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+}
+
+.auth-error-container p {
+  color: var(--body-text-color);
+  margin-bottom: 1rem;
+}
+
+.auth-error-details {
+  background: var(--auth-error-bg);
+  border: 1px solid var(--auth-error-border);
+  color: var(--auth-error-text);
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1rem 0;
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.875rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.auth-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 8px;
+}
+
+.auth-status-email {
+  font-size: 14px;
+  color: var(--ifm-navbar-link-color);
+}
+
+/* Authentication prompt styles for embedded component */
+.auth-prompt-container {
+  margin: 4rem 0;
+  padding: 2rem 0;
+}
+
+/* Authentication prompt in sidebar context (within front-matter grid) */
+.front-matter .auth-prompt-container {
+  margin: 0;
+  padding: 0;
+}
+
+.auth-prompt-card {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+  border-radius: 12px;
+  background: var(--sidebar-bg-color) !important;
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.1);
+}
+
+.auth-prompt-card h3 {
+  color: var(--heading-color);
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.auth-prompt-card p {
+  color: var(--body-text-color);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.auth-prompt-button {
+  /* Match secondary button sizing for uniform height */
+  font-size: 16px;
+  padding: 12px 24px;
+}
+
+.auth-prompt-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+}
+
+/* Make auth prompt buttons full width */
+.auth-prompt-buttons .auth-button,
+.auth-prompt-buttons .auth-button-secondary {
+  width: 100%;
+  justify-content: center;
+  line-height: 1.25;
+}
+
+/* Normalize primary button border to match secondary for equal height */
+.auth-prompt-buttons .auth-button {
+  border: 1px solid transparent;
+}
+
+.auth-prompt-separator {
+  position: relative;
+  color: var(--body-text-color);
+  font-size: 1rem;
+  opacity: 0.7;
+  margin: 1.5rem 0;
+  text-align: center;
+  width: 100%;
+}
+
+.auth-prompt-separator::before,
+.auth-prompt-separator::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: 45%;
+  height: 1px;
+  background-color: var(--body-text-color);
+  opacity: 0.3;
+}
+
+.auth-prompt-separator::before {
+  left: 0;
+}
+
+.auth-prompt-separator::after {
+  right: 0;
+}
+
+.auth-prompt-subtitle {
+  margin-top: 2rem !important;
+  margin-bottom: 0 !important;
+  font-size: 0.9rem !important;
+  color: var(--body-text-color);
+  opacity: 0.8;
+  line-height: 1.5 !important;
+}
+
+.auth-button-secondary {
+  padding: 12px 24px;
+  background: transparent;
+  color: var(--primary-neutral-600);
+  border: 1px solid var(--primary-neutral-400);
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  text-decoration: none;
+}
+
+.auth-button-secondary:hover {
+  background: var(--primary-neutral-100);
+  color: var(--primary-neutral-800);
+  border-color: var(--primary-neutral-500);
+  text-decoration: none;
+}
+
+.auth-button-secondary:focus {
+  outline: 2px solid var(--body-link-color);
+  outline-offset: 2px;
+}
+
+
+
+.auth-inline-link {
+  color: var(--body-link-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.auth-inline-link:hover {
+  color: var(--body-link-color-hover);
+  text-decoration: underline;
+}
+
+/* Access denied styles */
+.access-denied-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  padding: 2rem;
+}
+
+.access-denied-card {
+  text-align: center;
+  max-width: 600px;
+  padding: 3rem 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  background: var(--main-bg-color);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.1);
+}
+
+.access-denied-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+}
+
+.access-denied-card h1 {
+  color: var(--heading-color);
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.access-denied-content {
+  margin-bottom: 2.5rem;
+}
+
+.access-denied-message {
+  color: var(--body-text-color);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.access-denied-contact {
+  color: var(--body-text-color);
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 0;
+}
+
+.access-denied-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.access-denied-button {
+  font-size: 1rem;
+  padding: 0.75rem 2rem;
+}
+
+.access-denied-link {
+  color: var(--body-link-color);
+  text-decoration: none;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.access-denied-link:hover {
+  color: var(--body-link-color-hover);
+  background: var(--ifm-color-emphasis-100);
+  text-decoration: none;
+}
+
+.access-denied-footer {
+  border-top: 1px solid var(--border-color);
+  padding-top: 1.5rem;
+  font-size: 0.9rem;
+  color: var(--body-text-color);
+  opacity: 0.8;
+}
+
+.access-denied-footer a {
+  color: var(--body-link-color);
+  text-decoration: none;
+}
+
+.access-denied-footer a:hover {
+  color: var(--body-link-color-hover);
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .access-denied-actions {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+/* Hide sidebar on index page by default to prevent flash */
+[data-page="docs_index"] aside[class*="docSidebarContainer"],
+[data-page="docs_index"] .theme-doc-sidebar-container,
+[data-page="docs_index"] [class*="docSidebarContainer"],
+.docs-doc-id-index aside[class*="docSidebarContainer"],
+.docs-doc-id-index .theme-doc-sidebar-container,
+.docs-doc-id-index [class*="docSidebarContainer"] {
+  display: none !important;
+}
+
+/* Only show sidebar on index page when user is authenticated */
+body[data-index-page-auth="true"] aside[class*="docSidebarContainer"],
+body[data-index-page-auth="true"] .theme-doc-sidebar-container,
+body[data-index-page-auth="true"] [class*="docSidebarContainer"],
+body.show-sidebar-authenticated[data-page="docs_index"] aside[class*="docSidebarContainer"],
+body.show-sidebar-authenticated[data-page="docs_index"] .theme-doc-sidebar-container,
+body.show-sidebar-authenticated[data-page="docs_index"] [class*="docSidebarContainer"],
+body.show-sidebar-authenticated.docs-doc-id-index aside[class*="docSidebarContainer"],
+body.show-sidebar-authenticated.docs-doc-id-index .theme-doc-sidebar-container,
+body.show-sidebar-authenticated.docs-doc-id-index [class*="docSidebarContainer"] {
+  display: block !important;
+}
+
+/* Hide mobile sidebar on index page for unauthenticated users */
+.docs-doc-id-index .navbar-sidebar,
+[data-page="docs_index"] .navbar-sidebar {
+  display: none !important;
+}
+
+/* Hide mobile hamburger menu button on index page for unauthenticated users */
+.docs-doc-id-index .navbar__toggle,
+.docs-doc-id-index [class*="toggle"],
+.docs-doc-id-index button[class*="toggle"],
+[data-page="docs_index"] .navbar__toggle,
+[data-page="docs_index"] [class*="toggle"],
+[data-page="docs_index"] button[class*="toggle"] {
+  display: none !important;
+}
+
+/* Only show mobile sidebar on index page when user is authenticated */
+body[data-index-page-auth="true"] .navbar-sidebar,
+body.show-sidebar-authenticated[data-page="docs_index"] .navbar-sidebar,
+body.show-sidebar-authenticated.docs-doc-id-index .navbar-sidebar {
+  display: block !important;
+}
+
+/* Only show mobile hamburger menu button on index page when user is authenticated */
+body[data-index-page-auth="true"] .navbar__toggle,
+body[data-index-page-auth="true"] [class*="toggle"],
+body[data-index-page-auth="true"] button[class*="toggle"],
+body.show-sidebar-authenticated[data-page="docs_index"] .navbar__toggle,
+body.show-sidebar-authenticated[data-page="docs_index"] [class*="toggle"],
+body.show-sidebar-authenticated[data-page="docs_index"] button[class*="toggle"],
+body.show-sidebar-authenticated.docs-doc-id-index .navbar__toggle,
+body.show-sidebar-authenticated.docs-doc-id-index [class*="toggle"],
+body.show-sidebar-authenticated.docs-doc-id-index button[class*="toggle"] {
+  display: block !important;
+}
+
+/* Expand main content when sidebar is hidden on index page */
+@media (min-width: 997px) {
+  .docs-doc-id-index [class*="docMainContainer"] {
+    max-width: none !important;
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  .docs-doc-id-index [class*="docItemWrapper"] {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+  }
+
+  /* Restore normal layout when authenticated */
+  body.show-sidebar-authenticated.docs-doc-id-index [class*="docMainContainer"] {
+    max-width: initial !important;
+    margin-left: initial !important;
+    width: initial !important;
+  }
+
+  body.show-sidebar-authenticated.docs-doc-id-index [class*="docItemWrapper"] {
+    max-width: initial !important;
+    margin: initial !important;
+  }
+}
+
+.auth-logout-button {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: transparent;
+  border: 1px solid var(--ifm-navbar-link-color);
+  border-radius: 4px;
+  color: var(--ifm-navbar-link-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-logout-button:hover {
+  background: var(--ifm-navbar-link-color);
+  color: var(--ifm-navbar-background-color);
+}
+
+/* Navbar adjustments for unauthenticated state */
+.navbar__items--right {
+  min-height: var(--ifm-navbar-item-padding-vertical);
+}
+
+/* Ensure proper spacing when fewer navbar items are present */
+.navbar__items--right > *:not(:last-child) {
+  margin-right: var(--ifm-navbar-item-padding-horizontal);
 }

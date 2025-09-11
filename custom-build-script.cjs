@@ -70,7 +70,7 @@ function generateLlmBundle() {
 
 // First run the Docusaurus build
 console.log('\n\x1b[36mRunning Docusaurus build...\x1b[0m');
-execSync('docusaurus build', { cwd: rootDir, stdio: 'inherit' });
+execSync('docusaurus build', { cwd: rootDir, stdio: 'inherit', env: process.env });
 
 // Then try to generate LLM bundle
 try {

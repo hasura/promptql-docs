@@ -9,6 +9,7 @@ steps:
         '--context=dir:///workspace/.',
         '--cache=true',
         '--cache-ttl=24h',
+        '--build-arg=RELEASE_MODE=${_RELEASE_MODE}',
         '--destination=us-west1-docker.pkg.dev/${PROJECT_ID}/promptql-docs/promptql-docs:${SHORT_SHA}',
       ]
 
@@ -20,6 +21,9 @@ steps:
       - '-c'
       - |
         sed -i 's|latest|${SHORT_SHA}|g' ./k8s-manifest/k8s/deployment.yaml
+        sed -i 's|RELEASE_MODE_PLACEHOLDER|${_RELEASE_MODE}|g' ./k8s-manifest/k8s/deployment.yaml
+    env:
+      - 'release_mode=${_RELEASE_MODE}'
 
   #deploy kubernetes manifest
   - name: 'gcr.io/cloud-builders/kubectl'
@@ -41,5 +45,6 @@ timeout: 3600s
 substitutions:
   _REGION: us-west2
   _CLUSTERNAME: prod-website-cloud-us-we2-gke-01
+  _RELEASE_MODE: production
 options:
   workerPool: 'projects/websitecloud-352908/locations/us-west2/workerPools/gke-vpn-pool'
