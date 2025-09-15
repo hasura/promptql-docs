@@ -18,7 +18,8 @@ in, the CLI will acknowledge your login, giving you access to Hasura DDN resourc
 ### Step 2. Scaffold out a new local project
 
 ```ddn title="Next, create a new local project:"
-ddn supergraph init my-project --with-promptql && cd my-project
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init my-project --with-promptql --project-data-plane-id <your-data-plane-id> && cd my-project
 ```
 
 Once you move into this directory, you'll see your project scaffolded out for you. You can view the structure by either
