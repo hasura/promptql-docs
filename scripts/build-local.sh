@@ -52,16 +52,16 @@ echo ""
 echo "🌐 Service URLs:"
 echo "   - Hydra Admin API: http://localhost:4445"
 echo "   - Hydra Public API: http://localhost:4444"
-echo "   - Login/Consent UI: http://localhost:5000"
+echo "   - Login/Consent UI: http://localhost:4000"
 echo ""
 
 echo "🚀 Starting production server with authentication..."
 echo ""
-echo "📝 The production build will be served at http://localhost:3001"
+echo "📝 The production build will be served at http://localhost:3000"
 echo "   Press Ctrl+C to stop the server and clean up services"
 echo ""
 
 # Start the production server in the foreground
-npx docusaurus serve --port 3001
+npx docusaurus serve --port 3000
 
 # The cleanup function will be called automatically when the script exits

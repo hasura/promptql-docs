@@ -30,7 +30,7 @@ services:
   hydra-login-consent:
     image: oryd/hydra-login-consent-node:v2.2.0
     ports:
-      - "5000:3000"
+      - "4000:3000"
     environment:
       - HYDRA_ADMIN_URL=http://hydra:4445
       - NODE_TLS_REJECT_UNAUTHORIZED=0

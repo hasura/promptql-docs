@@ -31,7 +31,7 @@ yarn
 yarn start
 ```
 
-The docs will open at `http://localhost:3001` with hot reloading and full authentication - edit away and see changes instantly.
+The docs will open at `http://localhost:3000` with hot reloading and full authentication - edit away and see changes instantly.
 
 ### Making Changes
 

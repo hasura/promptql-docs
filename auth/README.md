@@ -10,8 +10,8 @@ This directory contains the mock authentication setup for the PromptQL documenta
    ```
 
 2. **Test the authentication flow:**
-   - Visit http://localhost:3001
-   - Try to access any documentation page (e.g., http://localhost:3001/docs/quickstart/)
+   - Visit http://localhost:3000
+   - Try to access any documentation page (e.g., http://localhost:3000/docs/quickstart/)
    - You should be redirected to the login page
    - Click "Sign In with Hasura Cloud" to start the OAuth flow
 
@@ -32,7 +32,7 @@ This directory contains the mock authentication setup for the PromptQL documenta
    - Mock login interface that simulates Hasura Cloud login
    - Handles user consent for OAuth2 flow
 
-3. **Docusaurus App** (Port 3001)
+3. **Docusaurus App** (Port 3000)
    - Main documentation site with integrated authentication
 
 ### Authentication Flow
@@ -64,7 +64,7 @@ This directory contains the mock authentication setup for the PromptQL documenta
 
 ### OAuth2 Settings
 - **Client ID:** `docusaurus-client`
-- **Redirect URI:** `http://localhost:3001/docs/callback`
+- **Redirect URI:** `http://localhost:3000/docs/callback`
 - **Scopes:** `openid email`
 
 ### Public Routes

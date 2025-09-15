@@ -8,7 +8,7 @@ import styles from './styles.module.css';
 import useIsBrowser from '@docusaurus/useIsBrowser';
 import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
-import { ChatWidget } from '@site/src/components/Bot';
+import { PromptQLChat } from "promptql-chat-sdk";
 import { useColorMode } from '@docusaurus/theme-common';
 import { useAuth } from '@site/src/contexts/AuthContext';
 import { getAuthConfig } from '@site/src/config/auth';
@@ -91,12 +91,13 @@ export default function DocRootLayout({ children }) {
       </div>
       {/* Only show chatbot for authenticated users or when auth is disabled */}
       {(isAuthenticated || authConfig.isAuthDisabled) && !isLoading && (
-        <ChatWidget
-          apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
-          theme={colorMode}
-          brandColor="var(--chat-bubble-brand)"
-          placeholder="Ask me about PromptQL..."
-          welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
+        <PromptQLChat
+          endpoint={"https://promptql.ddn.pro.hasura.io"}
+          apiKey={"c04ce2ee-327e-425a-92bb-41a3f7bfe5ed"}
+          ddnToken={
+            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTUwMzA4NzEsImV4cCI6MTc4NjU2Njg3MSwiY2xhaW1zLmp3dC5oYXN1cmEuaW8iOnsieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS1hbGxvd2VkLXJvbGVzIjpbImFkbWluIl19fQ.qCTN8_ZT5TweLh1h_dgSKs6U4h11DOEe0o2YvXixb1c"
+          }
+          primaryColor={"#89d203"}
         />
       )}
     </div>
