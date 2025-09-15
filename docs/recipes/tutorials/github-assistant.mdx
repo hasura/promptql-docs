@@ -81,7 +81,8 @@ Head to `app/connector/github/index.ts` and change the org name and the repo nam
 This will create a Hasura DDN cloud project and set up PromptQL keys to connect to the PromptQL runtime.
 
 ```ddn
-ddn project init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn project init --data-plane-id <your-data-plane-id>
 ```
 
 ### Fire up your PromptQL project

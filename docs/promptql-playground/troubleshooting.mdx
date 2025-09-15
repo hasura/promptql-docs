@@ -30,7 +30,8 @@ ddn context get project
 If you get the error `Key "project" is not set.`, you need to initialize a DDN project.
 
 ```ddn title="Run the following command in the project directory:"
-ddn project init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn project init --data-plane-id <your-data-plane-id>
 ```
 
 Restarting the local services post this should fix the issue.

@@ -20,7 +20,8 @@ acknowledge your login, giving you access to Hasura Cloud resources.
 ### Step 2. Scaffold out a new local project
 
 ```ddn title="Next, create a new local project:"
-ddn supergraph init imdb-promptflix --with-promptql && cd imdb-promptflix
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init imdb-promptflix --with-promptql --project-data-plane-id <your-data-plane-id> && cd imdb-promptflix
 ```
 
 Now that you're in this directory, you'll see your project scaffolded out for you. You can view the structure by either
