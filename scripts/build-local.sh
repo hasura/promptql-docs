@@ -52,7 +52,7 @@ echo ""
 echo "🌐 Service URLs:"
 echo "   - Hydra Admin API: http://localhost:4445"
 echo "   - Hydra Public API: http://localhost:4444"
-echo "   - Login/Consent UI: http://localhost:3000"
+echo "   - Login/Consent UI: http://localhost:5000"
 echo ""
 
 echo "🚀 Starting production server with authentication..."
