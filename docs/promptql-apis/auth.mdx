@@ -62,7 +62,7 @@ The JWT token is obtained by making a POST request to the token refresh endpoint
 
 #### Bash Example
 
-```bash title="Get JWT token"
+```bash title="Get the JWT"
 JWT_TOKEN=$(curl -s -X POST "https://auth.pro.hasura.io/ddn/promptql/token" \
   -H "Authorization: pat <YOUR_PAT_OR_SERVICE_ACCOUNT_TOKEN>" \
   -H "x-hasura-project-id: <YOUR_PROJECT_ID>" \
@@ -71,15 +71,25 @@ JWT_TOKEN=$(curl -s -X POST "https://auth.pro.hasura.io/ddn/promptql/token" \
 ```
 
 ```bash title="Use the token for user-scoped operations"
-curl -X GET "https://promptql.ddn.hasura.app/threads" \
-  -H "Authorization: Bearer ${JWT_TOKEN}" \
+curl -X POST "https://promptql.ddn.hasura.app/playground/threads/v2" \
+  -H "Authorization: api-key ${PROMPTQL_API_KEY}" \
   -H "Content-Type: application/json"
+  -d '{
+      "user_message": "<your_message>",
+      "ddn_headers": {
+          "x-hasura-ddn-token": "${JWT_TOKEN}"
+      },
+      "timezone": "<your_timezone>"
+  }'
 ```
 
 :::info Token Expiration
 
 JWT tokens have a limited lifespan. Implement token refresh logic in your applications to automatically obtain new
 tokens when needed.
+
+Additionally, instead of passing the key-value pair of `x-hasura-ddn-token`, you can utilize `Authorization` as the key
+with any authentication strategy the underlying DDN project supports.
 
 :::
 
