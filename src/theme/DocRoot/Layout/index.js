@@ -6,9 +6,9 @@ import DocRootLayoutSidebar from '@theme/DocRoot/Layout/Sidebar';
 import DocRootLayoutMain from '@theme/DocRoot/Layout/Main';
 import styles from './styles.module.css';
 import useIsBrowser from '@docusaurus/useIsBrowser';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
-import { PromptQLChat } from "promptql-chat-sdk";
 import { useColorMode } from '@docusaurus/theme-common';
 import { useAuth } from '@site/src/contexts/AuthContext';
 import { getAuthConfig } from '@site/src/config/auth';
@@ -91,14 +91,18 @@ export default function DocRootLayout({ children }) {
       </div>
       {/* Only show chatbot for authenticated users or when auth is disabled */}
       {(isAuthenticated || authConfig.isAuthDisabled) && !isLoading && (
-        <PromptQLChat
-          endpoint={"https://promptql.ddn.pro.hasura.io"}
-          apiKey={"c04ce2ee-327e-425a-92bb-41a3f7bfe5ed"}
-          ddnToken={
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3NTUwMzA4NzEsImV4cCI6MTc4NjU2Njg3MSwiY2xhaW1zLmp3dC5oYXN1cmEuaW8iOnsieC1oYXN1cmEtZGVmYXVsdC1yb2xlIjoiYWRtaW4iLCJ4LWhhc3VyYS1hbGxvd2VkLXJvbGVzIjpbImFkbWluIl19fQ.qCTN8_ZT5TweLh1h_dgSKs6U4h11DOEe0o2YvXixb1c"
-          }
-          primaryColor={"#89d203"}
-        />
+        <BrowserOnly>
+          {() => {
+            const PromptQLChatComponent = React.lazy(() =>
+              import("promptql-chat-sdk").then(module => ({ default: module.PromptQLChat }))
+            );
+            return (
+              <React.Suspense fallback={<div>Loading chat...</div>}>
+                <PromptQLChatComponent endpoint="https://docsql-proxy-710071984479.us-west2.run.app" themeMode={colorMode} title='DocsQL' primaryColor='var(--chat-user-bg)'/>
+              </React.Suspense>
+            );
+          }}
+        </BrowserOnly>
       )}
     </div>
   );
