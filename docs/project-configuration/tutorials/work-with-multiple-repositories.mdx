@@ -58,7 +58,8 @@ provisioning subgraphs, inviting collaborators, and managing the API as a whole.
 ### Step 1. Initialize a new local project
 
 ```ddn title="Create a new local project and initialize a git repository:"
-ddn supergraph init parent-project --with-promptql && cd parent-project && git init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init parent-project --with-promptql --project-data-plane-id <your-data-plane-id> && cd parent-project && git init
 ```
 
 This will scaffold out the local configuration for a PromptQL project and initialize a git repository.
@@ -113,7 +114,8 @@ initializing a new repository below.
 #### Step 1. Create a new repo for the `customers` subgraph
 
 ```ddn title="Initialize a new local project and git repo while also mapping to the existing cloud project:"
-ddn supergraph init customer-team --create-subgraph customers --with-project <project-name> --with-promptql && cd customer-team && git init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init customer-team --create-subgraph customers --with-project <project-name> --with-promptql --project-data-plane-id <your-data-plane-id> && cd customer-team && git init
 ```
 
 This will scaffold out the necessary project structure along with initializing a git repository for version control.
@@ -252,7 +254,8 @@ The steps below will allow you to incorporate your independent `billing` subgrap
 #### Step 1. Create a new repo for the `billing` subgraph
 
 ```ddn title="Initialize a new local project and git repo:"
-ddn supergraph init billing-team --with-project <project-name> --create-subgraph billing --with-promptql && cd billing-team && git init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init billing-team --with-project <project-name> --create-subgraph billing --with-promptql --project-data-plane-id <your-data-plane-id> && cd billing-team && git init
 ```
 
 This will scaffold out the necessary project structure along with initializing a git repository for version control.

@@ -17,20 +17,24 @@ Initialize a new Supergraph project directory.
 
 ## Synopsis
 
-This command is most often the first run with a new project. Use this to create a new supergraph directory and then begin to create your API. To learn more, check out the quickstart: https://hasura.io/docs/3.0/quickstart
+This command is most often the first run with a new project. Use this to create a new supergraph directory and then
+begin to create your API. To learn more, check out the quickstart: https://hasura.io/docs/3.0/quickstart
 
 ```bash
-ddn supergraph init <path-to-project-dir> [flags]
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn supergraph init <path-to-project-dir> [flags] --project-data-plane-id <your-data-plane-id>
 ```
 
 ## Examples
 
 ```bash
 # Initialize a new Supergraph project directory with a default subgraph 'app'
- ddn supergraph init <path-to-project-dir>
+# If you don't have a data plane provisioned, please contact your AI strategist
+ ddn supergraph init <path-to-project-dir> --project-data-plane-id <your-data-plane-id>
 
 # Initialize a new Supergraph project directory with a subgraph 'mysg'
- ddn supergraph init <path-to-project-dir> --create-subgraph mysg
+# If you don't have a data plane provisioned, please contact your AI strategist
+ ddn supergraph init <path-to-project-dir> --create-subgraph mysg --project-data-plane-id <your-data-plane-id>
 ```
 
 ## Options

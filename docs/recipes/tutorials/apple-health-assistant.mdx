@@ -87,7 +87,8 @@ Now, let's set up the Hasura DDN project with PromptQL to start exploring the da
 ```bash copy
 cd ddn-project
 ddn supergraph build local
-ddn project init
+# If you don't have a data plane provisioned, please contact your AI strategist
+ddn project init --data-plane-id <your-data-plane-id>
 ```
 
 - Add Anthropic API key to the`.env`.
