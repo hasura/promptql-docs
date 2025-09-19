@@ -50,7 +50,7 @@ const getOAuthConfig = () => {
       hydraAuthUrl: 'http://localhost:4444/oauth2/auth',
       hydraTokenUrl: 'http://localhost:4444/oauth2/token',
       clientId: 'docusaurus-client',
-      redirectUri: 'http://localhost:3001/docs/callback',
+      redirectUri: 'http://localhost:3000/docs/callback',
       scope: 'openid email'
     };
   }

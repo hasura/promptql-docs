@@ -24,4 +24,4 @@ RUN printf "\n\nexport NVM_DIR=\"\$HOME/.nvm\"\n. \"\$NVM_DIR/nvm.sh\"\n" >> ~/.
 
 WORKDIR /graphql-engine/docs
 
-EXPOSE 3001
+EXPOSE 3000

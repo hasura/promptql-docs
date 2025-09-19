@@ -2383,3 +2383,8 @@ body.show-sidebar-authenticated.docs-doc-id-index button[class*="toggle"] {
 .navbar__items--right > *:not(:last-child) {
   margin-right: var(--ifm-navbar-item-padding-horizontal);
 }
+
+/* Special stylings for chat component */
+#modal-description code {
+  border: none;
+}

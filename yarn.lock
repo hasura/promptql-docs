@@ -6445,6 +6445,7 @@ __metadata:
     postcss: "npm:^8.4.31"
     posthog-js: "npm:1.133.0"
     prism-react-renderer: "npm:^2.3.1"
+    promptql-chat-sdk: "npm:^1.0.1"
     punycode: "npm:^2.3.1"
     react: "npm:^18.0.0"
     react-dom: "npm:^18.0.0"
@@ -12009,7 +12010,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prismjs@npm:^1.27.0, prismjs@npm:^1.29.0":
+"prismjs@npm:^1.27.0, prismjs@npm:^1.29.0, prismjs@npm:^1.30.0":
   version: 1.30.0
   resolution: "prismjs@npm:1.30.0"
   checksum: 10/6b48a2439a82e5c6882f48ebc1564c3890e16463ba17ac10c3ad4f62d98dea5b5c915b172b63b83023a70ad4f5d7be3e8a60304420db34a161fae69dd4e3e2da
@@ -12044,6 +12045,21 @@ __metadata:
     err-code: "npm:^2.0.2"
     retry: "npm:^0.12.0"
   checksum: 10/96e1a82453c6c96eef53a37a1d6134c9f2482f94068f98a59145d0986ca4e497bf110a410adf73857e588165eab3899f0ebcf7b3890c1b3ce802abc0d65967d4
+  languageName: node
+  linkType: hard
+
+"promptql-chat-sdk@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "promptql-chat-sdk@npm:1.0.1"
+  dependencies:
+    prismjs: "npm:^1.30.0"
+    react-markdown: "npm:^10.1.0"
+    react-syntax-highlighter: "npm:^15.6.6"
+    remark-gfm: "npm:^4.0.1"
+  peerDependencies:
+    react: ">=18.0.0"
+    react-dom: ">=18.0.0"
+  checksum: 10/4c5e80cb4483a76eef82a0c602b91a6162462579f2ddc0188d5807ba60436a6d09c0ac1fcb161c701bdec1b8639577ee559dcaef1cd6b1c1828004a1f8e84d1d
   languageName: node
   linkType: hard
 
@@ -12429,6 +12445,22 @@ __metadata:
   peerDependencies:
     react: ">= 0.14.0"
   checksum: 10/9a89c81f7dcc109b038dc2a73189fa1ea916e6485d8a39856ab3d01d2c753449b5ae1c0df9c9ee0ed5c8c9808a68422b19af9a168ec091a274bddc7ad092eb86
+  languageName: node
+  linkType: hard
+
+"react-syntax-highlighter@npm:^15.6.6":
+  version: 15.6.6
+  resolution: "react-syntax-highlighter@npm:15.6.6"
+  dependencies:
+    "@babel/runtime": "npm:^7.3.1"
+    highlight.js: "npm:^10.4.1"
+    highlightjs-vue: "npm:^1.0.0"
+    lowlight: "npm:^1.17.0"
+    prismjs: "npm:^1.30.0"
+    refractor: "npm:^3.6.0"
+  peerDependencies:
+    react: ">= 0.14.0"
+  checksum: 10/8b7e60bc7df7218248e17dfc3c44b8f45cd9e363a763477753d5c39242910ff822180db59098e1cc74d0d2ced54ed1ca79a32d67e1afa0c8227ca918a7e0c692
   languageName: node
   linkType: hard
 

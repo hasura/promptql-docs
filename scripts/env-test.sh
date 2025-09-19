@@ -48,7 +48,7 @@ echo "Found in JS bundles: $RELEASE_MODE_VALUE"
 
 # Also try to fetch from the running container
 echo "Checking live endpoint..."
-ENDPOINT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/docs/index/ 2>/dev/null || echo "000")
+ENDPOINT_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000/docs/index/ 2>/dev/null || echo "000")
 echo "Endpoint status: $ENDPOINT_STATUS"
 
 if [ "$ENDPOINT_STATUS" = "200" ]; then

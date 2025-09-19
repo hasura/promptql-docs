@@ -40,13 +40,13 @@ echo ""
 echo "🌐 Service URLs:"
 echo "   - Hydra Admin API: http://localhost:4445"
 echo "   - Hydra Public API: http://localhost:4444"
-echo "   - Login/Consent UI: http://localhost:3000"
+echo "   - Login/Consent UI: http://localhost:4000"
 echo ""
 
 echo "🚀 Starting Docusaurus development server..."
 echo ""
 
 # Start Docusaurus in the foreground so we can see logs and stop with Ctrl+C
-NODE_ENV=development npx docusaurus start --port 3001 --host 0.0.0.0
+NODE_ENV=development npx docusaurus start --port 3000 --host 0.0.0.0
 
 # The cleanup function will be called automatically when the script exits
