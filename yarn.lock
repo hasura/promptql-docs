@@ -6445,7 +6445,7 @@ __metadata:
     postcss: "npm:^8.4.31"
     posthog-js: "npm:1.133.0"
     prism-react-renderer: "npm:^2.3.1"
-    promptql-chat-sdk: "npm:^1.0.0"
+    promptql-chat-sdk: "npm:^1.0.1"
     punycode: "npm:^2.3.1"
     react: "npm:^18.0.0"
     react-dom: "npm:^18.0.0"
@@ -12048,9 +12048,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"promptql-chat-sdk@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "promptql-chat-sdk@npm:1.0.0"
+"promptql-chat-sdk@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "promptql-chat-sdk@npm:1.0.1"
   dependencies:
     prismjs: "npm:^1.30.0"
     react-markdown: "npm:^10.1.0"
@@ -12059,7 +12059,7 @@ __metadata:
   peerDependencies:
     react: ">=18.0.0"
     react-dom: ">=18.0.0"
-  checksum: 10/2406b163ea5cfbcfc485a6e851e357f138c22843383601136237e3feb3014b7a8d4fb2ea9b085f50ff23244dbad70c84816deeec917a27bd7416ea5f5f8a7b39
+  checksum: 10/4c5e80cb4483a76eef82a0c602b91a6162462579f2ddc0188d5807ba60436a6d09c0ac1fcb161c701bdec1b8639577ee559dcaef1cd6b1c1828004a1f8e84d1d
   languageName: node
   linkType: hard
 
