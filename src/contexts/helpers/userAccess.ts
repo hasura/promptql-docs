@@ -43,8 +43,8 @@ export const checkUserAccess = async (token: string): Promise<boolean> => {
       return false;
     }
 
-    const enabledUsers = data?.data?.ddn_promptql_enabled_users || [];
-    return Array.isArray(enabledUsers) && enabledUsers.length > 0;
+    const enabled = Boolean(data?.data?.checkUserPromptQLAccess?.promptql_enabled);
+    return enabled;
   } catch (_error) {
     return false;
   }

@@ -128,9 +128,8 @@ export const getAuthConfig = (): AuthConfig => {
 // The API will identify the user from the Authorization Bearer header
 export const USER_ACCESS_QUERY = `
   query CheckUserAccess {
-    ddn_promptql_enabled_users {
-      id
-      email
+    checkUserPromptQLAccess {
+      promptql_enabled
     }
   }
 `;
