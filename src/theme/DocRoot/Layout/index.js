@@ -6,9 +6,9 @@ import DocRootLayoutSidebar from '@theme/DocRoot/Layout/Sidebar';
 import DocRootLayoutMain from '@theme/DocRoot/Layout/Main';
 import styles from './styles.module.css';
 import useIsBrowser from '@docusaurus/useIsBrowser';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import posthog from 'posthog-js';
 import { initOpenReplay, startOpenReplayTracking } from '@site/src/components/OpenReplay/OpenReplay';
-import { ChatWidget } from '@site/src/components/Bot';
 import { useColorMode } from '@docusaurus/theme-common';
 import { useAuth } from '@site/src/contexts/AuthContext';
 import { getAuthConfig } from '@site/src/config/auth';
@@ -91,13 +91,18 @@ export default function DocRootLayout({ children }) {
       </div>
       {/* Only show chatbot for authenticated users or when auth is disabled */}
       {(isAuthenticated || authConfig.isAuthDisabled) && !isLoading && (
-        <ChatWidget
-          apiEndpoint="https://pql-docs-bot-710071984479.us-west2.run.app/"
-          theme={colorMode}
-          brandColor="var(--chat-bubble-brand)"
-          placeholder="Ask me about PromptQL..."
-          welcomeMessage="Hi! I'm here to help you with PromptQL. What would you like to know?"
-        />
+        <BrowserOnly>
+          {() => {
+            const PromptQLChatComponent = React.lazy(() =>
+              import("promptql-chat-sdk").then(module => ({ default: module.PromptQLChat }))
+            );
+            return (
+              <React.Suspense fallback={<div>Loading chat...</div>}>
+                <PromptQLChatComponent endpoint="https://docsql-proxy-710071984479.us-west2.run.app" themeMode={colorMode} title='DocsQL' primaryColor='var(--chat-user-bg)' codeExecutionIndicatorText='🧠 DocsQL is thinking...' welcomeMessage='DocsQL is here to help!'/>
+              </React.Suspense>
+            );
+          }}
+        </BrowserOnly>
       )}
     </div>
   );

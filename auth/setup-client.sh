@@ -10,7 +10,7 @@ curl -X POST \
   -d '{
     "client_id": "docusaurus-client",
     "client_name": "Docusaurus Documentation",
-    "redirect_uris": ["http://localhost:3001/docs/callback"],
+    "redirect_uris": ["http://localhost:3000/docs/callback"],
     "grant_types": ["authorization_code"],
     "response_types": ["code"],
     "scope": "openid email",
@@ -20,4 +20,4 @@ curl -X POST \
 echo "Client created successfully!"
 echo "Client ID: docusaurus-client"
 echo "Client Type: Public (no client secret)"
-echo "Redirect URI: http://localhost:3001/docs/callback"
+echo "Redirect URI: http://localhost:3000/docs/callback"
