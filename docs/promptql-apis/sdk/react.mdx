@@ -1,0 +1,61 @@
+---
+sidebar_position: 5
+sidebar_label: React
+description: "Get started with the React SDK for PromptQL chat interfaces."
+keywords:
+  - hasura ddn
+  - promptql apis
+  - apis
+  - sdk
+  - react
+  - chat
+  - ui
+---
+
+# React SDK
+
+## Introduction
+
+The React SDK is available [here](https://www.npmjs.com/package/promptql-chat-sdk). This SDK is built for simplified and
+bespoke **chat interfaces** and doesn't have parity to the Playground experience (generation and downloading of
+artifacts).
+
+## Install
+
+```sh title="The SDK can be installed using npm:"
+npm install promptql-chat-sdk
+```
+
+## Connect
+
+```tsx title="You'll connect by creating a drop-in chat component:"
+import { PromptQLChat } from "promptql-chat-sdk";
+
+function App() {
+  return (
+    <div>
+      <h1>My Application</h1>
+      <PromptQLChat endpoint="http://localhost:8080" />
+    </div>
+  );
+}
+```
+
+:::info Requires a Proxy Server
+
+The SDK requires a proxy server to handle authentication. The endpoint should point to your proxy server that forwards
+requests to the PromptQL API with the necessary authentication headers.
+[See examples](https://github.com/hasura/promptql-chat-sdk/blob/main/proxy-examples/README.md).
+
+:::
+
+## Usage
+
+The SDK provides three integration approaches:
+
+- **Drop-in Component** - Complete chat interface with a single component
+- **Component Library** - Individual components for custom layouts
+- **Headless Hook** - Full UI control with state management
+
+For detailed documentation, examples, and API reference, see the
+[NPM package](https://www.npmjs.com/package/promptql-chat-sdk).
