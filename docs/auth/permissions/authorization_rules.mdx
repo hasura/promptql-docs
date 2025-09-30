@@ -1,0 +1,265 @@
+---
+sidebar_position: 5
+description:
+  "Guide on configuring permissions in your metadata, using authorization rules." 
+keywords:
+  - permissions
+  - rule-based-access 
+  - supergraph
+  - argument presets
+sidebar_label: Authorization Rules 
+---
+
+# Authorization Rules 
+
+This document describes the rules‑based authorization feature used by the SQL frontend. It lets you express conditional permissions that depend on session variables (such as `x-hasura-user-id`, `x-hasura-role`, `x-hasura-allow-publish`) and apply them to:
+- Types (field‑level visibility)
+- Models (row‑level filtering, operation permissions, and argument presets)
+- Commands (execution permission and argument presets)
+
+They are designed to be more flexible than role-based access, but do not replace them - both access types can be used together.
+
+## How it works (at a glance)
+
+Rules are declared under a rulesBased array. Each rule uses a condition that references session variables and provides one of these actions:
+- `allow`: permit access to the object or operation
+- `deny`: deny access to the object or operation
+- `allowFields` / `denyFields`: restrict which fields are visible on an object type
+- `filter`: apply a row‑level predicate
+- `allowRelationalOperations`: allow insert/update/delete on a model
+- `denyRelationalOperations`: deny insert/update/delete on a model
+- `presetArgument`: set a fixed value for a model/command argument based on the condition
+
+Conditions can be composed from helpers like `contains` and `equal`. The left side typically reads a session variable; the right side is a literal value or list.
+
+## Can I still use role-based authorization?
+
+Absolutely! Any metadata item can use either role-based or rules-based authorization, and you can mix and match them across your project. 
+
+## Why might I choose this over role-based authorization?
+
+Role-based permissions are a great fit when you have a small number of different permissions, but quickly become complicated when you have multiple axis to consider. For example, if we have three user types, `admin`, `editor`, and `viewer`, and two types of content, `public` and `private`, we might need six different roles to express all the combinations. With rules-based permissions, we can express the same logic with a single role and a few conditions.
+
+## Important notes
+
+- Rules are evaluated per request using the provided session variables.
+- Multiple rules can apply and "deny" rules take precedence; actions are combined: e.g., `allowFields` then `denyFields` further restricts what’s visible, multiple `filter`s are combined with `and`.
+
+## Examples 
+
+### Output `TypePermissions` 
+
+This example for the `movie` type allows a set of fields to several roles but denies `rating` to a `limited_fields_user`.
+
+```yaml
+kind: TypePermissions
+version: v2
+definition:
+  typeName: movie
+  permissions:
+    rulesBased:
+      - allowFields:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - admin
+                  - user
+                  - user_not
+                  - user_and
+                  - user_or
+                  - limited_fields_user
+          fields:
+            - movie_id
+            - rating
+            - title
+            - release_date
+      - denyFields:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - limited_fields_user
+          fields:
+            - rating
+```
+
+More information can be found in the metadata docs for [TypePermissions](reference/metadata-reference/permissions.mdx#typepermissions-typepermissions-(v2))
+
+### `ModelPermissions` 
+
+Allow access and relational operations for a role, and add row‑level filters for the `movies` model.
+
+```yaml
+kind: ModelPermissions
+version: v2
+definition:
+  modelName: movies
+  permissions:
+    rulesBased:
+      - allow:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - admin
+                  - user
+                  - user_not
+                  - user_and
+                  - user_or
+                  - limited_fields_user
+      - allowRelationalOperations:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - admin
+          operations:
+            - insert
+            - update
+            - delete
+      - filter:
+          condition:
+            equal:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal: user
+          predicate:
+            fieldComparison:
+              field: movie_id
+              operator: _eq
+              value:
+                literal: 1
+```
+
+Preset a model argument based on role for the `actors_by_movie` model.
+
+```yaml
+kind: ModelPermissions
+version: v2
+definition:
+  modelName: actors_by_movie
+  permissions:
+    rulesBased:
+      - allow:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - admin
+                  - user_with_preset_movie_id
+      - presetArgument:
+          condition:
+            equal:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal: user_with_preset_movie_id
+          argumentName: movie_id
+          value:
+            literal: 1
+```
+
+More information can be found in the metadata docs for [ModelPermissions](reference/metadata-reference/permissions.mdx#modelpermissions-modelpermissions-(v2))
+
+### `CommandPermissions` 
+
+Grant execution and set a preset argument for a command based on role:
+
+```yaml
+kind: CommandPermissions
+version: v2
+definition:
+  commandName: get_actors_by_bool_exp
+  permissions:
+    rulesBased:
+      - allow:
+          condition:
+            contains:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal:
+                  - bool_exp_user
+      - presetArgument:
+          condition:
+            equal:
+              left:
+                sessionVariable: x-hasura-role
+              right:
+                literal: bool_exp_user
+          argumentName: actor_bool_exp
+          value:
+            booleanExpression:
+              fieldComparison:
+                field: actor_id
+                operator: _eq
+                value:
+                  literal: 4
+```
+
+More information can be found in the metadata docs for [CommandPermissions](reference/metadata-reference/permissions.mdx#commandpermissions-commandpermissions-(v2))
+
+## Conditions
+
+Rules use `Conditions` to decide whether a rule applies. `Conditions` are boolean expressions built from:
+- `and` / `or` / `not`: logical composition of sub-conditions
+- `equal` / `contains`: compare two values (left/right)
+- `greaterThan` / `lessThan` / `greaterThanOrEqual` / `lessThanOrEqual`: compare numeric values
+- `isNull`: true if the value is null
+
+Comparisons use a left and right value and can be defined using: 
+- `sessionVariable`: read a value that may come from request headers (e.g., `x-hasura-role`)
+- `literal`: a constant value (string, number, array, etc.)
+
+Example combining multiple operators:
+
+```yaml
+kind: ModelPermissions
+version: v2
+definition:
+  modelName: movies
+  permissions:
+    rulesBased:
+      - allow:
+          condition:
+            and:
+              - contains:
+                  left: 
+                    sessionVariable: x-hasura-role
+                  right: 
+                    literal: [admin, editor]
+              - greaterThanOrEqual:
+                  left: 
+                    sessionVariable: x-hasura-clearance-level
+                  right: 
+                    literal: 3 
+              - not:
+                  isNull: 
+                    sessionVariable: x-hasura-user-id 
+      - filter:
+          condition:
+            equal:
+              left: 
+                sessionVariable: x-hasura-role 
+              right: 
+                literal: editor 
+          predicate:
+            fieldComparison:
+              field: rating
+              operator: _gte
+              value:
+                literal: 7
+```
+
