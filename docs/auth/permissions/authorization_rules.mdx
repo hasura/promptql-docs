@@ -38,7 +38,7 @@ Absolutely! Any metadata item can use either role-based or rules-based authoriza
 
 ## Why might I choose this over role-based authorization?
 
-Role-based permissions are a great fit when you have a small number of different permissions, but quickly become complicated when you have multiple axis to consider. For example, if we have three user types, `admin`, `editor`, and `viewer`, and two types of content, `public` and `private`, we might need six different roles to express all the combinations. With rules-based permissions, we can express the same logic with a single role and a few conditions.` 
+Role-based permissions are a great fit when you have a small number of different permissions, but quickly become complicated when you have multiple axis to consider. For example, if we have three user types, `admin`, `editor`, and `viewer`, and two types of content, `public` and `private`, we might need six different roles to express all the combinations. With rules-based permissions, we can express the same logic with a single role and a few conditions.
 
 ## Important notes
 
@@ -87,6 +87,8 @@ definition:
           fields:
             - rating
 ```
+
+More information can be found in the metadata docs for [TypePermissions](https://hasura.io/docs/3.0/reference/metadata-reference/permissions#typepermissions-typepermissions-(v2))
 
 ### `ModelPermissions` 
 
@@ -169,6 +171,8 @@ definition:
             literal: 1
 ```
 
+More information can be found in the metadata docs for [ModelPermissions](https://hasura.io/docs/3.0/reference/metadata-reference/permissions#modelpermissions-modelpermissions-(v2))
+
 ### `CommandPermissions` 
 
 Grant execution and set a preset argument for a command based on role:
@@ -204,6 +208,8 @@ definition:
                 value:
                   literal: 4
 ```
+
+More information can be found in the metadata docs for [CommandPermissions](https://hasura.io/docs/3.0/reference/metadata-reference/permissions#commandpermissions-commandpermissions-(v2))
 
 ## Conditions
 
