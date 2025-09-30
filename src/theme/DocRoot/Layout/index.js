@@ -98,7 +98,7 @@ export default function DocRootLayout({ children }) {
             );
             return (
               <React.Suspense fallback={<div>Loading chat...</div>}>
-                <PromptQLChatComponent endpoint="https://docsql-proxy-710071984479.us-west2.run.app" themeMode={colorMode} title='DocsQL' primaryColor='var(--chat-user-bg)'/>
+                <PromptQLChatComponent endpoint="https://docsql-proxy-710071984479.us-west2.run.app" themeMode={colorMode} title='DocsQL' primaryColor='var(--chat-user-bg)' codeExecutionIndicatorText='🧠 DocsQL is thinking...' welcomeMessage='DocsQL is here to help!'/>
               </React.Suspense>
             );
           }}
