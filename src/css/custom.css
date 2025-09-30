@@ -2388,3 +2388,7 @@ body.show-sidebar-authenticated.docs-doc-id-index button[class*="toggle"] {
 #modal-description code {
   border: none;
 }
+
+.promptql-chat__message-item code {
+  background: none;
+}
