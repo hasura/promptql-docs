@@ -1764,3 +1764,12 @@ pre[class*='language-'] code span.token {
 div[style*="position: fixed"] textarea::-webkit-scrollbar {
   display: none;
 }
+
+/* Special stylings for chat component */
+#modal-description code {
+  border: none;
+}
+
+.promptql-chat__message-item code {
+  background: none;
+}
