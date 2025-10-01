@@ -14,43 +14,42 @@ import Thumbnail from "@site/src/components/Thumbnail";
 
 # Autograph
 
-Autograph is a tool that enables users to improve the AI model while interacting with PromptQL. When users encounter
-unexpected behavior or have specific requests, they can tag @Autograph and provide feedback directly within the
+## Introduction
+
+Autograph is a tool that enables you to improve the AI model while interacting with PromptQL. When you encounter
+unexpected behavior or have specific requests, you can tag `@autograph` and provide feedback directly within the
 conversation. Once this feedback is reviewed and implemented, it will be incorporated into the AI model in the next
 PromptQL release.
 
-## Examples
-
-##### Ask for help
-
-```
-@autograph this is not working. Please help.
-```
-
-##### Share business context
-
-```
-@autograph our week starts from Monday, not Sunday.
-```
-
-##### Request to use the right data
-
-```
-@autograph always use the "users" table, not "customers".
-```
-
 ## Walkthrough
 
-1. Find a chat where you want to provide feedback or ask for help.
-2. Add a new message and tag @autograph.
+### Step 1. Go to a chat where responses could be improved
 
-   <Thumbnail alt="Autograph Request" src="/img/promptql-playground/autograph-request-3.png" />
+**You can ask for help:**
 
-3. Once you use @autograph, your request is submitted and visible on the Autograph page.
+> @autograph this is not working. Please help.
 
-   <Thumbnail alt="Autograph Request Page" src="/img/promptql-playground/autograph-request-2.png" />
+**Share business context:**
 
-4. You can check the status of the request in the autograph page. Request status is also visible on the original chat's
-   messages (autograph message will contain the request status and reviewer notes, as shown in step 2).
+> @autograph our week starts on Monday, not Sunday.
 
-   <Thumbnail alt="Autograph Request Details" src="/img/promptql-playground/autograph-request-1.png" />
+**Request to use the right data:**
+
+> @autograph always use the "users" table, not "customers".
+
+### Step 2. Add a new message and tag `@autograph`
+
+<Thumbnail alt="Autograph Request" src="/img/promptql-playground/autograph-request-3.png" />
+
+### Step 3. Keep track
+
+Once you use `@autograph`, your request is submitted and visible on the Autograph page:
+
+<Thumbnail alt="Autograph Request Page" src="/img/promptql-playground/autograph-request-2.png" />
+
+### Step 4. See details
+
+You can check the status of the request in the autograph page. Request status is also visible on the original chat's
+messages (autograph message will contain the request status and reviewer notes, as shown in step 2).
+
+<Thumbnail alt="Autograph Request Details" src="/img/promptql-playground/autograph-request-1.png" />
