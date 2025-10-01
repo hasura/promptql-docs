@@ -41,268 +41,322 @@ definition:
 
 ## Metadata structure
 
+
 ### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
 
 Definition of the configuration of PromptQL, v2
 
-| Key          | Value                                                  | Required | Description                                                 |
-| ------------ | ------------------------------------------------------ | -------- | ----------------------------------------------------------- |
-| `kind`       | `PromptQlConfig`                                       | true     |                                                             |
-| `version`    | `v2`                                                   | true     |                                                             |
-| `definition` | [PromptQlConfigV2](#promptqlconfigv2-promptqlconfigv2) | true     | Definition of the configuration of PromptQL for the project |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `kind` | `PromptQlConfig` | true |  |
+| `version` | `v2` | true |  |
+| `definition` | [PromptQlConfigV2](#promptqlconfigv2-promptqlconfigv2) | true | Definition of the configuration of PromptQL for the project |
+
+
 
 #### PromptQlConfigV2 {#promptqlconfigv2-promptqlconfigv2}
 
 Definition of the configuration of PromptQL for the project
 
-| Key                       | Value                                                                               | Required | Description                                                                                                                              |
-| ------------------------- | ----------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `systemInstructions`      | string / null                                                                       | false    | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
-| `llm`                     | [LlmConfig](#promptqlconfigv2-llmconfig)                                            | true     | Configuration of the LLM to be used for PromptQL                                                                                         |
-| `schemaSelector`          | [SchemaSelectorConfig](#promptqlconfigv2-schemaselectorconfig) / null               | false    | The configuration for schema selection. Defaults to including all tables and columns.                                                    |
-| `aiPrimitivesLlm`         | [LlmConfig](#promptqlconfigv2-llmconfig) / null                                     | false    | Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc                                 |
-| `overrideAiPrimitivesLlm` | [[AiPrimitivesLlmConfig](#promptqlconfigv2-aiprimitivesllmconfig)]                  | false    | Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc                                   |
-| `threadTitleGeneration`   | [ThreadTitleGenerationConfig](#promptqlconfigv2-threadtitlegenerationconfig) / null | false    | Configure title generation for threads in the PromptQL playground                                                                        |
-| `maxAssistantActions`     | integer / null                                                                      | false    | Maximum number of assistant actions that can be performed autonomously before the process is interrupted                                 |
-| `featureFlags`            | [PromptQlFeatureFlags](#promptqlconfigv2-promptqlfeatureflags) / null               | false    | Feature flags to be used for PromptQL to enable and disable experimental features                                                        |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `systemInstructions` | string / null | false | Custom system instructions provided to every PromptQL thread that allows tailoring of behavior to match to the project's specific needs. |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | Configuration of the LLM to be used for PromptQL |
+| `schemaSelector` | [SchemaSelectorConfig](#promptqlconfigv2-schemaselectorconfig) / null | false | The configuration for schema selection. Defaults to including all tables and columns. |
+| `aiPrimitivesLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | Configuration of the default LLM to be used for AI primitives, such as classification, summarization etc |
+| `overrideAiPrimitivesLlm` | [[AiPrimitivesLlmConfig](#promptqlconfigv2-aiprimitivesllmconfig)] | false | Configuration of specific LLMs to be used for AI primitives, such as classification, summarization etc |
+| `threadTitleGeneration` | [ThreadTitleGenerationConfig](#promptqlconfigv2-threadtitlegenerationconfig) / null | false | Configure title generation for threads in the PromptQL playground |
+| `maxAssistantActions` | integer / null | false | Maximum number of assistant actions that can be performed autonomously before the process is interrupted |
+| `maxTableArtifactSampleRows` | integer / null | false | Maximum number of rows to show to the LLM when sampling table artifacts |
+| `featureFlags` | [PromptQlFeatureFlags](#promptqlconfigv2-promptqlfeatureflags) / null | false | Feature flags to be used for PromptQL to enable and disable experimental features |
+| `contextWindowLimit` | integer / null | false | Maximum number of tokens to be used for the context window for threads. |
+
+
 
 #### PromptQlFeatureFlags {#promptqlconfigv2-promptqlfeatureflags}
 
 Feature flags to be used for PromptQL to enable and disable experimental features
 
-| Key                        | Value          | Required | Description                                       |
-| -------------------------- | -------------- | -------- | ------------------------------------------------- |
-| `enable_automations`       | boolean / null | false    | Enable the experimental automations feature       |
-| `enable_visualizations`    | boolean / null | false    | Enable the experimental visualizations feature    |
-| `enable_visualizations_v2` | boolean / null | false    | Enable the experimental visualizations v2 feature |
-| `<customKey>`              |                | false    |                                                   |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `enable_automations` | boolean / null | false | Enable the experimental automations feature |
+| `enable_visualizations` | boolean / null | false | Enable the experimental visualizations feature |
+| `enable_visualizations_v2` | boolean / null | false | Enable the experimental visualizations v2 feature |
+| `enable_visualizations_v3` | boolean / null | false | Enable the experimental visualizations v3 feature |
+| `<customKey>` |  | false |  |
+
+
 
 #### ThreadTitleGenerationConfig {#promptqlconfigv2-threadtitlegenerationconfig}
 
 Configure title generation for threads in the PromptQL playground
 
-| Key      | Value                                           | Required | Description                                                                                                         |
-| -------- | ----------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- |
-| `enable` | boolean                                         | true     | Whether or not to enable thread title generation (default: true)                                                    |
-| `llm`    | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false    | The LLM configuration to use for thread title generation. If not specified, the summarize AI primitive LLM is used. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `enable` | boolean | true | Whether or not to enable thread title generation (default: true) |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The LLM configuration to use for thread title generation. If not specified, the summarize AI primitive LLM is used. |
+
+
 
 #### AiPrimitivesLlmConfig {#promptqlconfigv2-aiprimitivesllmconfig}
 
 Configure PromptQL to use a particular LLM for a specific primitive
 
-| Key             | Value                                          | Required | Description                                 |
-| --------------- | ---------------------------------------------- | -------- | ------------------------------------------- |
-| `primitiveName` | [LlmPrimitive](#promptqlconfigv2-llmprimitive) | true     | The name of the operation to override       |
-| `llm`           | [LlmConfig](#promptqlconfigv2-llmconfig)       | true     | The configuration to use for this operation |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `primitiveName` | [LlmPrimitive](#promptqlconfigv2-llmprimitive) | true | The name of the operation to override |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | The configuration to use for this operation |
+
+
 
 #### LlmPrimitive {#promptqlconfigv2-llmprimitive}
 
 The name of an LLM primitive, such as `classify`, `summarize`, `extract` and `visualize`.
 
+
 **Value:** string
+
 
 #### SchemaSelectorConfig {#promptqlconfigv2-schemaselectorconfig}
 
 Configuration for schema selection in PromptQL
 
+
 **One of the following values:**
 
-| Value                                              | Description                                                        |
-| -------------------------------------------------- | ------------------------------------------------------------------ |
-| [SchemaSelector](#promptqlconfigv2-schemaselector) | LLM-based schema selector configuration                            |
-| [FixedSchema](#promptqlconfigv2-fixedschema)       | Fixed schema selector configuration                                |
-| [AllSchema](#promptqlconfigv2-allschema)           | All schema selector configuration (includes all available schemas) |
+| Value | Description |
+|-----|-----|
+| [SchemaSelector](#promptqlconfigv2-schemaselector) | LLM-based schema selector configuration |
+| [FixedSchema](#promptqlconfigv2-fixedschema) | Fixed schema selector configuration |
+| [AllSchema](#promptqlconfigv2-allschema) | All schema selector configuration (includes all available schemas) |
+
+
 
 #### AllSchema {#promptqlconfigv2-allschema}
 
 All schema selector configuration (includes all available schemas)
 
-| Key    | Value | Required | Description |
-| ------ | ----- | -------- | ----------- |
-| `type` | `all` | true     |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `all` | true |  |
+
+
 
 #### FixedSchema {#promptqlconfigv2-fixedschema}
 
 Fixed schema selector configuration
 
-| Key      | Value                                                    | Required | Description                                           |
-| -------- | -------------------------------------------------------- | -------- | ----------------------------------------------------- |
-| `type`   | `fixed`                                                  | true     |                                                       |
-| `tables` | [[FixedSchemaTable](#promptqlconfigv2-fixedschematable)] | true     | List of tables to include with their specific columns |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `fixed` | true |  |
+| `tables` | [[FixedSchemaTable](#promptqlconfigv2-fixedschematable)] | true | List of tables to include with their specific columns |
+
+
 
 #### FixedSchemaTable {#promptqlconfigv2-fixedschematable}
 
 Configuration for a fixed schema table with specific columns
 
-| Key          | Value    | Required | Description                                                          |
-| ------------ | -------- | -------- | -------------------------------------------------------------------- |
-| `schemaName` | string   | true     | The name of the schema                                               |
-| `tableName`  | string   | true     | The name of the table                                                |
-| `columns`    | [string] | true     | List of column names to include. If empty, all columns are included. |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `schemaName` | string | true | The name of the schema |
+| `tableName` | string | true | The name of the table |
+| `columns` | [string] | true | List of column names to include. If empty, all columns are included. |
+
+
 
 #### SchemaSelector {#promptqlconfigv2-schemaselector}
 
 LLM-based schema selector configuration
 
-| Key             | Value                                                       | Required | Description                                     |
-| --------------- | ----------------------------------------------------------- | -------- | ----------------------------------------------- |
-| `type`          | `llm_selector`                                              | true     |                                                 |
-| `llm`           | [LlmConfig](#promptqlconfigv2-llmconfig)                    | true     | LLM configuration to use for schema selection   |
-| `maxItems`      | integer / null                                              | false    | Maximum number of items to select               |
-| `instructions`  | string / null                                               | false    | Custom instructions for the LLM selector        |
-| `alwaysInclude` | [SchemaSelection](#promptqlconfigv2-schemaselection) / null | false    | Schema items to always include in the selection |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `type` | `llm_selector` | true |  |
+| `llm` | [LlmConfig](#promptqlconfigv2-llmconfig) | true | LLM configuration to use for schema selection |
+| `maxItems` | integer / null | false | Maximum number of items to select |
+| `instructions` | string / null | false | Custom instructions for the LLM selector |
+| `alwaysInclude` | [SchemaSelection](#promptqlconfigv2-schemaselection) / null | false | Schema items to always include in the selection |
+
+
 
 #### SchemaSelection {#promptqlconfigv2-schemaselection}
 
 Schema selection configuration specifying tables and functions to include
 
-| Key         | Value                                                  | Required | Description                                                                                         |
-| ----------- | ------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------------------- |
-| `tables`    | [SchemaTableNames](#promptqlconfigv2-schematablenames) | false    | Schemas in the database. The key is the schema name. Values are lists of table names in the schema. |
-| `functions` | [string]                                               | false    | Functions in the database. Values are the function names.                                           |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `tables` | [undefined](#promptqlconfigv2-undefined) | false | Schemas in the database. The key is the schema name. Values are lists of table names in the schema. |
+| `functions` | [string] | false | Functions in the database. Values are the function names. |
 
-#### SchemaTableNames {#promptqlconfigv2-schematablenames}
+
+
+#### undefined {#promptqlconfigv2-undefined}
 
 Schemas in the database. The key is the schema name. Values are lists of table names in the schema.
 
-| Key           | Value    | Required | Description |
-| ------------- | -------- | -------- | ----------- |
-| `<customKey>` | [string] | false    |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `<customKey>` | [string] | false |  |
+
+
 
 #### LlmConfig {#promptqlconfigv2-llmconfig}
 
 Configuration of the LLM to be used for PromptQL
 
+
 **One of the following values:**
 
-| Value                                                      | Description                                            |
-| ---------------------------------------------------------- | ------------------------------------------------------ |
-| [HasuraLlmConfig](#promptqlconfigv2-hasurallmconfig)       | Configuration settings for the Hasura-configured LLM   |
-| [OpenAiLlmConfig](#promptqlconfigv2-openaillmconfig)       | Configuration settings for an OpenAI LLM               |
-| [AnthropicLlmConfig](#promptqlconfigv2-anthropicllmconfig) | Configuration settings for an Anthropic LLM            |
-| [AzureLlmConfig](#promptqlconfigv2-azurellmconfig)         | Configuration settings for an Azure-provided LLM       |
-| [GeminiLlmConfig](#promptqlconfigv2-geminillmconfig)       | Configuration settings for a Gemini LLM                |
-| [VertexLlmConfig](#promptqlconfigv2-vertexllmconfig)       | Configuration settings for a Google Vertex AI LLM      |
-| [BedrockLlmConfig](#promptqlconfigv2-bedrockllmconfig)     | Configuration settings for an AWS Bedrock-provided LLM |
+| Value | Description |
+|-----|-----|
+| [HasuraLlmConfig](#promptqlconfigv2-hasurallmconfig) | Configuration settings for the Hasura-configured LLM |
+| [OpenAiLlmConfig](#promptqlconfigv2-openaillmconfig) | Configuration settings for an OpenAI LLM |
+| [AnthropicLlmConfig](#promptqlconfigv2-anthropicllmconfig) | Configuration settings for an Anthropic LLM |
+| [AzureLlmConfig](#promptqlconfigv2-azurellmconfig) | Configuration settings for an Azure-provided LLM |
+| [GeminiLlmConfig](#promptqlconfigv2-geminillmconfig) | Configuration settings for a Gemini LLM |
+| [VertexLlmConfig](#promptqlconfigv2-vertexllmconfig) | Configuration settings for a Google Vertex AI LLM |
+| [BedrockLlmConfig](#promptqlconfigv2-bedrockllmconfig) | Configuration settings for an AWS Bedrock-provided LLM |
+
+
 
 #### BedrockLlmConfig {#promptqlconfigv2-bedrockllmconfig}
 
 Configuration settings for an AWS Bedrock-provided LLM
 
-| Key                  | Value                                                  | Required | Description                                                   |
-| -------------------- | ------------------------------------------------------ | -------- | ------------------------------------------------------------- |
-| `provider`           | `bedrock`                                              | true     |                                                               |
-| `modelId`            | string                                                 | true     | The specific AWS Bedrock model to use.                        |
-| `regionName`         | string                                                 | true     | The specific AWS Bedrock region to use.                       |
-| `awsAccessKeyId`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS access key ID to use for the AWS Bedrock API          |
-| `awsSecretAccessKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The AWS secret access key to use for the AWS Bedrock API      |
-| `fallback`           | [LlmConfig](#promptqlconfigv2-llmconfig) / null        | false    | The fallback LLM to use if the AWS Bedrock API is unavailable |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `bedrock` | true |  |
+| `modelId` | string | true | The specific AWS Bedrock model to use. |
+| `regionName` | string | true | The specific AWS Bedrock region to use. |
+| `awsAccessKeyId` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The AWS access key ID to use for the AWS Bedrock API |
+| `awsSecretAccessKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The AWS secret access key to use for the AWS Bedrock API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the AWS Bedrock API is unavailable |
+
+
 
 #### VertexLlmConfig {#promptqlconfigv2-vertexllmconfig}
 
 Configuration settings for a Google Vertex AI LLM
 
-| Key                           | Value                                                                 | Required | Description                                                      |
-| ----------------------------- | --------------------------------------------------------------------- | -------- | ---------------------------------------------------------------- |
-| `provider`                    | `vertex`                                                              | true     |                                                                  |
-| `modelId`                     | string                                                                | true     | The specific Gemini/Vertex model to use                          |
-| `googleProject`               | string                                                                | true     | The GCP project ID used for Vertex AI                            |
-| `googleLocation`              | string                                                                | true     | The Vertex AI location (e.g., us-central1)                       |
-| `googleServiceAccountKeyJson` | [EnvironmentValue](#promptqlconfigv2-environmentvalue)                | true     | The Google service account key JSON to authenticate to Vertex AI |
-| `safetySettings`              | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false    | Safety settings for Gemini-compatible models on Vertex           |
-| `fallback`                    | [LlmConfig](#promptqlconfigv2-llmconfig) / null                       | false    | The fallback LLM to use if Vertex is unavailable                 |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `vertex` | true |  |
+| `modelId` | string | true | The specific Gemini/Vertex model to use |
+| `googleProject` | string | true | The GCP project ID used for Vertex AI |
+| `googleLocation` | string | true | The Vertex AI location (e.g., us-central1) |
+| `googleServiceAccountKeyJson` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The Google service account key JSON to authenticate to Vertex AI |
+| `safetySettings` | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false | Safety settings for Gemini-compatible models on Vertex |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if Vertex is unavailable |
+
+
 
 #### GeminiLlmConfig {#promptqlconfigv2-geminillmconfig}
 
 Configuration settings for a Gemini LLM
 
-| Key              | Value                                                                 | Required | Description                                                                         |
-| ---------------- | --------------------------------------------------------------------- | -------- | ----------------------------------------------------------------------------------- |
-| `provider`       | `gemini`                                                              | true     |                                                                                     |
-| `model`          | string / null                                                         | false    | The specific Gemini model to use. If not specified, the default model will be used. |
-| `apiKey`         | [EnvironmentValue](#promptqlconfigv2-environmentvalue)                | true     | The API key to use for the Gemini API                                               |
-| `safetySettings` | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false    | Safety settings for the Gemini API                                                  |
-| `fallback`       | [LlmConfig](#promptqlconfigv2-llmconfig) / null                       | false    | The fallback LLM to use if the Gemini API is unavailable                            |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `gemini` | true |  |
+| `model` | string / null | false | The specific Gemini model to use. If not specified, the default model will be used. |
+| `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Gemini API |
+| `safetySettings` | [GeminiSafetySettings](#promptqlconfigv2-geminisafetysettings) / null | false | Safety settings for the Gemini API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Gemini API is unavailable |
+
+
 
 #### GeminiSafetySettings {#promptqlconfigv2-geminisafetysettings}
 
 Configuration to control Gemini's safety settings
 
-| Key                | Value                                                       | Required | Description                                                                  |
-| ------------------ | ----------------------------------------------------------- | -------- | ---------------------------------------------------------------------------- |
-| `harassment`       | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false    | Negative or harmful comments targeting identity and/or protected attributes. |
-| `hateSpeech`       | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false    | Content that is rude, disrespectful, or profane.                             |
-| `sexuallyExplicit` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false    | Contains references to sexual acts or other lewd content.                    |
-| `dangerous`        | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false    | Promotes, facilitates, or encourages harmful acts.                           |
-| `civicIntegrity`   | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false    | Election-related queries.                                                    |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `harassment` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Negative or harmful comments targeting identity and/or protected attributes. |
+| `hateSpeech` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Content that is rude, disrespectful, or profane. |
+| `sexuallyExplicit` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Contains references to sexual acts or other lewd content. |
+| `dangerous` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Promotes, facilitates, or encourages harmful acts. |
+| `civicIntegrity` | [GeminiBlockType](#promptqlconfigv2-geminiblocktype) / null | false | Election-related queries. |
+
+
 
 #### GeminiBlockType {#promptqlconfigv2-geminiblocktype}
 
 Blocking level used for Gemini safety settings
 
+
 **One of the following values:**
 
-| Value                 | Description                                                  |
-| --------------------- | ------------------------------------------------------------ |
-| `blockNone`           | Always show regardless of probability of unsafe content      |
-| `blockOnlyHigh`       | Block when high probability of unsafe content                |
-| `blockMediumAndAbove` | Block when medium or high probability of unsafe content      |
-| `blockLowAndAbove`    | Block when low, medium or high probability of unsafe content |
+| Value | Description |
+|-----|-----|
+| `blockNone` | Always show regardless of probability of unsafe content |
+| `blockOnlyHigh` | Block when high probability of unsafe content |
+| `blockMediumAndAbove` | Block when medium or high probability of unsafe content |
+| `blockLowAndAbove` | Block when low, medium or high probability of unsafe content |
+
+
 
 #### AzureLlmConfig {#promptqlconfigv2-azurellmconfig}
 
 Configuration settings for an Azure-provided LLM
 
-| Key          | Value                                                  | Required | Description                                                                                |
-| ------------ | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
-| `provider`   | `azure`                                                | true     |                                                                                            |
-| `apiVersion` | string / null                                          | false    | The specific Azure API version to use. If not specified, the default version will be used. |
-| `model`      | string / null                                          | false    | The specific Azure model to use. If not specified, the default model will be used.         |
-| `endpoint`   | string                                                 | true     | The endpoint to use for the Azure LLM API                                                  |
-| `apiKey`     | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Azure API                                                       |
-| `fallback`   | [LlmConfig](#promptqlconfigv2-llmconfig) / null        | false    | The fallback LLM to use if the Azure API is unavailable                                    |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `azure` | true |  |
+| `apiVersion` | string / null | false | The specific Azure API version to use. If not specified, the default version will be used. |
+| `model` | string / null | false | The specific Azure model to use. If not specified, the default model will be used. |
+| `endpoint` | string | true | The endpoint to use for the Azure LLM API |
+| `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Azure API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Azure API is unavailable |
+
+
 
 #### AnthropicLlmConfig {#promptqlconfigv2-anthropicllmconfig}
 
 Configuration settings for an Anthropic LLM
 
-| Key        | Value                                                  | Required | Description                                                                                |
-| ---------- | ------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------ |
-| `provider` | `anthropic`                                            | true     |                                                                                            |
-| `model`    | string / null                                          | false    | The specific Anthropic model to use. If not specified, the default model will be used.     |
-| `baseUrl`  | string / null                                          | false    | The base URL to use for the Anthropic API. If not specified, the default URL will be used. |
-| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the Anthropic API                                                   |
-| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null        | false    | The fallback LLM to use if the Anthropic API is unavailable                                |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `anthropic` | true |  |
+| `model` | string / null | false | The specific Anthropic model to use. If not specified, the default model will be used. |
+| `baseUrl` | string / null | false | The base URL to use for the Anthropic API. If not specified, the default URL will be used. |
+| `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the Anthropic API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Anthropic API is unavailable |
+
+
 
 #### OpenAiLlmConfig {#promptqlconfigv2-openaillmconfig}
 
 Configuration settings for an OpenAI LLM
 
-| Key        | Value                                                  | Required | Description                                                                             |
-| ---------- | ------------------------------------------------------ | -------- | --------------------------------------------------------------------------------------- |
-| `provider` | `openai`                                               | true     |                                                                                         |
-| `model`    | string / null                                          | false    | The specific OpenAI model to use. If not specified, the default model will be used.     |
-| `baseUrl`  | string / null                                          | false    | The base URL to use for the OpenAI API. If not specified, the default URL will be used. |
-| `apiKey`   | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true     | The API key to use for the OpenAI API                                                   |
-| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null        | false    | The fallback LLM to use if the OpenAI API is unavailable                                |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `openai` | true |  |
+| `model` | string / null | false | The specific OpenAI model to use. If not specified, the default model will be used. |
+| `baseUrl` | string / null | false | The base URL to use for the OpenAI API. If not specified, the default URL will be used. |
+| `apiKey` | [EnvironmentValue](#promptqlconfigv2-environmentvalue) | true | The API key to use for the OpenAI API |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the OpenAI API is unavailable |
+
+
 
 #### EnvironmentValue {#promptqlconfigv2-environmentvalue}
 
 Either a literal string or a reference to a Hasura secret
 
+
 **Must have exactly one of the following fields:**
 
-| Key            | Value  | Required | Description |
-| -------------- | ------ | -------- | ----------- |
-| `value`        | string | false    |             |
-| `valueFromEnv` | string | false    |             |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `value` | string | false |  |
+| `valueFromEnv` | string | false |  |
+
+
 
 #### HasuraLlmConfig {#promptqlconfigv2-hasurallmconfig}
 
 Configuration settings for the Hasura-configured LLM
 
-| Key           | Value                                           | Required | Description                                              |
-| ------------- | ----------------------------------------------- | -------- | -------------------------------------------------------- |
-| `provider`    | `hasura`                                        | true     |                                                          |
-| `fallback`    | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false    | The fallback LLM to use if the Hasura API is unavailable |
-| `specificLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false    |                                                          |
+| Key | Value | Required | Description |
+|-----|-----|-----|-----|
+| `provider` | `hasura` | true |  |
+| `fallback` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false | The fallback LLM to use if the Hasura API is unavailable |
+| `specificLlm` | [LlmConfig](#promptqlconfigv2-llmconfig) / null | false |  |
