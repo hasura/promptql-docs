@@ -1,11 +1,14 @@
 ---
 sidebar_position: 2
 sidebar_label: Artifacts
-description: "Learn what artifacts are and how to generate them."
+description: "Learn what artifacts are, how to generate them, and how to reference them using mentions."
 keywords:
   - hasura ddn
   - playground
   - artifacts
+  - mentions
+  - saved artifacts
+  - chat artifacts
 ---
 
 import Thumbnail from "@site/src/components/Thumbnail";
@@ -66,6 +69,169 @@ result.
 
 <Thumbnail alt="Visualization artifact in the Playground" src="/img/promptql-playground/visualizationartifact.png" />
 
+## Saved artifacts vs chat artifacts
+
+Artifacts in PromptQL exist in two contexts: **chat artifacts** and **saved artifacts**. Understanding the difference helps you work more efficiently across conversations.
+
+### Chat artifacts
+
+Chat artifacts are generated within the current conversation thread. When PromptQL creates a chart, table, or text output during your session, it's automatically stored as a chat artifact. These artifacts are available immediately for reference within the same thread.
+
+For example, if you ask PromptQL to "create a sales chart for Q4," the resulting visualization becomes a chat artifact that you can reference later in the same conversation.
+
+### Saved artifacts
+
+Saved artifacts are chat artifacts that you've explicitly saved for reuse across different conversations. When you save an artifact, it becomes available in any thread within your project, allowing you to build on previous work without switching contexts.
+
+To save an artifact, look for the save icon in the artifact's header. Once saved, you can access it from any new conversation by using mentions (see below).
+
+### When to save artifacts
+
+Consider saving artifacts when:
+
+- You've created a query or visualization you'll use repeatedly
+- You want to reference work from a previous conversation
+- You're building a library of reusable components for your project
+- You need to share specific outputs with team members across different threads
+
+## Artifact visibility
+
+Saved artifacts support two visibility modes that control who can access and reference them:
+
+### Private artifacts
+
+Private artifacts are visible only to you. When you save an artifact as private:
+
+- Only you can see it in the mentions dropdown
+- Only you can view, edit, or delete it
+- Other project collaborators cannot access or reference it
+
+This is the default visibility mode and is ideal for:
+
+- Work in progress that you're not ready to share
+- Personal queries or visualizations
+- Sensitive data or experimental work
+
+### Project artifacts
+
+Project artifacts are shared with all project collaborators. When you save an artifact with project visibility:
+
+- All project collaborators can see it in the mentions dropdown
+- All collaborators can reference it using `@` mentions in their conversations
+- Only you (the owner) can edit or delete it
+- A collaborator icon badge indicates the artifact is shared
+
+This visibility mode is useful for:
+
+- Reusable queries that benefit the entire team
+- Standard visualizations or reports
+- Shared data transformations
+- Team knowledge base of common artifacts
+
+### Setting visibility
+
+You can set an artifact's visibility when saving it:
+
+1. Click the save icon on any chat artifact
+2. Enter a name and optional description
+3. Choose visibility:
+   - **Private**: Select the lock icon option
+   - **Project**: Select the collaborators icon option
+4. Click "Save Artifact"
+
+### Changing visibility
+
+To change an artifact's visibility after saving:
+
+1. Navigate to the saved artifact page
+2. Click the "More" button (three dots) in the top-right corner
+3. Select either:
+   - "Share with project collaborators" (to make it project-visible)
+   - "Make it private" (to restrict access to yourself)
+4. Confirm the change in the modal
+
+:::info Owner permissions
+Only the artifact owner can change visibility settings. Project collaborators with view access cannot modify visibility.
+:::
+
+### Visibility in mentions
+
+When using `@` mentions, the artifacts you see depend on visibility:
+
+- **Your private artifacts**: Always visible to you in the mentions dropdown
+- **Your project artifacts**: Visible to you and all project collaborators
+- **Others' project artifacts**: Visible to you if they're shared with the project
+- **Others' private artifacts**: Never visible to you
+
+This ensures that mentions respect artifact permissions and collaborators only see artifacts they have access to.
+
+### Project settings
+
+Project administrators can control artifact sharing at the project level:
+
+- When "Allow Artifact Sharing" is **enabled** (default), users can create both private and project artifacts
+- When **disabled**, users can only create private artifacts, and existing project artifacts can be made private but not shared again
+
+## Referencing artifacts with mentions
+
+Mentions allow you to reference artifacts directly in your messages using `@` syntax, similar to mentioning people in Slack or other chat applications. This makes it easy to build on previous work, compare results, or provide context to PromptQL.
+
+### How to use mentions
+
+To insert a mention:
+
+1. Type `@` in the chat input box
+2. A dropdown appears showing available artifacts
+3. Start typing to search by name (fuzzy search supported)
+4. Use arrow keys (↑↓) to navigate the list
+5. Press Enter to select, or click on an artifact
+6. The mention appears as a colored chip in your message
+
+The dropdown shows two sections:
+
+- **Current Conversation**: Artifacts from the active thread
+- **Saved Artifacts**: Artifacts you've saved from any conversation
+
+### Referencing chat artifacts
+
+Chat artifacts from your current conversation appear automatically in the mentions dropdown. This makes it easy to iterate on work within the same session.
+
+**Example:**
+
+```plaintext
+User: "Create a sales chart for Q4"
+PromptQL: [Generates chart artifact: "Q4 Sales Chart"]
+
+User: "Now create a similar chart for @Q4 Sales Chart but for Q3"
+PromptQL: [References previous chart, generates Q3 version]
+
+User: "Compare @Q4 Sales Chart and @Q3 Sales Chart side by side"
+PromptQL: [Creates comparison using both artifacts]
+```
+
+### Referencing saved artifacts
+
+Saved artifacts appear in the mentions dropdown under the "Saved Artifacts" section. You can search across all your saved artifacts by name, making it easy to reuse work from previous conversations.
+
+**Example:**
+
+```plaintext
+[Previous conversation - saved artifact: "Customer Segmentation Query"]
+
+[New conversation]
+User: "Apply @Customer Segmentation Query to the new dataset"
+PromptQL: [Loads saved query, applies to current context]
+```
+
+### Keyboard shortcuts
+
+When the mentions dropdown is open:
+
+- **↑↓ Arrow keys**: Navigate through the list
+- **Enter/Tab**: Select the highlighted mention
+- **Esc**: Close the dropdown without selecting
+- **Continue typing**: Filter results with fuzzy search
+
 ## Exporting artifacts
 
 Each artifact contains set of three options for exporting data.
@@ -86,9 +252,12 @@ represented as CSV files).
 The artifact definition option provides a JSON file for each artifact that provides additional information, such as the
 identifier, along with the artifact's raw data.
 
-:::info reuse artifacts
+:::tip reuse artifacts across conversations
 
-You can reuse artifacts via the PromptQL Playground; look for the share icon in the top-right corner of an artifact to
-reuse it in a new thread.
+You can reuse artifacts in multiple ways:
+
+- **Within a conversation**: Use `@` mentions to reference any artifact in the current thread
+- **Across conversations**: Save an artifact using the save icon, then reference it with `@` mentions in any new thread
+- **Share to a new thread**: Click the share icon in the top-right corner of an artifact to open it in a new conversation
 
 :::
