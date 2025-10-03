@@ -1,0 +1,184 @@
+---
+sidebar_position: 8
+description: "Learn how to use the Changelog feature in PromptQL to track and communicate project changes and history."
+keywords:
+  - hasura
+  - promptql
+  - changelog
+  - project management
+  - builds
+  - versioning
+---
+
+# Managing Project Changelogs
+
+## Overview
+
+The Changelog feature in PromptQL helps you track and communicate changes to your project over time. This is especially
+useful for teams where business users need to understand the current state of a project and its development history.
+
+With changelogs, you can:
+
+- Document what changes were made in each build
+- Communicate updates to stakeholders
+- Maintain a historical record of project evolution
+- Provide context for data source additions, performance improvements, and bug fixes
+
+The changelog feature is available through both the CLI and console interfaces.
+
+## How to Use Changelogs
+
+### Creating Changelog Entries
+
+When you create and apply builds in your PromptQL project, changelog entries are automatically generated. The changelog
+feature integrates seamlessly with your existing build workflow.
+
+:::info Empty Changelog Entries
+
+For applied builds that predate the Changelog feature, there are unpublished (and unversioned) entries for each.
+[Learn more about backfilling](#backfilling-entries).
+
+:::
+
+#### Automatic Changelog Generation
+
+Create your build as usual:
+
+```ddn
+ddn supergraph build create
+```
+
+Then apply it:
+
+```ddn
+ddn supergraph build apply
+```
+
+This automatically creates a draft changelog entry with a calendar-based version number (CalVer), making it easy to
+track when changes were made.
+
+#### Viewing Changelog Entries
+
+You can view all changelog entries using the changelog command:
+
+```ddn
+ddn changelog list
+```
+
+#### Editing Draft Entries
+
+Once you have a draft changelog entry, you can edit it using markdown formatting. This allows you to add detailed
+information about what changed in your build.
+
+**Example changelog content:**
+
+```markdown
+## New Data Sources
+
+- Added new database tables for improved analytics
+- Enhanced data access controls for better security
+```
+
+You can edit changelog entries using the CLI:
+
+```ddn
+ddn changelog edit v2025.09.26
+```
+
+:::info Edit from the console
+
+As a project admin, you can also edit these entries from the console. Navigate to the `Builds` page and see all
+available entries from the `Changelog` tab. Non-admin users who navigate here can only see published entries and are
+unable to edit them.
+
+:::
+
+When you publish an entry, it becomes visible to everyone in the project, providing transparency about what changes were
+made.
+
+### Publishing Changelog Entries Directly
+
+For a streamlined workflow, you can create and publish changelog entries in a single step when applying builds.
+
+#### Direct Publishing
+
+Create a build:
+
+```ddn
+ddn supergraph build create
+```
+
+Apply it with changelog content:
+
+```ddn
+ddn supergraph build apply <build-version> --published --changelog-body "## Bug Fix 🐛\n- Fixed critical issue with data processing"
+```
+
+:::info Legacy control planes
+
+If the project's control plane predates the addition of changelog functionality, the build will still be applied but
+without the changelog content.
+
+:::
+
+This automatically generates and publishes the changelog entry with your content, making it immediately visible to all
+project members.
+
+## Changelog States
+
+Changelog entries can exist in two states:
+
+### Draft State
+
+- Automatically created when you apply a build
+- Only visible to project administrators
+- Can be edited and modified before publishing
+- Allows you to refine the content and add context
+
+### Published State
+
+- Visible to all project members from the `Changelog` tab of the `Builds` page
+- Provides transparency about project changes
+- Helps team members understand what changed and when
+
+## Getting Started
+
+### New Entries
+
+To start using the changelog feature:
+
+1. Ensure you're working with a PromptQL-enabled project
+2. Update to the latest CLI version that supports changelog commands
+3. Create and apply builds as usual - draft changelog entries will be automatically generated
+4. Use `ddn changelog list` to view existing entries
+5. Edit and publish changelog entries as needed
+
+### Backfilling Entries {#backfilling-entries}
+
+If your project existed before the addition of this feature, you have a catalog of unpublished and unversioned entries
+for each applied build. You can use the `ddn changelog add` command to assign a version number to an entry and publish
+it for historical context.
+
+As an example, let's say a build was applied on 20 April, 2025 with build version `459514642a`. A historical changelog
+entry could be generated for it like this:
+
+```ddn
+ddn changelog add 459514642a --version-number v2025.04.20
+```
+
+## Best Practices
+
+### Writing Effective Changelog Entries
+
+- **Use clear, descriptive headings** to categorize changes (e.g., "New Features", "Performance Improvements", "Bug
+  Fixes") as `##` second-level headings
+- **Be specific about changes** - mention what was added, changed, or fixed
+- **Consider your audience** - write for primarily non-technical team members
+- **Include impact information** - explain how changes affect users or workflows
+
+### Organizing Changelog Content
+
+- Group related changes under appropriate headings
+- Use bullet points for easy scanning
+- Keep entries concise but informative
+- Include relevant context when necessary
