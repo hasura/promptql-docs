@@ -52,6 +52,11 @@ a server restart, an automation might run more than once at approximately its sc
 Because of the "at least once" policy it is recommended to design scheduled automations with the assumption that they
 will, on rare occasions, run multiple times in rapid succession.
 
+## Current Limitations
+
+The timezone setting for schedules does not currently have any effect - all schedules run according to UTC time. This is
+planned to change in the near future.
+
 ## Base URL
 
 Schedule endpoints use the following base URL:
