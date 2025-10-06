@@ -1,7 +1,7 @@
 ---
 sidebar_position: 6
 sidebar_label: Schedules API
-description: "Learn how to create and manage scheduled automations and recurring tasks."
+description: "Learn how to create and manage scheduled automations."
 keywords:
   - hasura ddn
   - schedules
@@ -18,9 +18,9 @@ import TabItem from "@theme/TabItem";
 
 ## Introduction
 
-The Schedules API allows you to create and manage scheduled executions of automations and other recurring tasks. This
-API enables you to set up automated workflows that run at specific times or intervals, perfect for data processing
-pipelines, report generation, and other time-based operations.
+The Schedules API allows you to create and manage scheduled executions of saved automation artifacts. This API enables
+you to set up automated workflows that run at specific times or intervals, perfect for data processing pipelines, report
+generation, and other time-based operations.
 
 :::info To enable schedules you must enable the flag in metadata
 
@@ -34,15 +34,29 @@ definition:
     enable_scheduled_automations: true
 ```
 
-Additionally, while you can currently _schedule_ automations, you cannot yet _run_ them. This feature is coming soon.
-
 :::
+
+## Automations vs Saved Automation Artifacts
+
+Automations will soon be replaced by saved artifacts, which generalize over the concepts of automations, table data, and
+other saved data. Because of that pending change instead of applying to automations, schedules are created for saved
+artifacts that have the `automation` artifact type. This means that automations must be migrated to saved artifacts
+before they can be scheduled.
+
+## Run Policy
+
+Schedules run on an "at least once" policy. That means that in unusual cases, like when an automation is interrupted by
+a server restart, an automation might run more than once at approximately its scheduled time. People usually want
+"exactly once", but in practice that isn't possible. You can have either "at least once" or "at most once".
+
+Because of the "at least once" policy it is recommended to design scheduled automations with the assumption that they
+will, on rare occasions, run multiple times in rapid succession.
 
 ## Base URL
 
 Schedule endpoints use the following base URL:
 
-`https://promptql.ddn.hasura.app/schedules`
+`https://promptql.ddn.hasura.app/schedules/v1`
 
 :::note Private DDN Endpoint
 
@@ -56,6 +70,17 @@ by the control plane. For example:
 :::
 
 ## Authentication
+
+There are authentication considerations for scheduled automations: 
+
+1. Authentication for creating schedules, and other API operations described in this document.
+2. Authentication for running automations at scheduled times.
+
+Authentication for API operations is generally accomplished using bearer JWTs, which are often short-lived. On the other
+hand, once a schedule is created it is expected to successfully run its automation long after such a JWT would expire.
+So authentication to be used at automation run time is separated from authentication for API access.
+
+### Authentication for Schedule API Endpoints
 
 Schedule endpoints require JWT authentication for all operations:
 
@@ -71,53 +96,79 @@ For information on obtaining JWT tokens, see the
 
 :::
 
+### Authentication for Scheduled Automations
+
+Check the `AuthConfig` in your `promptql-config.hml` file. If its mode is set to `noAuth` then no action is required.
+
+If your project is **not** configured with `noAuth` then you will likely need special configuration for schedules.
+Because schedules are expected to operate for an indefinite period they require a long-lived authentication key.
+
+Create an additional `AuthConfig` block that uses the `webhook` mode. See [AuthConfig webhook
+documentation](/reference/metadata-reference/auth-config/#webhook). Provide details for a webhook that accepts
+a long-lived API key via an HTTP request header. This may be a key that maps to a less-privileged service account - as
+long as the account has sufficient permissions to access resources required for your scheduled automations.
+
+When creating schedules include HTTP header name and value with the API key in the `ddn_headers` field of the create API
+call. The header will be securely stored in the PromptQL data plane for your project. The header **cannot** be read
+through schedule API requests - it is write-only. The header can be set to a different value in update API requests, or
+it can be removed.
+
 ## List Schedules
 
 Retrieve all schedules for your project.
 
-`GET /schedules`
+`GET /schedules/v1`
 
 ### Response
+
+`200 OK`
 
 ```json
 [
   {
-    "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "artifact_id": "5d7ea082-840f-4973-8e80-5bfced8dbdfa",
+    "thread_id": "0017d28f-89f4-49b6-a39e-8064b46a6e60",
     "name": "Daily Report Generation",
     "description": "Generate daily analytics report",
     "cron_expression": "0 9 * * *",
-    "automation_name": "generate_daily_report",
-    "enabled": true,
+    "timezone": "America/Los_Angeles",
+    "is_active": true,
+    "input_preset": [{
+      "report_type": "daily",
+      "include_charts": true
+    }],
     "created_at": "2024-01-15T10:30:00Z",
-    "updated_at": "2024-01-15T10:30:00Z",
-    "next_run": "2024-01-16T09:00:00Z",
-    "last_run": "2024-01-15T09:00:00Z",
-    "last_run_status": "success"
+    "updated_at": "2024-01-15T10:30:00Z"
   }
 ]
 ```
 
 ### Response Fields
 
-| Field             | Type    | Description                                    |
-| ----------------- | ------- | ---------------------------------------------- |
-| `schedule_id`     | string  | Unique identifier for the schedule             |
-| `name`            | string  | Human-readable name for the schedule           |
-| `description`     | string  | Optional description of what the schedule does |
-| `cron_expression` | string  | Cron expression defining when to run           |
-| `automation_name` | string  | Name of the automation to execute              |
-| `enabled`         | boolean | Whether the schedule is currently active       |
-| `created_at`      | string  | ISO 8601 timestamp of creation                 |
-| `updated_at`      | string  | ISO 8601 timestamp of last update              |
-| `next_run`        | string  | ISO 8601 timestamp of next scheduled run       |
-| `last_run`        | string  | ISO 8601 timestamp of last execution           |
-| `last_run_status` | string  | Status of the last execution                   |
+| Field             | Type      | Nullable | Description                                                          |
+| ----------------- | -------   | -------- | -------------------------------------------------------------------- |
+| `id`              | UUID      | No       | Unique identifier for the schedule                                   |
+| `artifact_id`     | UUID      | No       | ID of the saved automation artifact to run                           |
+| `thread_id`       | UUID      | Yes      | ID of the chat thread where the schedule was created                 |
+| `name`            | string    | No       | Human-readable name for the schedule                                 |
+| `description`     | string    | Yes      | Optional description of what the schedule does                       |
+| `cron_expression` | string    | No       | Cron expression defining when to run                                 |
+| `timezone`        | string    | No       | Time zone which determines run times, IANA Time Zone Database format |
+| `is_active`       | boolean   | No       | Whether the schedule is currently active                             |
+| `input_preset`    | TableData | Yes      | Input data that may be read by the automation                        |
+| `created_at`      | timestamp | No       | ISO 8601 timestamp of creation                                       |
+| `updated_at`      | timestamp | No       | ISO 8601 timestamp of last update                                    |
+
+
+`TableData` is an array of objects representing tabular data. The intention is that the same set of property names
+should be repeated in each object in the array.
 
 ## Create Schedule
 
 Create a new scheduled task.
 
-`POST /schedules`
+`POST /schedules/v1`
 
 ### Request Body
 
@@ -126,25 +177,35 @@ Create a new scheduled task.
   "name": "Daily Report Generation",
   "description": "Generate daily analytics report at 9 AM",
   "cron_expression": "0 9 * * *",
-  "automation_name": "generate_daily_report",
-  "enabled": true,
-  "input_data": {
+  "timezone": "America/Los_Angeles",
+  "artifact_id": "5d7ea082-840f-4973-8e80-5bfced8dbdfa",
+  "is_active": true,
+  "input_preset": [{
     "report_type": "daily",
     "include_charts": true
-  }
+  }],
+  "ddn_headers": { "Authorization": "Bearer TWFuIGlzIGR..." }
 }
 ```
 
 ### Request Fields
 
-| Field             | Type    | Required | Description                                           |
-| ----------------- | ------- | -------- | ----------------------------------------------------- |
-| `name`            | string  | Yes      | Human-readable name for the schedule                  |
-| `description`     | string  | No       | Optional description of what the schedule does        |
-| `cron_expression` | string  | Yes      | Cron expression defining when to run                  |
-| `automation_name` | string  | Yes      | Name of the automation to execute                     |
-| `enabled`         | boolean | No       | Whether the schedule should be active (default: true) |
-| `input_data`      | object  | No       | Optional input data to pass to the automation         |
+| Field             | Type      | Required | Description                                                              |
+| ----------------- | -------   | -------- | ------------------------------------------------------------------------ |
+| `name`            | string    | Yes      | Human-readable name for the schedule                                     |
+| `description`     | string    | No       | Optional description of what the schedule does                           |
+| `cron_expression` | string    | Yes      | Cron expression defining when to run                                     |
+| `timezone`        | string    | Yes      | Time zone which determines run times, IANA Time Zone Database format     |
+| `artifact_id`     | string    | Yes      | ID of the saved automation artifact to run                               |
+| `is_active`       | boolean   | No       | Whether the schedule should be active (default: true)                    |
+| `input_data`      | TableData | No       | Optional input data to pass to the automation                            |
+| `ddn_headers`     | object    | No       | Optional HTTP headers to be used for authentication when automation runs |
+
+
+`TableData` is an array of objects representing tabular data. The intention is that the same set of property names
+should be repeated in each object in the array.
+
+`ddn_headers` is an object with string values. See the Authentication section above.
 
 ### Cron Expression Format
 
@@ -169,31 +230,37 @@ The cron expression follows the standard 5-field format:
 
 ### Response
 
+`201 Created`
+
 ```json
 {
-  "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
   "name": "Daily Report Generation",
   "description": "Generate daily analytics report at 9 AM",
   "cron_expression": "0 9 * * *",
-  "automation_name": "generate_daily_report",
-  "enabled": true,
+  "timezone": "America/Los_Angeles",
+  "artifact_id": "5d7ea082-840f-4973-8e80-5bfced8dbdfa",
+  "is_active": true,
+  "input_preset": [{
+    "report_type": "daily",
+    "include_charts": true
+  }],
   "created_at": "2024-01-15T10:30:00Z",
   "updated_at": "2024-01-15T10:30:00Z",
-  "next_run": "2024-01-16T09:00:00Z"
 }
 ```
 
 ### Error Responses
 
-- `400 Bad Request` - Invalid cron expression or automation name
-- `404 Not Found` - Referenced automation does not exist
+- `403 Forbidden` - Authorization failure
+- `404 Not Found` - Referenced saved artifact does not exist
 - `422 Unprocessable Entity` - Validation errors in request body
 
 ## Get Schedule
 
 Retrieve a specific schedule by its ID.
 
-`GET /schedules/{schedule_id}`
+`GET /schedules/v1/{schedule_id}`
 
 ### Path Parameters
 
@@ -203,35 +270,23 @@ Retrieve a specific schedule by its ID.
 
 ### Response
 
+`200 OK`
+
 ```json
 {
-  "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+  "id": "123e4567-e89b-12d3-a456-426614174000",
   "name": "Daily Report Generation",
   "description": "Generate daily analytics report at 9 AM",
   "cron_expression": "0 9 * * *",
-  "automation_name": "generate_daily_report",
-  "enabled": true,
-  "created_at": "2024-01-15T10:30:00Z",
-  "updated_at": "2024-01-15T10:30:00Z",
-  "next_run": "2024-01-16T09:00:00Z",
-  "last_run": "2024-01-15T09:00:00Z",
-  "last_run_status": "success",
-  "input_data": {
+  "timezone": "America/Los_Angeles",
+  "artifact_id": "5d7ea082-840f-4973-8e80-5bfced8dbdfa",
+  "is_active": true,
+  "input_preset": [{
     "report_type": "daily",
     "include_charts": true
-  },
-  "execution_history": [
-    {
-      "execution_id": "exec-uuid-1",
-      "started_at": "2024-01-15T09:00:00Z",
-      "completed_at": "2024-01-15T09:02:30Z",
-      "status": "success",
-      "output": {
-        "report_generated": true,
-        "records_processed": 1250
-      }
-    }
-  ]
+  }],
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
 }
 ```
 
@@ -239,3 +294,166 @@ Retrieve a specific schedule by its ID.
 
 - `404 Not Found` - Schedule not found or access denied
 - `422 Unprocessable Entity` - Invalid schedule ID format
+
+## Get Schedule Execution History
+
+Retrieve records of scheduled runs with status and logs in reverse date order.
+
+`GET /schedules/v1/{schedule_id}/runs?since=2024-01-15T10:30:00Z&limit=100`
+
+### Path Parameters
+
+| Parameter     | Type   | Required | Description                      |
+| ------------- | ------ | -------- | -------------------------------- |
+| `schedule_id` | string | Yes      | UUID of the schedule to retrieve |
+| `since` | timestamp | No | Fetch records created on or after this time (default: all records) |
+| `limit` | integer | No | Limit number of records to fetch (default: no limit) |
+
+### Response
+
+`200 OK`
+
+```json
+[
+  {
+    "id": "20238fa4-6243-4603-9ea9-bdd08ab8aabe",
+    "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+    "output": {
+      "artifact_type": "table",
+      "data": [
+        { "page": "A", "viewCount": 123000 },
+        { "page": "B", "viewCount": 7 }
+      ]
+    },
+    "logs": "Successfully wrote analytics data to artifact, output",
+    "llm_usage": [{
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "input_tokens": 7588,
+      "output_tokens": 2233,
+      "cached_tokens": 0,
+      "context_window_limit": 0
+    }],
+    "execution_time_ms": 3124,
+    "error": null,
+    "status": "completed",
+    "created_at": "2024-01-15T10:30:00Z"
+  }
+]
+```
+
+### Response Fields
+
+| Field               | Type      | Nullable | Description                                                          |
+| ------------------- | -------   | -------- | -------------------------------------------------------------------- |
+| `id`                | UUID      | No       | Unique identifier for the run record                                 |
+| `schedule_id`       | UUID      | No       | ID of the schedule that was run                                      |
+| `output`            | Artifact  | Yes      | Output data produced by the automation, if any                       |
+| `logs`              | string    | No       | Program output, such as from print statements                        |
+| `llm_usage`         | object    | Yes      | AI usage details, if any - many automations do not may any AI calls  |
+| `execution_time_ms` | integer   | No       | Total wall clock time spent runnning automation                      |
+| `error`             | string    | Yes      | Error message, if any                                                |
+| `status`            | string    | No       | Possible values are `completed` and `executed_with_error`            |
+| `created_at`        | timestamp | No       | ISO 8601 timestamp of creation                                       |
+
+## Test Schedule Now
+
+Run saved automation artifact immediately using configuration stored in schedule, and record result in run history
+
+`POST /schedules/v1/{schedule_id}/runs`
+
+### Request Body
+
+```json
+{}
+```
+
+Request body must be a JSON object. The object should not have any fields.
+
+### Response
+
+`201 Created`
+
+```json
+{
+  "id": "20238fa4-6243-4603-9ea9-bdd08ab8aabe",
+  "schedule_id": "123e4567-e89b-12d3-a456-426614174000",
+  "output": {
+    "artifact_type": "table",
+    "data": [
+      { "page": "A", "viewCount": 123000 },
+      { "page": "B", "viewCount": 7 }
+    ]
+  },
+  "logs": "Successfully wrote analytics data to artifact, output",
+  "llm_usage": [{
+    "provider": "anthropic",
+    "model": "claude-3-5-sonnet-20241022",
+    "input_tokens": 7588,
+    "output_tokens": 2233,
+    "cached_tokens": 0,
+    "context_window_limit": 0
+  }],
+  "execution_time_ms": 3124,
+  "error": null,
+  "status": "completed",
+  "created_at": "2024-01-15T10:30:00Z"
+}
+```
+
+### Error Responses
+
+- `403 Forbidden` - Authorization failure
+- `404 Not Found` - Referenced schedule does not exist
+- `422 Unprocessable Entity` - Validation errors in request body
+
+## Update Schedule
+
+Modify, disable, or enable a schedule.
+
+`PATCH /schedules/v1/{schedule_id}`
+
+### Request Body
+
+| Field             | Type      | Required | Description                                                              |
+| ----------------- | -------   | -------- | ------------------------------------------------------------------------ |
+| `name`            | string    | No       | Human-readable name for the schedule                                     |
+| `description`     | string    | No       | Optional description of what the schedule does                           |
+| `cron_expression` | string    | No       | Cron expression defining when to run                                     |
+| `timezone`        | string    | No       | Time zone which determines run times, IANA Time Zone Database format     |
+| `artifact_id`     | string    | No       | ID of the saved automation artifact to run                               |
+| `is_active`       | boolean   | No       | Whether the schedule should be active (default: true)                    |
+| `input_data`      | TableData | No       | Optional input data to pass to the automation                            |
+| `ddn_headers`     | object    | No       | Optional HTTP headers to be used for authentication when automation runs |
+
+Providing an explicit `null` value for any field will update the schedule to set that value to `null`.
+
+Any fields that are omitted from the request body will remain unchanged.
+
+### Response
+
+`200 OK`
+
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "name": "Daily Report Generation",
+  "description": "Generate daily analytics report at 9 AM",
+  "cron_expression": "0 9 * * *",
+  "timezone": "America/Los_Angeles",
+  "artifact_id": "5d7ea082-840f-4973-8e80-5bfced8dbdfa",
+  "is_active": true,
+  "input_preset": [{
+    "report_type": "daily",
+    "include_charts": true
+  }],
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z",
+}
+```
+
+### Error Responses
+
+- `403 Forbidden` - Authorization failure
+- `404 Not Found` - Referenced schedule, or referenced saved artifact does not exist
+- `422 Unprocessable Entity` - Validation errors in request body
