@@ -178,21 +178,21 @@ jobs:
                 echo "$REQUEST_PAYLOAD"
                 echo ""
                 
-                curl -X POST "https://docs-bot.ddn.pro.hasura.io/promptql/automations/v1/insert_new_page/run" \
+                curl -X POST "https://docsql.agents-hasura.private-ddn.hasura.app/promptql/automations/v1/insert_new_page/run" \
                   -H "Content-Type: application/json" \
                   -H "authorization: api-key $PROMPTQL_API_KEY" \
                   -d "$REQUEST_PAYLOAD"
                 ;;
               "M")
                 echo "Updating existing page: $page_url"
-                curl -X POST "https://docs-bot.ddn.pro.hasura.io/promptql/automations/v1/update_page/run" \
+                curl -X POST "https://docsql.agents-hasura.private-ddn.hasura.app/promptql/automations/v1/update_page/run" \
                   -H "Content-Type: application/json" \
                   -H "authorization: api-key $PROMPTQL_API_KEY" \
                   -d "{\"input\": [$(cat /tmp/payload.json)], \"ddn_headers\": {\"authorization\": \"Bearer $PQL_BOT_ADMIN_JWT\"}}"
                 ;;
               "D")
                 echo "Deleting page: $page_url"
-                curl -X POST "https://docs-bot.ddn.pro.hasura.io/promptql/automations/v1/delete_page/run" \
+                curl -X POST "https://docsql.agents-hasura.private-ddn.hasura.app/promptql/automations/v1/delete_page/run" \
                   -H "Content-Type: application/json" \
                   -H "authorization: api-key $PROMPTQL_API_KEY" \
                   -d "{\"input\": [{\"page_url\": \"$page_url\"}], \"ddn_headers\": {\"authorization\": \"Bearer $PQL_BOT_ADMIN_JWT\"}}"
