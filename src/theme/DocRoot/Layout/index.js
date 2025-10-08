@@ -85,6 +85,18 @@ export default function DocRootLayout({ children }) {
         )}
         <DocRootLayoutMain hiddenSidebarContainer={hiddenSidebarContainer}>{children}</DocRootLayoutMain>
       </div>
+        <BrowserOnly>
+          {() => {
+            const PromptQLChatComponent = React.lazy(() =>
+              import("promptql-chat-sdk").then(module => ({ default: module.PromptQLChat }))
+            );
+            return (
+              <React.Suspense fallback={<div>Loading chat...</div>}>
+                <PromptQLChatComponent endpoint="https://docsql-proxy-710071984479.us-west2.run.app" themeMode={colorMode} title='DocsQL' primaryColor='var(--chat-user-bg)' codeExecutionIndicatorText='🧠 DocsQL is thinking...' welcomeMessage='DocsQL is here to help!'/>
+              </React.Suspense>
+            );
+          }}
+        </BrowserOnly>
     </div>
   );
 }
