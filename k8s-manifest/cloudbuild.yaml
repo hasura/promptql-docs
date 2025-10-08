@@ -1,17 +1,13 @@
 #for building image
 steps:
   #update image tag
-  - name: 'gcr.io/kaniko-project/executor:latest'
-    id: kaniko
-    args:
-      [
-        '--dockerfile=./Dockerfile',
-        '--context=dir:///workspace/.',
-        '--cache=true',
-        '--cache-ttl=24h',
-        '--build-arg=RELEASE_MODE=${_RELEASE_MODE}',
-        '--destination=us-west1-docker.pkg.dev/${PROJECT_ID}/promptql-docs/promptql-docs:${SHORT_SHA}',
-      ]
+  - name: 'gcr.io/cloud-builders/docker'
+    id: docker-build
+    script: |
+      docker build -t us-west1-docker.pkg.dev/${PROJECT_ID}/promptql-docs/promptql-docs:${SHORT_SHA} \
+        --build-arg RELEASE_MODE=${_RELEASE_MODE} \
+        .
+    automapSubstitutions: true
 
   #change in Deployment file
   - name: 'gcr.io/cloud-builders/gcloud'
@@ -41,6 +37,8 @@ steps:
       - 'CLOUDSDK_COMPUTE_REGION=${_REGION}'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_CLUSTERNAME}'
 
+images:
+- 'us-west1-docker.pkg.dev/${PROJECT_ID}/promptql-docs/promptql-docs:${SHORT_SHA}'
 timeout: 3600s
 substitutions:
   _REGION: us-west2
