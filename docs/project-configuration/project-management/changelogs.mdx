@@ -10,6 +10,8 @@ keywords:
   - versioning
 ---
 
+import Thumbnail from "@site/src/components/Thumbnail";
+
 # Managing Project Changelogs
 
 ## Overview
@@ -65,6 +67,10 @@ You can view all changelog entries using the changelog command:
 ddn changelog list
 ```
 
+Or using the console's `Builds` page under the `Changelog` tab:
+
+<Thumbnail src="/img/promptql-playground/changelog-list.png" alt="View all changelog entries" width="1000" />
+
 #### Editing Draft Entries
 
 Once you have a draft changelog entry, you can edit it using markdown formatting. This allows you to add detailed
@@ -85,16 +91,12 @@ You can edit changelog entries using the CLI:
 ddn changelog edit v2025.09.26
 ```
 
-:::info Edit from the console
+As a project admin, you can also edit these entries from the console:
 
-As a project admin, you can also edit these entries from the console. Navigate to the `Builds` page and see all
-available entries from the `Changelog` tab. Non-admin users who navigate here can only see published entries and are
-unable to edit them.
-
-:::
+<Thumbnail src="/img/promptql-playground/changelog-edit.png" alt="Edit a changeloge entry" width="1000" />
 
 When you publish an entry, it becomes visible to everyone in the project, providing transparency about what changes were
-made.
+made. Non-admin users who navigate here can only see published entries and are unable to edit them.
 
 ### Publishing Changelog Entries Directly
 
