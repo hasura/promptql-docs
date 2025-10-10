@@ -1,0 +1,61 @@
+---
+sidebar_position: 5
+sidebar_label: Private vs Public
+description: Learn how to choose between private and public applications with PromptQL.
+keywords:
+  - private
+  - public
+  - api
+  - authentication
+  - authorization
+---
+
+# Private vs Public
+
+You can choose to make your PromptQL application public or private.
+
+## Private
+
+A `private` PromptQL project is only accessible to collaborators on your project.
+
+Requests to a private application must include a special reserved header `x-hasura-ddn-token` with a valid JWT token
+which the console generates and regenerates every hour. Currently this token is only available in the console.
+
+If a `private` application is also set to JWT or Webhook mode, rather than `noAuth` mode, queries must **also** include
+the JWT or webhook authentication values to be successful in addition to the `x-hasura-ddn-token` header.
+
+## Public
+
+A public PromptQL project is accessible to everyone.
+
+If a `public` application is also set to JWT or Webhook mode, rather than `noAuth` mode, queries must include the JWT or
+webhook authentication values to be successful.
+
+Requests to a public application do not require the `x-hasura-ddn-token` header.
+
+:::danger Public projects with noAuth mode
+
+If set to `public` with `noAuth` mode, queries do not require any authentication and the application is fully public.
+
+:::
+
+## Changing the mode
+
+### DDN CLI
+
+Set to `private` mode:
+
+```bash
+ddn project set-api-access-mode private
+```
+
+Set to `public` mode:
+
+```bash
+ddn project set-api-access-mode public
+```
+
+### PromptQL Console
+
+Click on the `Settings` gear icon in the bottom left of the sidebar navigation and then the `Summary` tab to access the
+API access mode toggle.
