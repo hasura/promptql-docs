@@ -47,7 +47,7 @@ Prism.languages.ddn = {
   subcommand: {
     // List all known subcommand parts from filenames + common ones
     pattern:
-      /\b(?:project|command|connector|connector-link|model|relationship|subgraph|supergraph|auth|codemod|completion|console|context|help|plugins|run|update-cli|version|init|add|list|remove|show|update|bash|fish|powershell|zsh|generate-promptql-secret-key|login|upgrade-context-v2-to-v3|upgrade-graphqlconfig-aggregate|upgrade-graphqlconfig-subscriptions|upgrade-model-v1-to-v2|upgrade-object-boolean-expression-types|upgrade-project-config-v2-to-v3|upgrade-supergraph-config-v1-to-v2|create-context|get-context|get-current-context|get|set-current-context|set|unset|doctor|build|delete|diff|local|set-self-hosted-engine-url|prune|apply|create|env|introspect|plugin|setenv|show-resources|add-resources|install|uninstall|upgrade|set-api-access-mode|logs)\b/,
+      /\b(?:project|command|connector|connector-link|model|relationship|subgraph|supergraph|auth|codemod|changelog|completion|console|context|help|plugins|run|update-cli|version|init|add|list|remove|show|update|bash|fish|powershell|zsh|generate-promptql-secret-key|login|upgrade-context-v2-to-v3|upgrade-graphqlconfig-aggregate|upgrade-graphqlconfig-subscriptions|upgrade-model-v1-to-v2|upgrade-object-boolean-expression-types|upgrade-project-config-v2-to-v3|upgrade-supergraph-config-v1-to-v2|create-context|get-context|get-current-context|get|set-current-context|set|unset|doctor|build|delete|diff|local|set-self-hosted-engine-url|prune|apply|create|env|introspect|plugin|setenv|show-resources|add-resources|install|uninstall|upgrade|set-api-access-mode|logs)\b/,
     alias: 'function',
   },
   // General argument should be last
