@@ -27,14 +27,14 @@ confirmation workflows.
 
 Thread endpoints use the following base URL:
 
-`https://promptql.ddn.hasura.app/`
+`https://promptql.ddn.hasura.app/playground`
 
 :::note Private DDN Endpoint
 
 For Private DDN setups the endpoint will change to use the fully qualified domain name (FQDN) for the project assigned
 by the control plane. For example:
 
-`https://promptql.<FQDN>/`
+`https://promptql.<FQDN>/playground`
 
 **You can find your API endpoint in the project's settings under `PromptQL API Endpoint`.**
 
@@ -64,7 +64,7 @@ Content-Type: application/json
 These endpoints access shared project resources and accept PromptQL API keys:
 
 ```
-Authorization: Bearer <your-promptql-api-key>
+Authorization: api-key <your-promptql-api-key>
 Content-Type: application/json
 ```
 
@@ -73,7 +73,7 @@ Content-Type: application/json
 - Thread reading (`/threads/{thread_id}`, `/api-threads/{thread_id}`) when using API key
 - Thread listing (`/threads`, `/api-threads`)
 - Thread evaluation (`/threads/{thread_id}/evaluate`)
-- Thread feedback (`/threads/{thread_id}/feedback`)
+- Thread feedback (`/threads/{thread_id}/feedback, /projects/{project_id}/feedbacks`)
 
 :::info Getting JWT Tokens
 
@@ -819,6 +819,54 @@ Retrieve feedback for a thread or specific interaction.
       "action_id": "action-uuid",
       "detail": "The response was very helpful and accurate",
       "created_at": "2024-01-15T10:30:00Z"
+    }
+  ]
+}
+```
+
+### Get Thread Feedback List
+
+Retrieve list of thread feedbacks for a project with date range filtering.
+
+`GET /projects/{project_id}/feedbacks`
+
+#### Path Parameters
+
+| Parameter   | Type   | Required | Description                            |
+| ----------- | ------ | -------- | -------------------------------------- |
+| `project_id` | string | Yes      | UUID of the project to get feedbacks for |
+
+#### Query Parameters
+
+| Parameter         | Type     | Required | Description                                     |
+| ----------------- | -------- | -------- | ----------------------------------------------- |
+| `from_created_at` | datetime | No       | Filter feedbacks created after this timestamp   |
+| `to_created_at`   | datetime | No       | Filter feedbacks created before this timestamp  |
+
+#### Response
+
+This is a map of thread IDs to list of feedbacks if present.
+
+```json
+{
+  "123e4567-e89b-12d3-a456-426614174000": [
+    {
+      "thread_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "user_id": "11111111-2222-3333-4444-555555555555",
+      "feedback": 1,
+      "interaction_id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+      "detail": "The response was very helpful and accurate",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-10-14T16:45:00.789012Z"
+    },
+    {
+      "thread_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "user_id": "11111111-2222-3333-4444-555555555555",
+      "feedback": -1,
+      "interaction_id": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+      "detail": "The response was not clear",
+      "created_at": "2024-01-15T10:30:00Z",
+      "updated_at": "2024-10-14T16:45:00.789012Z"
     }
   ]
 }
