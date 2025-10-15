@@ -315,6 +315,18 @@ Create a new thread using the v2 API with enhanced features.
 
 `POST /threads/v2/start`
 
+#### Request Body
+
+```json
+{
+  "user_message": "Tell me about my data",
+  "ddn_headers": {
+    "x-hasura-ddn-token": "such token"
+  },
+  "timezone": "Australia/Melbourne"
+}
+```
+
 #### Response
 
 ```json
@@ -336,6 +348,18 @@ Continue an existing thread conversation with enhanced artifact support.
 | Parameter   | Type   | Required | Description                    |
 | ----------- | ------ | -------- | ------------------------------ |
 | `thread_id` | string | Yes      | UUID of the thread to continue |
+
+#### Request Body
+
+```json
+{
+  "user_message": "Tell me about my data",
+  "ddn_headers": {
+    "x-hasura-ddn-token": "such token"
+  },
+  "timezone": "Australia/Melbourne"
+}
+```
 
 #### Response
 
