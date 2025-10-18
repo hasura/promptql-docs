@@ -135,7 +135,7 @@ composite of two key measures:
 
 1. Accuracy: The correctness of the result.
 
-- **Computational accuracy**: The correctness of the result on a task that was possible to solve programmatically
+- **Computational accuracy**: The correctness of the result on a task that can be solved programmatically
 - **Cognitive accuracy**: The correctness of the result on a task needing AI
 
 2. Repeatability: How often is the result the same, across multiple runs of the same prompt.
@@ -164,12 +164,15 @@ $$
 
 Where:
 
-- $\text{CompAcc} (Computational Accuracy)$
-  - A user-assigned score between 0 and 1 indicating how accurately the system handles computational (algorithmic)
-    tasks.
-- $\text{CogAcc} (Cognitive Accuracy)$
-  - A user-assigned score between 0 and 1 indicating the system's accuracy on more interpretive, cognitive tasks.
-- $\text{CompRep} (Computational Repeatability)$
+**$\text{CompAcc}$ (Computational Accuracy)**
+
+A user-assigned score between 0 and 1 indicating how accurately the system handles computational (algorithmic) tasks.
+
+**$\text{CogAcc}$ (Cognitive Accuracy)**
+
+A user-assigned score between 0 and 1 indicating the system's accuracy on more interpretive, cognitive tasks.
+
+**$\text{CompRep}$ (Computational Repeatability)**
 
 $$
 \text{CompRep} = \exp\left(-\alpha_C (1 - C)\right)
@@ -179,7 +182,7 @@ This transforms the raw computational repeatability measure (C, ranging from 0 t
 higher αC means that any deviation from perfect computational repeatability (C=1) is penalized more severely. In plain
 English: This score heavily rewards systems that deliver the same computational results every time.
 
-- $\text{CogRep} (Cognitive Repeatability)$
+**$\text{CogRep}$ (Cognitive Repeatability)**
 
 $$
 \text{CogRep} = \exp\left(-\alpha_K (1 - K)\right)
@@ -190,7 +193,7 @@ controls how harshly deviations from perfect repeatability are penalized for cog
 measures how consistently the system provides similar cognitive outputs across multiple runs, typically allowing for a
 bit more variation than computational tasks if α<sub>K</sub> is smaller than α<sub>C</sub>.
 
-- $\text{w}$
+**$\text{w}$**
 
 A weighting factor between 0 and 1 that determines the relative importance of computational versus cognitive factors in
 both accuracy and repeatability.
