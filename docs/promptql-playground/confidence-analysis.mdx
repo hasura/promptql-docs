@@ -1,0 +1,233 @@
+---
+sidebar_position: 7
+sidebar_label: Confidence Analysis
+description: "Learn how to enable and use confidence analysis for AI-powered fact-checking in PromptQL."
+keywords:
+  - hasura ddn
+  - playground
+  - confidence analysis
+  - fact-checking
+  - assumptions
+  - reliability
+  - lab features
+---
+
+import Thumbnail from "@site/src/components/Thumbnail";
+
+# Confidence Analysis
+
+## Introduction
+
+Confidence Analysis is an AI-powered feature that provides fact-checking and assumption validation for PromptQL responses. When enabled, it analyzes the assumptions made in generated artifacts (tables and text) and validates them against your available data and provided context.
+
+This feature helps you:
+
+- **Understand assumptions**: See what assumptions PromptQL made when generating results
+- **Validate accuracy**: Check which assumptions are supported by your data
+- **Build trust**: Make informed decisions based on confidence levels
+- **Identify gaps**: Find areas where additional context or data might be needed
+
+## Enabling confidence analysis
+
+Confidence Analysis is a lab feature that needs to be enabled in your PromptQL Playground settings.
+
+### Step 1: Access settings
+
+1. Navigate to your PromptQL project in the console
+2. Click the **Settings** icon in the left sidebar
+3. Select **PromptQL** from the settings menu
+4. Click on **Lab Features**
+
+### Step 2: Enable the feature
+
+1. Find **"Show confidence analysis to the user for each interaction when available"** in the list of lab features
+2. Toggle the switch to **ON**
+3. The feature is now enabled for all new and existing conversations in this project
+
+:::info Lab features
+Lab features are experimental capabilities that you can enable to access cutting-edge functionality. These features are actively developed and may evolve based on user feedback.
+:::
+
+## Using confidence analysis
+
+Once enabled, confidence analysis automatically runs for each PromptQL interaction that generates artifacts.
+
+### Viewing the analysis
+
+After PromptQL completes a response that includes table or text artifacts, you'll see a confidence analysis icon appear next to the response.
+
+1. **Look for the icon**: A small confidence analysis indicator appears after the response completes
+2. **Hover to view**: Hover over the icon to open the confidence analysis panel
+3. **Review the details**: The panel shows a comprehensive breakdown of assumptions and fact-checks
+
+### Understanding the analysis panel
+
+The confidence analysis panel contains several sections:
+
+#### Summary statistics
+
+At the top of the panel, you'll see:
+
+- **Fact-supported count**: Number of assumptions backed by data
+- **Not fact-supported count**: Number of assumptions lacking direct data support
+
+These counts give you a quick overview of the reliability of the response.
+
+#### Artifact-level analysis
+
+The panel breaks down the analysis by artifact (each table or text output):
+
+- **Artifact name**: The identifier of the analyzed artifact
+- **Assumptions list**: All assumptions made for that specific artifact
+
+#### Individual assumption details
+
+Each assumption can be expanded to show:
+
+- **Assumption text**: The specific assumption made by PromptQL
+- **Fact-check category**: Color-coded category (see below)
+- **Explanation**: Detailed reasoning for the fact-check result
+- **Supporting facts**: Relevant data from your database (when available)
+- **User context**: Context you provided that informed the assumption (when available)
+
+## Fact-check categories
+
+Confidence Analysis classifies each assumption into one of four categories:
+
+### Fact Supported (Green)
+
+**Meaning**: The assumption is directly backed by data in your database.
+
+**Example**: "The user with ID 123 has the email 'user@example.com'" when this data exists in your users table.
+
+**What to do**: These assumptions are reliable and can be trusted for decision-making.
+
+### Partially Supported (Yellow)
+
+**Meaning**: Some evidence exists in your data to support the assumption, but it's incomplete or indirect.
+
+**Example**: "Most users prefer email notifications" when only partial notification preference data exists.
+
+**What to do**: Verify the assumption with additional queries or context if critical for your use case.
+
+### Reasonable Assumption (Yellow)
+
+**Meaning**: The assumption is logical based on common patterns or conventions, but isn't directly verified by your data.
+
+**Example**: "Weeks start on Monday" when not explicitly defined in your data model.
+
+**What to do**: Confirm these assumptions align with your business logic. You can provide explicit context in future queries if they don't.
+
+### Not Supported (Orange)
+
+**Meaning**: The assumption lacks supporting data or contradicts available information.
+
+**Example**: "The product category 'Electronics' exists" when your database has no such category.
+
+**What to do**: Review these carefully. Consider providing additional context or checking if the query needs refinement.
+
+## Best practices
+
+### When to pay attention to confidence analysis
+
+- **Critical business decisions**: Always review confidence analysis for queries that inform important decisions
+- **Data integrity concerns**: Check assumptions when data quality or completeness is uncertain
+- **New data sources**: Pay extra attention when working with newly connected databases
+- **Complex queries**: Multi-step or cross-table queries benefit most from confidence validation
+
+### Improving confidence scores
+
+You can improve the accuracy of confidence analysis by:
+
+1. **Provide context**: Include relevant business rules and conventions in your queries
+   - Example: "Our fiscal year starts in April" or "We use ISO 8601 date formats"
+
+2. **Be specific**: Clear, specific questions lead to better-supported assumptions
+   - Instead of: "Show me sales data"
+   - Try: "Show me sales from the 'orders' table for Q4 2024"
+
+3. **Validate data models**: Ensure your data models accurately reflect your business domain
+   - Use clear table and column names
+   - Define relationships between tables
+   - Document data conventions in your project README
+
+4. **Iterative refinement**: Use confidence analysis feedback to refine your queries
+   - If assumptions are not supported, rephrase your question
+   - Add explicit constraints based on what the analysis reveals
+
+### Working with shared threads
+
+When you share a thread with others:
+
+- Confidence analysis results are preserved in shared threads
+- Recipients only see confidence analysis if the feature was enabled when the thread was created
+- The analysis provides transparency about the assumptions in shared results
+
+## Limitations
+
+Currently, Confidence Analysis:
+
+- **Analyzes table and text artifacts only**: Visualization artifacts are not yet included
+- **Takes time to compute**: Analysis appears shortly after the response, usually within a few seconds
+- **Requires feature flag**: Must be enabled in lab features to function
+- **Has a 5-minute window**: Analysis stops attempting after 5 minutes from interaction completion
+
+## Troubleshooting
+
+### The confidence analysis icon doesn't appear
+
+**Possible causes:**
+
+1. The feature is not enabled in lab features
+2. The response doesn't contain table or text artifacts
+3. The interaction is older than 5 minutes (for new analysis)
+4. An error occurred during analysis
+
+**Solutions:**
+
+- Verify the feature is enabled in Settings → PromptQL → Lab Features
+- Check that your query produced table or text outputs
+- For older interactions, the analysis may not have been available
+
+### The analysis shows "Loading" indefinitely
+
+**Possible causes:**
+
+1. Network connectivity issues
+2. Backend processing delay
+3. Analysis computation error
+
+**Solutions:**
+
+- Refresh the page and check again
+- If the issue persists after 5 minutes, the analysis may have timed out
+- Try the query again in a new message
+
+### All assumptions show as "Not Supported"
+
+**Possible causes:**
+
+1. Insufficient data in connected databases
+2. Query is too vague or abstract
+3. Data model doesn't match query expectations
+
+**Solutions:**
+
+- Provide more specific queries with explicit table/column references
+- Add business context to your questions
+- Review your data model and ensure relevant data exists
+
+## Related features
+
+- **[Artifacts](/promptql-playground/artifacts.mdx)**: Learn about the types of outputs that confidence analysis evaluates
+- **[Lab Features](/promptql-playground/troubleshooting.mdx)**: Explore other experimental features in PromptQL
+- **[Autograph](/promptql-playground/autograph.mdx)**: Report issues or provide feedback to improve PromptQL
+
+## Next steps
+
+Now that you understand confidence analysis:
+
+1. Enable the feature in your project settings
+2. Run a few queries and review the confidence analysis results
+3. Use the insights to refine your queries and add helpful context
+4. Share your feedback using [@autograph](/promptql-playground/autograph.mdx) to help improve the feature
